@@ -1,0 +1,27 @@
+== D1/D2 generality: identity(K) by task, model and arm (all items, 95% core bootstrap)
+  paint    Qwen2.5-7B-Instruct        P1 +21.43 [+21.16,+21.69]  LETTER +21.51 [+21.26,+21.74]  POST  +2.96 [ +2.83, +3.10]  NONE  +1.21 [ +1.10, +1.31]  BEFORE  +0.32 [ +0.24, +0.40]  P1-NONE +20.22 [+19.88,+20.56]  P1 key share 0.73  -> ok
+  paint    Qwen2.5-14B-Instruct       P1 +40.35 [+39.89,+40.80]  LETTER +35.70 [+35.41,+36.00]  POST  +3.49 [ +3.30, +3.68]  NONE  +0.80 [ +0.74, +0.87]  BEFORE  +0.17 [ +0.11, +0.22]  P1-NONE +39.54 [+39.09,+40.00]  P1 key share 0.90  -> ok
+  paint    Qwen3-8B                   P1 +42.65 [+42.26,+43.04]  LETTER +39.75 [+39.37,+40.11]  POST  +4.95 [ +4.69, +5.22]  NONE  +1.08 [ +0.95, +1.21]  BEFORE  +0.11 [ +0.06, +0.17]  P1-NONE +41.57 [+41.22,+41.92]  P1 key share 0.92  -> ok
+  paint    Mistral-7B-Instruct-v0.3   P1 +16.15 [+15.93,+16.37]  LETTER +16.00 [+15.70,+16.30]  POST  +2.16 [ +1.92, +2.40]  NONE  +0.40 [ +0.34, +0.46]  BEFORE  +0.13 [ +0.08, +0.17]  P1-NONE +15.75 [+15.53,+15.96]  P1 key share 0.86  -> ok
+  paint    OLMo-2-1124-7B-Instruct    P1  +6.48 [ +6.30, +6.67]  LETTER  +7.39 [ +7.23, +7.54]  POST  +0.72 [ +0.61, +0.82]  NONE  +0.14 [ +0.11, +0.18]  BEFORE  -0.12 [ -0.14, -0.09]  P1-NONE  +6.34 [ +6.16, +6.52]  P1 key share 0.47  -> ok
+  schedule Qwen2.5-7B-Instruct        P1 +12.73 [+12.42,+13.04]  LETTER +19.64 [+19.29,+19.95]  POST  +4.06 [ +3.77, +4.36]  NONE  +0.12 [ +0.08, +0.16]  BEFORE  -0.12 [ -0.16, -0.08]  P1-NONE +12.61 [+12.31,+12.91]  P1 key share 0.58  -> ok
+  schedule Qwen2.5-14B-Instruct       P1 +26.09 [+25.66,+26.51]  LETTER +35.58 [+35.29,+35.87]  POST +10.95 [+10.28,+11.62]  NONE  +0.56 [ +0.48, +0.64]  BEFORE  +0.15 [ +0.08, +0.22]  P1-NONE +25.54 [+25.10,+25.96]  P1 key share 0.87  -> ok
+  schedule Qwen3-8B                   P1 +28.53 [+28.01,+29.01]  LETTER +39.60 [+39.17,+40.02]  POST  +7.28 [ +6.86, +7.70]  NONE  +0.86 [ +0.76, +0.96]  BEFORE  +0.16 [ +0.11, +0.21]  P1-NONE +27.67 [+27.21,+28.12]  P1 key share 0.92  -> ok
+  schedule Mistral-7B-Instruct-v0.3   P1 +13.18 [+12.86,+13.49]  LETTER +16.16 [+15.66,+16.66]  POST  +5.10 [ +4.59, +5.63]  NONE  +0.14 [ +0.09, +0.19]  BEFORE  -0.02 [ -0.06, +0.01]  P1-NONE +13.05 [+12.73,+13.34]  P1 key share 0.82  -> ok
+  schedule OLMo-2-1124-7B-Instruct    P1  +4.48 [ +4.29, +4.67]  LETTER  +7.44 [ +7.24, +7.65]  POST  +2.25 [ +2.10, +2.40]  NONE  +0.10 [ +0.06, +0.14]  BEFORE  +0.01 [ -0.03, +0.06]  P1-NONE  +4.38 [ +4.18, +4.57]  P1 key share 0.35  -> ok
+  D1 [paint]: 5/5 models -> MET
+  D1 [schedule]: 5/5 models -> MET
+  D2: BEFORE identity(K) <= 0.5 in 10/10 cells -> MET
+
+== D3 localisation: fraction of the full key effect recovered when only these rows see the swapped key
+  Qwen2.5-7B-Instruct        P1     n= 60 full +38.94 nats | choice_words +0.92 [+0.90,+0.94] question -0.00 [-0.00,+0.00] story_tail +0.00 [-0.00,+0.00] rest_after_p +0.01 [+0.01,+0.02]
+  Qwen2.5-7B-Instruct        POST   n= 60 full +11.70 nats | remention_words +0.67 [+0.60,+0.73] question +0.00 [-0.00,+0.01] story_tail -0.01 [-0.01,-0.00] rest_after_p +0.11 [+0.09,+0.13]
+  Qwen2.5-7B-Instruct        LETTER n= 60 full +39.75 nats | choice_words +1.00 [+0.99,+1.01] question +0.00 [-0.00,+0.00] story_tail +0.00 [-0.00,+0.00] rest_after_p +0.00 [+0.00,+0.00]
+  Qwen2.5-14B-Instruct       P1     n= 60 full +74.85 nats | choice_words +0.94 [+0.93,+0.96] question -0.00 [-0.00,+0.00] story_tail -0.00 [-0.00,+0.00] rest_after_p +0.01 [+0.01,+0.01]
+  Qwen2.5-14B-Instruct       POST   n= 60 full +21.78 nats | remention_words +0.72 [+0.64,+0.80] question +0.00 [-0.00,+0.00] story_tail -0.00 [-0.00,+0.00] rest_after_p +0.09 [+0.07,+0.10]
+  Qwen2.5-14B-Instruct       LETTER n= 60 full +69.81 nats | choice_words +1.00 [+1.00,+1.00] question -0.00 [-0.00,-0.00] story_tail -0.00 [-0.00,+0.00] rest_after_p -0.00 [-0.00,-0.00]
+  Mistral-7B-Instruct-v0.3   P1     n= 60 full +27.28 nats | choice_words +0.98 [+0.96,+0.99] question -0.00 [-0.00,+0.00] story_tail -0.00 [-0.00,-0.00] rest_after_p +0.01 [+0.00,+0.01]
+  Mistral-7B-Instruct-v0.3   POST   n= 60 full +12.38 nats | remention_words +0.73 [+0.67,+0.78] question +0.00 [-0.00,+0.00] story_tail -0.00 [-0.00,+0.00] rest_after_p +0.05 [+0.03,+0.06]
+  Mistral-7B-Instruct-v0.3   LETTER n= 60 full +31.19 nats | choice_words +1.00 [+1.00,+1.01] question +0.00 [+0.00,+0.00] story_tail +0.00 [-0.00,+0.00] rest_after_p +0.00 [-0.00,+0.00]
+  D3 [P1]: 3/3 models -> MET
+  D3 [POST]: 3/3 models -> MET

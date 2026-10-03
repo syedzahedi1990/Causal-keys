@@ -182,3 +182,46 @@ An exploratory CPU pilot was run before this entry (Qwen2.5-1.5B, n = 40; `resul
 - **E4, value-only exchange in Paper 1's frames** (Mistral-24B, Qwen-72B). The design mirrors Paper 1's key-only exchange, applied to values instead. Predicted: ψ_V(NONE) ≥ 0.5 and ψ_V(NONE) > ψ_K(NONE) in both models. Where keys carry nothing, values carry the remap.
 
 **Exploratory:** ψ_V and ρ_V in the other formats; the role control in LETTER and at 72B.
+
+---
+
+## Outcome of P-2026-10-03-D (GPU stage 3; scored by analysis/stage3_score.py, committed with the predictions)
+
+- **Run:** 1× A100 80GB, transformers 5.18.0, code at b8815cb (after the D commit 0f5cbff).
+- **Output:** `results/gpu_stage3/STAGE3_SCORE.txt`.
+
+| Prediction | Result | Verdict |
+|---|---|---|
+| D1 paint: P1 ID_K > 0 and P1 − NONE > 0 (CIs excluding 0) | 5/5 models (P1 ID_K +6.5 to +42.7 nats) | **met** |
+| D1 schedule: same | 5/5 models (P1 ID_K +4.5 to +28.5 nats) | **met** |
+| D2 BEFORE ID_K ≤ 0.5 | 10/10 task × model cells (max +0.32) | **met** |
+| D3 P1: choice-word rows ≥ 0.70; question and tail ≤ 0.15 | 3/3 models: choice words 0.92 / 0.94 / 0.98; question 0.00; tail ≤ 0.01 | **met** |
+| D3 POST: re-mention-word rows ≥ 0.50 | 3/3 models: 0.67 / 0.72 / 0.73 | **met** |
+
+---
+
+## Outcome of P-2026-10-04-E (GPU stage 3b; scored by analysis/stage3b_score.py, committed with the predictions)
+
+- **Run:** 2× A100 80GB, transformers 5.18.0 and 5.9.0 as designed, code at 3ca63f1 (the E commit).
+- **Output:** `results/gpu_stage3b/STAGE3B_SCORE.txt`.
+
+| Prediction | Result | Verdict |
+|---|---|---|
+| E1a ID_K(AFTER) > 0, 4/4 models | +8.7 to +35.8 nats, 4/4 | **met** |
+| E1b ID_K(BEFORE) ≤ 0.5 and ID_K(PRE) ≤ 0.5 | 4/4 and 4/4 (max +0.01) | **met** |
+| E1c AFTER − BEFORE > 0 (4/4); POST − PRE > 0 (≥ 3/4) | 4/4; 4/4 | **met** |
+| E2 role control: \|f_K\|, \|f_V\| ≤ 0.15 in P1 and NONE | 4/4 and 4/4 (all fractions ≤ 0.02; also ≤ 0.01 at Qwen2.5-72B) | **met** |
+| E3 environment: s_K within 0.03 of the original | Qwen2.5-14B under 5.9.0 on 2 GPUs: 0.91 (original 0.91); Qwen2.5-32B under 5.18.0 on 1 GPU: 0.86 (original 0.86) | **met** |
+| E4 value-only exchange: ψ_V(NONE) ≥ 0.5 and > ψ_K(NONE) | Mistral-24B 0.80 vs 0.07; Qwen-72B 0.90 vs 0.05 | **met** |
+
+**Exploratory E4 crossover** (ψ_K / ψ_V, Mistral-24B; Qwen-72B):
+
+| Format | Mistral-24B | Qwen-72B |
+|---|---|---|
+| LETTER | 0.78 / 0.02 | 0.89 / 0.01 |
+| P1 | 0.53 / 0.23 | 0.63 / 0.21 |
+| POST | 0.20 / 0.52 | 0.21 / 0.68 |
+| NONE | 0.07 / 0.80 | 0.05 / 0.90 |
+| BEFORE | 0.00 / 0.97 | −0.03 / 1.00 |
+
+The same learned intervention is carried by the critical token's keys or values depending on the readout, while its behavioural effect φ is constant.

@@ -1,0 +1,42 @@
+== E1 instruction-matched 2x2 (identity carried by keys, nats)
+  Qwen2.5-7B-Instruct        AFTER +20.60 [+20.17,+21.03]  BEFORE  -0.14 [ -0.22, -0.06]  POST  +5.52 [ +5.23, +5.82]  PRE  -0.03 [ -0.12, +0.07]  NONE  +1.04 [ +0.94, +1.15]  AFTER-BEFORE +20.74 [+20.32,+21.17]  POST-PRE  +5.55 [ +5.22, +5.87]
+  Qwen2.5-14B-Instruct       AFTER +35.81 [+34.88,+36.73]  BEFORE  -0.13 [ -0.21, -0.05]  POST +12.08 [+11.45,+12.72]  PRE  -0.06 [ -0.16, +0.02]  NONE  +1.05 [ +0.89, +1.21]  AFTER-BEFORE +35.94 [+35.01,+36.84]  POST-PRE +12.14 [+11.52,+12.79]
+  Mistral-7B-Instruct-v0.3   AFTER +15.55 [+15.12,+15.96]  BEFORE  +0.01 [ -0.05, +0.07]  POST  +7.87 [ +7.35, +8.39]  PRE  -0.00 [ -0.06, +0.06]  NONE  +0.55 [ +0.48, +0.63]  AFTER-BEFORE +15.54 [+15.11,+15.96]  POST-PRE  +7.88 [ +7.37, +8.39]
+  OLMo-2-1124-7B-Instruct    AFTER  +8.65 [ +8.39, +8.91]  BEFORE  -0.31 [ -0.37, -0.24]  POST  +2.01 [ +1.80, +2.22]  PRE  -0.22 [ -0.29, -0.17]  NONE  +0.38 [ +0.29, +0.46]  AFTER-BEFORE  +8.96 [ +8.69, +9.22]  POST-PRE  +2.24 [ +2.03, +2.45]
+  E1a 4/4 -> MET;  E1b BEFORE 4/4, PRE 4/4 -> MET;  E1c AFTER-BEFORE 4/4, POST-PRE 4/4 -> MET
+
+== E2 role control: fraction of the role-swap effect carried by the critical token's key / value
+  Qwen2.5-7B-Instruct        P1     n=150 role effect +34.37  f_K  +0.01 [ +0.00, +0.01]  f_V  +0.01 [ +0.01, +0.01]  f_KV  +0.02 [ +0.01, +0.02]
+  Qwen2.5-7B-Instruct        NONE   n=150 role effect +28.69  f_K  +0.01 [ +0.01, +0.02]  f_V  +0.00 [ +0.00, +0.00]  f_KV  +0.01 [ +0.01, +0.02]
+  Qwen2.5-7B-Instruct        LETTER n=150 role effect +29.85  f_K  +0.00 [ -0.00, +0.01]  f_V  +0.02 [ +0.01, +0.02]  f_KV  +0.02 [ +0.01, +0.03]
+  Qwen2.5-14B-Instruct       P1     n=150 role effect +79.79  f_K  +0.00 [ +0.00, +0.00]  f_V  -0.00 [ -0.00, +0.00]  f_KV  -0.00 [ -0.00, +0.00]
+  Qwen2.5-14B-Instruct       NONE   n=150 role effect +51.41  f_K  +0.00 [ +0.00, +0.00]  f_V  -0.00 [ -0.00, +0.00]  f_KV  -0.00 [ -0.00, +0.00]
+  Qwen2.5-14B-Instruct       LETTER n=150 role effect +66.01  f_K  -0.00 [ -0.00, +0.00]  f_V  -0.00 [ -0.00, +0.00]  f_KV  -0.00 [ -0.00, +0.00]
+  Mistral-7B-Instruct-v0.3   P1     n=150 role effect +28.42  f_K  +0.00 [ +0.00, +0.00]  f_V  +0.00 [ +0.00, +0.01]  f_KV  +0.01 [ +0.00, +0.01]
+  Mistral-7B-Instruct-v0.3   NONE   n=150 role effect +26.59  f_K  +0.02 [ +0.01, +0.03]  f_V  +0.00 [ -0.00, +0.00]  f_KV  +0.02 [ +0.01, +0.02]
+  Mistral-7B-Instruct-v0.3   LETTER n=150 role effect +28.86  f_K  +0.00 [ -0.00, +0.00]  f_V  +0.01 [ +0.01, +0.02]  f_KV  +0.01 [ +0.01, +0.02]
+  OLMo-2-1124-7B-Instruct    P1     n=150 role effect +16.90  f_K  +0.00 [ +0.00, +0.01]  f_V  +0.00 [ +0.00, +0.00]  f_KV  +0.01 [ +0.00, +0.01]
+  OLMo-2-1124-7B-Instruct    NONE   n=150 role effect +17.71  f_K  +0.01 [ +0.01, +0.02]  f_V  +0.00 [ -0.00, +0.00]  f_KV  +0.01 [ +0.01, +0.02]
+  OLMo-2-1124-7B-Instruct    LETTER n=150 role effect +12.51  f_K  -0.00 [ -0.00, +0.00]  f_V  +0.00 [ +0.00, +0.00]  f_KV  +0.00 [ +0.00, +0.00]
+  Qwen2.5-72B-Instruct       P1     n=150 role effect +50.59  f_K  +0.00 [ +0.00, +0.00]  f_V  +0.00 [ +0.00, +0.00]  f_KV  +0.00 [ +0.00, +0.00]
+  Qwen2.5-72B-Instruct       NONE   n=150 role effect +38.36  f_K  +0.01 [ +0.01, +0.01]  f_V  -0.00 [ -0.00, +0.00]  f_KV  +0.01 [ +0.00, +0.01]
+  Qwen2.5-72B-Instruct       LETTER n=150 role effect +46.82  f_K  -0.00 [ -0.00, -0.00]  f_V  +0.00 [ +0.00, +0.00]  f_KV  +0.00 [ +0.00, +0.00]
+  E2: P1 4/4, NONE 4/4 -> MET
+
+== E3 environment deconfound (P1 key share)
+  tf59_2gpu   Qwen2.5-14B-Instruct   s_K  +0.91 [ +0.90, +0.91] vs original 0.91 -> within 0.03
+  tf518_1gpu  Qwen2.5-32B-Instruct   s_K  +0.86 [ +0.85, +0.87] vs original 0.86 -> within 0.03
+  E3 -> MET
+
+== E4 value-only vs key-only exchange in Paper 1 frames
+  mistral  P1     phi +0.705 [+0.677,+0.732]  psi_K +0.528 [+0.489,+0.565]  psi_V +0.229 [+0.216,+0.243]  rho_V +0.443 [+0.407,+0.480]
+  mistral  LETTER phi +0.749 [+0.712,+0.784]  psi_K +0.777 [+0.735,+0.817]  psi_V +0.018 [+0.013,+0.023]  rho_V +0.157 [+0.128,+0.189]
+  mistral  POST   phi +0.719 [+0.691,+0.746]  psi_K +0.196 [+0.160,+0.231]  psi_V +0.523 [+0.503,+0.543]  rho_V +0.770 [+0.729,+0.811]
+  mistral  NONE   phi +0.708 [+0.681,+0.733]  psi_K +0.069 [+0.058,+0.080]  psi_V +0.803 [+0.777,+0.827]  rho_V +0.934 [+0.923,+0.944]
+  mistral  BEFORE phi +0.738 [+0.712,+0.763]  psi_K -0.001 [-0.012,+0.010]  psi_V +0.971 [+0.959,+0.984]  rho_V +0.963 [+0.951,+0.975]
+  qwen     P1     phi +0.895 [+0.866,+0.921]  psi_K +0.633 [+0.593,+0.671]  psi_V +0.209 [+0.192,+0.227]  rho_V +0.437 [+0.392,+0.482]
+  qwen     LETTER phi +0.901 [+0.869,+0.928]  psi_K +0.887 [+0.862,+0.909]  psi_V +0.009 [+0.004,+0.015]  rho_V +0.168 [+0.135,+0.204]
+  qwen     POST   phi +0.866 [+0.842,+0.890]  psi_K +0.209 [+0.175,+0.245]  psi_V +0.675 [+0.650,+0.699]  rho_V +0.803 [+0.766,+0.840]
+  qwen     NONE   phi +0.861 [+0.837,+0.883]  psi_K +0.052 [+0.045,+0.060]  psi_V +0.898 [+0.884,+0.911]  rho_V +0.953 [+0.943,+0.962]
+  qwen     BEFORE phi +0.906 [+0.885,+0.923]  psi_K -0.033 [-0.043,-0.024]  psi_V +1.000 [+0.984,+1.015]  rho_V +1.007 [+0.995,+1.019]
+  E4 -> MET ([np.True_, np.True_])

@@ -1,0 +1,1 @@
+2b1eca7 Proposal: add GPU stage-1 outcome and stage-2 readiness

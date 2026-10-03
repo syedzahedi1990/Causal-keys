@@ -219,3 +219,29 @@ with open(ROOT / "paper" / "numbers.tex", "w") as fh:
     for k, v in sorted(macros.items()):
         fh.write(f"\\newcommand{{\\{k}}}{{{v}}}\n")
 print(f"wrote {len(macros)} macros and figures to {FIG}")
+
+# ---------------------------------------------------------------- auto-generated tables
+TAB = ROOT / "paper" / "tables"
+TAB.mkdir(exist_ok=True)
+lines = [r"\begin{tabular}{lcccccc}", r"\toprule",
+         r"Model & key share (P1) & \multicolumn{5}{c}{identity carried by keys (nats)} \\",
+         r"\cmidrule(lr){3-7}",
+         r" & & lettered & options after & re-mention & none & options before \\", r"\midrule"]
+for m in order:
+    sh = nat[m]["share"]
+    cells = " & ".join(f"{nat[m]['idK'][a][0]:+.1f}" for a in ["LETTER", "P1", "POST", "NONE", "BEFORE"])
+    lines.append(f"{SHORT[m]} & {sh[0]:.2f} [{sh[1]:.2f}, {sh[2]:.2f}] & {cells} \\\\")
+lines += [r"\bottomrule", r"\end{tabular}"]
+(TAB / "tab_natural.tex").write_text("\n".join(lines) + "\n")
+
+lines = [r"\begin{tabular}{llccc}", r"\toprule",
+         r"Model & Format & $\varphi$ (full remap) & $\psi$ (key addition) & $\rho$ (key removal) \\", r"\midrule"]
+for label, out in frames.items():
+    for i, a in enumerate(FRAME_ARMS):
+        f3 = lambda q: f"{out[a][q][0]:.2f} [{out[a][q][1]:.2f}, {out[a][q][2]:.2f}]"
+        name = label if i == 0 else ""
+        lines.append(f"{name} & {ARM_LABEL[a].replace(chr(10), ' ')} & {f3('phi')} & {f3('psi')} & {f3('rho')} \\\\")
+    lines.append(r"\midrule" if label != list(frames)[-1] else r"\bottomrule")
+lines.append(r"\end{tabular}")
+(TAB / "tab_frames.tex").write_text("\n".join(lines) + "\n")
+print("wrote tables to", TAB)

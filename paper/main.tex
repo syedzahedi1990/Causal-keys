@@ -1,0 +1,56 @@
+\documentclass{article}
+
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+\usepackage{icml2026}          % anonymous submission mode
+\usepackage{amsmath,amssymb,mathtools,amsthm}
+\usepackage[capitalize,noabbrev]{cleveref}
+\usepackage[textsize=tiny]{todonotes}
+
+% ---- notation shared by all sections
+\newcommand{\fmtOpt}{\textsc{options-after}}
+\newcommand{\fmtLetter}{\textsc{lettered}}
+\newcommand{\fmtPost}{\textsc{re-mention}}
+\newcommand{\fmtNone}{\textsc{none}}
+\newcommand{\fmtBefore}{\textsc{options-before}}
+\input{numbers}
+
+\icmltitlerunning{Looked Up or Copied? The Readout Decides Which Attention Channel Carries In-Context State}
+
+\begin{document}
+
+\twocolumn[
+  \icmltitle{Looked Up or Copied? The Readout Decides Which Attention Channel\\Carries In-Context State and Intervention Effects}
+  \icmlsetsymbol{equal}{*}
+  \begin{icmlauthorlist}
+    \icmlauthor{Anonymous Authors}{anon}
+  \end{icmlauthorlist}
+  \icmlaffiliation{anon}{Anonymous Institution}
+  \icmlcorrespondingauthor{Anonymous Authors}{anon@example.com}
+  \icmlkeywords{mechanistic interpretability, attention, key-value cache, interventions, causal abstraction}
+  \vskip 0.3in
+]
+\printAffiliationsAndNotice{}
+
+\begin{abstract}
+\input{sections/abstract}
+\end{abstract}
+
+\input{sections/intro}
+\input{sections/related}
+\input{sections/method}
+\input{sections/results}
+\input{sections/discussion}
+
+\bibliography{references}
+\bibliographystyle{icml2026}
+
+\newpage
+\appendix
+\onecolumn
+\input{sections/appendix}
+
+\end{document}

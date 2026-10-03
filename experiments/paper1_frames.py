@@ -10,12 +10,18 @@ For every native story core (Paper 1 gpu/component_data/native_story_120.json) a
     to evolve: P + K_M ("addition") and M + K_P ("removal").
 Readout: full-vocabulary log-probs at the answer position, scored on the six locations (letters for LETTER).
 
+Stage 4 (P-2026-10-05-F): --refit FAM=RUN_DIR adds the bases of a run of experiments/refit_remap.py as family "FAM/"
+(runs "FAM/m3_101", ..., exchanges "FAM/addition_101", ...), each m3 paired with its own run's pca of the same seed;
+every family is patched and exchanged in its own batches, so the released (unprefixed) family is computed exactly as
+before. --prefill sets the assistant prefill (default "Answer:").
+
 Outputs per item: candidate log-probs, global argmax token id, for every run. Paper 1 reproduction is checked
 afterwards against data/mechanism/native_*.jsonl.gz (analysis/stage2_score.py).
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import time
 from pathlib import Path
@@ -39,10 +45,10 @@ OBJECTIVES = ("m3", "pca", "f_star")
 SEEDS = (101, 102, 103)
 
 
-def encode_with_span(tok, arm, core, location):
+def encode_with_span(tok, arm, core, location, prefill="Answer:"):
     rec = record(core, "direct", location)
     raw = raw_prompt(arm, rec["story"], rec["query"])
-    text = chat_text(tok, raw)
+    text = chat_text(tok, raw, prefill=prefill)
     off = text.index(raw)
     story_at = raw.index(rec["story"])
     initial_len = rec["story"].index(f"{core['agent']} watches as")
@@ -68,6 +74,53 @@ def load_bases(p1_root, model_key, cohort="original_1000"):
     return out
 
 
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def load_refit(run, fam, width):
+    """Bases of one refit_remap.py run as keys (f"{fam}/{obj}", seed), plus their provenance; the run's FRAME.json
+    must name the frame fam (none -> NONE, p1 -> P1), be COMPLETE and match the run's COMPLETE.json."""
+    assert fam.isalnum() and fam != "v", fam
+    run, out, prov = Path(run), {}, {}
+    for obj in OBJECTIVES:
+        for s in SEEDS:
+            f = run / "bases" / f"{obj}_ts{s}.npz"
+            with np.load(f, allow_pickle=False) as z:
+                assert z.files == ["rank_16"], z.files
+                U = torch.tensor(z["rank_16"], dtype=torch.float32)
+            assert U.shape == (16, width), (f, U.shape)
+            assert torch.allclose(U @ U.T, torch.eye(U.shape[0]), atol=1e-4)
+            out[(f"{fam}/{obj}", s)] = U
+            prov[f"{fam}/{obj}_{s}"] = {"path": str(f), "sha256": sha(f)}
+    fr = run.parent / "FRAME.json"
+    info = json.loads(fr.read_text())
+    meta = {"run": str(run), "complete_sha256": sha(run / "COMPLETE.json"), "frame_sha256": sha(fr),
+            "frame": info.get("frame")}
+    assert str(meta["frame"]).lower() == fam, f"family {fam!r} given a run fit under frame {meta['frame']!r}"
+    assert info.get("status") == "COMPLETE" and info.get("complete_sha256") == meta["complete_sha256"], \
+        (fr, info.get("status"))
+    return out, prov, meta
+
+
+def tokenizer_check(repo, rev, tok, arms, cores, prefills):
+    """Ids with and without fix_mistral_regex must be identical on every prompt evaluated (abort otherwise)."""
+    tok_fix = AutoTokenizer.from_pretrained(repo, revision=rev, use_fast=True, fix_mistral_regex=True)
+    n = 0
+    for arm in arms:
+        for core in cores:
+            for loc in (core["base"], core["source"], core["target"]):
+                rec = record(core, "direct", loc)
+                raw = raw_prompt(arm, rec["story"], rec["query"])
+                for pf in prefills:
+                    text = chat_text(tok, raw, prefill=pf)
+                    a = tok(text, add_special_tokens=False).input_ids
+                    b = tok_fix(text, add_special_tokens=False).input_ids
+                    assert a == b, f"fix_mistral_regex changes the ids ({arm}, core {core['id']}, {loc}, prefill {pf!r})"
+                    n += 1
+    return {"prompts": n, "identical": True, "prefills": list(prefills)}
+
+
 def lp_rows(model, ids, cid):
     out = model(ids, use_cache=False, logits_to_keep=1)
     lp = torch.log_softmax(out.logits[:, -1].float(), -1)
@@ -75,25 +128,8 @@ def lp_rows(model, ids, cid):
 
 
 @torch.no_grad()
-def run_core(model, tok, core, arm, bases, dev):
-    ids = {}
-    for name, loc in (("B", core["base"]), ("S", core["source"]), ("T", core["target"])):
-        ids[name], span, vpos = encode_with_span(tok, arm, core, loc)
-    if len({tuple(v.shape) for v in ids.values()}) > 1:
-        return None
-    ib = ids["B"].to(dev)
-    cid = candidate_ids(tok, arm)
-    nL = len(blocks(model))
-    res = {"core": core, "arm": arm, "span": [span[0], span[-1] + 1], "vpos": vpos, "runs": {}}
-    # natural runs + event-span residuals at the fit layer
-    h = {}
-    for name in ("B", "S", "T"):
-        with capture(model, [FIT_LAYER0], "resid") as st:
-            c, g = lp_rows(model, ids[name].to(dev), cid)
-        h[name] = st[FIT_LAYER0][0, span[0]:span[-1] + 1]
-        res["runs"][name] = {"cand": c[0].tolist(), "argmax": int(g[0])}
+def run_family(model, ib, cid, nL, h, span, vpos, bases, keys, fam, res):
     # materialise patches exactly as Paper 1 (BF16 basis, base + (delta @ U^T) @ U)
-    keys = list(bases)
     hb, hs = h["B"], h["S"]
     patches = []
     for k in keys:
@@ -121,7 +157,7 @@ def run_core(model, tok, core, arm, bases, dev):
     # key-only exchange between m3 (M) and pca (P) of the same seed; Q/V evolve (Paper 1 native design)
     rows, swaps = [], []
     for s in SEEDS:
-        iM, iP = keys.index(("m3", s)), keys.index(("pca", s))
+        iM, iP = keys.index((fam + "m3", s)), keys.index((fam + "pca", s))
         rows += [iP, iM]
         swaps += [iM, iP]   # P gets K_M (addition); M gets K_P (removal)
     P2 = patches[rows]
@@ -147,8 +183,33 @@ def run_core(model, tok, core, arm, bases, dev):
         with hooks(hs_):
             c, g = lp_rows(model, ib.expand(len(rows), -1), cid)
         for j, s in enumerate(SEEDS):
-            res["runs"][f"addition{tag}_{s}"] = {"cand": c[2 * j].tolist(), "argmax": int(g[2 * j])}
-            res["runs"][f"removal{tag}_{s}"] = {"cand": c[2 * j + 1].tolist(), "argmax": int(g[2 * j + 1])}
+            res["runs"][f"{fam}addition{tag}_{s}"] = {"cand": c[2 * j].tolist(), "argmax": int(g[2 * j])}
+            res["runs"][f"{fam}removal{tag}_{s}"] = {"cand": c[2 * j + 1].tolist(), "argmax": int(g[2 * j + 1])}
+
+
+@torch.no_grad()
+def run_core(model, tok, core, arm, bases, dev, prefill="Answer:"):
+    ids = {}
+    for name, loc in (("B", core["base"]), ("S", core["source"]), ("T", core["target"])):
+        ids[name], span, vpos = encode_with_span(tok, arm, core, loc, prefill)
+    if len({tuple(v.shape) for v in ids.values()}) > 1:
+        return None
+    ib = ids["B"].to(dev)
+    cid = candidate_ids(tok, arm)
+    nL = len(blocks(model))
+    res = {"core": core, "arm": arm, "span": [span[0], span[-1] + 1], "vpos": vpos, "runs": {}}
+    # natural runs + event-span residuals at the fit layer
+    h = {}
+    for name in ("B", "S", "T"):
+        with capture(model, [FIT_LAYER0], "resid") as st:
+            c, g = lp_rows(model, ids[name].to(dev), cid)
+        h[name] = st[FIT_LAYER0][0, span[0]:span[-1] + 1]
+        res["runs"][name] = {"cand": c[0].tolist(), "argmax": int(g[0])}
+    fams = {}
+    for k in bases:
+        fams.setdefault(k[0][: k[0].rfind("/") + 1], []).append(k)
+    for fam, keys in fams.items():  # one family per batch: the released family is computed exactly as before
+        run_family(model, ib, cid, nL, h, span, vpos, bases, keys, fam, res)
     return res
 
 
@@ -161,6 +222,9 @@ def main():
     ap.add_argument("--model-override", default=None, help="testing only: a small HF model id")
     ap.add_argument("--bases-override", default=None, help="testing only: random bases of this width")
     ap.add_argument("--out", default="results/paper1_frames")
+    ap.add_argument("--refit", action="append", default=[], metavar="FAM=DIR",
+                    help="stage 4: bases of a refit_remap.py run directory (DIR/bases/{obj}_ts{seed}.npz) as family FAM/")
+    ap.add_argument("--prefill", default="Answer:", help="assistant prefill (stage 4 exploratory: '')")
     a = ap.parse_args()
     repo, rev = PROFILES[a.model]
     if a.model_override:
@@ -179,16 +243,34 @@ def main():
         assert c["target"] == PAIR_SWAP[c["source"]]
     if a.n:
         cores = cores[: a.n]
+    tok_check = None
+    if a.model == "mistral":
+        tok_check = tokenizer_check(repo, rev, tok, a.arms.split(","), cores, sorted({a.prefill, "Answer:", ""}))
+        print("tokenizer check (fix_mistral_regex):", json.dumps(tok_check), flush=True)
     if a.bases_override:
         g = torch.Generator().manual_seed(0)
         d = model.config.hidden_size
         bases = {(o, s): torch.linalg.qr(torch.randn(d, 16, generator=g))[0].T.contiguous() for o in OBJECTIVES for s in SEEDS}
     else:
         bases = load_bases(a.p1_root, a.model)
+    basis_prov = {}
+    for o in OBJECTIVES:
+        for s in SEEDS:
+            f = Path(a.p1_root) / "gpu/component_data/bases" / f"{a.model}_original_1000_{o}_{s}.npz"
+            basis_prov[f"{o}_{s}"] = {"path": "random (--bases-override)"} if a.bases_override else {"path": str(f), "sha256": sha(f)}
+    refits = {}
+    for spec in a.refit:
+        fam, run = spec.split("=", 1)
+        assert fam not in refits, fam
+        new, prov, refits[fam] = load_refit(run, fam, model.config.hidden_size)
+        bases.update(new)
+        basis_prov.update(prov)
+    for (o, s), U in bases.items():
+        basis_prov[f"{o}_{s}"]["tensor_sha256"] = hashlib.sha256(U.numpy().tobytes()).hexdigest()
     res, t0 = [], time.time()
     for arm in a.arms.split(","):
         for i, core in enumerate(cores):
-            r = run_core(model, tok, core, arm, bases, first)
+            r = run_core(model, tok, core, arm, bases, first, a.prefill)
             if r is not None:
                 r["core_index"] = i
                 res.append(r)
@@ -197,7 +279,8 @@ def main():
     prov = {"args": vars(a), "repo": repo, "revision": rev, "torch": torch.__version__,
             "transformers": transformers.__version__,
             "device": torch.cuda.get_device_name(0) if dev == "cuda" else "cpu",
-            "n_gpus": torch.cuda.device_count(), "alphabet": {arm: list(alphabet(arm)) for arm in a.arms.split(",")}}
+            "n_gpus": torch.cuda.device_count(), "alphabet": {arm: list(alphabet(arm)) for arm in a.arms.split(",")},
+            "prefill": a.prefill, "tokenizer_check": tok_check, "bases": basis_prov, "refits": refits}
     tag = a.model if not a.model_override else "TEST_" + repo.split("/")[-1]
     json.dump({"provenance": prov, "results": res}, open(f"{a.out}/{tag}.json", "w"))
     print(json.dumps(prov))

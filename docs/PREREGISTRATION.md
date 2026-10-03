@@ -230,7 +230,7 @@ The same learned intervention is carried by the critical token's keys or values 
 
 ## P-2026-10-05-F: GPU stage 4, does the fitting format decide which channel carries a learned remap? (paper v2 only)
 
-**DRAFT, not yet final.** It becomes final in the commit that adds the scoring script `analysis/stage4_score.py`, before any stage-4 GPU run; changes until then are visible in the history. Results go into paper v2 only; v1 (commit 14f6f4e) is frozen.
+**DRAFT, not yet final.** It becomes final in a commit titled "Finalise preregistration F", which also fixes the scoring script `analysis/stage4_score.py`, before any stage-4 GPU run; earlier commits of the code are work in progress, and all changes are visible in the history. Results go into paper v2 only; v1 (commit 14f6f4e) is frozen.
 
 **Question.** In stage 3b, Paper 1's released remap M (fit with the options listed after the question) was carried by the writing token's keys under LETTER (ψ_K 0.78, ψ_V 0.02 at Mistral-Small-24B) and by its values under NONE (ψ_K 0.07, ψ_V 0.80), while φ stayed at 0.70–0.75. Two accounts:
 - **H_read:** the readers in the evaluation format decide which channel appears to carry the edit; a remap fit with no later mention also writes into the keys, so it shows the same crossover.

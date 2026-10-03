@@ -24,7 +24,8 @@ RNG = np.random.default_rng(0)
 B = 10000
 
 
-def per_core(results, arm):
+def per_core(results, arm, fam=""):
+    """fam "" = Paper 1's released bases; "none/", "p1/" = stage-4 refit families (run names prefixed)."""
     rows = {}
     for r in results:
         if r["arm"] != arm:
@@ -34,13 +35,15 @@ def per_core(results, arm):
             continue
         iS, iT = LOCS.index(c["source"]), LOCS.index(c["target"])
         m = {k: v["cand"][iT] - v["cand"][iS] for k, v in r["runs"].items()}
-        avg = lambda pre: float(np.mean([m[f"{pre}_{s}"] for s in SEEDS]))
-        rows[c["id"]] = {"S": m["S"], "T": m["T"], "B": m["B"], "M": avg("m3"), "P": avg("pca"), "F": avg("f_star"),
+        avg = lambda pre: float(np.mean([m[f"{fam}{pre}_{s}"] for s in SEEDS]))
+        has = lambda pre: f"{fam}{pre}_101" in m
+        top = lambda pre, i: float(np.mean([r["runs"][f"{fam}{pre}_{s}"]["cand"].index(max(r["runs"][f"{fam}{pre}_{s}"]["cand"])) == i for s in SEEDS]))
+        rows[c["id"]] = {"S": m["S"], "T": m["T"], "B": m["B"], "M": avg("m3"), "P": avg("pca"),
+                         "F": avg("f_star") if has("f_star") else float("nan"),
                          "add": avg("addition"), "rem": avg("removal"),
-                         "addv": avg("addition_v") if "addition_v_101" in m else float("nan"),
-                         "remv": avg("removal_v") if "removal_v_101" in m else float("nan"),
-                         "M_T_rate": float(np.mean([r["runs"][f"m3_{s}"]["cand"].index(max(r["runs"][f"m3_{s}"]["cand"])) == iT for s in SEEDS])),
-                         "P_S_rate": float(np.mean([r["runs"][f"pca_{s}"]["cand"].index(max(r["runs"][f"pca_{s}"]["cand"])) == iS for s in SEEDS]))}
+                         "addv": avg("addition_v") if has("addition_v") else float("nan"),
+                         "remv": avg("removal_v") if has("removal_v") else float("nan"),
+                         "M_T_rate": top("m3", iT), "P_S_rate": top("pca", iS)}
     return rows
 
 

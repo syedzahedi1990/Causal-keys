@@ -94,6 +94,21 @@ Results for direct questions. Identity is measured as a double difference agains
 | Story after the state token | −1% | 0% |
 | Instruction, chat tokens, prefill, answer position | 0% | 0% |
 
+**Depth and KV group (only the option-word rows see the swapped key):**
+
+| Rows/layers seeing the swapped key | Paper 1 format | Lettered options |
+|---|---|---|
+| Layers 0–3 | −1% | −1% |
+| **Layers 4–7** | **19%** | **35%** |
+| Layers 8–11 | 12% | 5% |
+| Layers 12–15 | 13% | 3% |
+| Layers 16–27 | ≤ 2% | ≤ 1% |
+| KV group 0 / KV group 1 | 19% / **46%** | 6% / **65%** |
+
+- The read happens in early-to-mid layers (4–15 of 28) and is concentrated in one KV group.
+- Single 4-layer windows sum to only about 45% of the all-layer effect, so the read compounds across layers. This matches Paper 1's finding that narrow block bands recover only part of the key effect.
+- Fractions are of the all-layer, choice-words-only effect at n=40 (`results/row_restricted_windows/`).
+
 ### 3c. Mechanism probe
 
 This probe used an earlier setup: world view, no system prompt or prefill, n=25, no CIs.

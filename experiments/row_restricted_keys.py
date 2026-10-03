@@ -46,7 +46,7 @@ class RowSplice:
         self.use_src = False
         self.layers = None   # optional set of layers where K_S is visible
         self.group = None    # optional KV-group index; only that group's slice of the key is swapped
-        self.head_dim = model.config.hidden_size // model.config.num_attention_heads
+        self.head_dim = getattr(model.config, "head_dim", None) or model.config.hidden_size // model.config.num_attention_heads
         self.orig = []
         for l, blk in enumerate(blocks(model)):
             at = blk.self_attn

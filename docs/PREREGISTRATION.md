@@ -225,3 +225,34 @@ An exploratory CPU pilot was run before this entry (Qwen2.5-1.5B, n = 40; `resul
 | BEFORE | 0.00 / 0.97 | −0.03 / 1.00 |
 
 The same learned intervention is carried by the critical token's keys or values depending on the readout, while its behavioural effect φ is constant.
+
+---
+
+## P-2026-10-05-F: GPU stage 4, does the fitting format decide which channel carries a learned remap? (paper v2 only)
+
+**DRAFT, not yet final.** It becomes final in the commit that adds the scoring script `analysis/stage4_score.py`, before any stage-4 GPU run; changes until then are visible in the history. Results go into paper v2 only; v1 (commit 14f6f4e) is frozen.
+
+**Question.** In stage 3b, Paper 1's released remap M (fit with the options listed after the question) was carried by the writing token's keys under LETTER (ψ_K 0.78, ψ_V 0.02 at Mistral-Small-24B) and by its values under NONE (ψ_K 0.07, ψ_V 0.80), while φ stayed at 0.70–0.75. Two accounts:
+- **H_read:** the readers in the evaluation format decide which channel appears to carry the edit; a remap fit with no later mention also writes into the keys, so it shows the same crossover.
+- **H_fit:** the fitting format decides what the remap writes; a remap fit with no later mention writes only what the value channel reads, so it stays value-carried even under LETTER and transfers poorly there.
+
+**Runs:** `scripts/gpu_stage4.sh` (Mistral-Small-24B-Instruct-2501 at revision 9527884be6e5616bdd54de542f9ae13384489724, BF16, transformers 5.9.0). **Scoring:** `analysis/stage4_score.py`, committed with this entry.
+- **Fits.** Paper 1's released `gpu/train.py`, unmodified, run through `experiments/refit_remap.py`, which replaces only the prompt function. Recipe: rank 16, output of (1-based) block 4, every event-span token, objective m3 (pair-swap), six-way conditional cross-entropy at the reply start (no prefill, Paper 1's "original" interface), AdamW lr 1e-3, batch 1, one shuffled epoch of the 1000 training pairs, seeds 101–103, each run's own PCA basis as initializer and as control P.
+  - **fit_p1** (same-code control): Paper 1's own format (options after the question, "Answer with exactly one choice.").
+  - **fit_none**: identical up to the end of the story, then "Question: … / Answer with one word. / Answer:", with no candidates named.
+- **Evaluation** as in stage 3b (`experiments/paper1_frames.py`): the 96 native cores with B, S and T distinct; LETTER, P1, POST, NONE, BEFORE; "Answer:" prefill; key-only and value-only exchanges from (1-based) block 6, each refit M paired with its own run's P; the released bases are re-run in the same job as an anchor. Fits are averaged within core; 95% core bootstrap, 10,000 resamples, ratio of means.
+
+**Gates** (the predictions are interpreted only if all pass; a failed gate is reported as a failed fit or a failed control):
+- **G1, same activations.** Each refit P spans the released P of the same seed: mean squared principal cosine ≥ 0.99 for every seed in both runs.
+- **G2, the fits work.** φ ≥ 0.5 under the fitting format: φ_none(NONE) and φ_p1(P1).
+- **G3, the control reproduces the released crossover.** fit_p1 has ψ_K(LETTER) ≥ 0.5 and ψ_V(NONE) ≥ 0.5.
+
+**Predictions (H_read):**
+- **F1, crossover without later mentions at fitting.** fit_none has ψ_K(LETTER) ≥ 0.5 and ψ_V(NONE) ≥ 0.5.
+- **F2, transfer to lettered options.** fit_none has φ(LETTER) ≥ 0.5.
+- **F3, no fit-format effect on the crossover.** D = [ψ_K(LETTER) − ψ_K(NONE)] for fit_none minus the same for fit_p1, paired over cores: its 95% CI lies within [−0.25, +0.25].
+- **F4, the channel follows the natural read.** For each refit, across the five formats, the key share ψ_K/(ψ_K + ψ_V) correlates with the identity key share s_ID = ID_K/(ID_K + ID_V) of the unpatched Mistral-Small-24B (stage-2 natural factorial, `results/gpu_stage2/format_factorial`) at Pearson r ≥ 0.9.
+
+H_fit would predict instead: F1 fails with ψ_V(LETTER) ≥ 0.5 for fit_none, F2 fails, and D ≤ −0.4.
+
+**Exploratory:** evaluation without the "Answer:" prefill; ρ_K and ρ_V; principal cosines between fit_none, fit_p1 and the released M, against the between-seed baseline; loss curves; the f_star fits that `train.py` makes alongside m3.

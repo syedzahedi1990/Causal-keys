@@ -47,10 +47,16 @@ def record(core: dict, view: str, location: str) -> dict:
     return {"story": initial + " " + event, "query": QUERIES[view].format(a=a, b=b, o=o, d=d), "answer": answer}
 
 
-def prompt(rec: dict, choices: bool = True) -> str:
+def prompt(rec: dict, choices: bool | str = True) -> str:
+    """``choices``: True/"after" lists choices after the question, "before" lists them before the story
+    (so choice tokens cannot attend to story tokens), False omits them."""
+    listing = "Choices: " + ", ".join(LOCATIONS)
+    if choices == "before":
+        return ("Read the choices, then the story, and answer the question.\n" + listing + "\n\nStory: "
+                + rec["story"] + "\nQuestion: " + rec["query"] + "\nAnswer with exactly one choice.\nAnswer:")
     text = PREFIX + rec["story"] + "\nQuestion: " + rec["query"]
     if choices:
-        text += "\nChoices: " + ", ".join(LOCATIONS) + "\nAnswer with exactly one choice."
+        text += "\n" + listing + "\nAnswer with exactly one choice."
     else:
         text += "\nAnswer with one word."
     return text + "\nAnswer:"

@@ -89,6 +89,7 @@ def main():
     ap.add_argument("--views", default="world,direct")
     ap.add_argument("--l0", default="0,2,4,8,12")
     ap.add_argument("--no-choices", action="store_true")
+    ap.add_argument("--choices-first", action="store_true", help="list choices before the story")
     ap.add_argument("--no-chat", action="store_true")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--dtype", default="float32")
@@ -106,11 +107,12 @@ def main():
     t0 = time.time()
     for view in a.views.split(","):
         for i, core in enumerate(cores):
-            r = run_core(model, tok, core, view, not a.no_choices, not a.no_chat, l0s, cand, device)
+            ch = False if a.no_choices else ("before" if a.choices_first else True)
+            r = run_core(model, tok, core, view, ch, not a.no_chat, l0s, cand, device)
             if r is not None:
                 res.append(r)
         print(f"  view {view} done ({time.time() - t0:.0f}s)", flush=True)
-    tag = f"{a.model.split('/')[-1]}_{'nochoices' if a.no_choices else 'choices'}_s{a.seed}"
+    tag = f"{a.model.split('/')[-1]}_{'nochoices' if a.no_choices else 'choicesfirst' if a.choices_first else 'choices'}_s{a.seed}"
     Path(a.out).mkdir(parents=True, exist_ok=True)
     json.dump({"args": vars(a), "results": res}, open(f"{a.out}/{tag}.json", "w"))
     summarize(res, l0s)

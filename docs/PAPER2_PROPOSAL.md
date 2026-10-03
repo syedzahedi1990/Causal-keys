@@ -2,7 +2,12 @@
 
 **Working title:** Looked Up, Not Copied: The Readout Decides Whether In-Context State Travels Through Attention Keys or Values, and What Interventions Change
 
-**Status (2026-10-03, updated):** direction chosen. CPU gate G1 passed (Section 3b′) and the reader is localised (Section 3b″). GPU stages not started ($0 spent). A Colab notebook for stage 1 is ready: `notebooks/gpu_stage1_format_factorial.ipynb`.
+**Status (2026-10-03, after code review):**
+- **Gate G1 was not met as originally written.** No-option formats still show 1–2 nats of key effect.
+- **The option-listing version of C1 is exploratory.** It was adopted *after* seeing the data. A fresh-seed CPU test and an out-of-sample GPU test are preregistered in `docs/PREREGISTRATION.md`.
+- **Measurement code was audited** by an independent review workflow, and the verified issues are fixed.
+- **The reader is localised** at 1.5B (Section 3b″).
+- **GPU stages have not started** ($0 spent). The Colab notebook for stage 1 is ready.
 
 ---
 
@@ -11,8 +16,11 @@
 A prompt writes some state into context, such as "Alice watches as the lamp is moved to the cabinet". Later tokens can read that state token in two ways: by matching its attention key or by copying its value.
 
 We show that the readout decides which:
-- **Candidates listed after the state token** (a multiple-choice line, as in Paper 1): each listed candidate looks the state up by key identity. Keys then carry a share of the answer log-odds that grows with scale: about 0.31 at 0.5B, about 0.5 at 1.5B, 0.73 at 24B and 0.745 at 72B.
-- **No later re-mention** (free-form answer): the key share is exactly 0 and the value is copied.
+- **Answer options listed after the state token** (a multiple-choice line, as in Paper 1): the listed option words look the state up by key identity.
+  - With Paper 1's encoder, keys carry a key share of 0.37 [0.34, 0.41] of the answer log-odds at Qwen2.5-1.5B, and about 0.35 at 0.5B (pilot, n=6).
+  - Lettered options give 0.71.
+  - Paper 1's 24B/72B fixed-value data give 0.73 / 0.745. That is a related but different estimand (blocks 6+, values fixed at the target run, a patched recipient), so it is **not** on the same scale curve. Matched-estimand scale points are a GPU-stage question.
+- **No listed options after the state token** (free answer, options before the story, or a neutral re-mention sentence): keys carry about 0.02–0.08 of the log-odds and almost no identity. The value is copied.
 
 This split has consequences for interventions. Paper 1's learned remap was fit under a multiple-choice readout, and it put more of its edit into the channel that readout weights: it is 96% complete in keys but only 73% in values (Qwen2.5-72B). That explains Paper 1's open "why keys?" result. It also predicts how such interventions will (fail to) transfer to free-form answers. And it implies that attribution methods which freeze attention patterns (the QK side) miss most of the state's effect in multiple-choice-style prompts.
 
@@ -39,7 +47,10 @@ The table gives the mean log p(S) − log p(T) on direct questions (48 distinct 
 | natural source keys, values fixed at V_T | +12.7 | +4.3 |
 | natural target keys, values fixed at V_T | −26.1 | −9.7 |
 | **key share s_K** | **0.745** | **0.730** |
-| learned remap M: completeness in keys / in values | 0.96 / 0.73 | 0.76 / ≈0.53 |
+| learned remap M: completeness in keys κ_K | 0.96 [0.93, 0.98] | 0.74–0.76 [0.70, 0.80] |
+| learned remap M: completeness in values κ_V | 0.73 [0.64, 0.80] | 0.50–0.56 [0.38, 0.67] |
+
+CIs are 95% story-cluster bootstraps (48 stories; fits kept together). The two values per Mistral cell are the P and M frames. κ_V assumes the key and value effects add.
 
 Argmax rates (≈100% key-determined) overstate this; log-odds are the right scale.
 
@@ -53,7 +64,7 @@ Qwen2.5-1.5B, argmax rate of answering S among items answered correctly in both 
 | no choices (free answer) | **0%** | 81–98% | 100% |
 | choices listed before story | **0%** | 100% | 100% |
 
-- In log-odds, keys and values **add** (interaction ≈ 0) when choices come after the story, with key share 0.44–0.52.
+- This early script used no system prompt or prefill and did not save the clean-run log-probs. It is **superseded** by 3b′, and its argmax rates condition on competence (the n for choices-before was only 9–11 of 50).
 - SmolLM2-1.7B shows the same pattern without choices (keys 0%, values 86%).
 
 ### 3b′. Gate G1 with Paper 1's exact encoder (Qwen2.5-1.5B, n=40, log-odds, 95% CIs)
@@ -68,9 +79,11 @@ Results for direct questions. Identity is measured as a double difference agains
 | No choices | +1.9 | +21.1 | 0.08 | +0.3 |
 | Neutral sentence re-mentioning all six locations after the story | +0.4 [−0.1, 0.8] | +14.3 | 0.02 | −0.6 |
 
-Keys and values add in every format (interaction ≈ 0, recovery = 1.000).
+- **Additivity.** Keys and values add approximately in P1, BEFORE, NONE and POST, where all interaction CIs include 0. LETTER has a positive interaction of +2.0 [0.3, 3.7] nats, about 13% of the joint effect. (Recovery = 1.000 is an identity, not evidence of additivity.)
+- **Population.** These numbers pool all 40 items. Restricted to competent items, POST's key effect is +0.95 and NONE's is +2.6.
+- **Identity CIs.** The identity column was computed by hand. It is now implemented with bootstrap CIs in `experiments/format_factorial.py`.
 
-**Refinement:** a plain re-mention does not open the key channel. **Listed answer options** after the state token do, and more option-like formats (letters) give a larger key share. Without options, keys only slightly weaken the base answer.
+**Refinement (post hoc, exploratory until confirmed):** a plain re-mention does not open the key channel. **Listed answer options** after the state token do, and more option-like formats (letters) give a larger key share. Without options, keys only slightly weaken the base answer.
 
 ### 3b″. Who reads the key? Exact row-restricted key swap (attention computed twice per layer and spliced by row)
 
@@ -83,21 +96,23 @@ Keys and values add in every format (interaction ≈ 0, recovery = 1.000).
 
 ### 3c. Mechanism probe
 
-With the base story's critical key replaced by the source run's key, the **source word in the choices line** attends to the critical token exactly as it does in the source run. Its peak attention at layer 16 is 0.35 vs 0.15 for non-matching words. The base word's attention drops to baseline. So later candidate mentions look the state token up by key identity (`results/choice_attention_qwen1.5b_world.txt`).
+This probe used an earlier setup: world view, no system prompt or prefill, n=25, no CIs.
+
+With the base story's critical key replaced by the source run's key, the **source word in the choices line** attends to the critical token as it does in the source run. Its peak attention at layer 16 is 0.35 vs 0.15 for non-matching words. The base word's early-layer attention falls to the non-matching level, though at layer 16 it stays above it. So later candidate mentions look the state token up by key identity (`results/choice_attention_qwen1.5b_world.txt`).
 
 ## 4. Claims (to be preregistered after gate G2)
 
-- **C1, option-listing gate** (updated after gate G1).
-  - Identity-specific key effect ≈ 0 without listed answer options after the state token: no choices, choices before the story, or a neutral re-mention sentence.
-  - Identity-specific key effect > 0 with options listed after the state token, larger for lettered options.
+- **C1, option-listing gate** (post hoc; see `docs/PREREGISTRATION.md`).
+  - Without listed answer options after the state token, identity(K) is inside an equivalence margin of ±1 nat.
+  - With listed options after it, identity(K) > 1 nat.
 - **C2, additivity.** Key and value effects add in log-odds (interaction ≤ 15% of the joint effect).
 - **C3, reader.** The key effect is read by the re-mentioned candidate tokens. It is localised to identified heads and layers, and knocking out candidate→state attention removes it.
-- **C4, scale.** In Qwen2.5 from 0.5B to 72B (plus Llama, Gemma and Mistral), the key share of the multiple-choice answer rises with scale.
+- **C4, scale (exploratory, no direction preregistered).** How the multiple-choice key share varies across Qwen2.5 sizes, measured with one matched estimand (l0 = 0 and l0 = 0.0625·L).
 - **C5, channel completeness.** Interventions fit under a readout put more of their edit into that readout's dominant channel.
   - DAS fit under multiple-choice: key-biased.
   - DAS fit free-form: value-complete.
   - Unfitted PCA: complete in both.
-- **C6, transfer law (headline consequence).** An intervention's free-form effect ≈ its value completeness κ_V. Out-of-sample prediction for Paper 1's released remap bases: **0.73 ± 0.15 at 72B and ≈0.5 ± 0.15 at 24B**.
+- **C6, transfer law (headline consequence).** An intervention's free-form effect ≈ its value completeness κ_V. Out-of-sample prediction for Paper 1's released remap bases: **κ_V = 0.73 [0.64, 0.80] at 72B and 0.50–0.56 [0.38, 0.67] at 24B**. The 24B interval is wide, so that test is weak.
 - **C7, attribution blind spot.** Freezing attention patterns keeps only ≈ (1 − s_K) of the state's effect under re-mention readouts.
 - **C8, generality.** The same sign pattern holds on CausalToM (Prakash et al.) and MIB MCQA.
 

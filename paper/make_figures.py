@@ -42,8 +42,8 @@ MODEL_TAG = {"Qwen2.5-1.5B-Instruct": "QwenOnefive", "Qwen2.5-3B-Instruct": "Qwe
              "Qwen2.5-14B-Instruct": "QwenFourteen", "Qwen2.5-32B-Instruct": "QwenThirtytwo", "Qwen2.5-72B-Instruct": "QwenSeventytwo",
              "Qwen3-8B": "QwenThreeEight", "Mistral-7B-Instruct-v0.3": "MistralSeven",
              "Mistral-Small-24B-Instruct-2501": "MistralTwentyfour", "OLMo-2-1124-7B-Instruct": "OlmoSeven"}
-ARM_LABEL = {"P1": "options\nafter", "LETTER": "lettered\noptions", "POST": "re-mention\nsentence",
-             "NONE": "no\nre-mention", "BEFORE": "options\nbefore"}
+ARM_LABEL = {"P1": "options-\nafter", "LETTER": "letters-\nafter", "POST": "sentence-\nafter",
+             "NONE": "no-\nmention", "BEFORE": "list-\nbefore"}
 macros = {}
 
 
@@ -137,58 +137,54 @@ for j, a in enumerate(ARMS):
 ax.axhline(0, color=INK2, lw=0.6)
 ax.set_xticks(range(len(ARMS)))
 ax.set_xticklabels([ARM_LABEL[a] for a in ARMS], fontsize=6.3)
-ax.set_ylabel("identity carried by keys\n(relative to options-after)")
+ax.set_ylabel("value identity carried by keys\n(relative to options-after)")
 ax.grid(axis="y", color=GRID, lw=0.6)
 fig.tight_layout()
 fig.savefig(FIG / "fig_formats.pdf")
 plt.close(fig)
 
-# ---------------------------------------------------------------- Paper 1 frames (stage 2)
+# ---------------------------------------------------------------- Paper 1 frames: key-only vs value-only exchange (stage 3b)
 frames = {}
 FRAME_ARMS = ["LETTER", "P1", "POST", "NONE", "BEFORE"]
-ARM_TAG = {"P1": "Opt", "LETTER": "Letter", "POST": "Post", "NONE": "None", "BEFORE": "Before"}
-MODEL_TAG = {"Qwen2.5-1.5B-Instruct": "QwenOnefive", "Qwen2.5-3B-Instruct": "QwenThree", "Qwen2.5-7B-Instruct": "QwenSeven",
-             "Qwen2.5-14B-Instruct": "QwenFourteen", "Qwen2.5-32B-Instruct": "QwenThirtytwo", "Qwen2.5-72B-Instruct": "QwenSeventytwo",
-             "Qwen3-8B": "QwenThreeEight", "Mistral-7B-Instruct-v0.3": "MistralSeven",
-             "Mistral-Small-24B-Instruct-2501": "MistralTwentyfour", "OLMo-2-1124-7B-Instruct": "OlmoSeven"}
 for model, label in (("mistral", "Mistral-Small-24B"), ("qwen", "Qwen2.5-72B")):
-    f = ROOT / f"results/gpu_stage2/paper1_frames/{model}.json"
-    res = json.load(open(f))["results"]
+    res = json.load(open(ROOT / f"results/gpu_stage3b/paper1_frames_v/{model}.json"))["results"]
     rows = {a: s2.per_core(res, a) for a in FRAME_ARMS}
     out = {}
+    mtag = model.capitalize()
     for a in FRAME_ARMS:
         R = rows[a]
         out[a] = {"phi": s2.ratio(R, lambda x: x["M"] - x["P"], lambda x: x["T"] - x["S"])[:3],
                   "psi": s2.ratio(R, lambda x: x["add"] - x["P"], lambda x: x["M"] - x["P"])[:3],
                   "rho": s2.ratio(R, lambda x: x["rem"] - x["M"], lambda x: x["P"] - x["M"])[:3],
-                  "mT": float(np.mean([x["M_T_rate"] for x in R.values()])),
-                  "n": len(R)}
-        mtag = model.capitalize()
-        for q in ("phi", "psi", "rho"):
+                  "psiV": s2.ratio(R, lambda x: x["addv"] - x["P"], lambda x: x["M"] - x["P"])[:3],
+                  "rhoV": s2.ratio(R, lambda x: x["remv"] - x["M"], lambda x: x["P"] - x["M"])[:3],
+                  "mT": float(np.mean([x["M_T_rate"] for x in R.values()])), "n": len(R)}
+        for q in ("phi", "psi", "rho", "psiV", "rhoV"):
             mac(f"{q}{ARM_TAG[a]}{mtag}", out[a][q][0])
             mac(f"{q}Lo{ARM_TAG[a]}{mtag}", out[a][q][1])
             mac(f"{q}Hi{ARM_TAG[a]}{mtag}", out[a][q][2])
         mac(f"mT{ARM_TAG[a]}{mtag}", out[a]["mT"])
     frames[label] = out
 
-fig, axes = plt.subplots(1, 2, figsize=(6.8, 2.3), sharey=True)
+fig, axes = plt.subplots(1, 2, figsize=(6.8, 2.35), sharey=True)
 w = 0.26
 for ax, (label, out) in zip(axes, frames.items()):
     xs = np.arange(len(FRAME_ARMS))
-    for k, (q, col, name) in enumerate((("phi", BLUE, "full remap (behaviour)"), ("psi", ORANGE, "key-only addition"),
-                                         ("rho", AQUA, "key-only removal"))):
+    for k, (q, col, name) in enumerate((("phi", BLUE, "full remap: behavioural effect $\\varphi$"),
+                                         ("psi", ORANGE, "keys only: $\\psi_K$"), ("psiV", AQUA, "values only: $\\psi_V$"))):
         v = [out[a][q][0] for a in FRAME_ARMS]
         e = np.array([[out[a][q][0] - out[a][q][1] for a in FRAME_ARMS], [out[a][q][2] - out[a][q][0] for a in FRAME_ARMS]])
         ax.bar(xs + (k - 1) * w, v, w * 0.9, color=col, label=name, yerr=e, error_kw=dict(lw=0.6, ecolor=INK2), zorder=3)
-        if q == "rho":
+        if q == "psiV":
             for xi, vi in zip(xs + (k - 1) * w, v):
                 ax.text(xi, max(vi, 0) + 0.04, f"{vi:.2f}", ha="center", fontsize=5, color=INK2)
     ax.axhline(0, color=INK2, lw=0.6)
     ax.set_xticks(xs)
     ax.set_xticklabels([ARM_LABEL[a] for a in FRAME_ARMS], fontsize=6)
     ax.set_title(label, fontsize=8, color=INK)
+    ax.set_ylim(-0.1, 1.15)
     ax.grid(axis="y", color=GRID, lw=0.6)
-axes[0].set_ylabel("fraction of effect")
+axes[0].set_ylabel("fraction of the remap's effect")
 h, l = axes[0].get_legend_handles_labels()
 fig.legend(h, l, frameon=False, fontsize=6.5, loc="upper center", ncol=3)
 fig.tight_layout(rect=(0, 0, 1, 0.9))
@@ -207,7 +203,7 @@ for k, (arm, col) in enumerate((("P1", BLUE), ("LETTER", ORANGE))):
     for g, v in zip(groups, vals):
         mac(f"loc{ARM_TAG[arm]}{g[0].replace('_', '').capitalize()}", v)
     ys = np.arange(len(groups)) + (k - 0.5) * 0.36
-    ax.barh(ys, vals, 0.34, color=col, label={"P1": "options after", "LETTER": "lettered options"}[arm], zorder=3)
+    ax.barh(ys, vals, 0.34, color=col, label={"P1": "options-after", "LETTER": "letters-after"}[arm], zorder=3)
 ax.set_yticks(range(len(groups)))
 ax.set_yticklabels([g[1] for g in groups])
 ax.invert_yaxis()
@@ -266,13 +262,13 @@ for m in order:
 lines += [r"\bottomrule", r"\end{tabular}"]
 (TAB / "tab_onset.tex").write_text("\n".join(lines) + "\n")
 
-lines = [r"\begin{tabular}{llccc}", r"\toprule",
-         r"Model & Format & $\varphi$ (full remap) & $\psi$ (key addition) & $\rho$ (key removal) \\", r"\midrule"]
+lines = [r"\begin{tabular}{llccccc}", r"\toprule",
+         r"Model & Format & $\varphi$ & $\psi_K$ & $\rho_K$ & $\psi_V$ & $\rho_V$ \\", r"\midrule"]
 for label, out in frames.items():
     for i, a in enumerate(FRAME_ARMS):
         f3 = lambda q: f"{out[a][q][0]:.2f} [{out[a][q][1]:.2f}, {out[a][q][2]:.2f}]"
         name = label if i == 0 else ""
-        lines.append(f"{name} & {ARM_LABEL[a].replace(chr(10), ' ')} & {f3('phi')} & {f3('psi')} & {f3('rho')} \\\\")
+        lines.append(f"{name} & {ARM_LABEL[a].replace(chr(10), ' ')} & {f3('phi')} & {f3('psi')} & {f3('rho')} & {f3('psiV')} & {f3('rhoV')} \\\\")
     lines.append(r"\midrule" if label != list(frames)[-1] else r"\bottomrule")
 lines.append(r"\end{tabular}")
 (TAB / "tab_frames.tex").write_text("\n".join(lines) + "\n")
@@ -293,6 +289,126 @@ for k in keys:
     lines.append(f"{lab} & " + " & ".join(cells) + " \\\\")
 lines += [r"\bottomrule", r"\end{tabular}"]
 (TAB / "tab_windows.tex").write_text("\n".join(lines) + "\n")
+
+
+# ---------------------------------------------------------------- stage 3: new tasks
+TASK_MODELS = ["Qwen2.5-7B-Instruct", "Qwen2.5-14B-Instruct", "Qwen3-8B", "Mistral-7B-Instruct-v0.3", "OLMo-2-1124-7B-Instruct"]
+lines = [r"\begin{tabular}{llcccccc}", r"\toprule",
+         r"Task & Model & $s_K$ (\fmtOpt) & \multicolumn{5}{c}{$\mathrm{ID}_K$ (nats)} \\", r"\cmidrule(lr){4-8}",
+         r" & & & \fmtLetter & \fmtOpt & \fmtPost & \fmtNone & \fmtBefore \\", r"\midrule"]
+for task in ("paint", "schedule"):
+    vals = []
+    for i, m in enumerate(TASK_MODELS):
+        res = json.load(open(ROOT / f"results/gpu_stage3/task_factorial/{task}_{m}_s0.json"))["results"]
+        arms = {a: per_core(res, a) for a in ARMS}
+        idk = {a: ci([v["idK"] for v in arms[a].values()]) for a in ARMS}
+        sh = ratio_ci([v["d"]["K_S@0"] for v in arms["P1"].values()], [v["d"]["K_S@0"] + v["d"]["V_S@0"] for v in arms["P1"].values()])
+        vals.append((idk, sh))
+        cells = " & ".join(f"{idk[a][0]:+.1f}" for a in ["LETTER", "P1", "POST", "NONE", "BEFORE"])
+        lines.append(f"{task if i == 0 else ''} & {SHORT[m]} & {sh[0]:.2f} & {cells} \\\\")
+    lines.append(r"\midrule" if task == "paint" else r"\bottomrule")
+    tt = task.capitalize()
+    mac(f"task{tt}OptMin", min(v[0]["P1"][0] for v in vals), "{:.1f}")
+    mac(f"task{tt}OptMax", max(v[0]["P1"][0] for v in vals), "{:.1f}")
+    mac(f"task{tt}BeforeMax", max(v[0]["BEFORE"][0] for v in vals), "{:+.2f}")
+    mac(f"task{tt}ShareMin", min(v[1][0] for v in vals))
+    mac(f"task{tt}ShareMax", max(v[1][0] for v in vals))
+lines.append(r"\end{tabular}")
+(TAB / "tab_tasks.tex").write_text("\n".join(lines) + "\n")
+
+# ---------------------------------------------------------------- stage 3b: instruction-matched 2x2
+M4 = ["Qwen2.5-7B-Instruct", "Qwen2.5-14B-Instruct", "Mistral-7B-Instruct-v0.3", "OLMo-2-1124-7B-Instruct"]
+ARMS2 = ["AFTER", "POST", "NONE", "PRE", "BEFORE"]
+lab2 = {"AFTER": "\\fmtListA", "POST": "\\fmtPost", "NONE": "\\fmtNone", "PRE": "\\fmtSentB", "BEFORE": "\\fmtBefore"}
+lines = [r"\begin{tabular}{l" + "c" * len(ARMS2) + "}", r"\toprule",
+         "Model & " + " & ".join(lab2[a] for a in ARMS2) + r" \\", r"\midrule"]
+agg = {a: [] for a in ARMS2}
+for m in M4:
+    res = json.load(open(ROOT / f"results/gpu_stage3b/format_2x2/{m}_s0.json"))["results"]
+    arms = {a: per_core(res, a) for a in ARMS2}
+    idk = {a: ci([v["idK"] for v in arms[a].values()]) for a in ARMS2}
+    for a in ARMS2:
+        agg[a].append(idk[a][0])
+    lines.append(f"{SHORT[m]} & " + " & ".join(c1(idk[a]) for a in ARMS2) + r" \\")
+lines += [r"\bottomrule", r"\end{tabular}"]
+(TAB / "tab_2x2.tex").write_text("\n".join(lines) + "\n")
+mac("twoAfterMin", min(agg["AFTER"]), "{:.1f}"); mac("twoAfterMax", max(agg["AFTER"]), "{:.1f}")
+mac("twoPostMin", min(agg["POST"]), "{:.1f}"); mac("twoPostMax", max(agg["POST"]), "{:.1f}")
+mac("twoBeforeMax", max(agg["BEFORE"] + agg["PRE"]), "{:+.2f}")
+
+# ---------------------------------------------------------------- stage 3b: role control
+RM = M4 + ["Qwen2.5-72B-Instruct"]
+lines = [r"\begin{tabular}{llccc}", r"\toprule", r"Model & Format & role effect (nats) & $f_K$ & $f_V$ \\", r"\midrule"]
+fmax = 0.0
+for m in RM:
+    res = json.load(open(ROOT / f"results/gpu_stage3b/role_factorial/{m}_s0.json"))["results"]
+    for i, arm in enumerate(("P1", "NONE", "LETTER")):
+        R = [r for r in res if r["arm"] == arm and r["view"] == "direct"]
+        full = [r["clean"]["R"]["m"] - r["m"]["ID"] for r in R]
+        fk = ratio_ci([r["m"]["K_R"] - r["m"]["ID"] for r in R], full)
+        fv = ratio_ci([r["m"]["V_R"] - r["m"]["ID"] for r in R], full)
+        fmax = max(fmax, abs(fk[0]), abs(fv[0]))
+        lines.append(f"{SHORT[m] if i == 0 else ''} & {ARM_LABEL[arm].replace(chr(10), ' ')} & {np.mean(full):+.1f} & {fk[0]:+.3f} & {fv[0]:+.3f} \\\\")
+    lines.append(r"\midrule" if m != RM[-1] else r"\bottomrule")
+lines.append(r"\end{tabular}")
+(TAB / "tab_role.tex").write_text("\n".join(lines) + "\n")
+mac("roleFracMax", fmax)
+
+# ---------------------------------------------------------------- stage 3b: environment check
+for sub, m, tag in (("tf59_2gpu", "Qwen2.5-14B-Instruct", "EnvFourteen"), ("tf518_1gpu", "Qwen2.5-32B-Instruct", "EnvThirtytwo")):
+    p1 = per_core(json.load(open(ROOT / f"results/gpu_stage3b/env_check/{sub}/{m}_s0.json"))["results"], "P1")
+    sh = ratio_ci([v["d"]["K_S@0"] for v in p1.values()], [v["d"]["K_S@0"] + v["d"]["V_S@0"] for v in p1.values()])
+    mac(f"share{tag}", sh[0])
+
+# ---------------------------------------------------------------- localisation at scale (stage 3) + 1.5B (CPU)
+LOCM = [("Qwen2.5-1.5B-Instruct", ROOT / "results/row_restricted_windows/Qwen2.5-1.5B-Instruct_direct.json"),
+        ("Qwen2.5-7B-Instruct", ROOT / "results/gpu_stage3/row_restricted/Qwen2.5-7B-Instruct/Qwen2.5-7B-Instruct_direct.json"),
+        ("Qwen2.5-14B-Instruct", ROOT / "results/gpu_stage3/row_restricted/Qwen2.5-14B-Instruct/Qwen2.5-14B-Instruct_direct.json"),
+        ("Mistral-7B-Instruct-v0.3", ROOT / "results/gpu_stage3/row_restricted/Mistral-7B-Instruct-v0.3/Mistral-7B-Instruct-v0.3_direct.json")]
+GR = [("mention", "later-mention words"), ("question", "question"), ("story_tail", "story after state"), ("rest_after_p", "other later tokens")]
+lines = [r"\begin{tabular}{llcccc}", r"\toprule",
+         r"Model & Format & " + " & ".join(g[1] for g in GR) + r" \\", r"\midrule"]
+locv = {}
+for m, f in LOCM:
+    res = json.load(open(f))
+    for arm in ("P1", "LETTER", "POST"):
+        R = [r for r in res if r["arm"] == arm]
+        if not R:
+            continue
+        full = [r["m"]["all"] - r["m_B"] for r in R]
+        row = []
+        for g, _ in GR:
+            gk = ("remention_words" if arm == "POST" else "choice_words") if g == "mention" else g
+            fr = ratio_ci([r["m"][gk] - r["m_B"] for r in R], full)
+            row.append(fr)
+            locv[(m, arm, g)] = fr
+        lines.append(f"{SHORT[m]} & {ARM_LABEL[arm].replace(chr(10), ' ')} & " + " & ".join(f"{x[0]:+.2f}" for x in row) + r" \\")
+    lines.append(r"\midrule" if m != LOCM[-1][0] else r"\bottomrule")
+lines.append(r"\end{tabular}")
+(TAB / "tab_localisation.tex").write_text("\n".join(lines) + "\n")
+big = [m for m, _ in LOCM[1:]]
+mac("locScaleOptMin", min(locv[(m, "P1", "mention")][0] for m in big)); mac("locScaleOptMax", max(locv[(m, "P1", "mention")][0] for m in big))
+mac("locScalePostMin", min(locv[(m, "POST", "mention")][0] for m in big)); mac("locScalePostMax", max(locv[(m, "POST", "mention")][0] for m in big))
+mac("locScaleQuestionMax", max(abs(locv[(m, "P1", "question")][0]) for m in big))
+
+fig, axes = plt.subplots(1, 2, figsize=(6.8, 1.9), sharey=True)
+for ax, arm, title in ((axes[0], "P1", "options-after"), (axes[1], "POST", "sentence-after")):
+    for k, (m, col) in enumerate(zip(big, (BLUE, ORANGE, AQUA))):
+        v = [locv[(m, arm, g)][0] for g, _ in GR]
+        ys = np.arange(len(GR)) + (k - 1) * 0.26
+        ax.barh(ys, v, 0.24, color=col, label=SHORT[m], zorder=3)
+    ax.set_yticks(range(len(GR)))
+    ax.set_yticklabels([g[1] for g in GR])
+    ax.axvline(0, color=INK2, lw=0.6)
+    ax.set_xlim(-0.1, 1.1)
+    ax.set_title(title, fontsize=7.5, color=INK)
+    ax.grid(axis="x", color=GRID, lw=0.6)
+axes[0].set_xlabel("fraction of the key effect recovered"); axes[1].set_xlabel("fraction of the key effect recovered")
+axes[0].invert_yaxis()  # shared y: invert once
+axes[1].legend(frameon=False, fontsize=6.3, loc="lower right")
+fig.tight_layout()
+fig.savefig(FIG / "fig_localisation.pdf")
+plt.close(fig)
 
 with open(ROOT / "paper" / "numbers.tex", "w") as fh:
     fh.write("% Auto-generated by paper/make_figures.py from saved results. Do not edit by hand.\n")

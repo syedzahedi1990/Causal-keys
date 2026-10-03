@@ -26,7 +26,7 @@ def arrow(x0, y0, x1, y1, color, rad=0.0, ls="-"):
 
 
 # panel (a): token stream
-ax.text(0.5, 38.3, "(a) Two ways later tokens can read the state token", fontsize=7.4, weight="bold", color=INK)
+ax.text(0.5, 38.3, "(a) Two ways later tokens can read the token that wrote a value", fontsize=7.4, weight="bold", color=INK)
 y = 21
 box(1, y, 20, 5, "…moved to the")
 box(23, y, 9, 5, "shelf", fc="#dcebfb", ec=BLUE, weight="bold")
@@ -42,10 +42,10 @@ arrow(31, 20.6, 88, 20.6, BLUE, rad=0.18, ls="--")
 ax.text(60, 13.4, "value copy: the answer position copies the state token's value", ha="center", fontsize=6.3, color=BLUE)
 
 # panel (b): format arms
-ax.text(0.5, 8.6, "(b) Readout arms (same story; only where candidates are named changes)", fontsize=7.4, weight="bold", color=INK)
-arms = [("options-after", "story · Q · Choices: … · Answer:"), ("lettered", "story · Q · A) … F) · Answer:"),
-        ("re-mention", "story · \"…has a box, …\" · Q"), ("none", "story · Q · Answer:"),
-        ("options-before", "Choices: … · story · Q")]
+ax.text(0.5, 8.6, "(b) Prompt arms (same story; only whether and where candidates are named changes)", fontsize=7.4, weight="bold", color=INK)
+arms = [("options-after", "story · Q · Choices: … · Answer:"), ("letters-after", "story · Q · A) … F) · Answer:"),
+        ("sentence-after", "story · \"…has a box, …\" · Q"), ("no-mention", "story · Q · Answer:"),
+        ("list-before", "Choices: … · story · Q")]
 for i, (name, desc) in enumerate(arms):
     x = 1 + i * 19.8
     box(x, 0.6, 18.6, 5.6, "", fc="white")

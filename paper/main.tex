@@ -12,19 +12,21 @@
 \usepackage[textsize=tiny]{todonotes}
 
 % ---- notation shared by all sections
-\newcommand{\fmtOpt}{\textsc{options-after}}
-\newcommand{\fmtLetter}{\textsc{lettered}}
-\newcommand{\fmtPost}{\textsc{re-mention}}
-\newcommand{\fmtNone}{\textsc{none}}
-\newcommand{\fmtBefore}{\textsc{options-before}}
+\newcommand{\fmtOpt}{\textsc{options-after}}      % options listed after the question, "exactly one choice"
+\newcommand{\fmtListA}{\textsc{list-after}}       % same list, one-word instruction
+\newcommand{\fmtLetter}{\textsc{letters-after}}
+\newcommand{\fmtPost}{\textsc{sentence-after}}     % neutral sentence naming every candidate, after the story
+\newcommand{\fmtSentB}{\textsc{sentence-before}}
+\newcommand{\fmtNone}{\textsc{no-mention}}
+\newcommand{\fmtBefore}{\textsc{list-before}}
 \input{numbers}
 
-\icmltitlerunning{Looked Up or Copied? The Readout Decides Which Attention Channel Carries In-Context State}
+\icmltitlerunning{Looked Up or Copied? Later Mentions Decide Which Attention Channel Carries an In-Context Value}
 
 \begin{document}
 
 \twocolumn[
-  \icmltitle{Looked Up or Copied? The Readout Decides Which Attention Channel\\Carries In-Context State and Intervention Effects}
+  \icmltitle{Looked Up or Copied? Later Mentions Decide Which Attention Channel\\Carries an In-Context Value, and Where an Intervention Appears to Act}
   \icmlsetsymbol{equal}{*}
   \begin{icmlauthorlist}
     \icmlauthor{Anonymous Authors}{anon}
@@ -41,10 +43,11 @@
 \end{abstract}
 
 \input{sections/intro}
-\input{sections/related}
 \input{sections/method}
 \input{sections/results}
+\input{sections/related}
 \input{sections/discussion}
+\input{sections/impact}
 
 \bibliography{references}
 \bibliographystyle{icml2026}

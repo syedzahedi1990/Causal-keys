@@ -128,3 +128,26 @@ Other families: Qwen3-8B 0.84, Mistral-7B 0.92, OLMo-2-7B 0.73.
 - The κ_V-based transfer law (C1/C2) is not supported. The value-channel completeness estimated from fixed-value clamping underestimates how fully the remap is carried by values.
 
 **Qwen2.5 P1 key share across scale:** 0.37 (1.5B), 0.69 (3B), 0.82 (7B), 0.91 (14B), 0.86 (32B), 0.76 (72B). It is non-monotonic beyond 14B.
+
+---
+
+## P-2026-10-03-D: GPU stage 3, generality to new tasks and localisation at 7–14B
+
+**Committed before any stage-3 run.**
+
+**Runs:** `scripts/gpu_stage3.sh`.
+- `experiments/task_factorial.py` on two new state tasks (`ckeys/tasks.py`), n = 150, in five open 7–14B models (Qwen2.5-7B, Qwen2.5-14B, Qwen3-8B, Mistral-7B-v0.3, OLMo-2-7B):
+  - **paint:** "Later, {agent} repainted the {thing} {colour}."
+  - **schedule:** "Later, {agent} moved the {thing} to {day}."
+- `experiments/row_restricted_keys.py` on the belief task with Paper 1's encoder, n = 60, arms P1/POST/LETTER, in Qwen2.5-7B, Qwen2.5-14B and Mistral-7B.
+
+**Scoring:** `analysis/stage3_score.py`, committed with this entry.
+
+**Predictions:**
+- **D1, generality.** Per task, a model counts if identity(K) in P1 is > 0 with a CI excluding 0, *and* the paired P1 − NONE difference is > 0 with a CI excluding 0. Met if ≥ 4 of 5 models count, separately for paint and for schedule.
+- **D2, structural control.** BEFORE identity(K) ≤ 0.5 nats in ≥ 9 of the 10 task × model cells.
+- **D3, localisation at scale.**
+  - In P1, choice-word rows recover ≥ 0.70 of the full key effect, while question rows and the remaining tail rows each recover ≤ 0.15, in all 3 models.
+  - In POST, where the full key effect is positive, re-mention-word rows recover ≥ 0.50 in ≥ 2 of 3 models.
+
+**Exploratory:** key shares on the new tasks; LETTER and POST identity; layer-window and KV-group localisation at 7–14B.

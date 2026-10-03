@@ -20,7 +20,7 @@ import numpy as np
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from ckeys.encoding import LISTING, LETTER_LISTING, candidate_ids, chat_text, raw_prompt
+from ckeys.encoding import LISTING, LETTER_LISTING, ROOM, candidate_ids, chat_text, raw_prompt
 from ckeys.interventions import blocks, capture
 from ckeys.story import LOCATIONS, make_cores, record
 
@@ -59,10 +59,10 @@ class RowSplice:
             if self.active and self.use_src and (self.layers is None or l in self.layers):
                 out = out.clone()
                 if self.group is None:
-                    out[:, self.pos] = self.ks[l].to(out.dtype)
+                    out[:, self.pos] = self.ks[l].to(out.device, out.dtype)
                 else:
                     sl = slice(self.group * self.head_dim, (self.group + 1) * self.head_dim)
-                    out[:, self.pos, sl] = self.ks[l][sl].to(out.dtype)
+                    out[:, self.pos, sl] = self.ks[l][sl].to(out.device, out.dtype)
             return out
         return hk
 
@@ -88,10 +88,18 @@ def main():
     ap.add_argument("--arms", default="P1,LETTER")
     ap.add_argument("--view", default="direct")
     ap.add_argument("--out", default="results/row_restricted")
+    ap.add_argument("--dtype", default="float32")
+    ap.add_argument("--device-map", default=None)
     ap.add_argument("--windows", type=int, default=0, help="if >0, also sweep layer windows of this size and KV groups (choice-word rows only)")
     a = ap.parse_args()
     tok = AutoTokenizer.from_pretrained(a.model)
-    model = AutoModelForCausalLM.from_pretrained(a.model, dtype=torch.float32).eval()
+    kw = {"dtype": getattr(torch, a.dtype)}
+    if a.device_map:
+        kw["device_map"] = a.device_map
+    model = AutoModelForCausalLM.from_pretrained(a.model, **kw).eval()
+    if not a.device_map and torch.cuda.is_available():
+        model = model.to("cuda")
+    dev = next(model.parameters()).device
     nL = len(blocks(model))
     rs = RowSplice(model)
     cores = make_cores(a.n, random.Random(0))
@@ -105,6 +113,7 @@ def main():
             _, is_, _ = encode_with_offsets(tok, raw_prompt(arm, rsrc["story"], rsrc["query"]))
             if ib.shape != is_.shape:
                 continue
+            ib, is_ = ib.to(dev), is_.to(dev)
             diff = (ib[0] != is_[0]).nonzero().flatten().tolist()
             assert len(diff) == 1
             p = diff[0]
@@ -112,15 +121,19 @@ def main():
             story_end = tb.index(rb["story"]) + len(rb["story"])
             q0 = tb.index("\nQuestion: ")
             q1 = q0 + len("\nQuestion: " + rb["query"])
-            c0 = tb.index(listing)
-            c1 = c0 + len(listing)
+            c0 = tb.find(listing)
+            c1 = c0 + len(listing) if c0 >= 0 else -1
+            r0 = tb.find(ROOM) if arm == "POST" else -1
+            r1 = r0 + len(ROOM) if r0 >= 0 else -1
+            loc_ids = set(candidate_ids(tok, "P1"))
             groups = {
                 "self": [p],
                 "story_tail": [i for i in rows_in(off, 0, story_end) if i > p],
                 "question": rows_in(off, q0 + 1, q1),
-                "choices": rows_in(off, c0, c1),
-                "choice_words": [i for i in rows_in(off, c0, c1)
-                                 if ib[0, i].item() in set(candidate_ids(tok, "P1"))],
+                "choices": rows_in(off, c0, c1) if c0 >= 0 else [],
+                "choice_words": [i for i in rows_in(off, c0, c1) if ib[0, i].item() in loc_ids] if c0 >= 0 else [],
+                "remention": rows_in(off, r0, r1) if r0 >= 0 else [],
+                "remention_words": [i for i in rows_in(off, r0, r1) if ib[0, i].item() in loc_ids] if r0 >= 0 else [],
             }
             covered = set().union(*groups.values())
             groups["rest_after_p"] = [i for i in range(p + 1, T) if i not in covered]
@@ -166,7 +179,9 @@ def main():
         full = np.array([r["m"]["all"] - r["m_B"] for r in R])
         lines.append(f"{arm}: n={len(R)}  full K_S effect {full.mean():+.2f} nats;  none-check {np.mean([r['m']['none'] - r['m_B'] for r in R]):+.3f}")
         extra = sorted(k for k in R[0]["m"] if k.startswith(("win", "kvgroup")))
-        for g in ["self", "story_tail", "question", "choices", "choice_words", "rest_after_p"] + extra:
+        for g in ["self", "story_tail", "question", "choices", "choice_words", "remention", "remention_words", "rest_after_p"] + extra:
+            if g not in R[0]["m"] or not R[0]["sizes"].get(g, 1):
+                continue
             d = np.array([r["m"][g] - r["m_B"] for r in R])
             rng = np.random.default_rng(0)
             bs = d[rng.integers(0, len(d), (10000, len(d)))].mean(1)

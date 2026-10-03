@@ -10,7 +10,7 @@ from pathlib import Path
 
 ARXIV = {
     "geiger2021inducing": "2112.00826", "geiger2024finding": "2303.02536", "makelov2024subspace": "2311.17030",
-    "wu2024reply": "2401.12631", "prakash2025lookbacks": "2505.14685", "lieberum2023chinchilla": "2307.09458",
+    "wu2024reply": "2401.12631", "lieberum2023chinchilla": "2307.09458",
     "wiegreffe2025answer": "2407.15018", "tulchinskii2024wise": "2410.02343", "ok2026lost": "2601.14152",
     "wong2026decide": "2601.03914", "sun2026persuaded": "2605.09314", "oh2026rebinding": "2606.08644",
     "wu2026record": "2609.24635", "cheng2026steering": "2604.08524", "zou2026introspection": "2609.35108",
@@ -33,6 +33,13 @@ AUTHOR_FIX = {
 }
 
 MANUAL = r"""
+@inproceedings{prakash2025lookbacks,
+  title = {{Language Models use Lookbacks to Track Beliefs}},
+  author = {Nikhil Prakash and Natalie Shapira and Arnab Sen Sharma and Christoph Riedl and Yonatan Belinkov and Tamar Rott Shaham and David Bau and Atticus Geiger},
+  booktitle = {International Conference on Learning Representations},
+  year = {2026},
+  note = {arXiv:2505.14685}
+}
 @misc{anonymous2026fitted,
   title  = {Beyond the Fitted Answer: Causal Dissection and Downstream Consequences of Learned Activation Interventions},
   author = {Anonymous},

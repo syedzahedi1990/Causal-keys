@@ -1,0 +1,50 @@
+P1      direct      n= 40 competent= 40 mass=0.98 span=+16.74
+    d[K_S@0  ]   +6.04 [ +5.25, +6.88]   dlogp(S)= +5.00  dlogp(B)= -1.04  dlogp(X)= +2.29
+    d[V_S@0  ]  +10.10 [ +8.99,+11.29]   dlogp(S)= +7.01  dlogp(B)= -3.09  dlogp(X)= +2.54
+    d[KV_S@0 ]  +16.74 [+15.64,+17.92]   dlogp(S)= +8.01  dlogp(B)= -8.73  dlogp(X)= -0.41
+    d[K_S@8  ]   +2.14 [ +1.65, +2.62]   dlogp(S)= +2.09  dlogp(B)= -0.05  dlogp(X)= +0.59
+    d[V_S@8  ]   +9.97 [ +8.92,+11.10]   dlogp(S)= +7.02  dlogp(B)= -2.95  dlogp(X)= +2.54
+    d[K_X@0  ]   +3.89 [ +3.13, +4.65]   dlogp(S)= +2.58  dlogp(B)= -1.31  dlogp(X)= +5.08
+    d[V_X@0  ]   +5.79 [ +5.10, +6.51]   dlogp(S)= +2.21  dlogp(B)= -3.58  dlogp(X)= +7.40
+    d[KV_X@0 ]   +8.59 [ +7.67, +9.50]   dlogp(S)= +0.61  dlogp(B)= -7.99  dlogp(X)= +7.91
+    interaction   +0.60 [ -0.53, +1.69]   key share 0.374   recovery dKV/span 1.000
+BEFORE  direct      n= 40 competent= 29 mass=0.95 span=+14.33
+    d[K_S@0  ]   +1.16 [ +0.74, +1.60]   dlogp(S)= +0.75  dlogp(B)= -0.41  dlogp(X)= +0.96
+    d[V_S@0  ]  +13.09 [+11.93,+14.26]   dlogp(S)= +6.56  dlogp(B)= -6.52  dlogp(X)= +1.03
+    d[KV_S@0 ]  +14.33 [+13.35,+15.38]   dlogp(S)= +7.39  dlogp(B)= -6.94  dlogp(X)= +0.43
+    d[K_S@8  ]   +1.16 [ +0.74, +1.60]   dlogp(S)= +0.75  dlogp(B)= -0.41  dlogp(X)= +0.96
+    d[V_S@8  ]  +13.00 [+11.83,+14.20]   dlogp(S)= +6.47  dlogp(B)= -6.54  dlogp(X)= +1.00
+    d[K_X@0  ]   +2.09 [ +1.66, +2.52]   dlogp(S)= +1.15  dlogp(B)= -0.94  dlogp(X)= +0.93
+    d[V_X@0  ]   +7.71 [ +6.91, +8.51]   dlogp(S)= +0.86  dlogp(B)= -6.86  dlogp(X)= +6.87
+    d[KV_X@0 ]   +7.52 [ +6.79, +8.25]   dlogp(S)= +0.39  dlogp(B)= -7.13  dlogp(X)= +7.41
+    interaction   +0.08 [ -0.61, +0.76]   key share 0.081   recovery dKV/span 1.000
+NONE    direct      n= 40 competent= 30 mass=0.63 span=+23.49
+    d[K_S@0  ]   +1.91 [ +1.05, +2.83]   dlogp(S)= +1.69  dlogp(B)= -0.22  dlogp(X)= +1.69
+    d[V_S@0  ]  +21.10 [+19.66,+22.56]   dlogp(S)=+10.29  dlogp(B)=-10.81  dlogp(X)= +1.20
+    d[KV_S@0 ]  +23.49 [+22.46,+24.54]   dlogp(S)=+11.39  dlogp(B)=-12.10  dlogp(X)= -0.10
+    d[K_S@8  ]   +1.91 [ +1.06, +2.84]   dlogp(S)= +1.68  dlogp(B)= -0.23  dlogp(X)= +1.69
+    d[V_S@8  ]  +21.08 [+19.63,+22.54]   dlogp(S)=+10.27  dlogp(B)=-10.81  dlogp(X)= +1.20
+    d[K_X@0  ]   +3.10 [ +2.30, +3.92]   dlogp(S)= +1.25  dlogp(B)= -1.86  dlogp(X)= +1.80
+    d[V_X@0  ]  +11.67 [+10.87,+12.51]   dlogp(S)= +0.34  dlogp(B)=-11.34  dlogp(X)=+11.11
+    d[KV_X@0 ]  +11.93 [+11.23,+12.64]   dlogp(S)= +0.12  dlogp(B)=-11.81  dlogp(X)=+11.82
+    interaction   +0.48 [ -0.78, +1.69]   key share 0.083   recovery dKV/span 1.000
+POST    direct      n= 40 competent= 28 mass=0.75 span=+15.35
+    d[K_S@0  ]   +0.35 [ -0.14, +0.83]   dlogp(S)= +0.30  dlogp(B)= -0.05  dlogp(X)= +0.85
+    d[V_S@0  ]  +14.34 [+13.14,+15.66]   dlogp(S)= +6.76  dlogp(B)= -7.58  dlogp(X)= +0.57
+    d[KV_S@0 ]  +15.35 [+14.20,+16.63]   dlogp(S)= +7.45  dlogp(B)= -7.90  dlogp(X)= -0.15
+    d[K_S@8  ]   +0.98 [ +0.49, +1.47]   dlogp(S)= +0.80  dlogp(B)= -0.18  dlogp(X)= +1.11
+    d[V_S@8  ]  +14.48 [+13.27,+15.79]   dlogp(S)= +6.75  dlogp(B)= -7.73  dlogp(X)= +0.53
+    d[K_X@0  ]   +1.87 [ +1.33, +2.45]   dlogp(S)= +1.03  dlogp(B)= -0.84  dlogp(X)= +0.39
+    d[V_X@0  ]   +8.09 [ +7.39, +8.81]   dlogp(S)= +0.43  dlogp(B)= -7.66  dlogp(X)= +7.03
+    d[KV_X@0 ]   +7.68 [ +6.99, +8.38]   dlogp(S)= +0.25  dlogp(B)= -7.43  dlogp(X)= +7.26
+    interaction   +0.66 [ -0.11, +1.42]   key share 0.024   recovery dKV/span 1.000
+LETTER  direct      n= 40 competent= 30 mass=1.00 span=+14.96
+    d[K_S@0  ]   +9.28 [ +8.24,+10.34]   dlogp(S)= +5.06  dlogp(B)= -4.21  dlogp(X)= +1.72
+    d[V_S@0  ]   +3.71 [ +2.82, +4.70]   dlogp(S)= +2.01  dlogp(B)= -1.70  dlogp(X)= +1.40
+    d[KV_S@0 ]  +14.96 [+13.95,+16.00]   dlogp(S)= +7.96  dlogp(B)= -7.00  dlogp(X)= -0.13
+    d[K_S@8  ]   +1.39 [ +0.90, +1.96]   dlogp(S)= +1.12  dlogp(B)= -0.28  dlogp(X)= +0.41
+    d[V_S@8  ]   +3.42 [ +2.62, +4.33]   dlogp(S)= +1.89  dlogp(B)= -1.53  dlogp(X)= +1.38
+    d[K_X@0  ]   +6.87 [ +5.88, +7.81]   dlogp(S)= +2.03  dlogp(B)= -4.83  dlogp(X)= +5.07
+    d[V_X@0  ]   +3.86 [ +3.05, +4.71]   dlogp(S)= +1.85  dlogp(B)= -2.00  dlogp(X)= +2.61
+    d[KV_X@0 ]   +7.40 [ +6.37, +8.36]   dlogp(S)= +1.02  dlogp(B)= -6.38  dlogp(X)= +6.42
+    interaction   +1.97 [ +0.29, +3.65]   key share 0.714   recovery dKV/span 1.000

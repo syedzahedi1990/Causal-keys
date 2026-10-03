@@ -2,7 +2,7 @@
 
 **Working title:** Looked Up, Not Copied: The Readout Decides Whether In-Context State Travels Through Attention Keys or Values, and What Interventions Change
 
-**Status (2026-10-03):** direction chosen and pilot evidence in hand. CPU gate experiments are running. GPU stages are not started yet ($0 spent).
+**Status (2026-10-03, updated):** direction chosen. CPU gate G1 passed (Section 3b′) and the reader is localised (Section 3b″). GPU stages not started ($0 spent). A Colab notebook for stage 1 is ready: `notebooks/gpu_stage1_format_factorial.ipynb`.
 
 ---
 
@@ -56,15 +56,40 @@ Qwen2.5-1.5B, argmax rate of answering S among items answered correctly in both 
 - In log-odds, keys and values **add** (interaction ≈ 0) when choices come after the story, with key share 0.44–0.52.
 - SmolLM2-1.7B shows the same pattern without choices (keys 0%, values 86%).
 
+### 3b′. Gate G1 with Paper 1's exact encoder (Qwen2.5-1.5B, n=40, log-odds, 95% CIs)
+
+Results for direct questions. Identity is measured as a double difference against a third location X that is absent from the story body, which cancels the non-specific "weaken the base" effect.
+
+| Format | Key effect | Value effect | Key share | Identity carried by keys |
+|---|---|---|---|---|
+| Paper 1 (choices after) | +6.0 [5.3, 6.9] | +10.1 | 0.37 | **+2.6** |
+| Lettered options after | +9.3 | +3.7 | **0.71** | **+3.2** |
+| Choices before the story | +1.2 | +13.1 | 0.08 | −0.2 |
+| No choices | +1.9 | +21.1 | 0.08 | +0.3 |
+| Neutral sentence re-mentioning all six locations after the story | +0.4 [−0.1, 0.8] | +14.3 | 0.02 | −0.6 |
+
+Keys and values add in every format (interaction ≈ 0, recovery = 1.000).
+
+**Refinement:** a plain re-mention does not open the key channel. **Listed answer options** after the state token do, and more option-like formats (letters) give a larger key share. Without options, keys only slightly weaken the base answer.
+
+### 3b″. Who reads the key? Exact row-restricted key swap (attention computed twice per layer and spliced by row)
+
+| Rows allowed to see the source key | Paper 1 format | Lettered options |
+|---|---|---|
+| The six location words in the options line | **87%** of the full key effect | **98%** |
+| Question tokens | 0% | 1% |
+| Story after the state token | −1% | 0% |
+| Instruction, chat tokens, prefill, answer position | 0% | 0% |
+
 ### 3c. Mechanism probe
 
 With the base story's critical key replaced by the source run's key, the **source word in the choices line** attends to the critical token exactly as it does in the source run. Its peak attention at layer 16 is 0.35 vs 0.15 for non-matching words. The base word's attention drops to baseline. So later candidate mentions look the state token up by key identity (`results/choice_attention_qwen1.5b_world.txt`).
 
 ## 4. Claims (to be preregistered after gate G2)
 
-- **C1, re-mention gate.**
-  - Key effect ≈ 0 with no post-state re-mention: choices before the story, no choices, a neutral listing sentence before the story, cloze.
-  - Key effect > 0 with a post-state re-mention: choices after, lettered options, or a neutral sentence after the story with a free-form answer.
+- **C1, option-listing gate** (updated after gate G1).
+  - Identity-specific key effect ≈ 0 without listed answer options after the state token: no choices, choices before the story, or a neutral re-mention sentence.
+  - Identity-specific key effect > 0 with options listed after the state token, larger for lettered options.
 - **C2, additivity.** Key and value effects add in log-odds (interaction ≤ 15% of the joint effect).
 - **C3, reader.** The key effect is read by the re-mentioned candidate tokens. It is localised to identified heads and layers, and knocking out candidate→state attention removes it.
 - **C4, scale.** In Qwen2.5 from 0.5B to 72B (plus Llama, Gemma and Mistral), the key share of the multiple-choice answer rises with scale.

@@ -1,0 +1,12 @@
+identity(K) by arm, all items (95% core bootstrap)
+model                                            P1                 LETTER                   NONE                 BEFORE                   POST
+Mistral-Small-24B-Instruct-2501  +9.62 [ +9.44, +9.80]  +9.20 [ +9.08, +9.33]  +0.44 [ +0.34, +0.55]  -0.53 [ -0.59, -0.47]  +5.63 [ +5.36, +5.90]
+Qwen2.5-32B-Instruct         +32.39 [+31.58,+33.20] +34.77 [+34.48,+35.06]  +1.10 [ +0.94, +1.26]  -0.42 [ -0.58, -0.29] +10.26 [ +9.58,+10.94]
+Qwen2.5-72B-Instruct         +25.57 [+24.98,+26.13] +26.41 [+26.16,+26.66]  +0.48 [ +0.38, +0.58]  -1.99 [ -2.16, -1.82]  +8.45 [ +7.98, +8.91]
+
+P1 - NONE identity(K), paired by core; P1 key share at l0=0 and depth-matched l0
+Mistral-Small-24B-Instruct-2501 diff  +9.18 [ +8.98, +9.39] (n=150)   share@0  +0.78 [ +0.77, +0.79]   share@2/40  +0.78 [ +0.77, +0.79]
+Qwen2.5-32B-Instruct         diff +31.29 [+30.50,+32.05] (n=150)   share@0  +0.86 [ +0.84, +0.87]   share@4/64  +0.86 [ +0.85, +0.87]
+Qwen2.5-72B-Instruct         diff +25.09 [+24.50,+25.67] (n=150)   share@0  +0.76 [ +0.75, +0.77]   share@5/80  +0.76 [ +0.75, +0.77]
+
+(Stage-1 verdict lines omitted: they refer to the stage-1 model list. C4 is scored in docs/PREREGISTRATION.md.)

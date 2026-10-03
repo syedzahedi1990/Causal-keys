@@ -1,0 +1,24 @@
+
+######## mistral  (mistralai/Mistral-Small-24B-Instruct-2501 @ 9527884be6e5616bdd54de542f9ae13384489724, NVIDIA A100-SXM4-80GB x2, transformers 5.9.0)
+  reproduction vs Paper 1 saved native outputs (P1, direct, argmax token): M 0.994 (n=360), P 1.000 (n=360)
+  P1     n= 96  phi(M) +0.705 [+0.677,+0.732]  psi(add) +0.528 [+0.489,+0.565]  rho(rem) +0.762 [+0.748,+0.776]  M T-rate 0.809  P S-rate 1.000  natural span +19.44
+  NONE   n= 96  phi(M) +0.708 [+0.681,+0.734]  psi(add) +0.069 [+0.058,+0.080]  rho(rem) +0.182 [+0.163,+0.202]  M T-rate 0.854  P S-rate 1.000  natural span +20.26
+  BEFORE n= 96  phi(M) +0.738 [+0.712,+0.762]  psi(add) -0.001 [-0.012,+0.010]  rho(rem) +0.007 [-0.004,+0.018]  M T-rate 0.844  P S-rate 1.000  natural span +16.45
+  POST   n= 96  phi(M) +0.719 [+0.691,+0.746]  psi(add) +0.196 [+0.161,+0.230]  rho(rem) +0.454 [+0.434,+0.474]  M T-rate 0.868  P S-rate 1.000  natural span +16.93
+  LETTER n= 96  phi(M) +0.749 [+0.710,+0.786]  psi(add) +0.777 [+0.734,+0.816]  rho(rem) +0.986 [+0.980,+0.992]  M T-rate 0.764  P S-rate 1.000  natural span +17.18
+  PREDICTIONS (mistral):
+    C1 transfer law: phi_NONE +0.708 [+0.681,+0.734] within kappa_V 0.53 +/- 0.15 -> NOT MET
+    C2 phi_P1 - phi_NONE = -0.003 [-0.019,+0.013] -> NOT MET
+    C3 psi_NONE +0.069 < 0.5 * psi_P1 (+0.528) -> MET
+
+######## qwen  (Qwen/Qwen2.5-72B-Instruct @ 495f39366efef23836d0cfae4fbe635880d2be31, NVIDIA A100-SXM4-80GB x2, transformers 5.9.0)
+  reproduction vs Paper 1 saved native outputs (P1, direct, argmax token): M 1.000 (n=360), P 1.000 (n=360)
+  P1     n= 96  phi(M) +0.895 [+0.864,+0.921]  psi(add) +0.633 [+0.592,+0.672]  rho(rem) +0.794 [+0.776,+0.811]  M T-rate 0.931  P S-rate 1.000  natural span +52.60
+  NONE   n= 96  phi(M) +0.861 [+0.837,+0.884]  psi(add) +0.052 [+0.046,+0.059]  rho(rem) +0.106 [+0.091,+0.122]  M T-rate 0.924  P S-rate 1.000  natural span +47.02
+  BEFORE n= 96  phi(M) +0.906 [+0.885,+0.923]  psi(add) -0.033 [-0.043,-0.024]  rho(rem) -0.024 [-0.038,-0.009]  M T-rate 0.955  P S-rate 1.000  natural span +45.22
+  POST   n= 96  phi(M) +0.866 [+0.841,+0.890]  psi(add) +0.209 [+0.174,+0.245]  rho(rem) +0.335 [+0.312,+0.359]  M T-rate 0.931  P S-rate 1.000  natural span +43.12
+  LETTER n= 96  phi(M) +0.901 [+0.869,+0.928]  psi(add) +0.887 [+0.862,+0.909]  rho(rem) +0.994 [+0.988,+1.001]  M T-rate 0.924  P S-rate 1.000  natural span +49.47
+  PREDICTIONS (qwen):
+    C1 transfer law: phi_NONE +0.861 [+0.837,+0.884] within kappa_V 0.73 +/- 0.15 -> MET
+    C2 phi_P1 - phi_NONE = +0.034 [+0.018,+0.049] -> MET
+    C3 psi_NONE +0.052 < 0.5 * psi_P1 (+0.633) -> MET

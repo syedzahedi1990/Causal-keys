@@ -89,3 +89,42 @@ Other families: Qwen3-8B 0.84, Mistral-7B 0.92, OLMo-2-7B 0.73.
 - **C4, natural factorial.** P1 key share ≥ 0.80 at Mistral-Small-24B, Qwen2.5-32B and Qwen2.5-72B. BEFORE identity(K) ≤ 0.5 nats in all three.
 
 **Exploratory, no prediction:** φ, ψ and ρ for BEFORE, POST and LETTER; PCA and f_star source-transfer rates per format.
+
+---
+
+## Outcome of P-2026-10-03-C (GPU stage 2; scored by analysis/stage2_score.py and analysis/stage1_prereg.py)
+
+- **Run:** 2× A100 80GB, torch 2.11.0, transformers 5.9.0, code at 2b1eca7.
+- **Output:** `results/gpu_stage2/STAGE2_FRAMES_SCORE.txt` and `STAGE2_FACTORIAL_SCORE.txt`.
+
+**Gate (reproduction of Paper 1, P1 format, argmax token vs saved native outputs): passed.**
+- Mistral-24B: M 0.994, P 1.000 (n = 360 each).
+- Qwen-72B: M 1.000, P 1.000.
+
+| Prediction | Mistral-Small-24B | Qwen2.5-72B |
+|---|---|---|
+| C1 φ_NONE(M) within κ_V ± 0.15 | 0.708 [0.681, 0.734] vs 0.53 ± 0.15 → **not met** | 0.861 [0.837, 0.884] vs 0.73 ± 0.15 → **met** (at the edge) |
+| C2 φ_P1 − φ_NONE > 0 | −0.003 [−0.019, +0.013] → **not met** | +0.034 [+0.018, +0.049] → **met** (small) |
+| C3 ψ_NONE < 0.5·ψ_P1 | 0.069 vs 0.528 → **met** | 0.052 vs 0.633 → **met** |
+
+**C4, natural factorial.**
+- P1 key share ≥ 0.80 → **not met** overall: Mistral-24B 0.78 [0.77, 0.79] no; Qwen2.5-32B 0.86 [0.84, 0.87] yes; Qwen2.5-72B 0.76 [0.75, 0.77] no.
+- BEFORE identity(K) ≤ 0.5 → **met** in all three: −0.53, −0.42, −1.99.
+
+**Exploratory results** (all formats, distinct cores, fits averaged):
+
+| Format | φ(M) Mistral / Qwen | ψ (key addition) Mistral / Qwen | ρ (key removal) Mistral / Qwen |
+|---|---|---|---|
+| P1 | 0.71 / 0.90 | 0.53 / 0.63 | 0.76 / 0.79 |
+| LETTER | 0.75 / 0.90 | 0.78 / 0.89 | 0.99 / 0.99 |
+| POST | 0.72 / 0.87 | 0.20 / 0.21 | 0.45 / 0.34 |
+| NONE | 0.71 / 0.86 | 0.07 / 0.05 | 0.18 / 0.11 |
+| BEFORE | 0.74 / 0.91 | 0.00 / −0.03 | 0.01 / −0.02 |
+
+**Reading** (stated after seeing the data, so not part of the preregistration):
+- The learned remap's behavioural effect is essentially **readout-invariant**: φ is flat across formats, and PCA source transfer is 1.000 in every format.
+- The **key-only exchange is strongly readout-dependent**: it is large only when candidates are listed after the state token and vanishes for free-form or options-before readouts.
+- So Paper 1's key-exchange result reflects its multiple-choice readout. The remap is written redundantly into the key and value channels, and the channel that appears to "carry" it depends on which channel the readout reads.
+- The κ_V-based transfer law (C1/C2) is not supported. The value-channel completeness estimated from fixed-value clamping underestimates how fully the remap is carried by values.
+
+**Qwen2.5 P1 key share across scale:** 0.37 (1.5B), 0.69 (3B), 0.82 (7B), 0.91 (14B), 0.86 (32B), 0.76 (72B). It is non-monotonic beyond 14B.

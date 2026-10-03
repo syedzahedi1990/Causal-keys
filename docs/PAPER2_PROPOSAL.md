@@ -4,7 +4,9 @@
 
 **Status (2026-10-03, after code review):**
 - **Gate G1 was not met as originally written.** No-option formats still show 1–2 nats of key effect.
-- **The option-listing version of C1 is exploratory.** It was adopted *after* seeing the data. A fresh-seed CPU test and an out-of-sample GPU test are preregistered in `docs/PREREGISTRATION.md`.
+- **The option-listing version of C1 was adopted *after* seeing the data.** It has since passed a preregistered fresh-seed test in the same model, with all 3 predictions met (`docs/PREREGISTRATION.md`):
+  - identity(K): +2.85 in P1, +4.10 for letters, and within ±0.41 nats in all no-option arms.
+  - The cross-model test (GPU stage 1) is preregistered and pending.
 - **Measurement code was audited** by an independent review workflow, and the verified issues are fixed.
 - **The reader is localised** at 1.5B (Section 3b″).
 - **GPU stages have not started** ($0 spent). The Colab notebook for stage 1 is ready.

@@ -26,10 +26,23 @@ No tunnels or remote shells. The GPU box runs a fixed script at a known commit, 
    - copies `gpu_stage1_results.tgz` to Drive with Vast's cloud copy and reads it through the Drive connector;
    - destroys the instance.
 
-## Stage 2: Paper 1 bases at 24B and 72B (X6 in docs/PAPER2_PROPOSAL.md)
+## Stage 2: Paper 1 bases at 24B/72B plus the natural factorial at 24–72B (preregistered P-2026-10-03-C)
 
-A script is to follow (`experiments/paper1_frames.py`). It will reproduce Paper 1's learned remap (M) and PCA (P) runs from the released bases, then:
-- evaluate them under the free-form, choices-before and lettered formats, as the transfer-law test;
-- run the full natural key/value factorial.
+**Hardware:** 2× 80GB GPUs (2× A100 80GB ≈ $1.3–2/h, or 2× H100 ≈ $3–4/h). Disk ≥ 300 GB, PyTorch template. Runtime is about 2–3 hours, mostly model downloads.
 
-Hardware: 24B on 1× A100/H100 80GB; 72B on 2× 80GB GPUs.
+With 1 GPU, the 24B and 32B parts still run and the 72B parts are skipped.
+
+Run it in the instance's **Jupyter → Terminal**:
+```bash
+git clone -b claude/paper2-research https://github.com/syedzahedi1990/Causal-keys.git && cd Causal-keys
+bash scripts/gpu_stage2.sh
+```
+
+The script:
+- downloads Paper 1's released data from the anonymous repository;
+- pins transformers 5.9.0 and the Paper 1 model revisions;
+- runs the Paper 1 frames for Mistral-24B and Qwen-72B;
+- runs the natural factorial for Mistral-24B, Qwen2.5-32B and Qwen2.5-72B;
+- writes `gpu_stage2_results.tgz`.
+
+Put that file in the Google Drive folder `causal-keys-results` and tell Claude. Then destroy the instance.

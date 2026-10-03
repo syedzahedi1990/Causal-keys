@@ -65,3 +65,25 @@ def test_self_key_exchange_noop_and_null_norm(mt):
 def test_rotated_subspace_orthonormal():
     s = RotatedSubspace(32, 4, init=pca_basis(torch.randn(50, 32), 4))
     assert torch.allclose(s.U @ s.U.T, torch.eye(4), atol=1e-5)
+
+
+def test_row_splice_exact(mt):
+    """Row-restricted key swap: all rows == full swap, no rows == clean (needs use_cache=False)."""
+    import experiments.row_restricted_keys as rr
+    from ckeys.interventions import edits
+    model, tok = mt
+    ids, pos = enc(tok, "shelf")
+    nL = model.config.num_hidden_layers
+    g = torch.Generator().manual_seed(0)
+    ks = {l: 3 * torch.randn(model.model.layers[l].self_attn.k_proj.out_features, generator=g) for l in range(nL)}
+    with torch.no_grad():
+        base = model(ids, use_cache=False).logits[0, -1]
+        with edits(model, [(l, "k", [pos], (lambda h, l=l: ks[l].expand_as(h))) for l in range(nL)]):
+            full = model(ids, use_cache=False).logits[0, -1]
+        rs = rr.RowSplice(model)
+        rs.ks, rs.pos, rs.active = ks, pos, True
+        for mask, ref in ((torch.ones(ids.shape[1], dtype=torch.bool), full),
+                          (torch.zeros(ids.shape[1], dtype=torch.bool), base)):
+            rs.mask = mask
+            assert torch.allclose(model(ids, use_cache=False).logits[0, -1], ref, atol=1e-4)
+        rs.active = False

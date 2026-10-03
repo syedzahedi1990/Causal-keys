@@ -120,10 +120,10 @@ def main():
             groups["all"] = list(range(T))
             iS, iB = cid[LOCATIONS.index(core["source"])], cid[LOCATIONS.index(core["base"])]
             with capture(model, range(nL), "k") as K:
-                lpS = torch.log_softmax(model(is_).logits[0, -1].float(), -1)
+                lpS = torch.log_softmax(model(is_, use_cache=False).logits[0, -1].float(), -1)
             rs.ks = {l: K[l][0, p] for l in range(nL)}
             rs.pos = p
-            lpB = torch.log_softmax(model(ib).logits[0, -1].float(), -1)
+            lpB = torch.log_softmax(model(ib, use_cache=False).logits[0, -1].float(), -1)
             out = {"core": core, "arm": arm, "p": p, "T": T, "sizes": {g: len(v) for g, v in groups.items()},
                    "m_B": (lpB[iS] - lpB[iB]).item(), "m_S": (lpS[iS] - lpS[iB]).item(), "m": {}}
             rs.active = True
@@ -131,7 +131,7 @@ def main():
                 mask = torch.zeros(T, dtype=torch.bool)
                 mask[idx] = True
                 rs.mask = mask
-                lp = torch.log_softmax(model(ib).logits[0, -1].float(), -1)
+                lp = torch.log_softmax(model(ib, use_cache=False).logits[0, -1].float(), -1)
                 out["m"][g] = (lp[iS] - lp[iB]).item()
             rs.active = False
             res.append(out)

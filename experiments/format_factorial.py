@@ -100,7 +100,7 @@ def run_item(model, tok, core, arm, view, device):
         for mod, ch in ((at.k_proj, "K"), (at.v_proj, "V")):
             def hk(_m, _i, out, t=tabs[(l, ch)]):
                 out = out.clone()
-                out[:, pos] = t.to(out.dtype)
+                out[:, pos] = t.to(out.device, out.dtype)
                 return out
             hs.append(mod.register_forward_hook(hk))
     with hooks(hs):
@@ -188,13 +188,20 @@ def main():
     ap.add_argument("--dtype", default="float32")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--out", default="results/format_factorial")
+    ap.add_argument("--device-map", default=None, help="'auto' to shard a large model across GPUs")
+    ap.add_argument("--revision", default=None)
     a = ap.parse_args()
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    tok = AutoTokenizer.from_pretrained(a.model)
-    kw = {"dtype": getattr(torch, a.dtype)}
+    tok = AutoTokenizer.from_pretrained(a.model, revision=a.revision)
+    kw = {"dtype": getattr(torch, a.dtype), "revision": a.revision}
     if "gemma-2" in a.model.lower():
         kw["attn_implementation"] = "eager"  # SDPA drops Gemma-2 attention-logit softcapping
-    model = AutoModelForCausalLM.from_pretrained(a.model, **kw).to(device).eval()
+    if a.device_map:
+        kw["device_map"] = a.device_map
+    model = AutoModelForCausalLM.from_pretrained(a.model, **kw).eval()
+    if not a.device_map:
+        model = model.to(device)
+    device = next(model.parameters()).device  # inputs go to the first shard
     cores = make_cores(a.n, random.Random(a.seed))
     res, skipped, t0 = [], 0, time.time()
     for arm in a.arms.split(","):

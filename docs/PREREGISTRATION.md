@@ -63,3 +63,29 @@ Other families: Qwen3-8B 0.84, Mistral-7B 0.92, OLMo-2-7B 0.73.
   So the post hoc "listed answer options only" refinement from 1.5B does **not** generalise. At scale, a plain re-mention after the state token also opens the key channel, at roughly a third to half the strength of an options list. This is closer to the original re-mention hypothesis H*.
 - **BEFORE** (options before the story) is at or below 0 in every model (−0.45 to +0.01). This is the cleanest structural control: readers that precede the state token cannot read its key.
 - **NONE** carries small positive identity(K) in larger models (+1.0 to +1.25 nats at 7–14B). That is outside the CPU-era ±1 margin, though under 5% of P1.
+
+---
+
+## P-2026-10-03-C: GPU stage 2, Paper 1's released bases at 24B/72B across formats, plus a natural factorial at 24–72B
+
+**Committed before any stage-2 run.**
+
+**Runs:**
+- `scripts/gpu_stage2.sh` → `experiments/paper1_frames.py` (native story cores, Paper 1 encoder, transformers 5.9.0, pinned model revisions, released `original_1000` bases m3/pca/f_star, seeds 101–103).
+- `experiments/format_factorial.py` at Mistral-Small-24B, Qwen2.5-32B and Qwen2.5-72B (n = 150).
+
+**Scoring:** `analysis/stage2_score.py`, committed with this entry.
+- Primary population: native cores with B, S and T distinct.
+- Fits are averaged within core, then a core bootstrap is taken.
+- φ_f = [m(M) − m(P)] / [m(T) − m(S)], where m = logp(T) − logp(S).
+- ψ_f = [m(P+K_M) − m(P)] / [m(M) − m(P)].
+
+**Gate (reproduction).** In P1, the argmax of M and of P must agree with Paper 1's saved native outputs on ≥ 0.95 of (core, fit) items, per model. If this fails, C1–C3 are reported as unreliable for that model.
+
+**Predictions** (per model, Mistral-Small-24B and Qwen2.5-72B):
+- **C1, transfer law.** φ_NONE(M) lies within ±0.15 of the remap's value completeness κ_V, which was estimated beforehand from Paper 1's fixed-value data: 0.73 for Qwen-72B and 0.53 for Mistral-24B.
+- **C2.** φ_P1(M) − φ_NONE(M) > 0, with a paired bootstrap CI excluding 0. The learned remap transfers less to free-form answers than to the multiple-choice format it was fit in.
+- **C3.** Key-only addition is much weaker without a post-state re-mention: ψ_NONE < 0.5 · ψ_P1.
+- **C4, natural factorial.** P1 key share ≥ 0.80 at Mistral-Small-24B, Qwen2.5-32B and Qwen2.5-72B. BEFORE identity(K) ≤ 0.5 nats in all three.
+
+**Exploratory, no prediction:** φ, ψ and ρ for BEFORE, POST and LETTER; PCA and f_star source-transfer rates per format.

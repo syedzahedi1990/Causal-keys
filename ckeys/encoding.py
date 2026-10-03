@@ -42,10 +42,30 @@ def alphabet(arm: str) -> tuple[str, ...]:
     return LETTERS if arm == "LETTER" else LOCATIONS
 
 
-def encode(tok, raw: str, system: str = "You are a helpful assistant.", prefill: str = "Answer:") -> torch.Tensor:
+WRAPPER_USED = {"system_merged": False}
+
+
+def chat_text(tok, raw: str, system: str = "You are a helpful assistant.", prefill: str = "Answer:") -> str:
+    """Paper 1 wrapper: system turn + user turn + generation prompt (thinking disabled) + prefill.
+
+    Templates that reject a system role (e.g. Gemma-2) get the system text merged into the user turn;
+    this is recorded in WRAPPER_USED. ``enable_thinking`` is ignored by templates that do not use it.
+    """
     msgs = ([{"role": "system", "content": system}] if system else []) + [{"role": "user", "content": raw}]
-    text = tok.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True)
-    return tok(text + prefill, add_special_tokens=False, return_tensors="pt").input_ids
+    try:
+        text = tok.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True, enable_thinking=False)
+    except Exception as e:  # jinja2 TemplateError for unsupported system role
+        if not system or "system" not in str(e).lower():
+            raise
+        WRAPPER_USED["system_merged"] = True
+        text = tok.apply_chat_template([{"role": "user", "content": system + "\n\n" + raw}], tokenize=False,
+                                       add_generation_prompt=True, enable_thinking=False)
+    assert text.count(raw) == 1, "wrapper must contain the raw prompt exactly once"
+    return text + prefill
+
+
+def encode(tok, raw: str, system: str = "You are a helpful assistant.", prefill: str = "Answer:") -> torch.Tensor:
+    return tok(chat_text(tok, raw, system, prefill), add_special_tokens=False, return_tensors="pt").input_ids
 
 
 def candidate_ids(tok, arm: str) -> list[int]:

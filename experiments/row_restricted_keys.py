@@ -20,7 +20,7 @@ import numpy as np
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from ckeys.encoding import LISTING, LETTER_LISTING, candidate_ids, raw_prompt
+from ckeys.encoding import LISTING, LETTER_LISTING, candidate_ids, chat_text, raw_prompt
 from ckeys.interventions import blocks, capture
 from ckeys.story import LOCATIONS, make_cores, record
 
@@ -28,8 +28,7 @@ SYSTEM = "You are a helpful assistant."
 
 
 def encode_with_offsets(tok, raw):
-    msgs = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": raw}]
-    text = tok.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True) + "Answer:"
+    text = chat_text(tok, raw, SYSTEM)
     enc = tok(text, add_special_tokens=False, return_offsets_mapping=True, return_tensors="pt")
     return text, enc.input_ids, enc.offset_mapping[0].tolist()
 

@@ -1,0 +1,16 @@
+Loading weights:   0%|          | 0/291 [00:00<?, ?it/s]Loading weights: 100%|██████████| 291/291 [00:00<00:00, 8267.58it/s]
+  direct/P1 done (15s)
+  direct/NONE done (27s)
+  direct/LETTER done (42s)
+  world/P1 done (56s)
+  world/NONE done (69s)
+  world/LETTER done (83s)
+/workspace/Causal-keys/experiments/role_factorial.py:92: RuntimeWarning: divide by zero encountered in divide
+  f = d[idx].mean(1) / full[idx].mean(1)
+{"args": {"model": "mistralai/Mistral-7B-Instruct-v0.3", "n": 150, "arms": "P1,NONE,LETTER", "views": "direct,world", "dtype": "bfloat16", "device_map": null, "seed": 0, "out": "results/gpu_stage3b/role_factorial"}, "git_commit": "3ca63f14f7f369b368bf8190eabc231019af9b4b", "torch": "2.11.0+cu128", "transformers": "5.18.0", "python": "3.12.14", "device": "NVIDIA A100-SXM4-80GB", "wrapper": {"system_merged": false}, "l0_fracs": [0.0, 0.0625, 0.3], "skipped_items": 0}
+direct LETTER  n=150 full role effect +28.86 | K_R d= +0.01 frac=+0.00 [-0.00,+0.00] | V_R d= +0.32 frac=+0.01 [+0.01,+0.02] | KV_R d= +0.39 frac=+0.01 [+0.01,+0.02]
+direct NONE    n=150 full role effect +26.59 | K_R d= +0.51 frac=+0.02 [+0.01,+0.03] | V_R d= +0.03 frac=+0.00 [-0.00,+0.00] | KV_R d= +0.46 frac=+0.02 [+0.01,+0.02]
+direct P1      n=150 full role effect +28.42 | K_R d= +0.07 frac=+0.00 [+0.00,+0.00] | V_R d= +0.11 frac=+0.00 [+0.00,+0.01] | KV_R d= +0.19 frac=+0.01 [+0.00,+0.01]
+world  LETTER  n=150 full role effect  +0.08 | K_R d= -0.02 frac=-0.22 [-2.43,+2.46] | V_R d= +0.02 frac=+0.29 [-3.17,+3.65] | KV_R d= +0.05 frac=+0.55 [-3.57,+4.47]
+world  NONE    n=150 full role effect  +0.25 | K_R d= +0.50 frac=+2.04 [-13.50,+19.91] | V_R d= +0.02 frac=+0.07 [-1.03,+1.17] | KV_R d= +0.34 frac=+1.37 [-9.30,+12.46]
+world  P1      n=150 full role effect  +0.10 | K_R d= +0.07 frac=+0.68 [-5.21,+6.24] | V_R d= +0.03 frac=+0.32 [-2.26,+2.93] | KV_R d= +0.08 frac=+0.86 [-5.44,+7.23]

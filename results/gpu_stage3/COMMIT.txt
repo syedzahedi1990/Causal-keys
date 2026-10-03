@@ -1,0 +1,1 @@
+b8815cb Paper scaffold: ICML 2026 style, verified bibliography, auto tables, writing brief

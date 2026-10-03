@@ -1,0 +1,18 @@
+Loading weights:   0%|          | 0/579 [00:00<?, ?it/s]Loading weights: 100%|██████████| 579/579 [00:00<00:00, 8795.41it/s]
+  direct/P1 done (23s)
+  direct/NONE done (44s)
+  direct/LETTER done (67s)
+  world/P1 done (90s)
+  world/NONE done (111s)
+  world/LETTER done (134s)
+/workspace/Causal-keys/experiments/role_factorial.py:92: RuntimeWarning: divide by zero encountered in divide
+  f = d[idx].mean(1) / full[idx].mean(1)
+/workspace/Causal-keys/experiments/role_factorial.py:92: RuntimeWarning: invalid value encountered in divide
+  f = d[idx].mean(1) / full[idx].mean(1)
+{"args": {"model": "Qwen/Qwen2.5-14B-Instruct", "n": 150, "arms": "P1,NONE,LETTER", "views": "direct,world", "dtype": "bfloat16", "device_map": null, "seed": 0, "out": "results/gpu_stage3b/role_factorial"}, "git_commit": "3ca63f14f7f369b368bf8190eabc231019af9b4b", "torch": "2.11.0+cu128", "transformers": "5.18.0", "python": "3.12.14", "device": "NVIDIA A100-SXM4-80GB", "wrapper": {"system_merged": false}, "l0_fracs": [0.0, 0.0625, 0.3], "skipped_items": 0}
+direct LETTER  n=150 full role effect +66.01 | K_R d= -0.03 frac=-0.00 [-0.00,+0.00] | V_R d= -0.02 frac=-0.00 [-0.00,+0.00] | KV_R d= -0.00 frac=-0.00 [-0.00,+0.00]
+direct NONE    n=150 full role effect +51.41 | K_R d= +0.05 frac=+0.00 [+0.00,+0.00] | V_R d= -0.01 frac=-0.00 [-0.00,+0.00] | KV_R d= -0.03 frac=-0.00 [-0.00,+0.00]
+direct P1      n=150 full role effect +79.79 | K_R d= +0.06 frac=+0.00 [+0.00,+0.00] | V_R d= -0.03 frac=-0.00 [-0.00,+0.00] | KV_R d= -0.00 frac=-0.00 [-0.00,+0.00]
+world  LETTER  n=150 full role effect  +0.02 | K_R d= -0.02 frac=-0.71 [+nan,+nan] | V_R d= +0.02 frac=+0.86 [-5.00,+6.10] | KV_R d= +0.02 frac=+0.75 [-5.00,+5.50]
+world  NONE    n=150 full role effect  -0.03 | K_R d= +0.08 frac=-2.34 [-24.22,+23.35] | V_R d= -0.00 frac=+0.06 [-4.51,+4.78] | KV_R d= -0.01 frac=+0.17 [-4.85,+4.57]
+world  P1      n=150 full role effect  +0.02 | K_R d= +0.06 frac=+3.20 [-20.70,+24.54] | V_R d= +0.01 frac=+0.44 [-5.81,+6.56] | KV_R d= +0.03 frac=+1.82 [-11.50,+12.59]

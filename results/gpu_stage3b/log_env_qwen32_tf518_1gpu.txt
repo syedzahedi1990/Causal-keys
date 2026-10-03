@@ -1,0 +1,55 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Fetching 17 files:   0%|          | 0/17 [00:00<?, ?it/s]Fetching 17 files:   6%|▌         | 1/17 [03:10<50:55, 190.98s/it]Fetching 17 files:  12%|█▏        | 2/17 [03:28<22:18, 89.24s/it] Fetching 17 files:  18%|█▊        | 3/17 [03:31<11:33, 49.53s/it]Fetching 17 files:  24%|██▎       | 4/17 [03:44<07:39, 35.33s/it]Fetching 17 files:  29%|██▉       | 5/17 [03:47<04:44, 23.73s/it]Fetching 17 files:  35%|███▌      | 6/17 [04:02<03:47, 20.69s/it]Fetching 17 files:  41%|████      | 7/17 [04:05<02:26, 14.66s/it]Fetching 17 files:  47%|████▋     | 8/17 [04:47<03:32, 23.60s/it]Fetching 17 files:  53%|█████▎    | 9/17 [06:31<06:28, 48.58s/it]Fetching 17 files:  59%|█████▉    | 10/17 [07:21<05:44, 49.16s/it]Fetching 17 files:  65%|██████▍   | 11/17 [07:35<03:49, 38.22s/it]Fetching 17 files:  71%|███████   | 12/17 [07:53<02:40, 32.04s/it]Fetching 17 files:  76%|███████▋  | 13/17 [07:55<01:32, 23.21s/it]Fetching 17 files:  82%|████████▏ | 14/17 [07:59<00:51, 17.20s/it]Fetching 17 files:  88%|████████▊ | 15/17 [08:06<00:28, 14.11s/it]Fetching 17 files:  94%|█████████▍| 16/17 [08:07<00:10, 10.33s/it]Fetching 17 files: 100%|██████████| 17/17 [08:08<00:00,  7.46s/it]Fetching 17 files: 100%|██████████| 17/17 [08:08<00:00, 28.74s/it]
+Loading weights:   0%|          | 0/771 [00:00<?, ?it/s]Loading weights:  31%|███▏      | 242/771 [00:00<00:00, 2401.40it/s]Loading weights:  88%|████████▊ | 676/771 [00:00<00:00, 3537.29it/s]Loading weights: 100%|██████████| 771/771 [00:00<00:00, 3626.42it/s]
+  P1/direct done (93s)
+  NONE/direct done (175s)
+  BEFORE/direct done (269s)
+{"args": {"model": "Qwen/Qwen2.5-32B-Instruct", "n": 150, "arms": "P1,NONE,BEFORE", "views": "direct", "dtype": "bfloat16", "seed": 0, "out": "results/gpu_stage3b/env_check/tf518_1gpu", "device_map": null, "revision": null}, "git_commit": "3ca63f14f7f369b368bf8190eabc231019af9b4b", "torch": "2.11.0+cu128", "transformers": "5.18.0", "python": "3.12.14", "device": "NVIDIA A100-SXM4-80GB", "wrapper": {"system_merged": false}, "l0_fracs": [0.0, 0.0625, 0.3], "skipped_items": 0}
+P1      direct      [all] n=150 cand-mass=1.00 span=+71.50 batch-noise-floor=0.151
+   l0= 0  dK  +61.38 [+59.82,+62.98]  dV  +10.25 [ +9.18,+11.37]  dKV  +71.56 [+69.96,+73.13]
+          key share   +0.86 [ +0.85, +0.87]  interaction   -0.07 [ -1.83, +1.71]  interaction/dKV   -0.00 [ -0.03, +0.02]
+   l0= 4  dK  +60.77 [+59.23,+62.34]  dV   +9.94 [ +8.91,+11.02]  dKV  +71.64 [+70.03,+73.22]
+          key share   +0.86 [ +0.85, +0.87]  interaction   +0.93 [ -0.82, +2.74]  interaction/dKV   +0.01 [ -0.01, +0.04]
+   l0=19  dK  +42.38 [+40.08,+44.72]  dV   +9.38 [ +8.55,+10.26]  dKV  +67.06 [+65.25,+68.88]
+          key share   +0.82 [ +0.81, +0.83]  interaction  +15.31 [+13.21,+17.48]  interaction/dKV   +0.23 [ +0.20, +0.26]
+   identity(K)  +32.39 [+31.58,+33.19]   identity(V)   +7.10 [ +6.53, +7.69]   dlogp(B) under K_S -25.95, K_X -25.76
+P1      direct      [competent] n=150 cand-mass=1.00 span=+71.50 batch-noise-floor=0.151
+   l0= 0  dK  +61.38 [+59.82,+62.98]  dV  +10.25 [ +9.18,+11.37]  dKV  +71.56 [+69.96,+73.13]
+          key share   +0.86 [ +0.85, +0.87]  interaction   -0.07 [ -1.83, +1.71]  interaction/dKV   -0.00 [ -0.03, +0.02]
+   l0= 4  dK  +60.77 [+59.23,+62.34]  dV   +9.94 [ +8.91,+11.02]  dKV  +71.64 [+70.03,+73.22]
+          key share   +0.86 [ +0.85, +0.87]  interaction   +0.93 [ -0.82, +2.74]  interaction/dKV   +0.01 [ -0.01, +0.04]
+   l0=19  dK  +42.38 [+40.08,+44.72]  dV   +9.38 [ +8.55,+10.26]  dKV  +67.06 [+65.25,+68.88]
+          key share   +0.82 [ +0.81, +0.83]  interaction  +15.31 [+13.21,+17.48]  interaction/dKV   +0.23 [ +0.20, +0.26]
+   identity(K)  +32.39 [+31.58,+33.19]   identity(V)   +7.10 [ +6.53, +7.69]   dlogp(B) under K_S -25.95, K_X -25.76
+BEFORE  direct      [all] n=150 cand-mass=1.00 span=+68.04 batch-noise-floor=0.166
+   l0= 0  dK   +2.84 [ +2.44, +3.25]  dV  +65.15 [+63.67,+66.57]  dKV  +68.09 [+66.56,+69.58]
+          key share   +0.04 [ +0.04, +0.05]  interaction   +0.11 [ -0.51, +0.71]  interaction/dKV   +0.00 [ -0.01, +0.01]
+   l0= 4  dK   +2.87 [ +2.47, +3.29]  dV  +65.16 [+63.69,+66.59]  dKV  +68.12 [+66.59,+69.60]
+          key share   +0.04 [ +0.04, +0.05]  interaction   +0.08 [ -0.54, +0.69]  interaction/dKV   +0.00 [ -0.01, +0.01]
+   l0=19  dK   +2.85 [ +2.46, +3.27]  dV  +65.13 [+63.66,+66.55]  dKV  +68.08 [+66.56,+69.56]
+          key share   +0.04 [ +0.04, +0.05]  interaction   +0.10 [ -0.52, +0.70]  interaction/dKV   +0.00 [ -0.01, +0.01]
+   identity(K)   -0.42 [ -0.57, -0.29]   identity(V)  +30.55 [+29.66,+31.38]   dlogp(B) under K_S -0.00, K_X -0.00
+BEFORE  direct      [competent] n=150 cand-mass=1.00 span=+68.04 batch-noise-floor=0.166
+   l0= 0  dK   +2.84 [ +2.44, +3.25]  dV  +65.15 [+63.67,+66.57]  dKV  +68.09 [+66.56,+69.58]
+          key share   +0.04 [ +0.04, +0.05]  interaction   +0.11 [ -0.51, +0.71]  interaction/dKV   +0.00 [ -0.01, +0.01]
+   l0= 4  dK   +2.87 [ +2.47, +3.29]  dV  +65.16 [+63.69,+66.59]  dKV  +68.12 [+66.59,+69.60]
+          key share   +0.04 [ +0.04, +0.05]  interaction   +0.08 [ -0.54, +0.69]  interaction/dKV   +0.00 [ -0.01, +0.01]
+   l0=19  dK   +2.85 [ +2.46, +3.27]  dV  +65.13 [+63.66,+66.55]  dKV  +68.08 [+66.56,+69.56]
+          key share   +0.04 [ +0.04, +0.05]  interaction   +0.10 [ -0.52, +0.70]  interaction/dKV   +0.00 [ -0.01, +0.01]
+   identity(K)   -0.42 [ -0.57, -0.29]   identity(V)  +30.55 [+29.66,+31.38]   dlogp(B) under K_S -0.00, K_X -0.00
+NONE    direct      [all] n=150 cand-mass=0.03 span=+63.28 batch-noise-floor=0.156
+   l0= 0  dK   +9.75 [ +9.19,+10.33]  dV  +53.85 [+52.71,+54.99]  dKV  +63.39 [+62.14,+64.65]
+          key share   +0.15 [ +0.15, +0.16]  interaction   -0.21 [ -0.91, +0.49]  interaction/dKV   -0.00 [ -0.01, +0.01]
+   l0= 4  dK   +9.76 [ +9.19,+10.33]  dV  +53.85 [+52.71,+55.00]  dKV  +63.40 [+62.15,+64.67]
+          key share   +0.15 [ +0.15, +0.16]  interaction   -0.21 [ -0.90, +0.49]  interaction/dKV   -0.00 [ -0.01, +0.01]
+   l0=19  dK   +9.75 [ +9.19,+10.33]  dV  +53.87 [+52.73,+55.00]  dKV  +63.41 [+62.16,+64.67]
+          key share   +0.15 [ +0.15, +0.16]  interaction   -0.21 [ -0.89, +0.48]  interaction/dKV   -0.00 [ -0.01, +0.01]
+   identity(K)   +1.10 [ +0.94, +1.25]   identity(V)  +23.39 [+22.48,+24.25]   dlogp(B) under K_S -0.10, K_X +0.01
+NONE    direct      [competent] n=150 cand-mass=0.03 span=+63.28 batch-noise-floor=0.156
+   l0= 0  dK   +9.75 [ +9.19,+10.33]  dV  +53.85 [+52.71,+54.99]  dKV  +63.39 [+62.14,+64.65]
+          key share   +0.15 [ +0.15, +0.16]  interaction   -0.21 [ -0.91, +0.49]  interaction/dKV   -0.00 [ -0.01, +0.01]
+   l0= 4  dK   +9.76 [ +9.19,+10.33]  dV  +53.85 [+52.71,+55.00]  dKV  +63.40 [+62.15,+64.67]
+          key share   +0.15 [ +0.15, +0.16]  interaction   -0.21 [ -0.90, +0.49]  interaction/dKV   -0.00 [ -0.01, +0.01]
+   l0=19  dK   +9.75 [ +9.19,+10.33]  dV  +53.87 [+52.73,+55.00]  dKV  +63.41 [+62.16,+64.67]
+          key share   +0.15 [ +0.15, +0.16]  interaction   -0.21 [ -0.89, +0.48]  interaction/dKV   -0.00 [ -0.01, +0.01]
+   identity(K)   +1.10 [ +0.94, +1.25]   identity(V)  +23.39 [+22.48,+24.25]   dlogp(B) under K_S -0.10, K_X +0.01

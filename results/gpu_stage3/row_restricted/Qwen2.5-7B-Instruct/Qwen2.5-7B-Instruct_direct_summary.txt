@@ -1,0 +1,54 @@
+P1: n=60  full K_S effect +38.94 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= -0.06 [-0.18,+0.05]  frac of full -0.00
+   rows=story_tail    (avg   8.0 tok)  d= +0.03 [-0.03,+0.08]  frac of full +0.00
+   rows=question      (avg  10.0 tok)  d= -0.03 [-0.09,+0.03]  frac of full -0.00
+   rows=choices       (avg  13.0 tok)  d=+35.91 [+34.64,+37.23]  frac of full +0.92
+   rows=choice_words  (avg   6.0 tok)  d=+35.99 [+34.72,+37.31]  frac of full +0.92
+   rows=rest_after_p  (avg  16.0 tok)  d= +0.51 [+0.41,+0.61]  frac of full +0.01
+   rows=kvgroup0      (avg   nan tok)  d= +0.80 [+0.53,+1.09]  frac of full +0.02
+   rows=kvgroup1      (avg   nan tok)  d= +2.34 [+1.37,+3.43]  frac of full +0.06
+   rows=kvgroup2      (avg   nan tok)  d= -0.02 [-0.14,+0.12]  frac of full -0.00
+   rows=kvgroup3      (avg   nan tok)  d= +0.24 [+0.01,+0.50]  frac of full +0.01
+   rows=win00         (avg   nan tok)  d= +1.77 [+0.69,+3.02]  frac of full +0.05
+   rows=win04         (avg   nan tok)  d= -0.02 [-0.10,+0.06]  frac of full -0.00
+   rows=win08         (avg   nan tok)  d= +0.49 [+0.22,+0.80]  frac of full +0.01
+   rows=win12         (avg   nan tok)  d= +3.12 [+2.26,+4.13]  frac of full +0.08
+   rows=win16         (avg   nan tok)  d= +0.05 [-0.01,+0.11]  frac of full +0.00
+   rows=win20         (avg   nan tok)  d= +0.01 [-0.03,+0.04]  frac of full +0.00
+   rows=win24         (avg   nan tok)  d= +0.00 [-0.02,+0.03]  frac of full +0.00
+POST: n=60  full K_S effect +11.70 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= -0.44 [-0.58,-0.31]  frac of full -0.04
+   rows=story_tail    (avg   8.0 tok)  d= -0.06 [-0.12,-0.01]  frac of full -0.01
+   rows=question      (avg  10.0 tok)  d= +0.03 [-0.02,+0.08]  frac of full +0.00
+   rows=remention     (avg  21.0 tok)  d= +7.86 [+6.83,+8.88]  frac of full +0.67
+   rows=remention_words (avg   6.0 tok)  d= +7.80 [+6.78,+8.83]  frac of full +0.67
+   rows=rest_after_p  (avg  14.0 tok)  d= +1.30 [+1.10,+1.50]  frac of full +0.11
+   rows=kvgroup0      (avg   nan tok)  d= +0.00 [+0.00,+0.00]  frac of full +0.00
+   rows=kvgroup1      (avg   nan tok)  d= +0.00 [+0.00,+0.00]  frac of full +0.00
+   rows=kvgroup2      (avg   nan tok)  d= +0.00 [+0.00,+0.00]  frac of full +0.00
+   rows=kvgroup3      (avg   nan tok)  d= +0.00 [+0.00,+0.00]  frac of full +0.00
+   rows=win00         (avg   nan tok)  d= +0.00 [+0.00,+0.00]  frac of full +0.00
+   rows=win04         (avg   nan tok)  d= +0.00 [+0.00,+0.00]  frac of full +0.00
+   rows=win08         (avg   nan tok)  d= +0.00 [+0.00,+0.00]  frac of full +0.00
+   rows=win12         (avg   nan tok)  d= +0.00 [+0.00,+0.00]  frac of full +0.00
+   rows=win16         (avg   nan tok)  d= +0.00 [+0.00,+0.00]  frac of full +0.00
+   rows=win20         (avg   nan tok)  d= +0.00 [+0.00,+0.00]  frac of full +0.00
+   rows=win24         (avg   nan tok)  d= +0.00 [+0.00,+0.00]  frac of full +0.00
+LETTER: n=60  full K_S effect +39.75 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= +0.06 [-0.07,+0.18]  frac of full +0.00
+   rows=story_tail    (avg   8.0 tok)  d= +0.03 [-0.04,+0.10]  frac of full +0.00
+   rows=question      (avg  10.0 tok)  d= +0.00 [-0.10,+0.10]  frac of full +0.00
+   rows=choices       (avg  25.0 tok)  d=+39.81 [+38.45,+41.07]  frac of full +1.00
+   rows=choice_words  (avg   6.0 tok)  d=+39.78 [+38.43,+41.03]  frac of full +1.00
+   rows=rest_after_p  (avg  15.0 tok)  d= +0.07 [+0.03,+0.12]  frac of full +0.00
+   rows=kvgroup0      (avg   nan tok)  d= +0.51 [+0.24,+0.81]  frac of full +0.01
+   rows=kvgroup1      (avg   nan tok)  d= +2.81 [+1.80,+3.98]  frac of full +0.07
+   rows=kvgroup2      (avg   nan tok)  d= +0.48 [+0.12,+0.92]  frac of full +0.01
+   rows=kvgroup3      (avg   nan tok)  d= +0.27 [-0.06,+0.55]  frac of full +0.01
+   rows=win00         (avg   nan tok)  d= +1.97 [+1.14,+2.97]  frac of full +0.05
+   rows=win04         (avg   nan tok)  d= -0.04 [-0.14,+0.06]  frac of full -0.00
+   rows=win08         (avg   nan tok)  d= +0.40 [+0.04,+0.70]  frac of full +0.01
+   rows=win12         (avg   nan tok)  d= +5.77 [+3.91,+7.88]  frac of full +0.15
+   rows=win16         (avg   nan tok)  d= +0.06 [-0.03,+0.16]  frac of full +0.00
+   rows=win20         (avg   nan tok)  d= +0.00 [-0.04,+0.04]  frac of full +0.00
+   rows=win24         (avg   nan tok)  d= +0.01 [-0.03,+0.04]  frac of full +0.00

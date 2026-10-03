@@ -1,0 +1,16 @@
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights: 100%|██████████| 339/339 [00:00<00:00, 9670.21it/s]
+  direct/P1 done (13s)
+  direct/NONE done (24s)
+  direct/LETTER done (37s)
+  world/P1 done (49s)
+  world/NONE done (60s)
+  world/LETTER done (73s)
+/workspace/Causal-keys/experiments/role_factorial.py:92: RuntimeWarning: divide by zero encountered in divide
+  f = d[idx].mean(1) / full[idx].mean(1)
+{"args": {"model": "Qwen/Qwen2.5-7B-Instruct", "n": 150, "arms": "P1,NONE,LETTER", "views": "direct,world", "dtype": "bfloat16", "device_map": null, "seed": 0, "out": "results/gpu_stage3b/role_factorial"}, "git_commit": "3ca63f14f7f369b368bf8190eabc231019af9b4b", "torch": "2.11.0+cu128", "transformers": "5.18.0", "python": "3.12.14", "device": "NVIDIA A100-SXM4-80GB", "wrapper": {"system_merged": false}, "l0_fracs": [0.0, 0.0625, 0.3], "skipped_items": 0}
+direct LETTER  n=150 full role effect +29.85 | K_R d= +0.08 frac=+0.00 [-0.00,+0.01] | V_R d= +0.55 frac=+0.02 [+0.01,+0.02] | KV_R d= +0.64 frac=+0.02 [+0.01,+0.03]
+direct NONE    n=150 full role effect +28.69 | K_R d= +0.40 frac=+0.01 [+0.01,+0.02] | V_R d= +0.04 frac=+0.00 [+0.00,+0.00] | KV_R d= +0.38 frac=+0.01 [+0.01,+0.02]
+direct P1      n=150 full role effect +34.37 | K_R d= +0.21 frac=+0.01 [+0.00,+0.01] | V_R d= +0.34 frac=+0.01 [+0.01,+0.01] | KV_R d= +0.58 frac=+0.02 [+0.01,+0.02]
+world  LETTER  n=150 full role effect  -0.12 | K_R d= -0.04 frac=+0.34 [-1.37,+2.23] | V_R d= -0.03 frac=+0.25 [-1.71,+2.36] | KV_R d= -0.02 frac=+0.16 [-2.00,+2.17]
+world  NONE    n=150 full role effect  +0.00 | K_R d= +0.14 frac=+42.37 [-40.06,+41.68] | V_R d= +0.01 frac=+3.06 [-4.62,+4.81] | KV_R d= +0.06 frac=+18.37 [-15.59,+18.27]
+world  P1      n=150 full role effect  +0.03 | K_R d= +0.04 frac=+1.43 [-10.13,+10.65] | V_R d= +0.06 frac=+2.07 [-12.91,+15.38] | KV_R d= +0.09 frac=+2.96 [-17.72,+18.00]

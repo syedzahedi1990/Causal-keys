@@ -1,0 +1,1 @@
+3ca63f1 Preregister stage 3b (2x2 controls, role control, environment check, value-only exchange)

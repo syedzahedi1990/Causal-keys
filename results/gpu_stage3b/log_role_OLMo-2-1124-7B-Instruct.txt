@@ -1,0 +1,14 @@
+Loading weights:   0%|          | 0/355 [00:00<?, ?it/s]Loading weights: 100%|██████████| 355/355 [00:00<00:00, 10124.49it/s]
+  direct/P1 done (17s)
+  direct/NONE done (33s)
+  direct/LETTER done (49s)
+  world/P1 done (66s)
+  world/NONE done (82s)
+  world/LETTER done (99s)
+{"args": {"model": "allenai/OLMo-2-1124-7B-Instruct", "n": 150, "arms": "P1,NONE,LETTER", "views": "direct,world", "dtype": "bfloat16", "device_map": null, "seed": 0, "out": "results/gpu_stage3b/role_factorial"}, "git_commit": "3ca63f14f7f369b368bf8190eabc231019af9b4b", "torch": "2.11.0+cu128", "transformers": "5.18.0", "python": "3.12.14", "device": "NVIDIA A100-SXM4-80GB", "wrapper": {"system_merged": false}, "l0_fracs": [0.0, 0.0625, 0.3], "skipped_items": 0}
+direct LETTER  n=150 full role effect +12.51 | K_R d= -0.00 frac=-0.00 [-0.00,+0.00] | V_R d= +0.03 frac=+0.00 [+0.00,+0.00] | KV_R d= +0.03 frac=+0.00 [+0.00,+0.00]
+direct NONE    n=150 full role effect +17.71 | K_R d= +0.25 frac=+0.01 [+0.01,+0.02] | V_R d= +0.03 frac=+0.00 [-0.00,+0.00] | KV_R d= +0.24 frac=+0.01 [+0.01,+0.02]
+direct P1      n=150 full role effect +16.90 | K_R d= +0.07 frac=+0.00 [+0.00,+0.01] | V_R d= +0.03 frac=+0.00 [+0.00,+0.00] | KV_R d= +0.10 frac=+0.01 [+0.00,+0.01]
+world  LETTER  n=150 full role effect  +0.06 | K_R d= -0.01 frac=-0.16 [-1.70,+1.24] | V_R d= +0.01 frac=+0.23 [-1.26,+1.87] | KV_R d= +0.02 frac=+0.38 [-1.86,+2.70]
+world  NONE    n=150 full role effect  +0.01 | K_R d= +0.03 frac=+2.40 [-11.25,+14.99] | V_R d= +0.03 frac=+1.95 [-10.29,+11.37] | KV_R d= +0.04 frac=+2.83 [-11.76,+13.51]
+world  P1      n=150 full role effect  +0.04 | K_R d= +0.01 frac=+0.24 [-2.10,+2.83] | V_R d= +0.01 frac=+0.18 [-2.29,+2.48] | KV_R d= +0.03 frac=+0.77 [-4.58,+5.26]

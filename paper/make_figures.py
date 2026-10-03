@@ -44,12 +44,21 @@ MODEL_TAG = {"Qwen2.5-1.5B-Instruct": "QwenOnefive", "Qwen2.5-3B-Instruct": "Qwe
              "Mistral-Small-24B-Instruct-2501": "MistralTwentyfour", "OLMo-2-1124-7B-Instruct": "OlmoSeven"}
 ARM_LABEL = {"P1": "options-\nafter", "LETTER": "letters-\nafter", "POST": "sentence-\nafter",
              "NONE": "no-\nmention", "BEFORE": "list-\nbefore"}
+ARM_TEX = {"P1": "\\fmtOpt{}", "LETTER": "\\fmtLetter{}", "POST": "\\fmtPost{}", "NONE": "\\fmtNone{}",
+           "BEFORE": "\\fmtBefore{}", "AFTER": "\\fmtListA{}", "PRE": "\\fmtSentB{}"}
 macros = {}
 
 
 def mac(name, value, fmt="{:.2f}"):
     assert name.isalpha(), f"LaTeX macro names must be letters only: {name}"
     macros[name] = fmt.format(value) if not isinstance(value, str) else value
+
+
+def cell(t, f="{:+.1f}", fci=None):
+    """Estimate on one line, its 95% interval below in scriptsize."""
+    fci = fci or f
+    return (f"\\begin{{tabular}}[t]{{@{{}}c@{{}}}}{f.format(t[0])}\\\\[-1pt]"
+            f"{{\\scriptsize[{fci.format(t[1])}, {fci.format(t[2])}]}}\\end{{tabular}}")
 
 
 def ratio_ci(a, b, B=10000, seed=0):
@@ -80,6 +89,8 @@ for f in files:
                     "idV": ci([v["idV"] for v in arms[a].values()])} for a in ARMS},
         "idK": {a: ci([v["idK"] for v in arms[a].values()]) for a in ARMS},
         "share": ratio_ci([v["d"]["K_S@0"] for v in p1.values()], [v["d"]["K_S@0"] + v["d"]["V_S@0"] for v in p1.values()]),
+        "idshare": {a: ratio_ci([v["idK"] for v in arms[a].values()],
+                                [v["idK"] + v["idV"] for v in arms[a].values()]) for a in ARMS},
         "shares": {a: ratio_ci([v["d"]["K_S@0"] for v in arms[a].values()],
                                [v["d"]["K_S@0"] + v["d"]["V_S@0"] for v in arms[a].values()]) for a in ARMS},
     }
@@ -92,6 +103,13 @@ for m in order:
     for a in ARMS:
         mac(f"idK{ARM_TAG[a]}{key}", nat[m]["idK"][a][0], "{:.1f}")
 mac("nModels", len(nat), "{:d}")
+for a in ARMS:
+    vals = [nat[m]["idshare"][a][0] for m in order]
+    mac(f"idShare{ARM_TAG[a]}Min", min(vals)); mac(f"idShare{ARM_TAG[a]}Max", max(vals))
+    big = [nat[m]["idshare"][a][0] for m in order if m != "Qwen2.5-1.5B-Instruct"]
+    mac(f"idShare{ARM_TAG[a]}MinNoOnefive", min(big)); mac(f"idShare{ARM_TAG[a]}MaxNoOnefive", max(big))
+for m in order:
+    mac(f"idShareOpt{MODEL_TAG[m]}", nat[m]["idshare"]["P1"][0])
 before_max = max(nat[m]["idK"]["BEFORE"][0] for m in nat)
 mac("beforeMax", before_max, "{:+.2f}")
 none_max = max(nat[m]["idK"]["NONE"][0] for m in nat)
@@ -166,7 +184,25 @@ for model, label in (("mistral", "Mistral-Small-24B"), ("qwen", "Qwen2.5-72B")):
         mac(f"mT{ARM_TAG[a]}{mtag}", out[a]["mT"])
     frames[label] = out
 
-fig, axes = plt.subplots(1, 2, figsize=(6.8, 2.35), sharey=True)
+# exploratory cross-check: does the intervention's channel follow the natural identity read? (same pinned models)
+NATM = {"Mistral-Small-24B": "Mistral-Small-24B-Instruct-2501", "Qwen2.5-72B": "Qwen2.5-72B-Instruct"}
+cross = {}
+for (model, label) in (("mistral", "Mistral-Small-24B"), ("qwen", "Qwen2.5-72B")):
+    res = json.load(open(ROOT / f"results/gpu_stage3b/paper1_frames_v/{model}.json"))["results"]
+    for a in FRAME_ARMS:
+        R = s2.per_core(res, a)
+        ak = [x["add"] - x["P"] for x in R.values()]; av = [x["addv"] - x["P"] for x in R.values()]
+        cross[(label, a)] = (nat[NATM[label]]["idshare"][a], ratio_ci(ak, [k + v for k, v in zip(ak, av)]))
+        mac(f"chShare{ARM_TAG[a]}{model.capitalize()}", cross[(label, a)][1][0])
+        mac(f"natShare{ARM_TAG[a]}{model.capitalize()}", cross[(label, a)][0][0])
+cx = np.array([v[0][0] for v in cross.values()]); cy = np.array([v[1][0] for v in cross.values()])
+mac("crossR", float(np.corrcoef(cx, cy)[0, 1]))
+mac("crossMaxGap", float(np.max(np.abs(cx - cy))))
+
+fig = plt.figure(figsize=(6.8, 2.35))
+gs = fig.add_gridspec(1, 4, width_ratios=[1, 1, 0.2, 0.8], wspace=0.08)
+axes = [fig.add_subplot(gs[0, 0])]
+axes.append(fig.add_subplot(gs[0, 1], sharey=axes[0]))
 w = 0.26
 for ax, (label, out) in zip(axes, frames.items()):
     xs = np.arange(len(FRAME_ARMS))
@@ -175,46 +211,50 @@ for ax, (label, out) in zip(axes, frames.items()):
         v = [out[a][q][0] for a in FRAME_ARMS]
         e = np.array([[out[a][q][0] - out[a][q][1] for a in FRAME_ARMS], [out[a][q][2] - out[a][q][0] for a in FRAME_ARMS]])
         ax.bar(xs + (k - 1) * w, v, w * 0.9, color=col, label=name, yerr=e, error_kw=dict(lw=0.6, ecolor=INK2), zorder=3)
-        if q == "psiV":
-            for xi, vi in zip(xs + (k - 1) * w, v):
-                ax.text(xi, max(vi, 0) + 0.04, f"{vi:.2f}", ha="center", fontsize=5, color=INK2)
     ax.axhline(0, color=INK2, lw=0.6)
     ax.set_xticks(xs)
-    ax.set_xticklabels([ARM_LABEL[a] for a in FRAME_ARMS], fontsize=6)
-    ax.set_title(label, fontsize=8, color=INK)
+    ax.set_xticklabels([ARM_LABEL[a].replace("-\n", "\n") for a in FRAME_ARMS], fontsize=5.8)
+    ax.set_title(f"({'ab'[list(frames).index(label)]}) {label}", fontsize=7.5, color=INK)
     ax.set_ylim(-0.1, 1.15)
     ax.grid(axis="y", color=GRID, lw=0.6)
 axes[0].set_ylabel("fraction of the remap's effect")
+plt.setp(axes[1].get_yticklabels(), visible=False)
 h, l = axes[0].get_legend_handles_labels()
-fig.legend(h, l, frameon=False, fontsize=6.5, loc="upper center", ncol=3)
-fig.tight_layout(rect=(0, 0, 1, 0.9))
+fig.legend(h, l, frameon=False, fontsize=6.5, loc="upper left", bbox_to_anchor=(0.06, 1.0), ncol=3)
+
+ax = fig.add_subplot(gs[0, 3])
+ax.plot([-0.15, 1.05], [-0.15, 1.05], color=INK2, lw=0.6, ls=":", zorder=1)
+ABBR = {"LETTER": "letters", "P1": "options", "POST": "sentence", "NONE": "none", "BEFORE": "before"}
+for (label, a), (nx, cy_) in cross.items():
+    mist = label.startswith("Mistral")
+    ax.errorbar(nx[0], cy_[0], xerr=[[nx[0] - nx[1]], [nx[2] - nx[0]]], yerr=[[cy_[0] - cy_[1]], [cy_[2] - cy_[0]]],
+                fmt="o" if mist else "s", ms=3.4, color=INK2, mfc="white" if mist else INK, mec=INK, mew=0.7,
+                elinewidth=0.6, zorder=3, label=label if a == "LETTER" else None)
+    if label.startswith("Qwen"):
+        ax.annotate(ABBR[a], (nx[0], cy_[0]), textcoords="offset points",
+                    xytext={"LETTER": (-24, -3), "P1": (5, -5), "POST": (5, -6), "NONE": (6, 0), "BEFORE": (5, -7)}[a],
+                    fontsize=5.6, color=INK2)
+ax.set_xlim(-0.15, 1.05); ax.set_ylim(-0.15, 1.05)
+ax.set_xticks([0, 0.5, 1]); ax.set_yticks([0, 0.5, 1])
+ax.set_xlabel("natural read: identity key share", fontsize=6.5)
+ax.set_ylabel("remap: $\\psi_K/(\\psi_K+\\psi_V)$", fontsize=6.5, labelpad=2)
+ax.set_title("(c) remap vs. natural read", fontsize=7.5, color=INK)
+ax.grid(color=GRID, lw=0.6)
+ax.legend(frameon=False, fontsize=5.8, loc="lower right", handletextpad=0.1, borderaxespad=0.2)
+fig.subplots_adjust(left=0.075, right=0.99, bottom=0.2, top=0.8)
 fig.savefig(FIG / "fig_frames.pdf")
 plt.close(fig)
 
-# ---------------------------------------------------------------- localisation at 1.5B (CPU)
+# ---------------------------------------------------------------- localisation at 1.5B (CPU): macros only
 loc = json.load(open(ROOT / "results/row_restricted_windows/Qwen2.5-1.5B-Instruct_direct.json"))
-groups = [("choice_words", "option words"), ("question", "question"), ("story_tail", "story after state"),
+groups = [("choice_words", "option words"), ("question", "question"), ("story_tail", "story after writing token"),
           ("rest_after_p", "instruction / answer tail")]
-fig, ax = plt.subplots(figsize=(3.5, 1.9))
 for k, (arm, col) in enumerate((("P1", BLUE), ("LETTER", ORANGE))):
     R = [r for r in loc if r["arm"] == arm]
     full = [r["m"]["all"] - r["m_B"] for r in R]
     vals = [ratio_ci([r["m"][g] - r["m_B"] for r in R], full)[0] for g, _ in groups]
     for g, v in zip(groups, vals):
         mac(f"loc{ARM_TAG[arm]}{g[0].replace('_', '').capitalize()}", v)
-    ys = np.arange(len(groups)) + (k - 0.5) * 0.36
-    ax.barh(ys, vals, 0.34, color=col, label={"P1": "options-after", "LETTER": "letters-after"}[arm], zorder=3)
-ax.set_yticks(range(len(groups)))
-ax.set_yticklabels([g[1] for g in groups])
-ax.invert_yaxis()
-ax.axvline(0, color=INK2, lw=0.6)
-ax.set_xlabel("fraction of full key effect recovered")
-ax.set_xlim(-0.1, 1.1)
-ax.grid(axis="x", color=GRID, lw=0.6)
-ax.legend(frameon=False, fontsize=6.3, loc="lower right")
-fig.tight_layout()
-fig.savefig(FIG / "fig_localisation.pdf")
-plt.close(fig)
 
 # ---------------------------------------------------------------- Paper 1 fixed-value key share (CPU reanalysis anchors)
 mac("sKQwenFV", 0.745)
@@ -238,13 +278,20 @@ for m in order:
 lines += [r"\bottomrule", r"\end{tabular}"]
 (TAB / "tab_natural.tex").write_text("\n".join(lines) + "\n")
 
+lines = [r"\begin{tabular}{lccccc}", r"\toprule",
+         r"Model & \fmtLetter & \fmtOpt & \fmtPost & \fmtNone & \fmtBefore \\", r"\midrule"]
+for m in order:
+    lines.append(f"{SHORT[m]} & " + " & ".join(cell(nat[m]["idshare"][a], "{:+.2f}") for a in ARMS) + r" \\")
+lines += [r"\bottomrule", r"\end{tabular}"]
+(TAB / "tab_idshare.tex").write_text("\n".join(lines) + "\n")
+
 # appendix: full decomposition per model x format
 lines = [r"\begin{tabular}{llrrrrr}", r"\toprule",
          r"Model & Format & $d_K$ & $d_V$ & $d_{KV}$ & interaction & $\mathrm{ID}_V$ \\", r"\midrule"]
 for m in order:
     for i, a in enumerate(ARMS):
         d = nat[m]["dec"][a]
-        lines.append(f"{SHORT[m] if i == 0 else ''} & {ARM_LABEL[a].replace(chr(10), ' ')} & {d['dK'][0]:+.1f} & {d['dV'][0]:+.1f} & "
+        lines.append(f"{SHORT[m] if i == 0 else ''} & {ARM_TEX[a]} & {d['dK'][0]:+.1f} & {d['dV'][0]:+.1f} & "
                      f"{d['dKV'][0]:+.1f} & {d['int'][0]:+.1f} \\tiny[{d['int'][1]:+.1f}, {d['int'][2]:+.1f}] & {d['idV'][0]:+.1f} \\\\")
     lines.append(r"\midrule" if m != order[-1] else r"\bottomrule")
 lines.append(r"\end{tabular}")
@@ -268,7 +315,7 @@ for label, out in frames.items():
     for i, a in enumerate(FRAME_ARMS):
         f3 = lambda q: f"{out[a][q][0]:.2f} [{out[a][q][1]:.2f}, {out[a][q][2]:.2f}]"
         name = label if i == 0 else ""
-        lines.append(f"{name} & {ARM_LABEL[a].replace(chr(10), ' ')} & {f3('phi')} & {f3('psi')} & {f3('rho')} & {f3('psiV')} & {f3('rhoV')} \\\\")
+        lines.append(f"{name} & {ARM_TEX[a]} & {f3('phi')} & {f3('psi')} & {f3('rho')} & {f3('psiV')} & {f3('rhoV')} \\\\")
     lines.append(r"\midrule" if label != list(frames)[-1] else r"\bottomrule")
 lines.append(r"\end{tabular}")
 (TAB / "tab_frames.tex").write_text("\n".join(lines) + "\n")
@@ -304,8 +351,8 @@ for task in ("paint", "schedule"):
         idk = {a: ci([v["idK"] for v in arms[a].values()]) for a in ARMS}
         sh = ratio_ci([v["d"]["K_S@0"] for v in arms["P1"].values()], [v["d"]["K_S@0"] + v["d"]["V_S@0"] for v in arms["P1"].values()])
         vals.append((idk, sh))
-        cells = " & ".join(f"{idk[a][0]:+.1f}" for a in ["LETTER", "P1", "POST", "NONE", "BEFORE"])
-        lines.append(f"{task if i == 0 else ''} & {SHORT[m]} & {sh[0]:.2f} & {cells} \\\\")
+        cells = " & ".join(cell(idk[a]) for a in ["LETTER", "P1", "POST", "NONE", "BEFORE"])
+        lines.append(f"{task if i == 0 else ''} & {SHORT[m]} & {cell(sh, '{:.2f}')} & {cells} \\\\")
     lines.append(r"\midrule" if task == "paint" else r"\bottomrule")
     tt = task.capitalize()
     mac(f"task{tt}OptMin", min(v[0]["P1"][0] for v in vals), "{:.1f}")
@@ -320,16 +367,23 @@ lines.append(r"\end{tabular}")
 M4 = ["Qwen2.5-7B-Instruct", "Qwen2.5-14B-Instruct", "Mistral-7B-Instruct-v0.3", "OLMo-2-1124-7B-Instruct"]
 ARMS2 = ["AFTER", "POST", "NONE", "PRE", "BEFORE"]
 lab2 = {"AFTER": "\\fmtListA", "POST": "\\fmtPost", "NONE": "\\fmtNone", "PRE": "\\fmtSentB", "BEFORE": "\\fmtBefore"}
-lines = [r"\begin{tabular}{l" + "c" * len(ARMS2) + "}", r"\toprule",
-         "Model & " + " & ".join(lab2[a] for a in ARMS2) + r" \\", r"\midrule"]
+ROWS2 = ["AFTER", "POST", "BEFORE", "PRE", "NONE"]
+SH2 = {"Qwen2.5-7B-Instruct": "Qwen-7B", "Qwen2.5-14B-Instruct": "Qwen-14B", "Mistral-7B-Instruct-v0.3": "Mistral-7B",
+       "OLMo-2-1124-7B-Instruct": "OLMo-2-7B"}
 agg = {a: [] for a in ARMS2}
+idk2 = {}
 for m in M4:
     res = json.load(open(ROOT / f"results/gpu_stage3b/format_2x2/{m}_s0.json"))["results"]
     arms = {a: per_core(res, a) for a in ARMS2}
-    idk = {a: ci([v["idK"] for v in arms[a].values()]) for a in ARMS2}
+    idk2[m] = {a: ci([v["idK"] for v in arms[a].values()]) for a in ARMS2}
     for a in ARMS2:
-        agg[a].append(idk[a][0])
-    lines.append(f"{SHORT[m]} & " + " & ".join(c1(idk[a]) for a in ARMS2) + r" \\")
+        agg[a].append(idk2[m][a][0])
+lines = [r"\begin{tabular}{@{}l" + "c" * len(M4) + "@{}}", r"\toprule",
+         "Format & " + " & ".join(SH2[m] for m in M4) + r" \\", r"\midrule"]
+for a in ROWS2:
+    if a == "NONE":
+        lines.append(r"\midrule")
+    lines.append(f"{lab2[a]} & " + " & ".join(cell(idk2[m][a], "{:+.1f}", "{:.1f}") for m in M4) + r" \\")
 lines += [r"\bottomrule", r"\end{tabular}"]
 (TAB / "tab_2x2.tex").write_text("\n".join(lines) + "\n")
 mac("twoAfterMin", min(agg["AFTER"]), "{:.1f}"); mac("twoAfterMax", max(agg["AFTER"]), "{:.1f}")
@@ -339,6 +393,7 @@ mac("twoBeforeMax", max(agg["BEFORE"] + agg["PRE"]), "{:+.2f}")
 # ---------------------------------------------------------------- stage 3b: role control
 RM = M4 + ["Qwen2.5-72B-Instruct"]
 lines = [r"\begin{tabular}{llccc}", r"\toprule", r"Model & Format & role effect (nats) & $f_K$ & $f_V$ \\", r"\midrule"]
+role_eff = []
 fmax = 0.0
 for m in RM:
     res = json.load(open(ROOT / f"results/gpu_stage3b/role_factorial/{m}_s0.json"))["results"]
@@ -348,11 +403,13 @@ for m in RM:
         fk = ratio_ci([r["m"]["K_R"] - r["m"]["ID"] for r in R], full)
         fv = ratio_ci([r["m"]["V_R"] - r["m"]["ID"] for r in R], full)
         fmax = max(fmax, abs(fk[0]), abs(fv[0]))
-        lines.append(f"{SHORT[m] if i == 0 else ''} & {ARM_LABEL[arm].replace(chr(10), ' ')} & {np.mean(full):+.1f} & {fk[0]:+.3f} & {fv[0]:+.3f} \\\\")
+        role_eff.append(np.mean(full))
+        lines.append(f"{SHORT[m] if i == 0 else ''} & {ARM_TEX[arm]} & {np.mean(full):+.1f} & {cell(fk, '{:+.3f}')} & {cell(fv, '{:+.3f}')} \\\\")
     lines.append(r"\midrule" if m != RM[-1] else r"\bottomrule")
 lines.append(r"\end{tabular}")
 (TAB / "tab_role.tex").write_text("\n".join(lines) + "\n")
 mac("roleFracMax", fmax)
+mac("roleEffMin", min(role_eff), "{:.1f}"); mac("roleEffMax", max(role_eff), "{:.1f}")
 
 # ---------------------------------------------------------------- stage 3b: environment check
 for sub, m, tag in (("tf59_2gpu", "Qwen2.5-14B-Instruct", "EnvFourteen"), ("tf518_1gpu", "Qwen2.5-32B-Instruct", "EnvThirtytwo")):
@@ -365,7 +422,7 @@ LOCM = [("Qwen2.5-1.5B-Instruct", ROOT / "results/row_restricted_windows/Qwen2.5
         ("Qwen2.5-7B-Instruct", ROOT / "results/gpu_stage3/row_restricted/Qwen2.5-7B-Instruct/Qwen2.5-7B-Instruct_direct.json"),
         ("Qwen2.5-14B-Instruct", ROOT / "results/gpu_stage3/row_restricted/Qwen2.5-14B-Instruct/Qwen2.5-14B-Instruct_direct.json"),
         ("Mistral-7B-Instruct-v0.3", ROOT / "results/gpu_stage3/row_restricted/Mistral-7B-Instruct-v0.3/Mistral-7B-Instruct-v0.3_direct.json")]
-GR = [("mention", "later-mention words"), ("question", "question"), ("story_tail", "story after state"), ("rest_after_p", "other later tokens")]
+GR = [("mention", "later-mention words"), ("question", "question"), ("story_tail", "story after writing token"), ("rest_after_p", "other later tokens")]
 lines = [r"\begin{tabular}{llcccc}", r"\toprule",
          r"Model & Format & " + " & ".join(g[1] for g in GR) + r" \\", r"\midrule"]
 locv = {}
@@ -382,7 +439,7 @@ for m, f in LOCM:
             fr = ratio_ci([r["m"][gk] - r["m_B"] for r in R], full)
             row.append(fr)
             locv[(m, arm, g)] = fr
-        lines.append(f"{SHORT[m]} & {ARM_LABEL[arm].replace(chr(10), ' ')} & " + " & ".join(f"{x[0]:+.2f}" for x in row) + r" \\")
+        lines.append(f"{SHORT[m]} & {ARM_TEX[arm]} & " + " & ".join(cell(x, "{:+.2f}") for x in row) + r" \\")
     lines.append(r"\midrule" if m != LOCM[-1][0] else r"\bottomrule")
 lines.append(r"\end{tabular}")
 (TAB / "tab_localisation.tex").write_text("\n".join(lines) + "\n")
@@ -390,6 +447,11 @@ big = [m for m, _ in LOCM[1:]]
 mac("locScaleOptMin", min(locv[(m, "P1", "mention")][0] for m in big)); mac("locScaleOptMax", max(locv[(m, "P1", "mention")][0] for m in big))
 mac("locScalePostMin", min(locv[(m, "POST", "mention")][0] for m in big)); mac("locScalePostMax", max(locv[(m, "POST", "mention")][0] for m in big))
 mac("locScaleQuestionMax", max(abs(locv[(m, "P1", "question")][0]) for m in big))
+mac("locScaleOptOtherMax", max(abs(locv[(m, "P1", g)][0]) for m in big for g in ("question", "story_tail", "rest_after_p")))
+mac("locScalePostOtherMin", min(locv[(m, "POST", "rest_after_p")][0] for m in big))
+mac("locScalePostOtherMax", max(locv[(m, "POST", "rest_after_p")][0] for m in big))
+left = [1 - sum(locv[(m, "POST", g)][0] for g, _ in GR) for m in big]
+mac("locScalePostLeftMin", min(left)); mac("locScalePostLeftMax", max(left))
 
 fig, axes = plt.subplots(1, 2, figsize=(6.8, 1.9), sharey=True)
 for ax, arm, title in ((axes[0], "P1", "options-after"), (axes[1], "POST", "sentence-after")):

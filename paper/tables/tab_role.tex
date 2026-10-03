@@ -2,24 +2,24 @@
 \toprule
 Model & Format & role effect (nats) & $f_K$ & $f_V$ \\
 \midrule
-Qwen2.5-7B & options- after & +34.4 & +0.006 & +0.010 \\
- & no- mention & +28.7 & +0.014 & +0.001 \\
- & letters- after & +29.8 & +0.003 & +0.018 \\
+Qwen2.5-7B & \fmtOpt{} & +34.4 & \begin{tabular}[t]{@{}c@{}}+0.006\\[-1pt]{\scriptsize[+0.004, +0.008]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.010\\[-1pt]{\scriptsize[+0.007, +0.013]}\end{tabular} \\
+ & \fmtNone{} & +28.7 & \begin{tabular}[t]{@{}c@{}}+0.014\\[-1pt]{\scriptsize[+0.011, +0.018]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.001\\[-1pt]{\scriptsize[+0.000, +0.003]}\end{tabular} \\
+ & \fmtLetter{} & +29.8 & \begin{tabular}[t]{@{}c@{}}+0.003\\[-1pt]{\scriptsize[-0.000, +0.005]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.018\\[-1pt]{\scriptsize[+0.013, +0.025]}\end{tabular} \\
 \midrule
-Qwen2.5-14B & options- after & +79.8 & +0.001 & -0.000 \\
- & no- mention & +51.4 & +0.001 & -0.000 \\
- & letters- after & +66.0 & -0.000 & -0.000 \\
+Qwen2.5-14B & \fmtOpt{} & +79.8 & \begin{tabular}[t]{@{}c@{}}+0.001\\[-1pt]{\scriptsize[+0.000, +0.001]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}-0.000\\[-1pt]{\scriptsize[-0.001, +0.000]}\end{tabular} \\
+ & \fmtNone{} & +51.4 & \begin{tabular}[t]{@{}c@{}}+0.001\\[-1pt]{\scriptsize[+0.000, +0.002]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}-0.000\\[-1pt]{\scriptsize[-0.001, +0.001]}\end{tabular} \\
+ & \fmtLetter{} & +66.0 & \begin{tabular}[t]{@{}c@{}}-0.000\\[-1pt]{\scriptsize[-0.001, +0.000]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}-0.000\\[-1pt]{\scriptsize[-0.001, +0.000]}\end{tabular} \\
 \midrule
-Mistral-7B & options- after & +28.4 & +0.003 & +0.004 \\
- & no- mention & +26.6 & +0.019 & +0.001 \\
- & letters- after & +28.9 & +0.000 & +0.011 \\
+Mistral-7B & \fmtOpt{} & +28.4 & \begin{tabular}[t]{@{}c@{}}+0.003\\[-1pt]{\scriptsize[+0.002, +0.004]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.004\\[-1pt]{\scriptsize[+0.001, +0.008]}\end{tabular} \\
+ & \fmtNone{} & +26.6 & \begin{tabular}[t]{@{}c@{}}+0.019\\[-1pt]{\scriptsize[+0.014, +0.025]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.001\\[-1pt]{\scriptsize[-0.000, +0.003]}\end{tabular} \\
+ & \fmtLetter{} & +28.9 & \begin{tabular}[t]{@{}c@{}}+0.000\\[-1pt]{\scriptsize[-0.001, +0.002]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.011\\[-1pt]{\scriptsize[+0.006, +0.017]}\end{tabular} \\
 \midrule
-OLMo-2-7B & options- after & +16.9 & +0.004 & +0.002 \\
- & no- mention & +17.7 & +0.014 & +0.002 \\
- & letters- after & +12.5 & -0.000 & +0.003 \\
+OLMo-2-7B & \fmtOpt{} & +16.9 & \begin{tabular}[t]{@{}c@{}}+0.004\\[-1pt]{\scriptsize[+0.003, +0.006]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.002\\[-1pt]{\scriptsize[+0.000, +0.003]}\end{tabular} \\
+ & \fmtNone{} & +17.7 & \begin{tabular}[t]{@{}c@{}}+0.014\\[-1pt]{\scriptsize[+0.011, +0.017]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.002\\[-1pt]{\scriptsize[-0.000, +0.004]}\end{tabular} \\
+ & \fmtLetter{} & +12.5 & \begin{tabular}[t]{@{}c@{}}-0.000\\[-1pt]{\scriptsize[-0.001, +0.001]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.003\\[-1pt]{\scriptsize[+0.001, +0.004]}\end{tabular} \\
 \midrule
-Qwen2.5-72B & options- after & +50.6 & +0.001 & +0.002 \\
- & no- mention & +38.4 & +0.007 & -0.001 \\
- & letters- after & +46.8 & -0.001 & +0.003 \\
+Qwen2.5-72B & \fmtOpt{} & +50.6 & \begin{tabular}[t]{@{}c@{}}+0.001\\[-1pt]{\scriptsize[+0.000, +0.002]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.002\\[-1pt]{\scriptsize[+0.001, +0.003]}\end{tabular} \\
+ & \fmtNone{} & +38.4 & \begin{tabular}[t]{@{}c@{}}+0.007\\[-1pt]{\scriptsize[+0.006, +0.009]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}-0.001\\[-1pt]{\scriptsize[-0.002, +0.001]}\end{tabular} \\
+ & \fmtLetter{} & +46.8 & \begin{tabular}[t]{@{}c@{}}-0.001\\[-1pt]{\scriptsize[-0.002, -0.000]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.003\\[-1pt]{\scriptsize[+0.002, +0.004]}\end{tabular} \\
 \bottomrule
 \end{tabular}

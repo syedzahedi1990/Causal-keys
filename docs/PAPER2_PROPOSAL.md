@@ -2,8 +2,8 @@
 
 **Working title:** *The Readout Decides: Whether In-Context State Is Looked Up Through Attention Keys or Copied From Values, and Why Component-Level Explanations of Interventions Do Not Transfer Across Answer Formats*
 
-**Status (2026-10-03, after GPU stages 1 and 2):**
-- Every experiment through stage 2 is complete. Predictions and their outcomes, met and not met, are in `docs/PREREGISTRATION.md`. Compute spent: two short Vast runs.
+**Status (2026-10-03, after GPU stages 1, 2, 3 and 3b; paper draft in `paper/`, main text 8 pages):**
+- Every planned GPU experiment is complete. Predictions and their outcomes, met and not met, are in `docs/PREREGISTRATION.md`. Compute spent: two short Vast runs.
 - **Gate G1:** not met as originally written. The narrowed "options only" claim, adopted post hoc at 1.5B, passed a fresh-seed preregistered test, then failed to generalise at ≥ 7B, where plain re-mentions also open the key channel.
 - **Stage 1** (P-2026-10-03-B): predictions 1 and 2 met in 5/5 open models.
 - **Stage 2** (P-2026-10-03-C):
@@ -11,6 +11,15 @@
   - C3 met in both models.
   - The transfer-law predictions C1/C2 were **not** supported (met only marginally at 72B).
   - The C4 key-share threshold was met only at 32B; its BEFORE control was met in all three models.
+- **Stage 3** (P-2026-10-03-D): all predictions met.
+  - Paint and schedule tasks: OPT − NONE > 0 in 5/5 models per task; BEFORE ≤ 0.5 nats in 10/10 cells.
+  - Localisation at 7–14B: option words recover 0.92–0.98 of the key effect; the neutral sentence's candidate words recover 0.67–0.73 (0.19–0.22 recovered by no single group).
+- **Stage 3b** (P-2026-10-04-E): all predictions met.
+  - Instruction-matched 2×2: position decides; LIST-AFTER 8.7–35.8 nats, LIST-BEFORE and SENTENCE-BEFORE ≤ +0.01.
+  - Role control: the writing token's key or value carries ≤ 0.02 of the belief-role effect, including at 72B.
+  - Environment re-runs reproduce the 14B and 32B key shares (0.91, 0.86); the fall beyond 14B is real.
+  - Value-only exchange: ψ_V(NONE) = 0.80 (Mistral-24B) and 0.90 (Qwen-72B), above ψ_K.
+- **Exploratory cross-check (paper Fig. 2c):** the remap's key share ψ_K/(ψ_K+ψ_V) tracks the unpatched model's identity key share ID_K/(ID_K+ID_V) across 5 formats × 2 models (Pearson r = 0.98; largest gap under SENTENCE-AFTER).
 - Measurement code was audited by an independent review workflow, and the verified issues are fixed.
 
 ---

@@ -1,4 +1,4 @@
-"""Figure 1 schematic: the state token's key (looked up by later candidate mentions) vs value (copied), and the format arms."""
+"""Figure 1 schematic: the writing token's key (looked up by later candidate mentions) vs value (copied), and the format arms."""
 from pathlib import Path
 
 import matplotlib
@@ -34,15 +34,15 @@ box(34, y, 15, 5, "… Question …")
 box(51, y, 17, 5, "Choices: box,")
 box(70, y, 8, 5, "shelf", fc="#fde3d8", ec=ORANGE, weight="bold")
 box(80, y, 18, 5, "… Answer: ▢")
-ax.text(27.5, 18.2, "state token\nkey $K$ · value $V$", ha="center", va="top", fontsize=6.2, color=BLUE)
+ax.text(27.5, 18.2, "writing token\nkey $K$ · value $V$", ha="center", va="top", fontsize=6.2, color=BLUE)
 arrow(74, 26.4, 28.5, 26.4, ORANGE, rad=0.25)
-ax.text(51, 33.2, "key lookup: a later mention of the candidate matches the state token's key",
+ax.text(51, 33.2, "key lookup: a later mention of the candidate matches the writing token's key",
         ha="center", fontsize=6.3, color=ORANGE)
 arrow(31, 20.6, 88, 20.6, BLUE, rad=0.18, ls="--")
-ax.text(60, 13.4, "value copy: the answer position copies the state token's value", ha="center", fontsize=6.3, color=BLUE)
+ax.text(60, 13.4, "value copy: later tokens copy the writing token's value", ha="center", fontsize=6.3, color=BLUE)
 
 # panel (b): format arms
-ax.text(0.5, 8.6, "(b) Prompt arms (same story; only whether and where candidates are named changes)", fontsize=7.4, weight="bold", color=INK)
+ax.text(0.5, 8.6, "(b) Prompt formats (same story; candidates named after, before or not at all)", fontsize=7.4, weight="bold", color=INK)
 arms = [("options-after", "story · Q · Choices: … · Answer:"), ("letters-after", "story · Q · A) … F) · Answer:"),
         ("sentence-after", "story · \"…has a box, …\" · Q"), ("no-mention", "story · Q · Answer:"),
         ("list-before", "Choices: … · story · Q")]

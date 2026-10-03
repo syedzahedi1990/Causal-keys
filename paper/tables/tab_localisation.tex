@@ -1,20 +1,20 @@
 \begin{tabular}{llcccc}
 \toprule
-Model & Format & later-mention words & question & story after state & other later tokens \\
+Model & Format & later-mention words & question & story after writing token & other later tokens \\
 \midrule
-Qwen2.5-1.5B & options- after & +0.87 & -0.00 & -0.01 & +0.00 \\
-Qwen2.5-1.5B & letters- after & +0.98 & +0.01 & -0.00 & -0.00 \\
+Qwen2.5-1.5B & \fmtOpt{} & \begin{tabular}[t]{@{}c@{}}+0.87\\[-1pt]{\scriptsize[+0.80, +0.95]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}-0.00\\[-1pt]{\scriptsize[-0.01, +0.01]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}-0.01\\[-1pt]{\scriptsize[-0.01, -0.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.00\\[-1pt]{\scriptsize[-0.04, +0.03]}\end{tabular} \\
+Qwen2.5-1.5B & \fmtLetter{} & \begin{tabular}[t]{@{}c@{}}+0.98\\[-1pt]{\scriptsize[+0.96, +1.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.01\\[-1pt]{\scriptsize[-0.00, +0.01]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}-0.00\\[-1pt]{\scriptsize[-0.01, +0.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}-0.00\\[-1pt]{\scriptsize[-0.00, +0.00]}\end{tabular} \\
 \midrule
-Qwen2.5-7B & options- after & +0.92 & -0.00 & +0.00 & +0.01 \\
-Qwen2.5-7B & letters- after & +1.00 & +0.00 & +0.00 & +0.00 \\
-Qwen2.5-7B & sentence- after & +0.67 & +0.00 & -0.01 & +0.11 \\
+Qwen2.5-7B & \fmtOpt{} & \begin{tabular}[t]{@{}c@{}}+0.92\\[-1pt]{\scriptsize[+0.90, +0.94]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}-0.00\\[-1pt]{\scriptsize[-0.00, +0.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.00\\[-1pt]{\scriptsize[-0.00, +0.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.01\\[-1pt]{\scriptsize[+0.01, +0.02]}\end{tabular} \\
+Qwen2.5-7B & \fmtLetter{} & \begin{tabular}[t]{@{}c@{}}+1.00\\[-1pt]{\scriptsize[+0.99, +1.01]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.00\\[-1pt]{\scriptsize[-0.00, +0.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.00\\[-1pt]{\scriptsize[-0.00, +0.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.00\\[-1pt]{\scriptsize[+0.00, +0.00]}\end{tabular} \\
+Qwen2.5-7B & \fmtPost{} & \begin{tabular}[t]{@{}c@{}}+0.67\\[-1pt]{\scriptsize[+0.60, +0.73]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.00\\[-1pt]{\scriptsize[-0.00, +0.01]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}-0.01\\[-1pt]{\scriptsize[-0.01, -0.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.11\\[-1pt]{\scriptsize[+0.09, +0.13]}\end{tabular} \\
 \midrule
-Qwen2.5-14B & options- after & +0.94 & -0.00 & -0.00 & +0.01 \\
-Qwen2.5-14B & letters- after & +1.00 & -0.00 & -0.00 & -0.00 \\
-Qwen2.5-14B & sentence- after & +0.72 & +0.00 & -0.00 & +0.09 \\
+Qwen2.5-14B & \fmtOpt{} & \begin{tabular}[t]{@{}c@{}}+0.94\\[-1pt]{\scriptsize[+0.93, +0.96]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}-0.00\\[-1pt]{\scriptsize[-0.00, +0.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}-0.00\\[-1pt]{\scriptsize[-0.00, +0.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.01\\[-1pt]{\scriptsize[+0.01, +0.01]}\end{tabular} \\
+Qwen2.5-14B & \fmtLetter{} & \begin{tabular}[t]{@{}c@{}}+1.00\\[-1pt]{\scriptsize[+1.00, +1.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}-0.00\\[-1pt]{\scriptsize[-0.00, -0.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}-0.00\\[-1pt]{\scriptsize[-0.00, +0.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}-0.00\\[-1pt]{\scriptsize[-0.00, -0.00]}\end{tabular} \\
+Qwen2.5-14B & \fmtPost{} & \begin{tabular}[t]{@{}c@{}}+0.72\\[-1pt]{\scriptsize[+0.64, +0.80]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.00\\[-1pt]{\scriptsize[-0.00, +0.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}-0.00\\[-1pt]{\scriptsize[-0.00, +0.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.09\\[-1pt]{\scriptsize[+0.07, +0.10]}\end{tabular} \\
 \midrule
-Mistral-7B & options- after & +0.98 & -0.00 & -0.00 & +0.01 \\
-Mistral-7B & letters- after & +1.00 & +0.00 & +0.00 & +0.00 \\
-Mistral-7B & sentence- after & +0.73 & +0.00 & -0.00 & +0.05 \\
+Mistral-7B & \fmtOpt{} & \begin{tabular}[t]{@{}c@{}}+0.98\\[-1pt]{\scriptsize[+0.96, +0.99]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}-0.00\\[-1pt]{\scriptsize[-0.00, +0.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}-0.00\\[-1pt]{\scriptsize[-0.00, -0.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.01\\[-1pt]{\scriptsize[+0.00, +0.01]}\end{tabular} \\
+Mistral-7B & \fmtLetter{} & \begin{tabular}[t]{@{}c@{}}+1.00\\[-1pt]{\scriptsize[+1.00, +1.01]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.00\\[-1pt]{\scriptsize[+0.00, +0.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.00\\[-1pt]{\scriptsize[-0.00, +0.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.00\\[-1pt]{\scriptsize[-0.00, +0.00]}\end{tabular} \\
+Mistral-7B & \fmtPost{} & \begin{tabular}[t]{@{}c@{}}+0.73\\[-1pt]{\scriptsize[+0.67, +0.78]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.00\\[-1pt]{\scriptsize[-0.00, +0.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}-0.00\\[-1pt]{\scriptsize[-0.00, +0.00]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}+0.05\\[-1pt]{\scriptsize[+0.03, +0.06]}\end{tabular} \\
 \bottomrule
 \end{tabular}

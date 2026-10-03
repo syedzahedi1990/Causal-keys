@@ -1,181 +1,252 @@
 % Appendix. main.tex issues \appendix and \onecolumn before \input'ing this file.
 
-\section{Preregistration log}\label{app:prereg}
+\section{Preregistration log and claim status}\label{app:prereg}
 
-We made four preregistrations, A--D. For each, the predictions were committed to the repository before the corresponding run, and the scoring script was committed before its outputs were inspected. \Cref{tab:prereg-a,tab:prereg-b,tab:prereg-c,tab:prereg-d} reproduce each prediction and its outcome as recorded in the preregistration log of the repository (\texttt{docs/PREREGISTRATION.md}), with the outcome wording kept. Values in these tables are copied from that log, which rounds independently of \cref{tab:natural,tab:frames}. In the log, P1, LETTER, POST, NONE and BEFORE denote \fmtOpt{}, \fmtLetter{}, \fmtPost{}, \fmtNone{} and \fmtBefore{}.
+We made five preregistrations, A--E. Each was committed to version control before its run, and each scoring script was committed before its outputs were inspected. \Cref{tab:prereg-ab,tab:prereg-c,tab:prereg-de} give every prediction with its outcome as recorded in the preregistration log of the repository (\texttt{docs/PREREGISTRATION.md}). The anonymised code release adds \texttt{PREREGISTRATION\_HISTORY.txt}, which lists, without author information, every commit that changed the log or a scoring script, with its time and diff, and every commit that changed the results, experiment code or GPU scripts, so that the order of preregistration, run and scoring can be checked; each result file also records the commit of the code that produced it. We keep the wording of the log, with two changes: format names are replaced by ours, and long entries are shortened without changing their content. In the log, the ``critical token'' or ``state token'' is the writing token, identity(K) is $\mathrm{ID}_K$, and $l_0$ is $\ell_0$. The log rounds independently of the tables in \cref{app:additional}, so a few values and intervals differ in the last digit (for example, the interval of the Qwen2.5-32B key share).
 
-\paragraph{History of the claim, including post hoc steps.} The claim tested here was revised twice, both times after seeing data.
-\begin{enumerate}\setlength\itemsep{1pt}
-  \item \emph{Starting hypothesis.} Before the seed-0 format factorial at 1.5B, the hypothesis was that any re-mention of the candidates after the state token opens the key channel.
-  \item \emph{Post hoc narrowing at 1.5B.} In the first run at Qwen2.5-1.5B (seed 0, $n = 40$), using the encoder of \citet{anonymous2026fitted}, the neutral re-mention arm \fmtPost{} showed no key effect. We therefore narrowed the claim to ``listed answer options after the state token open the key channel''. This narrowing was formed after seeing the data. An internal go/no-go gate written before that run was not met as written.
-  \item \emph{Preregistration A} tested the narrowed claim on fresh story cores in the same model. All three predictions were met (\cref{tab:prereg-a}). This confirms the narrowed claim in the same model on new data, not across models.
-  \item \emph{Preregistration B} tested out-of-sample models. Its two directional predictions were met in 5/5 models (\cref{tab:prereg-b}). However, at 7B and above \fmtPost{} carries an intermediate amount of key identity (from \idKPostOlmoSeven{} nats at OLMo-2-7B to \idKPostQwenFourteen{} at Qwen2.5-14B; \cref{tab:natural}), so the narrowed ``listed options only'' account does not generalise. The account we now give (from 7B up, any post-state re-mention opens the key channel, an options list most strongly; at 1.5B and 3B only an options list does) was revised again, post hoc, after seeing the stage-1 data. It is closer to the starting hypothesis. Its options-list part is tested again by D1 on new tasks. Its re-mention part has no preregistered test of whether \fmtPost{} opens the key channel (\fmtPost{} identity on the new tasks is exploratory in preregistration D); the \fmtPost{} arm of D3 tests only which rows read the key where that effect is positive.
-  \item \emph{Preregistration C} added a transfer-law prediction derived from the fixed-value data of \citet{anonymous2026fitted}. It failed for Mistral-Small-24B (neither C1 nor C2 was met) and was met only marginally for Qwen2.5-72B (C1 at the edge of its margin, C2 with a small difference); C3 was met in both models. The key-share threshold of C4 was met only at Qwen2.5-32B, and its \fmtBefore{} control was met in all three models (\cref{tab:prereg-c}). The interpretation given in \cref{sec:results} was written after seeing these data and is not part of the preregistration.
-  \item \emph{Preregistration D} (new tasks; localisation at 7--14B) is committed and pending (\cref{tab:prereg-d}).
-\end{enumerate}
-The \fmtNone{} margin of $\pm 1$ nat was set at 1.5B. In Qwen2.5-7B, Qwen3-8B, Qwen2.5-14B and Qwen2.5-32B, \fmtNone{} carries a small positive $\mathrm{ID}_K$ of about 1 nat (\idKNoneQwenSeven{} to \noneMax{} nats), with CIs extending past that margin; in the other six models it stays below 1 nat (\cref{tab:natural}). We report it as an unpredicted observation, not as a confirmation.
-
-\begin{table}[h]
+\begin{table}[!ht]
 \centering
-\small
-\caption{\textbf{Preregistration A}: fresh-seed CPU confirmation of the option-listing gate. Qwen2.5-1.5B-Instruct, seed 1 (new cores), $n = 40$ per arm, all items, keys clamped from layer 0, 95\% core-bootstrap CIs. Predictions committed at commit \texttt{13c1f1f}; run at \texttt{71e8489}.}
-\label{tab:prereg-a}
-\begin{tabular}{p{0.36\linewidth}p{0.44\linewidth}l}
+\footnotesize
+\caption{\textbf{Preregistrations A and B.} A: Qwen2.5-1.5B-Instruct in FP32 on CPU, seed 1 (new story cores), $n = 40$ per format, all items, keys clamped from layer~0, 95\% core-bootstrap CIs. Predictions committed at \texttt{13c1f1f}, run at \texttt{71e8489}. B: GPU stage 1 on held-out models (Qwen2.5-3B/7B, Qwen3-8B, Mistral-7B-v0.3, OLMo-2-7B), $n = 150$ per format, all items, 95\% core-bootstrap CIs. Predictions committed at \texttt{13c1f1f}, code at \texttt{f706ef5}, scoring script \texttt{analysis/stage1\_prereg.py} committed before inspection at \texttt{004579c}.}
+\label{tab:prereg-ab}
+\begin{tabular}{p{0.06\textwidth}p{0.36\textwidth}p{0.40\textwidth}p{0.08\textwidth}}
 \toprule
-Prediction & Observed & Verdict \\
+ & Prediction & Observed & Verdict \\
 \midrule
-1. $\mathrm{ID}_K > 1.0$ nats, CI excluding 0, in P1 and LETTER & P1 $+2.85$ [2.38, 3.33]; LETTER $+4.10$ [3.45, 4.77] & \textbf{met} \\
-2. $\mathrm{ID}_K$ CI within $\pm 1.0$ in NONE, BEFORE, POST & NONE $+0.10$ [$-0.01$, 0.21]; BEFORE $-0.20$ [$-0.28$, $-0.13$]; POST $-0.41$ [$-0.56$, $-0.26$] & \textbf{met} \\
-3. Key share ($l_0 = 0$) in P1 within [0.25, 0.50] & 0.38 [0.35, 0.41] & \textbf{met} \\
+A1 & identity(K) $> 1.0$ nats with a CI excluding 0, in \fmtOpt{} and in \fmtLetter{} & \fmtOpt{} $+2.85$ [2.38, 3.33]; \fmtLetter{} $+4.10$ [3.45, 4.77] & \textbf{met} \\
+A2 & identity(K) CI within the equivalence margin $\pm 1.0$ in \fmtNone{}, \fmtBefore{} and \fmtPost{} & \fmtNone{} $+0.10$ [$-0.01$, 0.21]; \fmtBefore{} $-0.20$ [$-0.28$, $-0.13$]; \fmtPost{} $-0.41$ [$-0.56$, $-0.26$] & \textbf{met} \\
+A3 & Key share ($l_0 = 0$) in \fmtOpt{} within [0.25, 0.50] & 0.38 [0.35, 0.41] & \textbf{met} \\
+\midrule
+B1 & identity(K) in \fmtOpt{} and \fmtLetter{} positive, CI excluding 0, in at least 4 of 5 models & 5/5 models & \textbf{met} \\
+B2 & identity(K)(\fmtOpt{}) $-$ identity(K)(\fmtNone{}) $> 0$, CI excluding 0, in at least 4 of 5 models & 5/5 models & \textbf{met} \\
+B3 & Exploratory, no directional claim: how the \fmtOpt{} key share ($l_0 = 0$ and $l_0 = 0.0625\,L$) varies with size within Qwen2.5 & Rises steadily with size: 1.5B 0.37 [0.36, 0.39]; 3B 0.69 [0.68, 0.71]; 7B 0.82 [0.81, 0.83]; 14B 0.91 [0.90, 0.91]. The depth-matched $l_0$ gives identical values. Recorded later, with the outcome of C: non-monotonic beyond 14B. & -- \\
 \bottomrule
 \end{tabular}
 
 \smallskip
-\begin{minipage}{0.92\linewidth}
+\begin{minipage}{0.94\textwidth}
 \footnotesize
-\emph{Notes recorded with the outcome.} BEFORE and POST are slightly but reliably negative. They sit inside the margin but are not exactly zero. The seed-0 LETTER interaction ($+2.0$ [0.3, 3.7]) did not replicate: seed 1 gives $+0.6$ [$-1.0$, 2.2]. This confirms the post hoc option-listing claim in the same model on new data; generalisation across models is preregistration B.
+\emph{Notes recorded with outcome A.} \fmtBefore{} and \fmtPost{} are slightly but reliably negative. They sit inside the margin but are not exactly zero. The seed-0 \fmtLetter{} interaction ($+2.0$ [0.3, 3.7]) did not replicate: seed 1 gives $+0.6$ [$-1.0$, 2.2]. This confirms the post hoc option-listing claim in the same model on new data; generalisation across models is preregistration B.
+
+\emph{Unpredicted observations recorded with outcome B} (reported, not reinterpreted). \fmtPost{} carries large key identity in the larger models (Qwen2.5-7B $+5.5$, Qwen2.5-14B $+12.1$, Qwen3-8B $+8.8$, Mistral-7B $+7.9$, OLMo-2-7B $+2.0$ nats) but about 0 at Qwen2.5-1.5B/3B ($-0.47$ and $-0.04$). So the post hoc ``listed answer options only'' refinement from 1.5B does not generalise. \fmtBefore{} is at or below 0 in every model ($-0.45$ to $+0.01$). \fmtNone{} carries small positive identity(K) in larger models ($+1.0$ to $+1.25$ nats at 7--14B), outside the CPU-era $\pm 1$ margin, though under 5\% of \fmtOpt{}.
 \end{minipage}
 \end{table}
 
-\begin{table}[h]
+\begin{table}[!ht]
 \centering
-\small
-\caption{\textbf{Preregistration B}: GPU stage 1, out-of-sample models (Qwen2.5-3B/7B, Qwen3-8B, Mistral-7B-v0.3, OLMo-2-7B), $n = 150$ per arm, all items, 95\% core-bootstrap CIs. Predictions committed at \texttt{13c1f1f}; code at \texttt{f706ef5}; scoring script (\texttt{analysis/stage1\_prereg.py}) committed before inspection at \texttt{004579c}.}
-\label{tab:prereg-b}
-\begin{tabular}{p{0.40\linewidth}p{0.40\linewidth}l}
-\toprule
-Prediction & Observed & Verdict \\
-\midrule
-1. $\mathrm{ID}_K$ in P1 and LETTER positive, CI excluding 0, in $\geq 4$ of 5 models & 5/5 models & \textbf{met} \\
-2. $\mathrm{ID}_K(\text{P1}) - \mathrm{ID}_K(\text{NONE}) > 0$, CI excluding 0, in $\geq 4$ of 5 models & 5/5 models & \textbf{met} \\
-3. Exploratory, no direction: P1 key share across Qwen2.5 sizes ($l_0 = 0$ and $0.0625\,L$) & Rises steadily with size: 1.5B 0.37 [0.36, 0.39]; 3B 0.69 [0.68, 0.71]; 7B 0.82 [0.81, 0.83]; 14B 0.91 [0.90, 0.91]. The depth-matched $l_0$ gives identical values. (Recorded later, with the outcome of C: non-monotonic beyond 14B; \cref{tab:prereg-c}.) & -- \\
-\bottomrule
-\end{tabular}
-
-\smallskip
-\begin{minipage}{0.92\linewidth}
 \footnotesize
-\emph{Unpredicted observations recorded with the outcome} (reported, not reinterpreted). POST carries large key identity in the larger models (Qwen2.5-7B $+5.5$, Qwen2.5-14B $+12.1$, Qwen3-8B $+8.8$, Mistral-7B $+7.9$, OLMo-2-7B $+2.0$ nats) but about 0 at Qwen2.5-1.5B/3B ($-0.47$ and $-0.04$), so the post hoc ``listed answer options only'' refinement from 1.5B does not generalise. BEFORE is at or below 0 in every model ($-0.45$ to $+0.01$). NONE carries small positive $\mathrm{ID}_K$ in larger models ($+1.0$ to $+1.25$ nats at 7--14B), outside the CPU-era $\pm 1$ margin, though under 5\% of P1.
-\end{minipage}
-\end{table}
-
-\begin{table}[h]
-\centering
-\small
-\caption{\textbf{Preregistration C}: GPU stage 2, the released bases of \citet{anonymous2026fitted} at Mistral-Small-24B and Qwen2.5-72B across formats, and the natural factorial at 24--72B. Predictions and scoring script (\texttt{analysis/stage2\_score.py}) committed before any stage-2 run (\texttt{5dc82f5}); code at \texttt{2b1eca7}. Primary population: the 96 native cores with B, S and T distinct; fits averaged within core; 95\% core bootstrap. $\kappa_V$ was estimated before the run from the fixed-value data of \citet{anonymous2026fitted}.}
+\caption{\textbf{Preregistration C}: GPU stage 2, the released bases of \citet{anonymous2026fitted} at Mistral-Small-24B and Qwen2.5-72B across formats, and the natural factorial at 24--72B. Predictions and the scoring script \texttt{analysis/stage2\_score.py} committed before any stage-2 run (\texttt{5dc82f5}); code at \texttt{2b1eca7}. C4 is scored by \texttt{analysis/stage1\_prereg.py} (committed at \texttt{004579c}). Primary population: native story cores with B, S and T distinct; fits averaged within core; 95\% core bootstrap. $\kappa_V$ was estimated before the run from the fixed-value data released with \citet{anonymous2026fitted}. Here $\psi$ is our $\psi_K$.}
 \label{tab:prereg-c}
-\begin{tabular}{p{0.24\linewidth}p{0.33\linewidth}p{0.33\linewidth}}
+\begin{tabular}{p{0.30\textwidth}p{0.31\textwidth}p{0.31\textwidth}}
 \toprule
 Prediction & Mistral-Small-24B & Qwen2.5-72B \\
 \midrule
-Gate: P1 argmax of M and P agrees with saved native outputs on $\geq 0.95$ of (core, fit) items & M 0.994, P 1.000 ($n = 360$ each): \textbf{passed} & M 1.000, P 1.000: \textbf{passed} \\
-C1, transfer law: $\varphi_{\text{NONE}}(\text{M})$ within $\kappa_V \pm 0.15$ & 0.708 [0.681, 0.734] vs $0.53 \pm 0.15$: \textbf{not met} & 0.861 [0.837, 0.884] vs $0.73 \pm 0.15$: \textbf{met} (at the edge) \\
-C2: $\varphi_{\text{P1}} - \varphi_{\text{NONE}} > 0$, paired CI excluding 0 & $-0.003$ [$-0.019$, $+0.013$]: \textbf{not met} & $+0.034$ [$+0.018$, $+0.049$]: \textbf{met} (small) \\
-C3: $\psi_{\text{NONE}} < 0.5\,\psi_{\text{P1}}$ & 0.069 vs 0.528: \textbf{met} & 0.052 vs 0.633: \textbf{met} \\
+Gate: in \fmtOpt{}, the argmax of M and of P agrees with the outputs released with \citet{anonymous2026fitted} on $\geq 0.95$ of (core, fit) items & M 0.994, P 1.000 ($n = 360$ each): \textbf{passed} & M 1.000, P 1.000: \textbf{passed} \\
+C1, transfer law: $\varphi_{\text{\fmtNone{}}}(\text{M})$ within $\pm 0.15$ of $\kappa_V$ & 0.708 [0.681, 0.734] vs $0.53 \pm 0.15$: \textbf{not met} & 0.861 [0.837, 0.884] vs $0.73 \pm 0.15$: \textbf{met} (at the edge) \\
+C2: $\varphi_{\text{\fmtOpt{}}}(\text{M}) - \varphi_{\text{\fmtNone{}}}(\text{M}) > 0$, paired CI excluding 0 & $-0.003$ [$-0.019$, $+0.013$]: \textbf{not met} & $+0.034$ [$+0.018$, $+0.049$]: \textbf{met} (small) \\
+C3: $\psi_{\text{\fmtNone{}}} < 0.5 \cdot \psi_{\text{\fmtOpt{}}}$ & 0.069 vs 0.528: \textbf{met} & 0.052 vs 0.633: \textbf{met} \\
 \bottomrule
 \end{tabular}
 
 \medskip
-\begin{tabular}{p{0.24\linewidth}p{0.66\linewidth}}
+\begin{tabular}{p{0.30\textwidth}p{0.64\textwidth}}
 \toprule
 Prediction (natural factorial) & Outcome \\
 \midrule
-C4: P1 key share $\geq 0.80$ at Mistral-Small-24B, Qwen2.5-32B and Qwen2.5-72B & \textbf{not met} overall: Mistral-24B 0.78 [0.77, 0.79] no; Qwen2.5-32B 0.86 [0.84, 0.87] yes; Qwen2.5-72B 0.76 [0.75, 0.77] no. \\
-C4: BEFORE $\mathrm{ID}_K \leq 0.5$ nats in all three & \textbf{met} in all three: $-0.53$, $-0.42$, $-1.99$. \\
+C4: \fmtOpt{} key share $\geq 0.80$ at Mistral-Small-24B, Qwen2.5-32B and Qwen2.5-72B & \textbf{not met} overall: Mistral-24B 0.78 [0.77, 0.79] no; Qwen2.5-32B 0.86 [0.84, 0.87] yes; Qwen2.5-72B 0.76 [0.75, 0.77] no. \\
+C4: \fmtBefore{} identity(K) $\leq 0.5$ nats in all three & \textbf{met} in all three: $-0.53$, $-0.42$, $-1.99$. \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-All stage-2 quantities ($\varphi$, $\psi$ and $\rho$ under every format) are in \cref{tab:frames}; they are exploratory except for $\varphi$ and $\psi$ under \fmtOpt{} and \fmtNone{}, which enter C1--C3. The interval for the Qwen2.5-32B key share in \cref{tab:natural} is recomputed by the figure script with its own bootstrap draws and differs from the log in the last digit of the lower bound; the point estimate is the same.
-
-\begin{table}[h]
+\begin{table}[!ht]
 \centering
-\small
-\caption{\textbf{Preregistration D}: GPU stage 3, generality to new tasks and localisation at 7--14B. Predictions and scoring script (\texttt{analysis/stage3\_score.py}) committed before any stage-3 run (\texttt{0f5cbff}). Outcomes pending.}
-\label{tab:prereg-d}
-\begin{tabular}{p{0.62\linewidth}p{0.28\linewidth}}
+\footnotesize
+\caption{\textbf{Preregistrations D and E.} D: GPU stage 3; predictions and the scoring script \texttt{analysis/stage3\_score.py} committed before any stage-3 run (\texttt{0f5cbff}); run at \texttt{b8815cb}. New tasks: $n = 150$ per format in Qwen2.5-7B, Qwen2.5-14B, Qwen3-8B, Mistral-7B-v0.3 and OLMo-2-7B; localisation: belief task, $n = 60$, in Qwen2.5-7B, Qwen2.5-14B and Mistral-7B, the order of the three D3 values. E: GPU stage 3b; predictions and the scoring script \texttt{analysis/stage3b\_score.py} committed before any stage-3b run, which ran at that commit (\texttt{3ca63f1}). E1 and E2 use Qwen2.5-7B, Qwen2.5-14B, Mistral-7B and OLMo-2-7B; E4 uses Mistral-Small-24B and Qwen2.5-72B.}
+\label{tab:prereg-de}
+\begin{tabular}{p{0.06\textwidth}p{0.40\textwidth}p{0.36\textwidth}p{0.08\textwidth}}
 \toprule
-Prediction & Outcome \\
+ & Prediction & Result & Verdict \\
 \midrule
-D1, generality. Per task (paint, schedule), a model counts if $\mathrm{ID}_K$ in P1 is $> 0$ with a CI excluding 0 \emph{and} the paired P1 $-$ NONE difference is $> 0$ with a CI excluding 0. Met if $\geq 4$ of 5 models (Qwen2.5-7B, Qwen2.5-14B, Qwen3-8B, Mistral-7B-v0.3, OLMo-2-7B) count, separately for each task. & pending (stage 3) \\
-D2, structural control. BEFORE $\mathrm{ID}_K \leq 0.5$ nats in $\geq 9$ of the 10 task $\times$ model cells. & pending (stage 3) \\
-D3, localisation at scale (Qwen2.5-7B, Qwen2.5-14B, Mistral-7B; belief task, $n = 60$). In P1, choice-word rows recover $\geq 0.70$ of the full key effect, while question rows and the remaining tail rows each recover $\leq 0.15$, in all 3 models. In POST, where the full key effect is positive, re-mention-word rows recover $\geq 0.50$ in $\geq 2$ of 3 models. & pending (stage 3) \\
+D1 & Paint: per model, \fmtOpt{} ID$_K > 0$ and \fmtOpt{} $-$ \fmtNone{} $> 0$ (CIs excluding 0); met if $\geq 4$ of 5 models count & 5/5 models (\fmtOpt{} ID$_K$ $+6.5$ to $+42.7$ nats) & \textbf{met} \\
+D1 & Schedule: same & 5/5 models (\fmtOpt{} ID$_K$ $+4.5$ to $+28.5$ nats) & \textbf{met} \\
+D2 & \fmtBefore{} ID$_K \leq 0.5$ nats in $\geq 9$ of the 10 task $\times$ model cells & 10/10 task $\times$ model cells (max $+0.32$) & \textbf{met} \\
+D3 & \fmtOpt{}: choice-word rows recover $\geq 0.70$ of the full key effect; question rows and the remaining tail rows each $\leq 0.15$; in all 3 models & 3/3 models: choice words 0.92 / 0.94 / 0.98; question 0.00; tail $\leq 0.01$ & \textbf{met} \\
+D3 & \fmtPost{}, where the full key effect is positive: re-mention-word rows recover $\geq 0.50$ in $\geq 2$ of 3 models & 3/3 models: 0.67 / 0.72 / 0.73 & \textbf{met} \\
+\midrule
+E1a & Instruction-matched $2{\times}2$, every arm ``Answer with one word'': ID$_K$(\fmtListA{}) $> 0$, CI excluding 0, in 4/4 models & $+8.7$ to $+35.8$ nats, 4/4 & \textbf{met} \\
+E1b & ID$_K$(\fmtBefore{}) $\leq 0.5$ and ID$_K$(\fmtSentB{}) $\leq 0.5$, each in $\geq 3/4$ models & 4/4 and 4/4 (max $+0.01$) & \textbf{met} \\
+E1c & Paired \fmtListA{} $-$ \fmtBefore{} $> 0$ in 4/4 models; paired \fmtPost{} $-$ \fmtSentB{} $> 0$ in $\geq 3/4$; each CI excluding 0 & 4/4; 4/4 & \textbf{met} \\
+E2 & Role control: for the direct question in \fmtOpt{} and \fmtNone{}, $\lvert f_K \rvert \leq 0.15$ and $\lvert f_V \rvert \leq 0.15$ in $\geq 3/4$ models (Qwen2.5-72B exploratory) & 4/4 and 4/4 (all fractions $\leq 0.02$; also $\leq 0.01$ at Qwen2.5-72B) & \textbf{met} \\
+E3 & Environment: each re-run within 0.03 of the original \fmtOpt{} key share (Qwen2.5-14B under transformers 5.9.0 on 2 GPUs, original 0.91; Qwen2.5-32B under transformers 5.18.0 on 1 GPU, original 0.86) & Qwen2.5-14B: 0.91 (original 0.91); Qwen2.5-32B: 0.86 (original 0.86) & \textbf{met} \\
+E4 & Value-only exchange in the frames of \citet{anonymous2026fitted}: $\psi_V(\text{\fmtNone{}}) \geq 0.5$ and $\psi_V(\text{\fmtNone{}}) > \psi_K(\text{\fmtNone{}})$ in both models & Mistral-24B 0.80 vs 0.07; Qwen-72B 0.90 vs 0.05 & \textbf{met} \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\begin{minipage}{0.94\textwidth}
+\footnotesize
+\emph{Exploratory parts of D and E}, with no prediction: key shares on the new tasks; \fmtLetter{} and \fmtPost{} identity on the new tasks; layer-window and KV-group localisation at 7--14B; $\psi_V$ and $\rho_V$ in the other formats; the role control in \fmtLetter{} and at Qwen2.5-72B. Before preregistration E, an exploratory CPU pilot of the role control was run at Qwen2.5-1.5B ($n = 40$; recorded in the log with E).
+\end{minipage}
+\end{table}
+
+\paragraph{History of the claim, including post hoc steps.}
+The account of when keys carry the value was revised twice after seeing data. We list every step.
+\begin{enumerate}\setlength\itemsep{1pt}
+  \item \emph{Starting hypothesis.} Before the first format factorial, our hypothesis was that any re-mention of the candidates after the writing token opens the key channel.
+  \item \emph{Post hoc narrowing at 1.5B.} In the first run at Qwen2.5-1.5B (seed 0, $n = 40$), \fmtPost{} showed no key effect. We therefore narrowed the claim to ``listed answer options after the writing token open the key channel''. This narrowing was made after seeing the data, and an internal go/no-go gate written before that run was not met as written.
+  \item \emph{Preregistration A} tested the narrowed claim on fresh story cores in the same model, and all three predictions were met. This confirms the narrowed claim in one model on new data, not across models.
+  \item \emph{Preregistration B} tested held-out models. Both directional predictions were met in 5/5 models, but from 7B up \fmtPost{} carries an intermediate amount of key identity, so the ``listed options only'' account does not generalise. The account we now give, that from 7B up a later mention of the candidates opens the key channel, whether a list or a neutral sentence (a list most strongly), while at 1.5B and 3B only a list does, was revised again, post hoc, after stage 1. It is closer to the starting hypothesis. The residual \fmtNone{} identity in the Qwen models from 7B to 32B (up to \noneMax{} nats) extends just beyond the $\pm 1$-nat margin that A set at 1.5B; in the other models it stays inside. We report it as unpredicted, not as a confirmation.
+  \item \emph{Preregistration C} added a transfer law derived from the fixed-value data of \citet{anonymous2026fitted}. It failed at Mistral-Small-24B (C1 and C2 not met) and held only marginally at Qwen2.5-72B. C3 was met in both models. The key-share threshold of C4 was met only at Qwen2.5-32B; its \fmtBefore{} control was met in all three models. The reading that the intervention is written into both channels, and that the format decides which one appears to carry it, was formed after seeing these data.
+  \item \emph{Preregistration D} retested the options-list part of the account on two new tasks (D1, D2) and localised the readers at 7--14B (D3). It contains no test of whether \fmtPost{} opens the key channel; \fmtPost{} on the new tasks was exploratory.
+  \item \emph{Preregistration E} was written in response to two internal reviews of a draft. It tested the revised account with an instruction-matched $2{\times}2$ (E1), including the first confirmatory test that a sentence after the story opens the key channel (E1c, \fmtPost{} $-$ \fmtSentB{}). It also tested the value half of the post hoc reading of C (E4), the role control (E2) and the software environment (E3). All its predictions were met.
+\end{enumerate}
+
+\Cref{tab:claims} lists each main claim with its status. ``Confirmatory'' means that a preregistered prediction tested the claim in the stated models and was met. ``Exploratory'' means that the measurement was planned or run without a prediction. ``Post hoc'' means that the claim was formed after seeing the data it rests on.
+
+\begin{table}[!ht]
+\centering
+\footnotesize
+\caption{\textbf{Status of each main claim.} Section of the main text, claim, and whether it is confirmatory (with the prediction that tests it), exploratory or post hoc.}
+\label{tab:claims}
+\begin{tabular}{p{0.09\textwidth}p{0.44\textwidth}p{0.38\textwidth}}
+\toprule
+Section & Claim & Status \\
+\midrule
+\cref{sec:mentions} & Candidates listed after the writing token (\fmtOpt{}, \fmtLetter{}) give a large positive $\mathrm{ID}_K$ & Confirmatory at 1.5B (A1), in five held-out 3--8B models (B1) and, for \fmtListA{}, in four 7--14B models (E1a); exploratory at Qwen2.5-14B under \fmtOpt{} and \fmtLetter{} and at 24--72B \\
+\cref{sec:mentions} & Without a later mention (\fmtNone{}), keys carry little identity & Confirmatory as a paired contrast with \fmtOpt{} (B2) and at 1.5B (A2); the residual in the Qwen models from 7B to 32B (up to \noneMax{} nats), just beyond A's $\pm 1$-nat margin, is unpredicted \\
+\cref{sec:mentions} & Without a later mention, the identity is copied through the value channel ($\mathrm{ID}_V \gg \mathrm{ID}_K$) & Exploratory (\cref{tab:decomposition}) \\
+\cref{sec:mentions} & Candidates before the writing token (\fmtBefore{}, \fmtSentB{}) carry no positive key identity ($\mathrm{ID}_K \leq 0.5$ nats in every model and task tested; $\leq 0$ in most models on the belief task, down to $\idKBeforeQwenSeventytwo$ nats at Qwen2.5-72B) & Confirmatory: A2 at 1.5B (within $\pm 1$ nat), and the $\leq 0.5$-nat bound in C4 second part (24--72B), D2 (new tasks) and E1b (7--14B); the negative sign was not predicted and is unexplained \\
+\cref{sec:mentions} & \fmtPost{} carries intermediate key identity from 7B up, and no positive key identity at 1.5B and 3B & Post hoc (observed in B); the 1.5B null was predicted by A2 (equivalence margin, met), and the positive part from 7B up was then confirmed in four 7--14B models by E1c (\fmtPost{} $-$ \fmtSentB{} $> 0$) \\
+\cref{sec:mentions} & With the instruction matched, moving a list or a sentence from before to after the writing token switches the key read on & Confirmatory in four 7--14B models (E1a--c); that a list reads more than a sentence, and that \fmtListA{} is close to \fmtOpt{}, are exploratory \\
+\cref{sec:mentions} & Key and value effects add up, with a small interaction & Exploratory (\cref{tab:decomposition}) \\
+\cref{sec:general} & The pattern holds on the paint and schedule tasks & Confirmatory for \fmtOpt{}, the \fmtOpt{} $-$ \fmtNone{} contrast and \fmtBefore{} (D1, D2); exploratory for \fmtPost{}, \fmtLetter{} and the key share \\
+\cref{sec:general} & Within Qwen2.5, the \fmtOpt{} key share rises with size to 14B, then falls & Exploratory (B3); the threshold $s_K \geq 0.80$ failed (C4) \\
+\cref{sec:general} & The fall beyond 14B is not a software-environment artefact & Confirmatory (E3) \\
+\cref{sec:general} & The key read is not only the input embedding & Exploratory (onset sweep, \cref{tab:onset}) \\
+\cref{sec:readers} & The later-mention words read the key at 7--14B & Confirmatory for \fmtOpt{} and \fmtPost{} in three 7--14B models (D3); exploratory for \fmtLetter{} \\
+\cref{sec:readers} & At 1.5B, option words read the key in layers 4--15, one KV group dominant & Exploratory (no prediction) \\
+\cref{sec:readers} & The answer then reads the later mentions & Hypothesis; not tested \\
+\cref{sec:role} & The writing token's channels carry identity, not belief role & Confirmatory for \fmtOpt{} and \fmtNone{} in four models (E2); exploratory for \fmtLetter{} and Qwen2.5-72B \\
+\cref{sec:intervention} & Reproduction of \citet{anonymous2026fitted} under \fmtOpt{} & Confirmatory gate (C), passed \\
+\cref{sec:intervention} & $\psi_K$ is much smaller without a later mention & Confirmatory (C3) \\
+\cref{sec:intervention} & Without a later mention, values carry the intervention & Confirmatory (E4) \\
+\cref{sec:intervention} & $\varphi$ varies little across formats (\phiOptMistral{}--\phiLetterMistral{} at Mistral-Small-24B, \phiNoneQwen{}--\phiBeforeQwen{} at Qwen2.5-72B); the full crossover of $\psi_K$ and $\psi_V$ over five formats & Exploratory; the one preregistered contrast (C2, \fmtOpt{} $-$ \fmtNone{}) was null at Mistral-Small-24B and small but positive at Qwen2.5-72B ($+0.034$ [$+0.018$, $+0.049$]) \\
+\cref{sec:intervention} & The intervention is written into both channels; the format decides which appears to carry it & Post hoc reading of C; its value half then confirmed (E4) \\
+\cref{sec:failed} & The transfer law from clamping-estimated $\kappa_V$ fails & Confirmatory test, failed at Mistral-Small-24B (C1, C2) and marginal at Qwen2.5-72B \\
 \bottomrule
 \end{tabular}
 \end{table}
-\todo{Stage 3: fill in the D1--D3 verdicts in \cref{tab:prereg-d} from the stage-3 scoring output, verbatim from the preregistration log.}
 
-The two new tasks write the state with one sentence each: ``Later, \{agent\} repainted the \{thing\} \{colour\}.'' (paint) and ``Later, \{agent\} moved the \{thing\} to \{day\}.'' (schedule). Exploratory, with no prediction: key shares on the new tasks, \fmtLetter{} and \fmtPost{} identity, and layer-window and KV-group localisation at 7--14B.
+\clearpage
+\section{Prompts}\label{app:prompts}
 
-\section{Exact prompts}\label{app:prompts}
+\paragraph{Belief task.} The story generator (\texttt{ckeys/story.py}) is ported from the released generator of \citet{anonymous2026fitted}. Each story core draws an agent and an other agent (Alice, Bob), an object and a distractor object from twenty objects, and four locations from the six candidates \emph{box, basket, shelf, drawer, cabinet, closet}. The initial location, the base location and the source location must differ, and the distractor's location must differ from the base and source locations. The two ``initially sees'' sentences are sorted by object name. The direct question is ``Where does \{$A$\} believe the \{$o$\} is?''. Base B and source S differ only at the writing token, the word after ``moved to the''. The third value X used for $\mathrm{ID}_K$ and $\mathrm{ID}_V$ is drawn, with a seed fixed by the core, from the candidates other than the base, source, initial and distractor locations, so it appears nowhere in the story. We keep a core only if the B, S and X prompts have the same token length and differ at exactly one token.
 
-All five arms share the story and question; only the candidate listing and the instruction differ. We show one story core from the generator (seed 0): agent Alice, other agent Bob, object \emph{hat}, distractor \emph{card}, initial location \emph{drawer}, distractor location \emph{box}, base location \emph{shelf}, source location \emph{cabinet}. The critical token is the word after ``moved to the''; the source prompt differs from the base only there (\emph{cabinet} instead of \emph{shelf}), and the third-location prompt used for $\mathrm{ID}_K$ has \emph{basket} there. The two ``initially sees'' sentences are sorted by object name, as in the generator of \citet{anonymous2026fitted}. Below are the raw (user-turn) prompts of the base run.
+We show the first core generated with seed 0: agent Alice, other agent Bob, object \emph{lamp}, distractor \emph{coin}, initial location \emph{basket} (the distractor is also in the basket), base location \emph{cabinet}, source location \emph{drawer}, third value \emph{box}. Below are the raw user-turn prompts of the base run in all seven formats, as built by \texttt{ckeys/encoding.py}. Line breaks inside the story are added here for width; in the prompts the story is one line.
 
-\paragraph{\fmtOpt{} (P1; the format of \citealt{anonymous2026fitted}).}\mbox{}
+\paragraph{\fmtOpt{} (the format of the key-exchange experiments of \citealt{anonymous2026fitted}).}\mbox{}
+{\small
 \begin{verbatim}
 Read the story and answer the question.
 
-Story: Everyone initially sees that the card is in the box. Everyone initially sees that
-the hat is in the drawer. Alice watches as the hat is moved to the shelf. Bob does not see
-this happen.
-Question: Where does Alice believe the hat is?
+Story: Everyone initially sees that the coin is in the basket. Everyone
+initially sees that the lamp is in the basket. Alice watches as the lamp is
+moved to the cabinet. Bob does not see this happen.
+Question: Where does Alice believe the lamp is?
 Choices: box, basket, shelf, drawer, cabinet, closet
 Answer with exactly one choice.
 Answer:
 \end{verbatim}
+}
 
-\paragraph{\fmtLetter{} (LETTER).}\mbox{}
+\paragraph{\fmtListA{}.} As \fmtOpt{}, with the last instruction line replaced by ``Answer with one word.''.
+{\small
+\begin{verbatim}
+...
+Question: Where does Alice believe the lamp is?
+Choices: box, basket, shelf, drawer, cabinet, closet
+Answer with one word.
+Answer:
+\end{verbatim}
+}
+
+\paragraph{\fmtLetter{}.}\mbox{}
+{\small
 \begin{verbatim}
 Read the story and answer the question.
 
-Story: Everyone initially sees that the card is in the box. Everyone initially sees that
-the hat is in the drawer. Alice watches as the hat is moved to the shelf. Bob does not see
-this happen.
-Question: Where does Alice believe the hat is?
+Story: Everyone initially sees that the coin is in the basket. Everyone
+initially sees that the lamp is in the basket. Alice watches as the lamp is
+moved to the cabinet. Bob does not see this happen.
+Question: Where does Alice believe the lamp is?
 Choices: A) box, B) basket, C) shelf, D) drawer, E) cabinet, F) closet
 Answer with one letter.
 Answer:
 \end{verbatim}
+}
 
-\paragraph{\fmtPost{} (POST).}\mbox{}
+\paragraph{\fmtPost{}.}\mbox{}
+{\small
 \begin{verbatim}
 Read the story and answer the question.
 
-Story: Everyone initially sees that the card is in the box. Everyone initially sees that
-the hat is in the drawer. Alice watches as the hat is moved to the shelf. Bob does not see
-this happen. The room has a box, a basket, a shelf, a drawer, a cabinet and a closet.
-Question: Where does Alice believe the hat is?
+Story: Everyone initially sees that the coin is in the basket. Everyone
+initially sees that the lamp is in the basket. Alice watches as the lamp is
+moved to the cabinet. Bob does not see this happen. The room has a box, a
+basket, a shelf, a drawer, a cabinet and a closet.
+Question: Where does Alice believe the lamp is?
 Answer with one word.
 Answer:
 \end{verbatim}
+}
 
-\paragraph{\fmtNone{} (NONE).}\mbox{}
+\paragraph{\fmtSentB{}.}\mbox{}
+{\small
 \begin{verbatim}
 Read the story and answer the question.
 
-Story: Everyone initially sees that the card is in the box. Everyone initially sees that
-the hat is in the drawer. Alice watches as the hat is moved to the shelf. Bob does not see
-this happen.
-Question: Where does Alice believe the hat is?
+Story: The room has a box, a basket, a shelf, a drawer, a cabinet and a
+closet. Everyone initially sees that the coin is in the basket. Everyone
+initially sees that the lamp is in the basket. Alice watches as the lamp is
+moved to the cabinet. Bob does not see this happen.
+Question: Where does Alice believe the lamp is?
 Answer with one word.
 Answer:
 \end{verbatim}
+}
 
-\paragraph{\fmtBefore{} (BEFORE).}\mbox{}
+\paragraph{\fmtNone{}.}\mbox{}
+{\small
+\begin{verbatim}
+Read the story and answer the question.
+
+Story: Everyone initially sees that the coin is in the basket. Everyone
+initially sees that the lamp is in the basket. Alice watches as the lamp is
+moved to the cabinet. Bob does not see this happen.
+Question: Where does Alice believe the lamp is?
+Answer with one word.
+Answer:
+\end{verbatim}
+}
+
+\paragraph{\fmtBefore{}.}\mbox{}
+{\small
 \begin{verbatim}
 Read the story and answer the question.
 Choices: box, basket, shelf, drawer, cabinet, closet
 
-Story: Everyone initially sees that the card is in the box. Everyone initially sees that
-the hat is in the drawer. Alice watches as the hat is moved to the shelf. Bob does not see
-this happen.
-Question: Where does Alice believe the hat is?
+Story: Everyone initially sees that the coin is in the basket. Everyone
+initially sees that the lamp is in the basket. Alice watches as the lamp is
+moved to the cabinet. Bob does not see this happen.
+Question: Where does Alice believe the lamp is?
 Answer with one word.
 Answer:
 \end{verbatim}
-Line breaks inside the story are added here for width; in the prompts the story is one line.
+}
 
-\paragraph{Chat wrapper.} Each raw prompt is wrapped as in the key-exchange encoder of \citet{anonymous2026fitted}, in its \texttt{Answer:}-prefill interface: a system turn ``You are a helpful assistant.'', a user turn holding the raw prompt, the model's generation prompt with thinking disabled (\texttt{enable\_thinking=False}, which matters for Qwen3 and is ignored by other templates), and the assistant prefill ``Answer:''. The raw prompt itself ends in ``Answer:'', so this string appears twice, once in the user turn and once as the prefill. For Qwen2.5 the full input is
+\paragraph{Chat wrapper and scoring.} Each raw prompt is wrapped as in the \texttt{Answer:}-prefill interface of \citet{anonymous2026fitted} and its released encoder: a system turn ``You are a helpful assistant.'', a user turn holding the raw prompt, the model's generation prompt, and the assistant prefill ``Answer:''. We also disable thinking (\texttt{enable\_thinking=False}, which matters for Qwen3 and is ignored by other templates). The raw prompt itself ends in ``Answer:'', so this string appears twice. For Qwen2.5 the full input is
+{\small
 \begin{verbatim}
 <|im_start|>system
 You are a helpful assistant.<|im_end|>
@@ -186,79 +257,197 @@ Answer:<|im_end|>
 <|im_start|>assistant
 Answer:
 \end{verbatim}
-The wrapper asserts that the raw prompt occurs exactly once in the templated text. Templates that reject a system role fall back to merging the system text into the user turn, and this fallback is recorded in every format-factorial output file from preregistration A onward; no model reported here needed it. Candidates are scored as the single tokens `` box'', `` basket'', \ldots{} (with a leading space), or `` A'' to `` F'' under \fmtLetter{}; the code asserts that each is a single token.
+}
+The wrapper asserts that the raw prompt occurs exactly once in the templated text. Templates that reject a system role fall back to merging the system text into the user turn; every output file records whether this happened, and no model reported here needed it. We read full-vocabulary log-probabilities at the last position and score the candidates as single tokens with a leading space (`` box'', `` basket'', \ldots, or `` A'' to `` F'' under \fmtLetter{}); the code asserts that each candidate is one token.
 
-\section{Implementation and exactness checks}\label{app:impl}
+\paragraph{Role-swap control.} The role-swapped story R exchanges the two names in the event and keeps the location word. For the core above, the base event and the role-swapped event are
+{\small
+\begin{verbatim}
+B: Alice watches as the lamp is moved to the cabinet. Bob does not see this happen.
+R: Bob watches as the lamp is moved to the cabinet. Alice does not see this happen.
+\end{verbatim}
+}
+The question still asks for Alice's belief, so the correct answer moves from the writing token's location (\emph{cabinet}) to the initial location (\emph{basket}). The role effect is measured with $m = \log p(\text{initial}) - \log p(\textsc{loc})$, and $f_C$ is the effect of clamping channel $C$ at the writing token to R's, divided by the full R$-$B difference in $m$.
 
-\paragraph{Clamp hooks.} Each clamp is a forward hook on the \texttt{k\_proj} and/or \texttt{v\_proj} module of every decoder block with index $l \geq l_0$. The hook overwrites the output row at the critical position $p$ with the vector cached from the donor run (B, S or X) at the same layer. These outputs are pre-RoPE and contain all KV groups, so under grouped-query attention every group is clamped. All clamp conditions for one item run as rows of a single batch of the base prompt: the identity row, $\mathcal{C}_K$, $\mathcal{C}_V$ and $\mathcal{C}_{KV}$ to S at each $l_0$, and $\mathcal{C}_K$, $\mathcal{C}_V$ and $\mathcal{C}_{KV}$ to X at $l_0 = 0$. Forward passes use \texttt{use\_cache=False} and compute logits only at the last position. We keep a core only if the B, S and X prompts have the same length and differ at exactly one token; no core was dropped in preregistration A or in any GPU run.
+\paragraph{Intervention frames.} The stage-2 and stage-3b runs with the bases of \citet{anonymous2026fitted} use their released native story cores, rendered with the same generator, the same format builders and the same wrapper. The patched span is the move event, from the observer's name to the end of the story; the writing token is the location word inside it.
 
-\paragraph{Identity row.} The identity row clamps the base run to its own keys and values, so it should equal the clean base run. From preregistration A onward we compute every factorial effect against it rather than against the separately run clean base ($d_C = m(C) - m(\mathrm{ID})$). In BF16, a batched forward pass can differ slightly from an unbatched one; measuring against a row of the same batch removes this difference from every effect. The size of the difference (identity row versus clean run) is written to each of these result summaries as a noise floor. The first CPU factorials and the row-restricted splices measure against the clean base run; in FP32 the two baselines agree to the printed precision in preregistration A.
-
-\paragraph{Exactness of the clamp.} The exactness lemma of \cref{sec:method} implies that $\mathcal{C}_{KV}(\mathrm{S})$ at $l_0 = 0$ reproduces the source run. In the FP32 CPU runs at Qwen2.5-1.5B, the recovery ratio $d_{KV}/[m(\mathrm{S}) - m(\mathrm{B})]$ equals 1 to the three decimals printed, in every arm (\texttt{results/format\_factorial/}). The unit tests (\texttt{tests/test\_interventions.py}, Qwen2.5-0.5B, FP32) further check that an identity edit and a self key exchange leave the logits unchanged to within $10^{-4}$, and that patching the full residual stream at the critical token after one block transfers the source answer.
-
-\paragraph{Exactness of the row-restricted splice.} The splice wraps each attention module's forward pass: it runs the module once with the base key at $p$ and once with the source key (inserted by the \texttt{k\_proj} hook), and returns the source output in the rows of the group $G$ and the base output elsewhere. For the layer-window and KV-group variants, the source key is inserted only in the chosen layers, or only in one group's slice of the key. A unit test checks that $G = $ all rows reproduces the full key clamp and $G = \emptyset$ reproduces the clean run, each to within $10^{-4}$ in the logits. Every run also re-runs $G = \emptyset$ for each item and reports its mean effect, which is zero to the printed precision (\texttt{results/row\_restricted/}).
-
-\paragraph{A KV-cache pitfall.} Our first splice implementation was silently wrong. Transformers 5 builds a \texttt{DynamicCache} by default even for a single forward pass. Running the attention module twice per layer therefore appended keys to the cache, and the second (source-key) pass silently read the base keys. The fix is to run every forward pass of the splice with \texttt{use\_cache=False}; the exactness test above was added in the same change. All splice results reported here were produced after the fix. Anyone who patches attention by calling a module more than once per forward pass should check this.
-
-\paragraph{Independent code audit.} Before the GPU runs, an independent multi-agent review of the measurement code found the following issues, all of which we fixed before any GPU result was produced:
-\begin{itemize}\setlength\itemsep{1pt}
-  \item the KV-cache bug in the double-attention splice described above;
-  \item the Qwen3 chat template entered thinking mode by default; the encoder now passes \texttt{enable\_thinking=False}, matching the encoder of \citet{anonymous2026fitted};
-  \item the Gemma-2 chat template rejects a system role; the encoder now falls back to merging the system text into the user turn and records the fallback, and Gemma-2 is loaded with eager attention because the SDPA path does not apply its attention-logit soft-capping (Gemma-2 and Llama-3.1 were optional in the stage-1 script and were not run, so neither appears in our results);
-  \item a competence filter that was defined but not applied; every statistic of the key/value factorial is now reported on all items (primary) and on items whose two clean runs are answered correctly (secondary);
-  \item statistics computed by hand, including the first $\mathrm{ID}_K$ values; $\mathrm{ID}_K$, $\mathrm{ID}_V$, the interaction and its share are now computed in the experiment script with core-bootstrap CIs.
-\end{itemize}
-
-\paragraph{Mistral-Small-24B tokenizer warning.} When loading the Mistral-Small-24B tokenizer, transformers warns that its pre-tokenisation regex is incorrect and suggests the flag \texttt{fix\_mistral\_regex=True}. We left the default, which is the setting under which the reproduction gate of preregistration C passed (\cref{tab:prereg-c}). We have not measured how the flag would change the results.
-
-\section{Compute and reproducibility}\label{app:compute}
-
-\paragraph{Hardware.} All runs are forward passes; nothing is trained. Pilots and early tests with models of at most 1.7B parameters ran on CPU in FP32: the natural key/value pilots at Qwen2.5-0.5B, Qwen2.5-1.5B and SmolLM2-1.7B, the first format factorials and preregistration A at Qwen2.5-1.5B, the row-restricted splices at Qwen2.5-1.5B, and the attention probe. The GPU stages ran on rented NVIDIA A100-SXM4-80GB instances in BF16: stage 1 (Qwen2.5-1.5B to 14B, Qwen3-8B, Mistral-7B, OLMo-2-7B) on one GPU, and stage 2 (Mistral-Small-24B, Qwen2.5-32B, Qwen2.5-72B, and the bases of \citet{anonymous2026fitted}) on two GPUs, with models sharded by \texttt{device\_map="auto"}. Stage 3 is planned for one 80GB GPU. \todo{Stage 3: record hardware, versions and commit of the stage-3 run.}
-
-\paragraph{Software.} Every format-factorial output file from preregistration A onward records the code commit, library versions, device and chat-wrapper fallback; the stage-2 frames files record library versions, device and model revision, and each GPU stage writes its commit to \texttt{COMMIT.txt}. GPU stage 1 used torch 2.11.0 (CUDA 12.8), transformers 5.18.0 and Python 3.12, at commit \texttt{f706ef5}. GPU stage 2 used torch 2.11.0 and transformers 5.9.0 (pinned by the stage-2 script for the reproduction of \citet{anonymous2026fitted}), at commit \texttt{2b1eca7}. The earlier CPU result files (natural pilots, first format factorials, row-restricted splices and attention probe) do not record the commit or library versions; each is identified by the repository commit that added it.
-
-\paragraph{Model revisions.} For the two models of \citet{anonymous2026fitted} we pin the model revisions used for the reproduction: Mistral-Small-24B-Instruct-2501 at \texttt{9527884be6e5616bdd54de542f9ae13384489724} and Qwen2.5-72B-Instruct at \texttt{495f39366efef23836d0cfae4fbe635880d2be31}. These pins apply to both the frames and the natural factorial at those sizes. The other models were loaded at the default revision available at run time; Qwen2.5-32B was not pinned.
-
-\paragraph{Data from \citet{anonymous2026fitted}.} Stage 2 uses their released reviewer repository: the rank-16 bases (learned remap, PCA and intended transfer; seeds 101--103; for Qwen2.5-72B the PCA bases are the reconstructed controls that \citet{anonymous2026fitted} label as such), the 120 native story cores, and the saved native outputs used for the reproduction gate.
-
-\paragraph{Code.} The released code contains:
-\begin{itemize}\setlength\itemsep{1pt}
-  \item \texttt{ckeys/}: the story generator (\texttt{story.py}), the encoder and format arms (\texttt{encoding.py}), the hook-based capture and clamp primitives (\texttt{interventions.py}), and the stage-3 tasks (\texttt{tasks.py});
-  \item \texttt{experiments/}: \texttt{format\_factorial.py} (key/value factorial and $\mathrm{ID}_K$), \texttt{row\_restricted\_keys.py} (exact splice, layer windows and KV groups), \texttt{paper1\_frames.py} (bases, reproduction and key-only exchange), \texttt{choice\_attention.py} (attention probe), \texttt{kv\_factorial\_natural.py} (CPU pilots) and \texttt{task\_factorial.py} (stage 3);
-  \item \texttt{analysis/}: the preregistered scoring scripts \texttt{stage1\_prereg.py}, \texttt{stage2\_score.py} and \texttt{stage3\_score.py}, and \texttt{paper1\_fixed\_value\_logodds.py} (the fixed-value reanalysis behind $\kappa_V$ and the fixed-value key share);
-  \item \texttt{scripts/gpu\_stage1.sh}, \texttt{scripts/gpu\_stage2.sh} and \texttt{scripts/gpu\_stage3.sh}: one command per GPU stage, which pins the library version, records the commit and environment, runs every model, and archives the results;
-  \item \texttt{tests/test\_interventions.py}: the exactness tests of \cref{app:impl};
-  \item \texttt{paper/make\_figures.py}: generates every figure, \cref{tab:natural,tab:frames} and every result macro in the text from the saved results, except the two fixed-value key shares of \citet{anonymous2026fitted}, which are entered from the output of \texttt{analysis/paper1\_fixed\_value\_logodds.py}.
-\end{itemize}
-
-\section{Additional results}\label{app:additional}
-
-\paragraph{Layer-window and KV-group localisation at 1.5B.} \Cref{tab:windows} refines the row-restricted splice of \cref{fig:localisation} (Qwen2.5-1.5B, 28 layers, two KV groups, FP32, $n = 40$, direct question). Only the six option-word rows see the source key, and the swap is further limited either to a window of layers (all KV groups) or to one KV group's slice of the key (all layers). Entries are fractions of the full key effect, in which all rows see the source key at all layers. For reference, the option-word rows at all layers recover \locOptChoicewords{} (\fmtOpt{}) and \locLetterChoicewords{} (\fmtLetter{}).
-
-\begin{table}[h]
-\centering
-\small
-\caption{\textbf{Depth and KV-group localisation of the option-word key read} (Qwen2.5-1.5B, $n = 40$). Fraction of the full key effect recovered when only the option-word rows see the source key, in the given layers or KV group. Exploratory; from \texttt{results/row\_restricted\_windows/}.}
-\label{tab:windows}
-\begin{tabular}{lcc}
+\paragraph{Paint and schedule tasks.} The two new tasks (\texttt{ckeys/tasks.py}) follow the same structure: two sentences give the starting values of two things, sorted by name, and a final sentence writes the new value at the writing token. They use the formats \fmtOpt{}, \fmtLetter{}, \fmtPost{}, \fmtNone{} and \fmtBefore{}, built exactly as above with the task's candidates; the neutral sentence of \fmtPost{} is task-specific. The agent is drawn from six names (Alice, Bob, Carol, David, Emma, Frank) and the things from ten per task.
+\begin{center}
+\footnotesize
+\begin{tabular}{p{0.16\textwidth}p{0.37\textwidth}p{0.37\textwidth}}
 \toprule
-Option-word rows see the swapped key in & \fmtOpt{} & \fmtLetter{} \\
+ & paint & schedule \\
 \midrule
-Layers 0--3 & $-1\%$ & $-1\%$ \\
-Layers 4--7 & \textbf{19\%} & \textbf{35\%} \\
-Layers 8--11 & 12\% & 5\% \\
-Layers 12--15 & 13\% & 3\% \\
-Layers 16--27 & $\leq 2\%$ & $\leq 1\%$ \\
-\midrule
-KV group 0 (all layers) & 19\% & 6\% \\
-KV group 1 (all layers) & \textbf{46\%} & \textbf{65\%} \\
+Candidates & red, blue, green, yellow, black, white & Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday \\
+Things & fence, door, bench, shed, gate, chair, table, wall, boat, bike & meeting, dinner, appointment, party, class, interview, concert, match, lecture, trip \\
+Starting value & ``The \{thing\} was painted \{value\}.'' & ``The \{thing\} was scheduled for \{value\}.'' \\
+Writing sentence & ``Later, \{agent\} repainted the \{thing\} \{value\}.'' & ``Later, \{agent\} moved the \{thing\} to \{value\}.'' \\
+Question & ``What color is the \{thing\} now?'' & ``On which day is the \{thing\} now?'' \\
+\fmtPost{} sentence & ``The shop sells red, blue, green, yellow, black and white paint.'' & ``The calendar shows Monday, Tuesday, Wednesday, Thursday, Friday, Saturday and Sunday.'' \\
+\fmtLetter{} options & A) red, \ldots, F) white & A) Monday, \ldots, G) Sunday \\
 \bottomrule
 \end{tabular}
+\end{center}
+The first cores generated with seed 0 give, under \fmtOpt{} and \fmtPost{},
+{\small
+\begin{verbatim}
+Read the story and answer the question.
+
+Story: The boat was painted yellow. The shed was painted yellow. Later, Emma repainted the
+shed black.
+Question: What color is the shed now?
+Choices: red, blue, green, yellow, black, white
+Answer with exactly one choice.
+Answer:
+
+Read the story and answer the question.
+
+Story: The interview was scheduled for Friday. The match was scheduled for Monday. Later,
+Frank moved the interview to Wednesday. The calendar shows Monday, Tuesday, Wednesday,
+Thursday, Friday, Saturday and Sunday.
+Question: On which day is the interview now?
+Answer with one word.
+Answer:
+\end{verbatim}
+}
+with source values \emph{green} and \emph{Thursday} and third values \emph{blue} and \emph{Tuesday}.
+
+\clearpage
+\section{Implementation and checks}\label{app:impl}
+
+\paragraph{Clamp hooks.} Each clamp is a forward hook on the \texttt{k\_proj} and/or \texttt{v\_proj} module of every decoder block $\ell \geq \ell_0$. The hook overwrites the output row at the writing position $p$ with the vector cached from the donor run (B, S or X) at the same layer. These outputs come before RoPE and before key normalisation (Qwen3, OLMo-2), and they contain all KV groups, so under grouped-query attention every group is clamped. All clamp conditions for one story run as rows of a single batch of the base prompt: the self-clamp row, $\mathcal{C}_K$, $\mathcal{C}_V$ and $\mathcal{C}_{KV}$ to S at each onset $\ell_0$, and the same three to X at $\ell_0 = 0$. The onsets are $\ell_0 = 0$, $\ell_0 = \mathrm{round}(0.0625\,L)$, which matches block 6 of 80, where the exchange of \citet{anonymous2026fitted} starts in Qwen2.5-72B, and $\ell_0 = \mathrm{round}(0.3\,L)$. Forward passes use \texttt{use\_cache=False} and compute logits only at the last position. From preregistration A onward, every natural-factorial output file records the number of skipped cores, which is zero in every such run.
+
+\paragraph{Self-clamp row.} The self-clamp row $\mathcal{C}_{KV}(\mathrm{B})$ sets the writing token's keys and values to their own values, so mathematically it equals the clean base run. In BF16, however, a batched forward pass can differ slightly from an unbatched one. From preregistration A onward we therefore measure every effect against this row of the same batch (\cref{eq:dc}), not against a separately run clean base, so that batching noise cancels. Each result summary records the gap between the self-clamp row and the clean run as a noise floor. The first CPU factorials (FP32) and all row-restricted splices measure against the clean base run.
+
+\paragraph{Exactness of the clamp.} By the argument in \cref{sec:method}, $\mathcal{C}_{KV}(\mathrm{S})$ from $\ell_0 = 0$ reproduces the source run at every later position. In the FP32 CPU runs at Qwen2.5-1.5B, the recovery ratio $d_{KV} / [m_{\mathrm{SB}}(\mathrm{S}) - m_{\mathrm{SB}}(\mathrm{B})]$ equals one to the printed precision in every format (\texttt{results/format\_factorial/}). The unit tests (\texttt{tests/test\_interventions.py}, Qwen2.5-0.5B in FP32) check that an identity edit and a self key exchange leave the logits unchanged to within $10^{-4}$, and that patching the residual stream at the writing token after one block transfers the source answer.
+
+\paragraph{Row-restricted splice.} The splice wraps the forward pass of each attention module. It runs the module once with the base key at $p$ and once with the source key, which the \texttt{k\_proj} hook inserts, and returns the source output in the rows of the chosen token group $G$ and the base output elsewhere. In the layer-window and KV-group variants, the source key is inserted only in the chosen layers, or only in one group's slice of the key. A unit test checks that $G = {}$all rows reproduces the full key clamp and $G = \emptyset$ reproduces the clean run, each to within $10^{-4}$ in the logits. Every run also evaluates $G = \emptyset$ for each story and reports its mean effect, which is zero to the printed precision.
+
+\paragraph{A KV-cache pitfall.} Our first splice implementation was silently wrong. Transformers 5 builds a \texttt{DynamicCache} by default, even for a single forward pass. Running the attention module twice per layer therefore appended keys to the cache, and the second (source-key) pass silently read the base keys. The fix is to run every forward pass with \texttt{use\_cache=False}. The exactness test above was added in the same change, and every splice result reported here was produced after it. Anyone who patches attention by calling a module more than once per forward pass should check for this.
+
+\paragraph{Exchanges in the intervention frames.} The patch of \citet{anonymous2026fitted} replaces the output of decoder block 4 (1-based) over every token of the move-event span by \cref{eq:patch}, materialised in BF16 as in their engine, with the released rank-16 bases for the learned remap M and the PCA control P, at seeds 101--103. The key-only exchange replaces the writing token's \texttt{k\_proj} output in blocks 6 to $L$ (1-based) by the other patched run's, giving P$+K_{\mathrm{M}}$ (addition) and M$+K_{\mathrm{P}}$ (removal); queries, values and residual states evolve freely. The value-only exchange does the same with \texttt{v\_proj}. The removal fractions are
+\begin{equation*}
+\rho_K = \frac{m(\mathrm{M}{+}K_{\mathrm{P}}) - m(\mathrm{M})}{m(\mathrm{P}) - m(\mathrm{M})}, \qquad
+\rho_V = \frac{m(\mathrm{M}{+}V_{\mathrm{P}}) - m(\mathrm{M})}{m(\mathrm{P}) - m(\mathrm{M})},
+\end{equation*}
+with $m = m_{\mathrm{TS}}$, averaged over the three fits within each core before the ratio of means is taken. The reproduction gate compares the argmax token of M and P under \fmtOpt{} with the outputs released with \citet{anonymous2026fitted}.
+
+\paragraph{Code audit.} Before the GPU runs, an independent review of the measurement code led to fixes made before any GPU result existed, among them the batched self-clamp baseline, depth-matched onsets, a seeded third value X, core-bootstrap CIs computed in the experiment scripts, the competence filter (now a secondary analysis) and provenance written into every output file.
+
+\paragraph{Mistral-Small-24B tokenizer warning.} When loading the Mistral-Small-24B tokenizer, transformers warns that its pre-tokenisation regex is incorrect and suggests \texttt{fix\_mistral\_regex=True}. We kept the default, under which the reproduction gate of preregistration C passed. We have not measured how the flag would change the results.
+
+\paragraph{Compute.} All experiments are forward passes; nothing is trained. Pilots with models of at most 1.7B parameters, the first format factorials, preregistration A, the 1.5B row-restricted splices and the attention probe ran on CPU in FP32; the preregistration-A output records transformers 5.18.0 and Python 3.11.15. All GPU runs used NVIDIA A100-SXM4-80GB GPUs in BF16, torch 2.11.0 with CUDA 12.8 and Python 3.12.14, as recorded in each stage's \texttt{ENV.txt} and output files:
+\begin{itemize}\setlength\itemsep{1pt}
+  \item stage 1 (preregistration B; Qwen2.5-1.5B to 14B, Qwen3-8B, Mistral-7B, OLMo-2-7B): one GPU, transformers 5.18.0, commit \texttt{f706ef5};
+  \item stage 2 (preregistration C; frames at 24B and 72B, natural factorial at 24--72B): two GPUs with \texttt{device\_map="auto"}, transformers 5.9.0, pinned by the stage-2 script for the reproduction gate, commit \texttt{2b1eca7};
+  \item stage 3 (preregistration D; new tasks and localisation at 7--14B): one GPU, transformers 5.18.0, commit \texttt{b8815cb};
+  \item stage 3b (preregistration E): two GPUs, commit \texttt{3ca63f1}; the $2{\times}2$, the role control at 7--14B and the Qwen2.5-32B environment re-run under transformers 5.18.0 (the re-run on one GPU), and the Qwen2.5-14B environment re-run, the value-only frames and the role control at 72B under transformers 5.9.0.
+\end{itemize}
+
+\paragraph{Model revisions.} For the two models of \citet{anonymous2026fitted} we pin the revisions used for the reproduction: Mistral-Small-24B-Instruct-2501 at \texttt{9527884be6e5616bdd54de542f9ae13384489724} and Qwen2.5-72B-Instruct at \texttt{495f39366efef23836d0cfae4fbe635880d2be31}. The pins apply to the frames and to the stage-2 natural factorial at those sizes. All other runs, including Qwen2.5-32B and the role control at Qwen2.5-72B, load the default revision available at run time.
+
+\paragraph{Released code.} The code release contains the story generator, encoder, tasks and hook primitives (\texttt{ckeys/}); one script per experiment (\texttt{experiments/}); the preregistered scoring scripts (\texttt{analysis/stage1\_prereg.py}, \texttt{stage2\_score.py}, \texttt{stage3\_score.py}, \texttt{stage3b\_score.py}); one shell script per GPU stage, which pins the library version and records the commit and environment (\texttt{scripts/}); the exactness tests (\texttt{tests/}); and \texttt{paper/make\_figures.py}, which generates every result figure, every table in \cref{app:additional} and every result macro in the text from the saved results (the schematic in \cref{fig:schematic} is drawn by \texttt{paper/make\_schematic.py}).
+
+\clearpage
+\section{Additional results}\label{app:additional}
+
+Unless stated otherwise, intervals are 95\% percentile intervals from 10{,}000 bootstrap resamples of stories (cores), with ratios recomputed within each resample. Each estimate is printed with its interval below it, except in \cref{tab:onset,tab:decomposition}, where the intervals of the individual effects are in the result summaries released with the code.
+
+\paragraph{Natural factorial in all models.} \Cref{tab:natural} gives the \fmtOpt{} key share and $\mathrm{ID}_K$ in every format for all \nModels{} models, and \cref{fig:formats} shows $\mathrm{ID}_K$ relative to \fmtOpt{}. \fmtBefore{} is negative in every model except Mistral-7B, where it is indistinguishable from zero; at Qwen2.5-72B it reaches $\idKBeforeQwenSeventytwo$ nats.
+
+\begin{table}[!ht]
+\centering
+\caption{\textbf{Natural factorial, all models.} Key share $s_K$ under \fmtOpt{} and value identity carried by keys, $\mathrm{ID}_K$ (nats), in each format, with keys and values clamped from layer~0. $n = 150$ stories per format and model; 95\% bootstrap CIs over stories (ratio recomputed in each resample for $s_K$). Models ordered by size. Rows up to 14B are from GPU stage 1, whose predictions B1--B2 cover \fmtOpt{}, \fmtLetter{} and \fmtNone{} in Qwen2.5-3B/7B, Qwen3-8B, Mistral-7B and OLMo-2-7B; rows from 24B are from stage 2, whose prediction C4 covers $s_K$ and \fmtBefore{}. The other cells, including the 1.5B and 14B rows, are exploratory; preregistration A tested 1.5B in a separate run (\cref{tab:prereg-ab}).}
+\label{tab:natural}
+\resizebox{\textwidth}{!}{\input{tables/tab_natural.tex}}
 \end{table}
-\todo{Provenance: generate \cref{tab:windows} in \texttt{paper/make\_figures.py} from \texttt{results/row\_restricted\_windows/} (as \texttt{tables/tab\_windows.tex} or as macros); its values are currently copied by hand from the result summary, against hard rule 1 of the brief.}
 
-The read happens in early-to-mid layers (4--15 of 28), and KV group 1 carries more of it than KV group 0 in both formats. The seven four-layer windows sum to under half of the full key effect, well below what the option-word rows recover with the swap at all layers; likewise, the two single-group swaps together recover less than swapping both groups at once. The read therefore compounds across layers and groups, and no narrow band reproduces it. This resembles the report of \citet{anonymous2026fitted} that, for their key-only addition exchange, neither a selected block band nor its complement recovers most of the full-range effect; for their removal exchange, by contrast, either region alone recovers most of it. Localisation at 7--14B is part of preregistration D. \todo{Stage 3: add layer-window and KV-group localisation at Qwen2.5-7B, Qwen2.5-14B and Mistral-7B.}
+\paragraph{Identity key share.} \Cref{tab:idshare} normalises $\mathrm{ID}_K$ by the total identity effect, $s_{\mathrm{ID}} = \overline{\mathrm{ID}}_K/(\overline{\mathrm{ID}}_K + \overline{\mathrm{ID}}_V)$, so that formats and models with different confidence can be compared. It tracks $s_K$ closely except under \fmtNone{} and \fmtBefore{}, where $s_K$ also counts the non-specific effect of a foreign key.
 
-\paragraph{Attention probe.} In an earlier configuration (Qwen2.5-1.5B, world question ``Where is the \{$o$\} actually located?'', options after the question, no system turn or prefill, $n = 25$ cores, no CIs), we measured head-averaged attention from each option word to the critical token, with the critical token's key swapped to the source run's at all layers. The option word that names the source location then attends to the critical token as it does in the source run, more than the non-matching option words do, and the base word's early-layer attention falls to the non-matching level, although in the middle layers it stays above that level (\texttt{results/choice\_attention\_qwen1.5b\_world.txt}). This probe is exploratory and uses a different prompt from the main experiments.
+\begin{table}[!ht]
+\centering
+\small
+\caption{\textbf{Identity key share $s_{\mathrm{ID}}$, all models} (exploratory). Ratio of mean $\mathrm{ID}_K$ to mean $\mathrm{ID}_K + \mathrm{ID}_V$, keys and values clamped from layer~0; $n = 150$ stories per format and model; 95\% bootstrap CIs, ratio recomputed in each resample.}
+\label{tab:idshare}
+\input{tables/tab_idshare.tex}
+\end{table}
 
-\paragraph{Competent-only robustness.} Our primary analyses pool all items, whether or not the model answers the clean runs correctly. As a secondary analysis, every quantity in \cref{tab:natural} is also computed on the items whose base and source clean runs are both answered correctly (argmax over the candidates). At 7B and above most items are competent, and the two analyses agree closely. The competent subset is smallest at Qwen2.5-1.5B and 3B, and the estimates move most at 3B. The sign of $\mathrm{ID}_K$ under \fmtOpt{}, \fmtLetter{}, \fmtNone{} and \fmtBefore{} is unchanged in every model, and the near-zero \fmtPost{} value at Qwen2.5-3B becomes slightly positive, with a CI that excludes 0, but stays far below the \fmtPost{} values from 7B up. No conclusion in \cref{sec:results} changes. The per-model, per-arm competent-only estimates with CIs are in the result summaries released with the code.
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.55\textwidth]{figures/fig_formats.pdf}
+\caption{\textbf{Key identity by format, relative to \fmtOpt{}.} Each point is one of the \nModels{} models: $\mathrm{ID}_K$ in that format divided by $\mathrm{ID}_K$ under \fmtOpt{} in the same model (so \fmtOpt{} is 1 by construction); points are jittered horizontally, and the horizontal line is the median over models. $n = 150$ stories per format and model; per-model values with 95\% bootstrap CIs are in \cref{tab:natural}.}
+\label{fig:formats}
+\end{figure}
+
+\paragraph{Decomposition.} \Cref{tab:decomposition} gives, for each model and format, the effects of clamping the key, the value or both, the interaction $d_{KV} - d_K - d_V$, and $\mathrm{ID}_V$. The interaction is small relative to $d_{KV}$ in every cell, so the two channels' effects add up. Under \fmtLetter{} the value channel carries almost no identity, and under \fmtNone{} and \fmtBefore{} it carries most of it: there the identity is copied.
+
+\begin{table}[!ht]
+\centering
+\footnotesize
+\caption{\textbf{Key/value decomposition.} Mean effects (nats of $m_{\mathrm{SB}}$) of clamping the writing token's key ($d_K$), value ($d_V$) or both ($d_{KV}$) to the source run's from layer~0, measured against the self-clamp row; the interaction $d_{KV} - d_K - d_V$ with its 95\% bootstrap CI; and the value identity $\mathrm{ID}_V$ (nats). $n = 150$ stories per format and model.}
+\label{tab:decomposition}
+\input{tables/tab_decomposition.tex}
+\end{table}
+
+\paragraph{Clamp onset.} \Cref{tab:onset} starts both clamps deeper. With $\ell_0 \approx 0.06L$ the shares are essentially unchanged. With $\ell_0 \approx 0.3L$ the shares stay substantial in most models (up to \onsetLateQwenFourteen{} at Qwen2.5-14B), but fall to \onsetLateQwenOnefive{} at Qwen2.5-1.5B and to \onsetLateOlmoSeven{} at OLMo-2-7B, where the key effect depends on the lowest layers. With $\ell_0 > 0$ the clamp is no longer exact, and at $\ell_0 \approx 0.3L$ the key and value effects no longer add up: the interaction is positive in every model (result summaries). The share at that onset is therefore descriptive only.
+
+\begin{table}[!ht]
+\centering
+\caption{\textbf{Key share by clamp onset.} $s_K = \bar d_K / (\bar d_K + \bar d_V)$ under \fmtOpt{} with both clamps applied from layer $\ell_0$ on; the onset used in each model is given in brackets. $n = 150$ stories per model; point estimates (the $\ell_0 = 0$ intervals are in \cref{tab:natural}). Exploratory.}
+\label{tab:onset}
+\input{tables/tab_onset.tex}
+\end{table}
+
+\paragraph{Layer windows and KV groups.} \Cref{tab:windows} refines the row-restricted splice at Qwen2.5-1.5B (28 layers, two KV groups). Only the option-word rows see the source key, and the swap is further limited to a window of four layers (all KV groups) or to one KV group's slice of the key (all layers). The read happens in layers 4--15, and KV group 1 carries more of it than KV group 0 in both formats. The seven windows together recover less than the option-word rows do with the swap at all layers, and the two single-group swaps together recover less than both groups at once, so the read compounds across layers and groups. We ran the same window and KV-group splices, on the option-word rows under \fmtOpt{} and \fmtLetter{}, at Qwen2.5-7B, Qwen2.5-14B and Mistral-7B (exploratory; result summaries). In these models no single four-layer window and no single KV group recovers most of the option-word effect, so the dominance of one KV group seen at 1.5B does not carry over.
+
+\begin{table}[!ht]
+\centering
+\caption{\textbf{Depth and KV-group localisation of the option-word key read} (Qwen2.5-1.5B, FP32). Entries are fractions of the effect obtained when the option-word rows see the source key in every layer and both KV groups, with 95\% bootstrap CIs over stories (ratio of means recomputed in each resample). $n = 40$ stories per format. Exploratory.}
+\label{tab:windows}
+\input{tables/tab_windows.tex}
+\end{table}
+
+\paragraph{New tasks.} \Cref{tab:tasks} gives the paint and schedule results. In every model and both tasks, $\mathrm{ID}_K$ is large under \fmtLetter{} and \fmtOpt{}, intermediate under \fmtPost{}, small under \fmtNone{} and near zero under \fmtBefore{}. The \fmtOpt{} key share ranges from \taskPaintShareMin{} to \taskPaintShareMax{} (paint) and from \taskScheduleShareMin{} to \taskScheduleShareMax{} (schedule), lowest at OLMo-2-7B in both.
+
+\begin{table}[!ht]
+\centering
+\caption{\textbf{Paint and schedule tasks.} Key share under \fmtOpt{} and $\mathrm{ID}_K$ (nats) in each format, clamped from layer~0. $n = 150$ stories per task, format and model; 95\% bootstrap CIs. Preregistration D (D1, D2) for \fmtOpt{}, \fmtNone{} and \fmtBefore{}; the rest exploratory.}
+\label{tab:tasks}
+\resizebox{\textwidth}{!}{\input{tables/tab_tasks.tex}}
+\end{table}
+
+\paragraph{Role control.} \Cref{tab:role} gives the role-swap effect and the fractions of it that the writing token's key and value carry. The role swap shifts the belief answer by many nats in every model and format, and neither channel at the writing token carries more than \roleFracMax{} of that shift.
+
+\begin{table}[!ht]
+\centering
+\caption{\textbf{Identity, not belief role.} Role effect: mean change in $m = \log p(\text{initial}) - \log p(\textsc{loc})$ when the observer and non-observer are swapped with the same location word (nats). $f_K$, $f_V$: fraction of that change reproduced by clamping only the writing token's key or value (all layers) to the role-swapped run's, as a ratio of means. Direct question; $n = 150$ stories per format and model; 95\% bootstrap CIs. Preregistration E (E2) for \fmtOpt{} and \fmtNone{} in the four 7--14B models; \fmtLetter{} and Qwen2.5-72B exploratory.}
+\label{tab:role}
+\input{tables/tab_role.tex}
+\end{table}
+
+\paragraph{Localisation.} \Cref{tab:localisation} gives the row-restricted splice for each token group. The later-mention words are the listed options under \fmtOpt{} and \fmtLetter{}, and the candidate words of the neutral sentence under \fmtPost{}. Under \fmtPost{} the ``other later tokens'' also recover a small part, and \locScalePostLeftMin{}--\locScalePostLeftMax{} of the effect is recovered by no single group. An earlier exploratory run at Qwen2.5-1.5B gives the same picture: the option words recover \locOptChoicewords{} of the key effect under \fmtOpt{} and \locLetterChoicewords{} under \fmtLetter{}. Restricting the splice further, the read is concentrated in layers 4--15 of 28, and one of the two KV groups carries most of it (exploratory; \cref{tab:windows}).
+
+\begin{table}[!ht]
+\centering
+\caption{\textbf{Which later tokens read the writing token's key.} Fraction of the full key effect (all tokens see the source key, in every layer) recovered when only one group of later tokens sees it; ratio of mean log-odds changes. ``Other later tokens'' covers the instruction, chat template, prefill and answer position. Qwen2.5-7B, Qwen2.5-14B and Mistral-7B: BF16, $n = 60$ stories per format; preregistration D (D3) for \fmtOpt{} and \fmtPost{}, \fmtLetter{} exploratory. Qwen2.5-1.5B: FP32, $n = 40$, exploratory. 95\% bootstrap CIs. The groups need not add up to one.}
+\label{tab:localisation}
+{\small\input{tables/tab_localisation.tex}}
+\end{table}
+
+\paragraph{Intervention frames.} \Cref{tab:frames} gives every frame quantity with its interval. The removal fractions follow the addition fractions: $\rho_K$ is large where $\psi_K$ is, and $\rho_V$ where $\psi_V$ is. Among the six candidates, M's top answer is the target T in \mTLetterMistral{}--\mTPostMistral{} of (core, fit) items at Mistral-Small-24B and \mTNoneQwen{}--\mTBeforeQwen{} at Qwen2.5-72B, depending on the format.
+
+\begin{table}[!ht]
+\centering
+\caption{\textbf{The intervention of \citet{anonymous2026fitted} across formats.} $\varphi$: behavioural shift of the learned remap M relative to the PCA patch P, as a fraction of the natural source-to-target shift (\cref{eq:phi}). $\psi_K$, $\psi_V$: fraction of the M$-$P difference that P reproduces when given M's keys or values at the writing token (\cref{eq:psik,eq:psiv}). $\rho_K$, $\rho_V$: fraction of that difference that M loses when given P's keys or values (\cref{app:impl}). Exchanges from block~6 on. $n = 96$ story cores with B, S and T distinct, three fits averaged within each core; 95\% bootstrap CIs over cores. Preregistrations C (C1--C3) and E (E4) for the cells they name; the rest exploratory.}
+\label{tab:frames}
+\resizebox{\textwidth}{!}{\input{tables/tab_frames.tex}}
+\end{table}
+
+\paragraph{Competent-only analysis.} Our primary analyses pool all stories, whether or not the model answers the clean runs correctly. As a secondary analysis, every natural-factorial quantity is also computed on the stories whose base and source clean runs are both answered correctly (argmax over the candidates). From 7B up most stories are competent and the two analyses agree closely. The competent subset is smallest at Qwen2.5-1.5B and 3B, and the estimates move most at 3B. The sign of $\mathrm{ID}_K$ under \fmtOpt{}, \fmtLetter{}, \fmtNone{} and \fmtBefore{} is unchanged in every model. The near-zero \fmtPost{} value at Qwen2.5-3B becomes slightly positive, with a CI that excludes zero, but stays far below the \fmtPost{} values from 7B up. No conclusion in the main text changes.
+
+\paragraph{Attention probe.} In an earlier configuration (Qwen2.5-1.5B, the question ``Where is the \{$o$\} actually located?'', options after the question, no system turn or prefill, $n = 25$ cores, no CIs), we measured head-averaged attention from each option word to the writing token, with the writing token's key swapped to the source run's in all layers. The option word that names the source location then attends to the writing token as it does in the source run, more than the non-matching option words do (\texttt{results/choice\_attention\_qwen1.5b\_world.txt}). This probe is exploratory and uses a different prompt from the main experiments.
+
+\section{Further discussion}\label{app:discussion}
+
+\paragraph{Relation to address and payload accounts.}
+Our \fmtNone{} results fit the payload side of the address-versus-payload distinction of \citet{wu2026record}: the identity is copied from the writing token's value. They do not test the address side, since $\mathrm{ID}_K$ counts only value-specific content and an address shared by base and source runs would not register. Later mentions add a second route, an identity lookup in which a re-mentioned word finds the writing token through its key, as duplicate-token heads do \citep{wang2022ioi}, although we do not identify individual heads; whether it runs alongside an address-based lookback we did not test.

@@ -24,6 +24,14 @@ ARXIV = {
     "pustovit2026packs": "2604.03270",
 }
 
+# Corrections to arXiv author metadata (diacritics, team names, name order), applied after fetching.
+AUTHOR_FIX = {
+    "opielka2026causality": [("Opiełka", "Opie{\\l}ka")],
+    "yang2024qwen25": [(" Qwen and  : and ", "")],
+    "olmo2025two": [("Team OLMo", "{Team OLMo}")],
+    "li2026bucketing": [("Li Puyin", "Puyin Li")],
+}
+
 MANUAL = r"""
 @misc{anonymous2026fitted,
   title  = {Beyond the Fitted Answer: Causal Dissection and Downstream Consequences of Learned Activation Interventions},
@@ -73,6 +81,8 @@ def main():
             raise SystemExit(f"arXiv id not found: {k} {aid}")
         title, authors, year = entries[aid]
         auth = " and ".join(authors[:12]) + (" and others" if len(authors) > 12 else "")
+        for old, new in AUTHOR_FIX.get(k, []):
+            auth = auth.replace(old, new)
         out.append(f"@article{{{k},\n  title = {{{{{title}}}}},\n  author = {{{auth}}},\n  journal = {{arXiv preprint arXiv:{aid}}},\n  year = {{{year}}}\n}}")
         print(f"{k:26s} {aid}  {year}  {title[:90]}")
     Path(__file__).with_name("references.bib").write_text("\n".join(out) + "\n" + MANUAL)

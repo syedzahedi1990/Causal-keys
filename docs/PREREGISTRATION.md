@@ -151,3 +151,34 @@ Other families: Qwen3-8B 0.84, Mistral-7B 0.92, OLMo-2-7B 0.73.
   - In POST, where the full key effect is positive, re-mention-word rows recover ≥ 0.50 in ≥ 2 of 3 models.
 
 **Exploratory:** key shares on the new tasks; LETTER and POST identity; layer-window and KV-group localisation at 7–14B.
+
+---
+
+## P-2026-10-04-E: GPU stage 3b, reviewer-driven controls
+
+**Committed before any stage-3b run.**
+
+Two internal reviews of the draft raised four points:
+1. A lexical/duplicate-token confound.
+2. Format arms that differ in their instruction.
+3. A scale curve confounded with the software environment.
+4. "Written into both channels" asserted without a value-only test.
+
+An exploratory CPU pilot was run before this entry (Qwen2.5-1.5B, n = 40; `results/role_factorial_cpu`). Swapping who observed the move, with the same location word, shifts the belief answer by 5–8 nats. Of that shift, the critical token's key and value carry only 0.00–0.05.
+
+**Runs:** `scripts/gpu_stage3b.sh`. **Scoring:** `analysis/stage3b_score.py`, committed with this entry.
+
+**Predictions:**
+- **E1, instruction-matched 2×2.** Every arm uses the instruction "Answer with one word": AFTER (list after the story), BEFORE (list before), POST (sentence after), PRE (sentence before), plus NONE. Models: Qwen2.5-7B, Qwen2.5-14B, Mistral-7B and OLMo-2-7B.
+  - (a) ID_K(AFTER) > 0 with a CI excluding 0, in 4/4 models.
+  - (b) ID_K(BEFORE) ≤ 0.5 and ID_K(PRE) ≤ 0.5, each in ≥ 3/4 models.
+  - (c) Paired ID_K(AFTER) − ID_K(BEFORE) > 0 in 4/4 models, and paired ID_K(POST) − ID_K(PRE) > 0 in ≥ 3/4 models, each with a CI excluding 0.
+- **E2, role control (identity vs belief role).** For the direct question in P1 and NONE, the critical token's key and value each carry at most 0.15 of the role-swap effect (|f_K| ≤ 0.15 and |f_V| ≤ 0.15) in ≥ 3/4 models. The location token's channels carry the location's identity, not who observed the move. Qwen2.5-72B is exploratory.
+- **E3, environment.** Each re-run must lie within 0.03 of the original P1 key share:
+  - Qwen2.5-14B re-run under transformers 5.9.0, sharded over 2 GPUs: original 0.91.
+  - Qwen2.5-32B re-run under transformers 5.18.0 on 1 GPU: original 0.86.
+
+  If both hold, the drop beyond 14B is not an artefact of the software environment.
+- **E4, value-only exchange in Paper 1's frames** (Mistral-24B, Qwen-72B). The design mirrors Paper 1's key-only exchange, applied to values instead. Predicted: ψ_V(NONE) ≥ 0.5 and ψ_V(NONE) > ψ_K(NONE) in both models. Where keys carry nothing, values carry the remap.
+
+**Exploratory:** ψ_V and ρ_V in the other formats; the role control in LETTER and at 72B.

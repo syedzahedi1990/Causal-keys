@@ -1,0 +1,14 @@
+P1: n=40  full K_S effect +6.29 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= -0.24 [-0.37,-0.12]  frac of full -0.04
+   rows=story_tail    (avg   8.0 tok)  d= -0.03 [-0.07,-0.00]  frac of full -0.01
+   rows=question      (avg  10.0 tok)  d= -0.00 [-0.04,+0.04]  frac of full -0.00
+   rows=choices       (avg  13.0 tok)  d= +5.42 [+4.88,+6.01]  frac of full +0.86
+   rows=choice_words  (avg   6.0 tok)  d= +5.44 [+4.91,+6.04]  frac of full +0.87
+   rows=rest_after_p  (avg  16.0 tok)  d= +0.01 [-0.23,+0.24]  frac of full +0.00
+LETTER: n=40  full K_S effect +9.41 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= +0.05 [-0.06,+0.17]  frac of full +0.01
+   rows=story_tail    (avg   8.0 tok)  d= -0.02 [-0.05,+0.01]  frac of full -0.00
+   rows=question      (avg  10.0 tok)  d= +0.05 [-0.01,+0.13]  frac of full +0.01
+   rows=choices       (avg  25.0 tok)  d= +9.21 [+8.16,+10.27]  frac of full +0.98
+   rows=choice_words  (avg   6.0 tok)  d= +9.21 [+8.16,+10.27]  frac of full +0.98
+   rows=rest_after_p  (avg  15.0 tok)  d= -0.00 [-0.02,+0.02]  frac of full -0.00

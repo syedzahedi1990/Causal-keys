@@ -44,6 +44,9 @@ class RowSplice:
     def __init__(self, model):
         self.model, self.active, self.mask, self.pos, self.ks = model, False, None, None, None
         self.use_src = False
+        self.layers = None   # optional set of layers where K_S is visible
+        self.group = None    # optional KV-group index; only that group's slice of the key is swapped
+        self.head_dim = model.config.hidden_size // model.config.num_attention_heads
         self.orig = []
         for l, blk in enumerate(blocks(model)):
             at = blk.self_attn
@@ -54,9 +57,13 @@ class RowSplice:
 
     def _khook(self, l):
         def hk(_m, _i, out):
-            if self.active and self.use_src:
+            if self.active and self.use_src and (self.layers is None or l in self.layers):
                 out = out.clone()
-                out[:, self.pos] = self.ks[l].to(out.dtype)
+                if self.group is None:
+                    out[:, self.pos] = self.ks[l].to(out.dtype)
+                else:
+                    sl = slice(self.group * self.head_dim, (self.group + 1) * self.head_dim)
+                    out[:, self.pos, sl] = self.ks[l][sl].to(out.dtype)
             return out
         return hk
 
@@ -82,6 +89,7 @@ def main():
     ap.add_argument("--arms", default="P1,LETTER")
     ap.add_argument("--view", default="direct")
     ap.add_argument("--out", default="results/row_restricted")
+    ap.add_argument("--windows", type=int, default=0, help="if >0, also sweep layer windows of this size and KV groups (choice-word rows only)")
     a = ap.parse_args()
     tok = AutoTokenizer.from_pretrained(a.model)
     model = AutoModelForCausalLM.from_pretrained(a.model, dtype=torch.float32).eval()
@@ -133,6 +141,20 @@ def main():
                 rs.mask = mask
                 lp = torch.log_softmax(model(ib, use_cache=False).logits[0, -1].float(), -1)
                 out["m"][g] = (lp[iS] - lp[iB]).item()
+            if a.windows:
+                cw = torch.zeros(T, dtype=torch.bool)
+                cw[groups["choice_words"]] = True
+                rs.mask = cw
+                for w0 in range(0, nL, a.windows):
+                    rs.layers = set(range(w0, min(nL, w0 + a.windows)))
+                    lp = torch.log_softmax(model(ib, use_cache=False).logits[0, -1].float(), -1)
+                    out["m"][f"win{w0:02d}"] = (lp[iS] - lp[iB]).item()
+                rs.layers = None
+                for g in range(model.config.num_key_value_heads):
+                    rs.group = g
+                    lp = torch.log_softmax(model(ib, use_cache=False).logits[0, -1].float(), -1)
+                    out["m"][f"kvgroup{g}"] = (lp[iS] - lp[iB]).item()
+                rs.group = None
             rs.active = False
             res.append(out)
         print(f"  {arm} done ({time.time() - t0:.0f}s)", flush=True)
@@ -144,11 +166,13 @@ def main():
         R = [r for r in res if r["arm"] == arm]
         full = np.array([r["m"]["all"] - r["m_B"] for r in R])
         lines.append(f"{arm}: n={len(R)}  full K_S effect {full.mean():+.2f} nats;  none-check {np.mean([r['m']['none'] - r['m_B'] for r in R]):+.3f}")
-        for g in ["self", "story_tail", "question", "choices", "choice_words", "rest_after_p"]:
+        extra = sorted(k for k in R[0]["m"] if k.startswith(("win", "kvgroup")))
+        for g in ["self", "story_tail", "question", "choices", "choice_words", "rest_after_p"] + extra:
             d = np.array([r["m"][g] - r["m_B"] for r in R])
             rng = np.random.default_rng(0)
             bs = d[rng.integers(0, len(d), (10000, len(d)))].mean(1)
-            lines.append(f"   rows={g:13s} (avg {np.mean([r['sizes'][g] for r in R]):5.1f} tok)  d={d.mean():+6.2f} "
+            size = np.mean([r['sizes'][g] for r in R]) if g in R[0]["sizes"] else float("nan")
+            lines.append(f"   rows={g:13s} (avg {size:5.1f} tok)  d={d.mean():+6.2f} "
                          f"[{np.percentile(bs, 2.5):+.2f},{np.percentile(bs, 97.5):+.2f}]  frac of full {d.mean() / full.mean():+.2f}")
     s = "\n".join(lines)
     open(f"{a.out}/{tag}_summary.txt", "w").write(s + "\n")

@@ -110,9 +110,10 @@ def run_core(model, tok, core, arm, bases, dev):
 
     hdl = blocks(model)[FIT_LAYER0].register_forward_hook(patch_hook)
     try:
-        with capture(model, range(FIRST_EXCHANGE0, nL), "k") as K:
+        with capture(model, range(FIRST_EXCHANGE0, nL), "k") as K, capture(model, range(FIRST_EXCHANGE0, nL), "v") as V:
             c, g = lp_rows(model, ib.expand(len(keys), -1), cid)
         kcrit = {l: K[l][:, vpos].clone() for l in range(FIRST_EXCHANGE0, nL)}  # [n_bases, kv_dim]
+        vcrit = {l: V[l][:, vpos].clone() for l in range(FIRST_EXCHANGE0, nL)}
     finally:
         hdl.remove()
     for i, k in enumerate(keys):
@@ -131,20 +132,23 @@ def run_core(model, tok, core, arm, bases, dev):
         o[:, lo:hi] = P.to(o.device, o.dtype)
         return (o,) + tuple(out[1:]) if isinstance(out, tuple) else o
 
-    hs_ = [blocks(model)[FIT_LAYER0].register_forward_hook(patch_hook2)]
-    for l in range(FIRST_EXCHANGE0, nL):
-        tab = kcrit[l][swaps]
+    # channel-only exchanges: keys (Paper 1's native design) and, symmetrically, values; the other channel,
+    # queries and residuals evolve endogenously
+    for chan, crit, tag in (("k_proj", kcrit, ""), ("v_proj", vcrit, "_v")):
+        hs_ = [blocks(model)[FIT_LAYER0].register_forward_hook(patch_hook2)]
+        for l in range(FIRST_EXCHANGE0, nL):
+            tab = crit[l][swaps]
 
-        def khook(_m, _i, out, t=tab):
-            out = out.clone()
-            out[:, vpos] = t.to(out.device, out.dtype)
-            return out
-        hs_.append(blocks(model)[l].self_attn.k_proj.register_forward_hook(khook))
-    with hooks(hs_):
-        c, g = lp_rows(model, ib.expand(len(rows), -1), cid)
-    for j, s in enumerate(SEEDS):
-        res["runs"][f"addition_{s}"] = {"cand": c[2 * j].tolist(), "argmax": int(g[2 * j])}
-        res["runs"][f"removal_{s}"] = {"cand": c[2 * j + 1].tolist(), "argmax": int(g[2 * j + 1])}
+            def xhook(_m, _i, out, t=tab):
+                out = out.clone()
+                out[:, vpos] = t.to(out.device, out.dtype)
+                return out
+            hs_.append(getattr(blocks(model)[l].self_attn, chan).register_forward_hook(xhook))
+        with hooks(hs_):
+            c, g = lp_rows(model, ib.expand(len(rows), -1), cid)
+        for j, s in enumerate(SEEDS):
+            res["runs"][f"addition{tag}_{s}"] = {"cand": c[2 * j].tolist(), "argmax": int(g[2 * j])}
+            res["runs"][f"removal{tag}_{s}"] = {"cand": c[2 * j + 1].tolist(), "argmax": int(g[2 * j + 1])}
     return res
 
 

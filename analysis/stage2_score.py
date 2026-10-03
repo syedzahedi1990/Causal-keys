@@ -37,6 +37,8 @@ def per_core(results, arm):
         avg = lambda pre: float(np.mean([m[f"{pre}_{s}"] for s in SEEDS]))
         rows[c["id"]] = {"S": m["S"], "T": m["T"], "B": m["B"], "M": avg("m3"), "P": avg("pca"), "F": avg("f_star"),
                          "add": avg("addition"), "rem": avg("removal"),
+                         "addv": avg("addition_v") if "addition_v_101" in m else float("nan"),
+                         "remv": avg("removal_v") if "removal_v_101" in m else float("nan"),
                          "M_T_rate": float(np.mean([r["runs"][f"m3_{s}"]["cand"].index(max(r["runs"][f"m3_{s}"]["cand"])) == iT for s in SEEDS])),
                          "P_S_rate": float(np.mean([r["runs"][f"pca_{s}"]["cand"].index(max(r["runs"][f"pca_{s}"]["cand"])) == iS for s in SEEDS]))}
     return rows
@@ -98,7 +100,12 @@ def main(root="results/paper1_frames", p1_root=None):
             psi = ratio(R, lambda x: x["add"] - x["P"], lambda x: x["M"] - x["P"])
             rho = ratio(R, lambda x: x["rem"] - x["M"], lambda x: x["P"] - x["M"])
             phis[a] = phi
-            print(f"  {a:6s} n={len(R):3d}  phi(M) {fmt(phi)}  psi(add) {fmt(psi)}  rho(rem) {fmt(rho)}  "
+            vinfo = ""
+            if not np.isnan(next(iter(R.values()))["addv"]):
+                psiv = ratio(R, lambda x: x["addv"] - x["P"], lambda x: x["M"] - x["P"])
+                rhov = ratio(R, lambda x: x["remv"] - x["M"], lambda x: x["P"] - x["M"])
+                vinfo = f"  psiV(add) {fmt(psiv)}  rhoV(rem) {fmt(rhov)}"
+            print(f"  {a:6s} n={len(R):3d}  phi(M) {fmt(phi)}  psi(add) {fmt(psi)}  rho(rem) {fmt(rho)}{vinfo}  "
                   f"M T-rate {np.mean([x['M_T_rate'] for x in R.values()]):.3f}  "
                   f"P S-rate {np.mean([x['P_S_rate'] for x in R.values()]):.3f}  "
                   f"natural span {np.mean([x['T'] - x['S'] for x in R.values()]):+.2f}")

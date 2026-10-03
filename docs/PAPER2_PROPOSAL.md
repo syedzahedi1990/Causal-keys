@@ -1,37 +1,46 @@
 # Paper 2 proposal: *Looked Up, Not Copied*
 
-**Working title:** Looked Up, Not Copied: The Readout Decides Whether In-Context State Travels Through Attention Keys or Values, and What Interventions Change
+**Working title:** *The Readout Decides: Whether In-Context State Is Looked Up Through Attention Keys or Copied From Values, and Why Component-Level Explanations of Interventions Do Not Transfer Across Answer Formats*
 
-**Status (2026-10-03, after code review):**
-- **Gate G1 was not met as originally written.** No-option formats still show 1–2 nats of key effect.
-- **The option-listing version of C1 was adopted *after* seeing the data.** It has since passed a preregistered fresh-seed test in the same model, with all 3 predictions met (`docs/PREREGISTRATION.md`):
-  - identity(K): +2.85 in P1, +4.10 for letters, and within ±0.41 nats in all no-option arms.
-  - The cross-model test (GPU stage 1) is preregistered and pending.
-- **GPU stage 1 (preregistered P-2026-10-03-B): predictions 1 and 2 were met in 5/5 open models** (Qwen2.5-3B/7B, Qwen3-8B, Mistral-7B, OLMo-2-7B).
-  - The Qwen2.5 key share of the multiple-choice answer rises 0.37 → 0.69 → 0.82 → 0.91 from 1.5B to 14B.
-  - Unpredicted: at 7B and above, a plain re-mention after the story also opens the key channel, so the 1.5B-era "options only" refinement does not generalise.
-  - Details are in `docs/PREREGISTRATION.md`.
-- **GPU stage 2 is ready:** `scripts/gpu_stage2.sh`, preregistered as P-2026-10-03-C.
-- **Measurement code was audited** by an independent review workflow, and the verified issues are fixed.
-- **The reader is localised** at 1.5B (Section 3b″).
-- **GPU stages have not started** ($0 spent). The Colab notebook for stage 1 is ready.
+**Status (2026-10-03, after GPU stages 1 and 2):**
+- Every experiment through stage 2 is complete. Predictions and their outcomes, met and not met, are in `docs/PREREGISTRATION.md`. Compute spent: two short Vast runs.
+- **Gate G1:** not met as originally written. The narrowed "options only" claim, adopted post hoc at 1.5B, passed a fresh-seed preregistered test, then failed to generalise at ≥ 7B, where plain re-mentions also open the key channel.
+- **Stage 1** (P-2026-10-03-B): predictions 1 and 2 met in 5/5 open models.
+- **Stage 2** (P-2026-10-03-C):
+  - Paper 1 reproduced item by item (99.4–100%).
+  - C3 met in both models.
+  - The transfer-law predictions C1/C2 were **not** supported (met only marginally at 72B).
+  - The C4 key-share threshold was met only at 32B; its BEFORE control was met in all three models.
+- Measurement code was audited by an independent review workflow, and the verified issues are fixed.
 
 ---
 
-## 1. One-paragraph pitch
+## 1. Findings (what the paper can now claim)
 
-A prompt writes some state into context, such as "Alice watches as the lamp is moved to the cabinet". Later tokens can read that state token in two ways: by matching its attention key or by copying its value.
+**F1. Mechanism: later re-mentions read in-context state through the state token's key.**
+- **Setting:** a story writes a location at a critical token, and the critical token's key and value are clamped to those of another run.
+- **Result:** the location's identity travels through the key whenever the candidate answers are re-mentioned after the state token, and the re-mentioned candidate words are what read it.
+  - Exact row-restricted swaps at 1.5B: the option words recover 87–98% of the key effect, the question and answer positions about 0%.
+  - The read happens in early-to-mid layers and is concentrated in one KV group.
+- **Structural control:** when the options come before the story, keys carry no identity, in all 10 models (≤ 0.01 nats).
+- **Without any re-mention:** keys carry at most about 1 nat, under 5% of the option-listing effect.
+- **Scale and families:** the effect holds from 0.5B to 72B in four families (Qwen2.5, Qwen3, Mistral, OLMo-2).
+  - Key share of the multiple-choice answer, Qwen2.5: 0.37 (1.5B), 0.69, 0.82, 0.91 (14B), 0.86 (32B), 0.76 (72B).
+  - Other models: Mistral-7B 0.92, Mistral-24B 0.78, OLMo-2-7B 0.73, Qwen3-8B 0.84.
+  - From 7B up, a neutral sentence re-mentioning the candidates opens the key channel at roughly ⅓–½ the strength of an options list.
 
-We show that the readout decides which:
-- **Answer options listed after the state token** (a multiple-choice line, as in Paper 1): the listed option words look the state up by key identity.
-  - With Paper 1's encoder, keys carry a key share of 0.37 [0.34, 0.41] of the answer log-odds at Qwen2.5-1.5B, and about 0.35 at 0.5B (pilot, n=6).
-  - Lettered options give 0.71.
-  - Paper 1's 24B/72B fixed-value data give 0.73 / 0.745. That is a related but different estimand (blocks 6+, values fixed at the target run, a patched recipient), so it is **not** on the same scale curve. Matched-estimand scale points are a GPU-stage question.
-- **No listed options after the state token** (free answer, options before the story, or a neutral re-mention sentence): keys carry about 0.02–0.08 of the log-odds and almost no identity. The value is copied.
+**F2. Consequence: component-level explanations of an intervention are readout-relative.**
+- **Behaviour is readout-invariant.** Paper 1's learned remap moves the answer by the same fraction of the natural S→T shift in every format: Mistral-24B φ 0.71–0.75, Qwen-72B φ 0.86–0.91. PCA source transfer is 100% in every format.
+- **The key-only exchange is not.** Swapping critical-token keys between the learned and PCA runs (Paper 1's central causal result):
+  - transfers the remap strongly with options after the story (key addition ψ 0.53–0.89, removal ρ 0.76–0.99);
+  - transfers it weakly with a neutral re-mention (ψ about 0.2);
+  - transfers essentially nothing for free-form or options-before readouts (ψ ≤ 0.07).
+- **Interpretation:** the remap is written redundantly into the key and value channels. Paper 1's "keys carry the learned–PCA difference" is true of its multiple-choice readout and false of a free-form one.
+- **Lesson:** where an intervention's effect "lives" depends on how the model is read out. Mechanistic attributions measured under multiple-choice formats, which are common in interpretability benchmarks and evals, need not transfer to free-form behaviour.
 
-This split has consequences for interventions. Paper 1's learned remap was fit under a multiple-choice readout, and it put more of its edit into the channel that readout weights: it is 96% complete in keys but only 73% in values (Qwen2.5-72B). That explains Paper 1's open "why keys?" result. It also predicts how such interventions will (fail to) transfer to free-form answers. And it implies that attribution methods which freeze attention patterns (the QK side) miss most of the state's effect in multiple-choice-style prompts.
+**F3. Negative result.** Channel completeness estimated under clamping (κ_V from Paper 1's fixed-value design) does **not** predict free-form transfer. It underestimates how fully the edit is carried by values (Mistral-24B: predicted 0.53, observed 0.71).
 
-We ship **kvaudit**, a one-call key/value/format audit for any intervention or interpretability claim.
+**Tool.** kvaudit (planned): exact key/value clamps, row-restricted splices, format arms and transfer cards, as one call.
 
 ## 2. How this direction was chosen
 

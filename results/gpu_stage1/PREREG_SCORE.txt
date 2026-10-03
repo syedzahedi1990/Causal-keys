@@ -1,0 +1,27 @@
+identity(K) by arm, all items (95% core bootstrap)
+model                                            P1                 LETTER                   NONE                 BEFORE                   POST
+Mistral-7B-Instruct-v0.3     +14.91 [+14.50,+15.31] +15.18 [+14.64,+15.71]  +0.55 [ +0.48, +0.63]  +0.01 [ -0.05, +0.07]  +7.87 [ +7.35, +8.38]
+OLMo-2-1124-7B-Instruct       +8.20 [ +7.96, +8.44]  +7.87 [ +7.71, +8.02]  +0.38 [ +0.29, +0.46]  -0.31 [ -0.37, -0.24]  +2.01 [ +1.81, +2.23]
+Qwen2.5-1.5B-Instruct         +2.83 [ +2.60, +3.07]  +3.57 [ +3.35, +3.80]  +0.16 [ +0.08, +0.23]  -0.24 [ -0.28, -0.20]  -0.47 [ -0.57, -0.37]
+Qwen2.5-14B-Instruct         +39.00 [+37.95,+40.04] +34.80 [+34.53,+35.06]  +1.05 [ +0.89, +1.21]  -0.13 [ -0.21, -0.05] +12.08 [+11.46,+12.69]
+Qwen2.5-3B-Instruct          +10.32 [ +9.58,+11.03] +11.37 [+10.37,+12.40]  +0.08 [ -0.04, +0.21]  -0.45 [ -0.57, -0.34]  -0.04 [ -0.41, +0.33]
+Qwen2.5-7B-Instruct          +21.16 [+20.70,+21.61] +20.38 [+20.00,+20.74]  +1.04 [ +0.94, +1.16]  -0.14 [ -0.22, -0.06]  +5.52 [ +5.23, +5.81]
+Qwen3-8B                     +35.38 [+34.58,+36.15] +33.91 [+33.44,+34.35]  +1.25 [ +1.05, +1.45]  -0.34 [ -0.42, -0.26]  +8.82 [ +8.33, +9.31]
+
+P1 - NONE identity(K), paired by core; P1 key share at l0=0 and depth-matched l0
+Mistral-7B-Instruct-v0.3     diff +14.35 [+13.93,+14.78] (n=150)   share@0  +0.92 [ +0.90, +0.93]   share@2/32  +0.91 [ +0.91, +0.92]
+OLMo-2-1124-7B-Instruct      diff  +7.83 [ +7.58, +8.07] (n=150)   share@0  +0.73 [ +0.71, +0.74]   share@2/32  +0.72 [ +0.71, +0.74]
+Qwen2.5-1.5B-Instruct        diff  +2.67 [ +2.45, +2.91] (n=150)   share@0  +0.37 [ +0.36, +0.39]   share@2/28  +0.37 [ +0.36, +0.39]
+Qwen2.5-14B-Instruct         diff +37.95 [+36.93,+38.98] (n=150)   share@0  +0.91 [ +0.90, +0.91]   share@3/48  +0.91 [ +0.90, +0.91]
+Qwen2.5-3B-Instruct          diff +10.23 [ +9.51,+10.98] (n=150)   share@0  +0.69 [ +0.68, +0.71]   share@2/36  +0.69 [ +0.68, +0.71]
+Qwen2.5-7B-Instruct          diff +20.11 [+19.65,+20.57] (n=150)   share@0  +0.82 [ +0.81, +0.83]   share@2/28  +0.82 [ +0.81, +0.83]
+Qwen3-8B                     diff +34.13 [+33.42,+34.84] (n=150)   share@0  +0.84 [ +0.83, +0.84]   share@2/36  +0.84 [ +0.83, +0.84]
+
+PREREGISTERED VERDICTS (P-2026-10-03-B), five open models: Qwen2.5-3B-Instruct, Qwen2.5-7B-Instruct, Qwen3-8B, Mistral-7B-Instruct-v0.3, OLMo-2-1124-7B-Instruct
+  Prediction 1 (P1 and LETTER identity(K) > 0, CI excl. 0): 5/5 -> MET   per model: [('Qwen2.5-3B-Instruct', np.True_), ('Qwen2.5-7B-Instruct', np.True_), ('Qwen3-8B', np.True_), ('Mistral-7B-Instruct-v0.3', np.True_), ('OLMo-2-1124-7B-Instruct', np.True_)]
+  Prediction 2 (P1 - NONE > 0, CI excl. 0):                 5/5 -> MET   per model: [('Qwen2.5-3B-Instruct', np.True_), ('Qwen2.5-7B-Instruct', np.True_), ('Qwen3-8B', np.True_), ('Mistral-7B-Instruct-v0.3', np.True_), ('OLMo-2-1124-7B-Instruct', np.True_)]
+  Prediction 3 (exploratory) Qwen2.5 P1 key share @l0=0 / depth-matched:
+    Qwen2.5-1.5B-Instruct     +0.37 [ +0.36, +0.39]    +0.37 [ +0.36, +0.39]
+    Qwen2.5-3B-Instruct       +0.69 [ +0.68, +0.71]    +0.69 [ +0.68, +0.71]
+    Qwen2.5-7B-Instruct       +0.82 [ +0.81, +0.83]    +0.82 [ +0.81, +0.83]
+    Qwen2.5-14B-Instruct      +0.91 [ +0.90, +0.91]    +0.91 [ +0.90, +0.91]

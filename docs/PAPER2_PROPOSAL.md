@@ -7,6 +7,11 @@
 - **The option-listing version of C1 was adopted *after* seeing the data.** It has since passed a preregistered fresh-seed test in the same model, with all 3 predictions met (`docs/PREREGISTRATION.md`):
   - identity(K): +2.85 in P1, +4.10 for letters, and within ±0.41 nats in all no-option arms.
   - The cross-model test (GPU stage 1) is preregistered and pending.
+- **GPU stage 1 (preregistered P-2026-10-03-B): predictions 1 and 2 were met in 5/5 open models** (Qwen2.5-3B/7B, Qwen3-8B, Mistral-7B, OLMo-2-7B).
+  - The Qwen2.5 key share of the multiple-choice answer rises 0.37 → 0.69 → 0.82 → 0.91 from 1.5B to 14B.
+  - Unpredicted: at 7B and above, a plain re-mention after the story also opens the key channel, so the 1.5B-era "options only" refinement does not generalise.
+  - Details are in `docs/PREREGISTRATION.md`.
+- **GPU stage 2 is ready:** `scripts/gpu_stage2.sh`, preregistered as P-2026-10-03-C.
 - **Measurement code was audited** by an independent review workflow, and the verified issues are fixed.
 - **The reader is localised** at 1.5B (Section 3b″).
 - **GPU stages have not started** ($0 spent). The Colab notebook for stage 1 is ready.

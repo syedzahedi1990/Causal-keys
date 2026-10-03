@@ -21,36 +21,50 @@ from ckeys.encoding import ARMS, alphabet, candidate_ids, encode, raw_prompt
 from ckeys.interventions import blocks, capture, hooks
 from ckeys.story import LOCATIONS, make_cores, record
 
-ROWS = [("K_S", 0), ("V_S", 0), ("KV_S", 0), ("K_S", 8), ("V_S", 8)]
+# rows: (key source, value source, l0) applied at the critical token for layers >= l0
+ROWS = [("S", "B", 0), ("B", "S", 0), ("S", "S", 0), ("S", "B", 8), ("B", "S", 8),
+        ("X", "B", 0), ("B", "X", 0), ("X", "X", 0)]
+LABEL = {("S", "B"): "K_S", ("B", "S"): "V_S", ("S", "S"): "KV_S", ("X", "B"): "K_X", ("B", "X"): "V_X", ("X", "X"): "KV_X"}
+
+
+def pick_x(core):
+    used = {core["base"], core["source"], core["initial"], core["distractor_location"]}
+    return next(l for l in LOCATIONS if l not in used)
 
 
 @torch.no_grad()
 def run_item(model, tok, core, arm, view, rows, device):
-    rb, rs = record(core, view, core["base"]), record(core, view, core["source"])
-    ib = encode(tok, raw_prompt(arm, rb["story"], rb["query"])).to(device)
-    is_ = encode(tok, raw_prompt(arm, rs["story"], rs["query"])).to(device)
-    if ib.shape != is_.shape:
+    X = pick_x(core)
+    locs = {"B": core["base"], "S": core["source"], "X": X}
+    ids = {}
+    for name, loc in locs.items():
+        r = record(core, view, loc)
+        ids[name] = encode(tok, raw_prompt(arm, r["story"], r["query"])).to(device)
+    if len({tuple(v.shape) for v in ids.values()}) > 1:
         return None
-    diff = (ib[0] != is_[0]).nonzero().flatten().tolist()
-    assert len(diff) == 1, diff
+    diff = (ids["B"][0] != ids["S"][0]).nonzero().flatten().tolist()
+    assert len(diff) == 1 and (ids["B"][0] != ids["X"][0]).nonzero().flatten().tolist() == diff, diff
     pos = diff[0]
+    ib = ids["B"]
     nL = len(blocks(model))
     alph = alphabet(arm)
     cid = candidate_ids(tok, arm)
-    iS, iB = cid[LOCATIONS.index(core["source"])], cid[LOCATIONS.index(core["base"])]
+    track = {"S": core["source"], "B": core["base"], "X": X, "init": core["initial"]}
+    tid = {k: cid[LOCATIONS.index(v)] for k, v in track.items()}
     kv, clean = {}, {}
-    for name, ids in (("B", ib), ("S", is_)):
+    for name in ("B", "S", "X"):
         with capture(model, range(nL), "k") as K, capture(model, range(nL), "v") as V:
-            lp = torch.log_softmax(model(ids).logits[0, -1].float(), -1)
+            lp = torch.log_softmax(model(ids[name]).logits[0, -1].float(), -1)
         kv[name] = ({l: K[l][0, pos] for l in range(nL)}, {l: V[l][0, pos] for l in range(nL)})
-        clean[name] = {"m": (lp[iS] - lp[iB]).item(), "mass": lp[cid].exp().sum().item(),
-                       "argmax_cand": alph[int(lp[cid].argmax())]}
-    rows = [(c, l0) for c, l0 in rows if l0 < nL]
+        clean[name] = {"lp": {k: lp[i].item() for k, i in tid.items()}, "m": (lp[tid["S"]] - lp[tid["B"]]).item(),
+                       "mass": lp[cid].exp().sum().item(), "argmax_cand": LOCATIONS[int(lp[cid].argmax())]}
+    rows = [r for r in rows if r[2] < nL]
 
-    def who(c, l0, l, ch):
-        return "S" if l >= l0 and (c == "KV_S" or c == f"{ch}_S") else "B"
+    def who(row, l, ch):
+        ks, vs, l0 = row
+        return (ks if ch == "K" else vs) if l >= l0 else "B"
 
-    tabs = {(l, ch): torch.stack([kv[who(c, l0, l, ch)][0 if ch == "K" else 1][l] for c, l0 in rows])
+    tabs = {(l, ch): torch.stack([kv[who(r, l, ch)][0 if ch == "K" else 1][l] for r in rows])
             for l in range(nL) for ch in "KV"}
     hs = []
     for l in range(nL):
@@ -63,8 +77,10 @@ def run_item(model, tok, core, arm, view, rows, device):
             hs.append(mod.register_forward_hook(hk))
     with hooks(hs):
         lp = torch.log_softmax(model(ib.expand(len(rows), -1)).logits[:, -1].float(), -1)
-    out = {f"{c}@{l0}": (lp[i, iS] - lp[i, iB]).item() for i, (c, l0) in enumerate(rows)}
-    return {"core": core, "arm": arm, "view": view, "pos": pos, "len": ib.shape[1], "clean": clean, "m": out}
+    out = {f"{LABEL[(k, v)]}@{l0}": {"m": (lp[i, tid["S"]] - lp[i, tid["B"]]).item(),
+                                      "lp": {t: lp[i, j].item() for t, j in tid.items()}}
+           for i, (k, v, l0) in enumerate(rows)}
+    return {"core": core, "X": X, "arm": arm, "view": view, "pos": pos, "len": ib.shape[1], "clean": clean, "m": out}
 
 
 def boot(x, n=10000, seed=0):
@@ -86,7 +102,9 @@ def summarize(res):
             comp = [r for r in R if r["clean"]["B"]["argmax_cand"] == (r["core"]["base"] if view != "other_agent" else r["core"]["initial"])
                     and r["clean"]["S"]["argmax_cand"] == (r["core"]["source"] if view != "other_agent" else r["core"]["initial"])]
             mB = np.array([r["clean"]["B"]["m"] for r in R]); mS = np.array([r["clean"]["S"]["m"] for r in R])
-            d = {k: np.array([r["m"][k] for r in R]) - mB for k in R[0]["m"]}
+            d = {k: np.array([r["m"][k]["m"] for r in R]) - mB for k in R[0]["m"]}
+            dl = {k: {t: np.array([r["m"][k]["lp"][t] - r["clean"]["B"]["lp"][t] for r in R]) for t in ("S", "B", "X")}
+                  for k in R[0]["m"]}
             span = mS - mB
             dK, dV, dKV = d["K_S@0"], d["V_S@0"], d["KV_S@0"]
             share = dK.mean() / (dK.mean() + dV.mean()) if abs(dK.mean() + dV.mean()) > 1e-6 else float("nan")
@@ -94,7 +112,8 @@ def summarize(res):
             lines.append(f"{arm:7s} {view:11s} n={len(R):3d} competent={len(comp):3d} mass={mass:.2f} span={span.mean():+6.2f}")
             for k in d:
                 mu, (lo, hi) = boot(d[k])
-                lines.append(f"    d[{k:7s}] {mu:+7.2f} [{lo:+6.2f},{hi:+6.2f}]")
+                parts = "  ".join(f"dlogp({t})={dl[k][t].mean():+6.2f}" for t in ("S", "B", "X"))
+                lines.append(f"    d[{k:7s}] {mu:+7.2f} [{lo:+6.2f},{hi:+6.2f}]   {parts}")
             mu, (lo, hi) = boot(dKV - dK - dV)
             lines.append(f"    interaction {mu:+7.2f} [{lo:+6.2f},{hi:+6.2f}]   key share {share:.3f}   recovery dKV/span {dKV.mean() / span.mean():.3f}")
     return "\n".join(lines)

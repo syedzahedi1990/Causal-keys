@@ -1,0 +1,59 @@
+P1      direct      n= 40 competent= 40 mass=0.98 span=+16.74
+    d[K_S@0  ]   +6.04 [ +5.25, +6.88]
+    d[V_S@0  ]  +10.10 [ +8.99,+11.29]
+    d[KV_S@0 ]  +16.74 [+15.64,+17.92]
+    d[K_S@8  ]   +2.14 [ +1.65, +2.62]
+    d[V_S@8  ]   +9.97 [ +8.92,+11.10]
+    interaction   +0.60 [ -0.53, +1.69]   key share 0.374   recovery dKV/span 1.000
+P1      other_agent n= 40 competent= 25 mass=0.99 span= +5.43
+    d[K_S@0  ]   +1.82 [ +1.14, +2.49]
+    d[V_S@0  ]   +3.45 [ +2.91, +4.02]
+    d[KV_S@0 ]   +5.43 [ +4.67, +6.21]
+    interaction   +0.16 [ -0.43, +0.74]   key share 0.345   recovery dKV/span 1.000
+AFTER   direct      n= 40 competent= 40 mass=0.93 span=+18.00
+    d[K_S@0  ]   +6.41 [ +5.56, +7.28]
+    d[V_S@0  ]  +10.53 [ +9.30,+11.85]
+    d[KV_S@0 ]  +18.00 [+16.92,+19.16]
+    d[K_S@8  ]   +2.14 [ +1.66, +2.60]
+    d[V_S@8  ]  +10.41 [ +9.24,+11.68]
+    interaction   +1.06 [ -0.24, +2.30]   key share 0.378   recovery dKV/span 1.000
+BEFORE  direct      n= 40 competent= 29 mass=0.95 span=+14.33
+    d[K_S@0  ]   +1.16 [ +0.74, +1.60]
+    d[V_S@0  ]  +13.09 [+11.93,+14.26]
+    d[KV_S@0 ]  +14.33 [+13.35,+15.38]
+    d[K_S@8  ]   +1.16 [ +0.74, +1.60]
+    d[V_S@8  ]  +13.00 [+11.83,+14.20]
+    interaction   +0.08 [ -0.61, +0.76]   key share 0.081   recovery dKV/span 1.000
+NONE    direct      n= 40 competent= 30 mass=0.63 span=+23.49
+    d[K_S@0  ]   +1.91 [ +1.05, +2.83]
+    d[V_S@0  ]  +21.10 [+19.66,+22.56]
+    d[KV_S@0 ]  +23.49 [+22.46,+24.54]
+    d[K_S@8  ]   +1.91 [ +1.06, +2.84]
+    d[V_S@8  ]  +21.08 [+19.63,+22.54]
+    interaction   +0.48 [ -0.78, +1.69]   key share 0.083   recovery dKV/span 1.000
+NONE    other_agent n= 40 competent= 25 mass=0.67 span=+18.02
+    d[K_S@0  ]   +2.15 [ +1.37, +2.98]
+    d[V_S@0  ]  +15.52 [+14.28,+16.74]
+    d[KV_S@0 ]  +18.02 [+17.00,+19.05]
+    interaction   +0.35 [ -0.61, +1.30]   key share 0.122   recovery dKV/span 1.000
+POST    direct      n= 40 competent= 28 mass=0.75 span=+15.35
+    d[K_S@0  ]   +0.35 [ -0.14, +0.83]
+    d[V_S@0  ]  +14.34 [+13.14,+15.66]
+    d[KV_S@0 ]  +15.35 [+14.20,+16.63]
+    d[K_S@8  ]   +0.98 [ +0.49, +1.47]
+    d[V_S@8  ]  +14.48 [+13.27,+15.79]
+    interaction   +0.66 [ -0.11, +1.42]   key share 0.024   recovery dKV/span 1.000
+PRE     direct      n= 40 competent= 21 mass=0.65 span=+16.07
+    d[K_S@0  ]   +0.78 [ +0.18, +1.39]
+    d[V_S@0  ]  +14.21 [+12.78,+15.63]
+    d[KV_S@0 ]  +16.07 [+15.08,+17.15]
+    d[K_S@8  ]   +0.78 [ +0.18, +1.39]
+    d[V_S@8  ]  +14.16 [+12.72,+15.59]
+    interaction   +1.08 [ -0.09, +2.29]   key share 0.052   recovery dKV/span 1.000
+LETTER  direct      n= 40 competent=  0 mass=1.00 span=+14.96
+    d[K_S@0  ]   +9.28 [ +8.24,+10.34]
+    d[V_S@0  ]   +3.71 [ +2.82, +4.70]
+    d[KV_S@0 ]  +14.96 [+13.95,+16.00]
+    d[K_S@8  ]   +1.39 [ +0.90, +1.96]
+    d[V_S@8  ]   +3.42 [ +2.62, +4.33]
+    interaction   +1.97 [ +0.29, +3.65]   key share 0.714   recovery dKV/span 1.000

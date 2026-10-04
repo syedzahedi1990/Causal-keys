@@ -7,9 +7,9 @@ Inputs (defaults under --root results/gpu_stage4):
   fit_none/run, fit_p1/run     experiments/refit_remap.py runs: bases (G1, principal cosines) and updates.jsonl (loss)
   {p1_root}/gpu/component_data/bases/mistral_original_1000_{obj}_{seed}.npz   Paper 1's released bases
   results/gpu_stage2/format_factorial/Mistral-Small-24B-Instruct-2501_s0.json  s_ID = ID_K / (ID_K + ID_V)
-Population: native cores with B, S, T distinct (n = 96); fits averaged within core (stage2_score.per_core); 95% core
-bootstrap, 10,000 resamples, fixed seed, ratio of means. Every statistic over the same cores uses the same resample
-indices, so F3's difference is paired over cores.
+Population: native cores with B, S, T distinct (n = 96, checked in every family x format cell); fits averaged within
+core (stage2_score.per_core); 95% core bootstrap, 10,000 resamples, fixed seed, ratio of means. Every statistic over the
+same cores uses the same resample indices, so F3's difference is paired over cores.
   phi   = [m(M) - m(P)] / [m(T) - m(S)]
   psi_K = [m(P+K_M) - m(P)] / [m(M) - m(P)]     psi_V = [m(P+V_M) - m(P)] / [m(M) - m(P)]
   rho_K = [m(M+K_P) - m(M)] / [m(P) - m(M)]     rho_V = [m(M+V_P) - m(M)] / [m(P) - m(M)]
@@ -33,6 +33,7 @@ FITS = {"none/": "fit_none", "p1/": "fit_p1"}
 FRAME = {"none/": "NONE", "p1/": "P1"}
 LABEL = {"none/": "fit_none", "p1/": "fit_p1", "": "released"}
 SEEDS = (101, 102, 103)
+OBJ = ("pca", "m3")  # the basis files read by the scorer
 SEED, B = 20261005, 10000
 STATS = {"phi": (lambda x: x["M"] - x["P"], lambda x: x["T"] - x["S"]),
          "psiK": (lambda x: x["add"] - x["P"], lambda x: x["M"] - x["P"]),
@@ -135,15 +136,33 @@ def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
-def provenance(fits, files):
-    """The scored families must be the gated fit runs: FRAME.json frame and status of each fit directory, and in
-    each frames file the family's frame, the COMPLETE.json sha256 of the same run, and the prefill."""
-    bad = []
+def provenance(fits, files, p1_root):
+    """The scored families must be the gated fit runs, and the basis files read here (G1, cosines) the ones evaluated:
+    each fit directory's FRAME.json (frame, status COMPLETE, complete_sha256 = sha256 of COMPLETE.json) and every basis
+    file against COMPLETE.json's inventory; in each frames file the family's frame, the same COMPLETE.json sha256, the
+    prefill, and the sha256 of every refit basis and of every released basis it records."""
+    bad, on_disk = [], {}
     for fam, run in fits.items():
-        fr = run.parent / "FRAME.json"
-        info = json.load(open(fr)) if fr.exists() else {}
-        if info and (info.get("frame") != FRAME[fam] or info.get("status") != "COMPLETE"):
-            bad.append(f"{fr}: frame {info.get('frame')} status {info.get('status')}, expected {FRAME[fam]} COMPLETE")
+        fr, cp = run.parent / "FRAME.json", run / "COMPLETE.json"
+        if not fr.exists() or not cp.exists():
+            bad.append(f"{run}: missing {fr.name if not fr.exists() else cp.name}")
+            continue
+        info, c = json.load(open(fr)), sha(cp)
+        if info.get("frame") != FRAME[fam] or info.get("status") != "COMPLETE" or info.get("complete_sha256") != c:
+            bad.append(f"{fr}: frame {info.get('frame')} status {info.get('status')} complete_sha256 "
+                       f"{str(info.get('complete_sha256'))[:12]}, expected {FRAME[fam]} COMPLETE {c[:12]}")
+        inventory = json.load(open(cp))["artifacts"]
+        for obj in OBJ:
+            for s in SEEDS:
+                f = run / "bases" / f"{obj}_ts{s}.npz"
+                on_disk[f"{fam}{obj}_{s}"] = h = sha(f) if f.exists() else None
+                if h is None or h != inventory.get(f"bases/{f.name}", {}).get("sha256"):
+                    bad.append(f"{f}: sha256 {h and h[:12]} is not COMPLETE.json's inventory entry")
+    for obj in OBJ:
+        for s in SEEDS:
+            g = released(p1_root, obj, s)
+            if g is not None and g.exists():
+                on_disk[f"{obj}_{s}"] = sha(g)
     for name, (d, prefill) in files.items():
         if d is None:
             continue
@@ -153,10 +172,41 @@ def provenance(fits, files):
         for fam, run in fits.items():
             r = p.get("refits", {}).get(fam[:-1])
             c = sha(run / "COMPLETE.json") if (run / "COMPLETE.json").exists() else None
-            if r is None or r.get("frame") != FRAME[fam] or (c and r.get("complete_sha256") != c):
+            if r is None or r.get("frame") != FRAME[fam] or r.get("complete_sha256") != c:
                 bad.append(f"{name}: family {fam} is {r and (r.get('run'), r.get('frame'))}, expected {run} "
                            f"({FRAME[fam]}, COMPLETE.json sha256 {c and c[:12]})")
-    print(f"  provenance: {'OK, scored families = gated fit runs, prefills as named' if not bad else 'MISMATCH'}")
+        for key, h in on_disk.items():
+            rec = p.get("bases", {}).get(key, {})
+            if ("/" in key or "sha256" in rec) and rec.get("sha256") != h:  # released: absent if random (TEST_MODE)
+                bad.append(f"{name}: basis {key} sha256 {str(rec.get('sha256'))[:12]}, file read here {h and h[:12]}")
+    ok = "OK, scored families = gated fit runs, basis files as evaluated, prefills as named"
+    print(f"  provenance: {ok if not bad else 'MISMATCH'}")
+    for b in bad:
+        print(f"    {b}")
+    return bad
+
+
+def population(files, test, n=96):
+    """The preregistered population: every (family, format) cell of both frames files holds the same cores, the 96
+    native cores with B, S and T distinct, from a run over all cores (--n 0) and the five formats; TEST_ files: the
+    same cores in every cell only."""
+    bad, cells = [], {}
+    for name, (d, rows) in files.items():
+        if d is None:
+            continue
+        args = d["provenance"].get("args", {})
+        if not test and (args.get("n") != 0 or args.get("arms") != ",".join(ARMS)):
+            bad.append(f"{name}: args n={args.get('n')!r} arms={args.get('arms')!r}, expected n=0 arms={','.join(ARMS)!r}")
+        for fam in ("", *FITS):
+            for arm in ARMS:
+                cells[f"{name} {LABEL[fam]} {arm}"] = set(rows.get((fam, arm), {}))
+    if not cells:
+        return []
+    ref = next(iter(cells.values()))
+    bad += [f"{c}: n={len(v)}, cores differ from the first cell's" for c, v in cells.items() if v != ref]
+    if not test and len(ref) != n:
+        bad.append(f"cells hold n={len(ref)} cores, expected {n}")
+    print(f"  population: {'OK, ' + str(len(ref)) + ' cores in every family x format cell' if not bad else 'MISMATCH'}")
     for b in bad:
         print(f"    {b}")
     return bad
@@ -267,8 +317,12 @@ def main():
         print(f"  frames: {p['repo']} @ {p['revision']}, {p['device']} x{p['n_gpus']}, transformers {p['transformers']}, "
               f"prefill {p.get('prefill')!r}, tokenizer check {p.get('tokenizer_check')}")
     print(f"  p1_root: {a.p1_root}")
-    if provenance(fits, {"frames": (d, "Answer:"), "frames_noprefill": (d0, "")}):
-        sys.exit("PROVENANCE MISMATCH: the frames files do not evaluate the fit runs gated here; not scored")
+    print(f"  factorial (s_ID): {a.factorial} sha256 {sha(a.factorial)[:16] if Path(a.factorial).exists() else SKIP}")
+    bad = provenance(fits, {"frames": (d, "Answer:"), "frames_noprefill": (d0, "")}, a.p1_root)
+    bad += population({"frames": (d, rows), "frames_noprefill": (d0, rows0)}, a.tag.startswith("TEST_"))
+    if bad:
+        sys.exit("PROVENANCE MISMATCH: fit runs, basis files, frames files or the population are not the ones gated "
+                 "and preregistered here; not scored")
     est = table(rows, "Primary evaluation ('Answer:' prefill): family x format")
 
     g = lambda fam, arm, k: est[fam, arm, k][0] if (fam, arm, k) in est else None
@@ -277,7 +331,7 @@ def main():
     print("\nGATES")
     G1 = gate_g1(root, fits, a.p1_root)
     G2 = both(ge(g("none/", "NONE", "phi")), ge(g("p1/", "P1", "phi")))
-    print(f"G2 the fits work: phi_none(NONE) {num(g('none/', 'NONE', 'phi'))}, phi_p1(P1) {num(g('p1/', 'P1', 'phi'))}, both >= 0.5 "
+    print(f"G2 the fits work (primary evaluation, fitting prompt): phi_none(NONE) {num(g('none/', 'NONE', 'phi'))}, phi_p1(P1) {num(g('p1/', 'P1', 'phi'))}, both >= 0.5 "
           f"-> {verdict(G2)}")
     G3 = both(ge(g("p1/", "LETTER", "psiK")), ge(g("p1/", "NONE", "psiV")))
     print(f"G3 the control reproduces the released crossover: fit_p1 psi_K(LETTER) {num(g('p1/', 'LETTER', 'psiK'))}, "
@@ -303,7 +357,7 @@ def main():
     print(f"F3 no fit-format effect on the crossover: D = {'n/a' if D is None else fmt(D) + f' (n={D[3]})'}, "
           f"95% CI within [-0.25, +0.25] -> {verdict(F3)}")
     sid = s_id(a.factorial)
-    print(f"F4 the channel follows the natural read: s_ID = mean ID_K / (mean ID_K + mean ID_V) over the factorial items "
+    print(f"F4 the channel follows the natural read, for each of fit_none and fit_p1 (fits averaged within core): s_ID = mean ID_K / (mean ID_K + mean ID_V) over the factorial items "
           f"(not stage 2's share@0) by format "
           f"{SKIP if sid is None else {k: round(float(v), 3) for k, v in sid.items()}}")
     f4 = []
@@ -313,6 +367,11 @@ def main():
         if sid is None or any(arm not in sh or arm not in sid for arm in ARMS):
             print(f"  {LABEL[fam]}: {SKIP} (needs all five formats in the frames and in the factorial)")
             f4.append(None)
+            continue
+        small = [x for x in ARMS if g(fam, x, "psiK") + g(fam, x, "psiV") < 0.2]
+        if small:
+            print(f"  {LABEL[fam]}: NOT EVALUABLE, psi_K + psi_V < 0.2 in {small} (counts as NOT MET)")
+            f4.append(False)
             continue
         r = float(np.corrcoef([sh[x] for x in ARMS], [sid[x] for x in ARMS])[0, 1])
         f4.append(r >= 0.9)

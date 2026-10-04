@@ -80,19 +80,10 @@ def sha(path):
 
 def load_refit(run, fam, width):
     """Bases of one refit_remap.py run as keys (f"{fam}/{obj}", seed), plus their provenance; the run's FRAME.json
-    must name the frame fam (none -> NONE, p1 -> P1), be COMPLETE and match the run's COMPLETE.json."""
+    must name the frame fam (none -> NONE, p1 -> P1), be COMPLETE and match the run's COMPLETE.json, and every basis
+    file must have the sha256 that COMPLETE.json's inventory and FRAME.json's validation record."""
     assert fam.isalnum() and fam != "v", fam
     run, out, prov = Path(run), {}, {}
-    for obj in OBJECTIVES:
-        for s in SEEDS:
-            f = run / "bases" / f"{obj}_ts{s}.npz"
-            with np.load(f, allow_pickle=False) as z:
-                assert z.files == ["rank_16"], z.files
-                U = torch.tensor(z["rank_16"], dtype=torch.float32)
-            assert U.shape == (16, width), (f, U.shape)
-            assert torch.allclose(U @ U.T, torch.eye(U.shape[0]), atol=1e-4)
-            out[(f"{fam}/{obj}", s)] = U
-            prov[f"{fam}/{obj}_{s}"] = {"path": str(f), "sha256": sha(f)}
     fr = run.parent / "FRAME.json"
     info = json.loads(fr.read_text())
     meta = {"run": str(run), "complete_sha256": sha(run / "COMPLETE.json"), "frame_sha256": sha(fr),
@@ -100,12 +91,58 @@ def load_refit(run, fam, width):
     assert str(meta["frame"]).lower() == fam, f"family {fam!r} given a run fit under frame {meta['frame']!r}"
     assert info.get("status") == "COMPLETE" and info.get("complete_sha256") == meta["complete_sha256"], \
         (fr, info.get("status"))
+    inventory = json.loads((run / "COMPLETE.json").read_text())["artifacts"]
+    for obj in OBJECTIVES:
+        for s in SEEDS:
+            f = run / "bases" / f"{obj}_ts{s}.npz"
+            h, recorded = sha(f), info["validation"]["bases"][f"{obj}_ts{s}"]["sha256"]
+            assert h == inventory[f"bases/{f.name}"]["sha256"] == recorded, f"{f} is not the basis this run wrote"
+            with np.load(f, allow_pickle=False) as z:
+                assert z.files == ["rank_16"], z.files
+                U = torch.tensor(z["rank_16"], dtype=torch.float32)
+            assert U.shape == (16, width), (f, U.shape)
+            assert torch.allclose(U @ U.T, torch.eye(U.shape[0]), atol=1e-4)
+            out[(f"{fam}/{obj}", s)] = U
+            prov[f"{fam}/{obj}_{s}"] = {"path": str(f), "sha256": h}
+    meta["bases_match_inventory"] = True
     return out, prov, meta
 
 
-def tokenizer_check(repo, rev, tok, arms, cores, prefills):
-    """Ids with and without fix_mistral_regex must be identical on every prompt evaluated (abort otherwise)."""
-    tok_fix = AutoTokenizer.from_pretrained(repo, revision=rev, use_fast=True, fix_mistral_regex=True)
+def pre_tokenizer(tok):
+    p = tok.backend_tokenizer.pre_tokenizer
+    return b"null" if p is None else p.__getstate__()  # the pre-tokenizer's JSON
+
+
+def fixed_tokenizer(repo, rev=None, strict=True, **kw):
+    """AutoTokenizer with fix_mistral_regex=True. For a Hub repo id transformers applies the fix only if a Hub lookup
+    succeeds (a failure is swallowed), so with strict the fixed pre-tokenizer must differ from the unfixed one; on a
+    miss both are reloaded from the snapshot directory of the pinned commit, where detection reads its config.json
+    (5.9.0 resolves a repo id's config.json at 'main', absent from a commit-only cache); the chat template must be the
+    repo id's. strict=False (test models) loads only the fixed tokenizer and checks nothing. Returns (tokenizer, record)."""
+    kw = dict(kw, use_fast=True, trust_remote_code=False, **(dict(revision=rev) if rev else {}))
+    if not strict:
+        return AutoTokenizer.from_pretrained(repo, **kw, fix_mistral_regex=True), {"strict": False}
+    base = AutoTokenizer.from_pretrained(repo, **kw)
+    plain, tok, src = pre_tokenizer(base), AutoTokenizer.from_pretrained(repo, **kw, fix_mistral_regex=True), None
+    if pre_tokenizer(tok) == plain and not Path(repo).is_dir():
+        from huggingface_hub import snapshot_download
+        src = snapshot_download(repo, revision=rev, allow_patterns=["config.json", "tokenizer*", "special_tokens_map.json"],
+                                **{k: kw[k] for k in ("cache_dir", "token", "local_files_only") if k in kw})
+        lkw = {k: v for k, v in kw.items() if k != "revision"}
+        plain = pre_tokenizer(AutoTokenizer.from_pretrained(src, **lkw))
+        tok = AutoTokenizer.from_pretrained(src, **lkw, fix_mistral_regex=True)
+        assert tok.chat_template == base.chat_template, f"chat template of {src} differs from {repo}'s"
+    fixed = pre_tokenizer(tok)
+    assert fixed != plain, f"fix_mistral_regex was not applied to {repo} (pre-tokenizer unchanged)"
+    return tok, {"strict": True, "fix_applied": True, "local_retry": src,
+                 "pre_tokenizer_sha256": {"fixed": hashlib.sha256(fixed).hexdigest(),
+                                          "unfixed": hashlib.sha256(plain).hexdigest()}}
+
+
+def tokenizer_check(repo, rev, tok, arms, cores, prefills, strict=True):
+    """Ids with and without fix_mistral_regex must be identical on every prompt evaluated (abort otherwise); with
+    strict the fix must actually be installed (fixed_tokenizer)."""
+    tok_fix, fix = fixed_tokenizer(repo, rev, strict)
     n = 0
     for arm in arms:
         for core in cores:
@@ -118,7 +155,7 @@ def tokenizer_check(repo, rev, tok, arms, cores, prefills):
                     b = tok_fix(text, add_special_tokens=False).input_ids
                     assert a == b, f"fix_mistral_regex changes the ids ({arm}, core {core['id']}, {loc}, prefill {pf!r})"
                     n += 1
-    return {"prompts": n, "identical": True, "prefills": list(prefills)}
+    return {"prompts": n, "identical": True, "prefills": list(prefills), "fix_mistral_regex": fix}
 
 
 def lp_rows(model, ids, cid):
@@ -245,7 +282,8 @@ def main():
         cores = cores[: a.n]
     tok_check = None
     if a.model == "mistral":
-        tok_check = tokenizer_check(repo, rev, tok, a.arms.split(","), cores, sorted({a.prefill, "Answer:", ""}))
+        tok_check = tokenizer_check(repo, rev, tok, a.arms.split(","), cores, sorted({a.prefill, "Answer:", ""}),
+                                    strict=not a.model_override)
         print("tokenizer check (fix_mistral_regex):", json.dumps(tok_check), flush=True)
     if a.bases_override:
         g = torch.Generator().manual_seed(0)

@@ -230,28 +230,30 @@ The same learned intervention is carried by the critical token's keys or values 
 
 ## P-2026-10-05-F: GPU stage 4, does the fitting format decide which channel carries a learned remap? (paper v2 only)
 
-**DRAFT, not yet final.** It becomes final in a commit titled "Finalise preregistration F", which also fixes the scoring script `analysis/stage4_score.py`, before any stage-4 GPU run; earlier commits of the code are work in progress, and all changes are visible in the history. Results go into paper v2 only; v1 (commit 14f6f4e) is frozen.
+**Final.** Fixed in the commit titled "Finalise preregistration F", together with the final scoring script `analysis/stage4_score.py` and the stage-4 code, before any stage-4 GPU run; the GPU script refuses to run on a draft entry or a modified tree. Results go into paper v2 only; v1 (`paper/versions/paper2_v1.pdf`, commit 4187b25) has no stage-4 content.
 
 **Question.** In stage 3b, Paper 1's released remap M (fit with the options listed after the question) was carried by the writing token's keys under LETTER (ψ_K 0.78, ψ_V 0.02 at Mistral-Small-24B) and by its values under NONE (ψ_K 0.07, ψ_V 0.80), while φ stayed at 0.70–0.75. Two accounts:
 - **H_read:** the readers in the evaluation format decide which channel appears to carry the edit; a remap fit with no later mention also writes into the keys, so it shows the same crossover.
 - **H_fit:** the fitting format decides what the remap writes; a remap fit with no later mention writes only what the value channel reads, so it stays value-carried even under LETTER and transfers poorly there.
 
 **Runs:** `scripts/gpu_stage4.sh` (Mistral-Small-24B-Instruct-2501 at revision 9527884be6e5616bdd54de542f9ae13384489724, BF16, transformers 5.9.0). **Scoring:** `analysis/stage4_score.py`, committed with this entry.
-- **Fits.** Paper 1's released `gpu/train.py`, unmodified, run through `experiments/refit_remap.py`, which replaces only the prompt function. Recipe: rank 16, output of (1-based) block 4, every event-span token, objective m3 (pair-swap), six-way conditional cross-entropy at the reply start (no prefill, Paper 1's "original" interface), AdamW lr 1e-3, batch 1, one shuffled epoch of the 1000 training pairs, seeds 101–103, each run's own PCA basis as initializer and as control P.
+- **Fits.** Paper 1's released `gpu/train.py` and `gpu/behavior_engine.py`, unmodified, run through `experiments/refit_remap.py`, which replaces at import time: the prompt function (fit_none only); Paper 1's release-integrity check (only README.md may differ; the code and training data must match the release manifest); and Paper 1's model loader, by one that uses the same load arguments (BF16, sdpa, eval mode, no gradients, no cache, pad = eos, `fix_mistral_regex`) at the pinned revision, with Paper 1's exact Python, package and device pins waived. Every replacement is recorded with hashes in each run's FRAME.json. Recipe: rank 16, output of (1-based) block 4, every event-span token, objective m3 (pair-swap), six-way conditional cross-entropy at the reply start (no prefill, Paper 1's "original" interface), AdamW lr 1e-3, batch 1, one shuffled epoch of the 1000 training pairs, seeds 101–103, each run's own PCA basis as initializer and as control P.
   - **fit_p1** (same-code control): Paper 1's own format (options after the question, "Answer with exactly one choice.").
   - **fit_none**: identical up to the end of the story, then "Question: … / Answer with one word. / Answer:", with no candidates named.
 - **Evaluation** as in stage 3b (`experiments/paper1_frames.py`): the 96 native cores with B, S and T distinct; LETTER, P1, POST, NONE, BEFORE; "Answer:" prefill; key-only and value-only exchanges from (1-based) block 6, each refit M paired with its own run's P; the released bases are re-run in the same job as an anchor. Fits are averaged within core; 95% core bootstrap, 10,000 resamples, ratio of means.
 
 **Gates** (the predictions are interpreted only if all pass; a failed gate is reported as a failed fit or a failed control):
 - **G1, same activations.** Each refit P spans the released P of the same seed: mean squared principal cosine ≥ 0.99 for every seed in both runs.
-- **G2, the fits work.** φ ≥ 0.5 under the fitting format: φ_none(NONE) and φ_p1(P1).
+- **G2, the fits work.** φ ≥ 0.5 in the primary evaluation ("Answer:" prefill) under each run's fitting prompt: φ_none(NONE) and φ_p1(P1).
 - **G3, the control reproduces the released crossover.** fit_p1 has ψ_K(LETTER) ≥ 0.5 and ψ_V(NONE) ≥ 0.5.
+
+Thresholds on φ, ψ_K and ψ_V refer to the ratio-of-means point estimates; only F3 uses an interval. Every statistic is computed per run (fit_none, fit_p1) with the three seeds averaged within core.
 
 **Predictions (H_read):**
 - **F1, crossover without later mentions at fitting.** fit_none has ψ_K(LETTER) ≥ 0.5 and ψ_V(NONE) ≥ 0.5.
 - **F2, transfer to lettered options.** fit_none has φ(LETTER) ≥ 0.5.
 - **F3, no fit-format effect on the crossover.** D = [ψ_K(LETTER) − ψ_K(NONE)] for fit_none minus the same for fit_p1, paired over cores: its 95% CI lies within [−0.25, +0.25].
-- **F4, the channel follows the natural read.** For each refit, across the five formats, the key share ψ_K/(ψ_K + ψ_V) correlates with the identity key share s_ID = ID_K/(ID_K + ID_V) of the unpatched Mistral-Small-24B (stage-2 natural factorial, `results/gpu_stage2/format_factorial`) at Pearson r ≥ 0.9.
+- **F4, the channel follows the natural read.** For each of fit_none and fit_p1, across the five formats, the key share ψ_K/(ψ_K + ψ_V) (from the point estimates) correlates with the identity key share s_ID = mean ID_K/(mean ID_K + mean ID_V) of the unpatched Mistral-Small-24B (stage-2 natural factorial, `results/gpu_stage2/format_factorial`) at Pearson r ≥ 0.9. F4 is met only if both runs meet it; if ψ_K + ψ_V < 0.2 in any format, that run's F4 is not evaluable and counts as not met.
 
 H_fit would predict instead: F1 fails with ψ_V(LETTER) ≥ 0.5 for fit_none, F2 fails, and D ≤ −0.4.
 

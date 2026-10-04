@@ -155,3 +155,128 @@ def test_injection_points_reach_unmodified_train(p1, tmp_path, monkeypatch):
         tr.train(argparse.Namespace(model="mistral", cohort="original_1000", model_path=None, output=tmp_path / "run"))
     assert (tmp_path / "INTEGRITY.json").exists() and json.loads((tmp_path / "run/RUN.json").read_text())["interface"] == "original"
     assert json.loads((tmp_path / "run/FAILED.json").read_text())["exception"] == "Reached"
+
+
+def fake_run(tmp, width=32, seed=0):
+    """A finished refit_remap.py run directory: FRAME.json, run/COMPLETE.json inventory and 9 orthonormal bases."""
+    import numpy as np
+    run, rng, inv, val = tmp / "fit" / "run", np.random.default_rng(seed), {}, {}
+    (run / "bases").mkdir(parents=True)
+    for o in rr.OBJECTIVES:
+        for s in rr.SEEDS:
+            f = run / "bases" / f"{o}_ts{s}.npz"
+            np.savez(f, rank_16=np.linalg.qr(rng.standard_normal((width, 16)))[0].T.astype(np.float32))
+            inv[f"bases/{f.name}"], val[f"{o}_ts{s}"] = {"sha256": rr.sha(f)}, {"sha256": rr.sha(f)}
+    (run / "COMPLETE.json").write_text(json.dumps({"status": "COMPLETE", "artifacts": inv}))
+    (run.parent / "FRAME.json").write_text(json.dumps({"frame": "NONE", "status": "COMPLETE", "validation": {"bases": val},
+                                                       "complete_sha256": rr.sha(run / "COMPLETE.json")}))
+    return run
+
+
+def test_load_refit_and_scorer_check_basis_inventory(tmp_path):
+    """A basis file replaced after the fit is refused by the frames step and by the scorer."""
+    from analysis import stage4_score as sc
+    from experiments.paper1_frames import load_refit
+    run, other = fake_run(tmp_path / "a"), fake_run(tmp_path / "b", seed=1)
+    _, prov, meta = load_refit(run, "none", 32)
+    assert meta["bases_match_inventory"] and prov["none/m3_101"]["sha256"] == rr.sha(run / "bases/m3_ts101.npz")
+    frames = {"provenance": {"prefill": "Answer:", "bases": prov, "refits": {"none": meta}}}
+    assert sc.provenance({"none/": run}, {"frames": (frames, "Answer:")}, None) == []
+    (run / "bases/m3_ts101.npz").write_bytes((other / "bases/m3_ts101.npz").read_bytes())
+    with pytest.raises(AssertionError, match="not the basis this run wrote"):
+        load_refit(run, "none", 32)
+    assert any("inventory" in b for b in sc.provenance({"none/": run}, {"frames": (frames, "Answer:")}, None))
+    (run.parent / "FRAME.json").unlink()
+    assert sc.provenance({"none/": run}, {}, None) == [f"{run}: missing FRAME.json"]
+
+
+def test_scorer_population():
+    """The scorer refuses a frames file over fewer cores, other formats or unequal cells (TEST_: equal cells only)."""
+    from analysis import stage4_score as sc
+    full = {"provenance": {"args": {"n": 0, "arms": ",".join(sc.ARMS)}}}
+    rows = {(f, a): dict.fromkeys(range(96)) for f in ("", *sc.FITS) for a in sc.ARMS}
+    assert sc.population({"frames": (full, rows), "frames_noprefill": (full, rows)}, False) == []
+    short = {k: dict.fromkeys(range(95)) if k == ("none/", "LETTER") else v for k, v in rows.items()}
+    assert len(sc.population({"frames": (full, short)}, False)) == 1 and len(sc.population({"frames": (full, short)}, True)) == 1
+    few = {k: dict.fromkeys(range(2)) for k in rows}
+    cut = {"provenance": {"args": {"n": 2, "arms": ",".join(sc.ARMS)}}}
+    assert len(sc.population({"frames": (cut, few)}, False)) == 2 and sc.population({"frames": (cut, few)}, True) == []
+
+
+def test_git_state_excludes_output_root():
+    g = rr.git_state(rr.REPO / "results/gpu_stage4/fit_none")
+    assert g["status_excluded"] == ["results/gpu_stage4"] and rr.git_state("/tmp/x/fit_none")["status_excluded"] == []
+
+
+def test_fixed_tokenizer_detects_skipped_fix(monkeypatch, tmp_path):
+    """transformers swallows a failed Hub lookup and returns the unfixed tokenizer; the retry from the snapshot
+    directory must apply the fix, also in a cache made only by commit-hash downloads (no refs/main, as on a GPU box)."""
+    import shutil
+    import huggingface_hub
+    import transformers.utils.hub as hub
+    from huggingface_hub import snapshot_download
+    from experiments.paper1_frames import fixed_tokenizer
+    try:
+        snap = Path(snapshot_download(*rr.MISTRAL[:1], revision=rr.MISTRAL[1], local_files_only=True,
+                                      allow_patterns=["config.json", "tokenizer*", "special_tokens_map.json"]))
+        _, rec = fixed_tokenizer(*rr.MISTRAL, local_files_only=True)
+    except Exception:
+        pytest.skip("no cached Mistral-Small-24B tokenizer")
+    assert rec["fix_applied"]
+    dst = tmp_path / "hub" / snap.parent.parent.name / "snapshots" / snap.name
+    shutil.copytree(snap, dst)  # files only, no refs
+
+    def down(*a, **k):
+        raise RuntimeError("429")
+
+    class Down:  # the Hub lookup fails; every other Hub call goes through
+        def __getattr__(self, n):
+            return down if n == "model_info" else getattr(huggingface_hub.HfApi(), n)
+    monkeypatch.setattr(huggingface_hub, "model_info", down)  # transformers 5.9.0
+    monkeypatch.setattr(hub, "hf_api", lambda *a, **k: Down(), raising=False)  # later versions
+    tok, rec = fixed_tokenizer(*rr.MISTRAL, cache_dir=str(tmp_path / "hub"))
+    assert rec["fix_applied"] and rec["local_retry"] == str(dst) and rec["pre_tokenizer_sha256"]["fixed"].startswith("3b27505c")
+    assert not (dst.parent.parent / "refs").exists()
+    with pytest.raises(AssertionError, match="not applied"):
+        fixed_tokenizer("Qwen/Qwen2.5-0.5B-Instruct", local_files_only=True)
+    assert fixed_tokenizer("Qwen/Qwen2.5-0.5B-Instruct", strict=False, local_files_only=True)[1] == {"strict": False}
+
+
+@need_p1
+def test_post_run_failure_recorded(p1, tmp_path, monkeypatch):
+    """A failure after train() returns leaves FRAME.json at POST_RUN_FAILED with the error and complete_sha256."""
+    be, tr, ld, integ = p1
+
+    def fake_train(args):
+        integ.verify()
+        args.output.mkdir(parents=True)
+        (args.output / "COMPLETE.json").write_text(json.dumps({"status": "COMPLETE"}))
+
+    def bad_validate(*a, **k):
+        raise ValueError("Trained basis is not orthonormal")
+    for mod, name, new in ((tr, "train", fake_train), (rr, "validate_run", bad_validate), (sys, "stdout", sys.stdout)):
+        monkeypatch.setattr(mod, name, new)
+    for mod, name in ((be, "prompt"), (integ, "verify"), (ld, "load_engine"), (tr, "datasets"), (tr, "schedule"),
+                      (tr, "require")):
+        monkeypatch.setattr(mod, name, getattr(mod, name))  # restored after the injections
+    monkeypatch.setattr(sys, "argv", ["refit_remap.py", "--frame", "NONE", "--p1-root", str(P1R), "--out",
+                                      str(tmp_path / "fit"), "--test-model", "Qwen/Qwen2.5-0.5B-Instruct"])
+    with pytest.raises(ValueError, match="orthonormal"):
+        rr.main()
+    f = json.loads((tmp_path / "fit/FRAME.json").read_text())
+    assert f["status"] == "POST_RUN_FAILED" and "orthonormal" in f["error"]
+    assert f["complete_sha256"] == rr.sha(tmp_path / "fit/run/COMPLETE.json")
+
+
+@need_p1
+def test_tokenizer_check_records_fix(tmp_path):
+    from transformers import AutoTokenizer
+    from experiments.paper1_frames import tokenizer_check
+    cores = json.loads((P1R / "gpu/component_data/native_story_120.json").read_text())["stories"][:2]
+    repo = "Qwen/Qwen2.5-0.5B-Instruct"
+    try:
+        tok = AutoTokenizer.from_pretrained(repo, local_files_only=True)
+    except Exception:
+        pytest.skip("no cached Qwen2.5-0.5B tokenizer")
+    r = tokenizer_check(repo, None, tok, rr.ARMS5, cores, ["", "Answer:"], strict=False)
+    assert r["prompts"] == 60 and r["fix_mistral_regex"] == {"strict": False}

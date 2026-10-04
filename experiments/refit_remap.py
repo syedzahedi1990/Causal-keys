@@ -15,9 +15,11 @@ Every change is injected at import time by replacing module attributes; nothing 
   * TEST_MODE (--test-model): a tiny model on CPU, the first K training pairs, and exactly one waived require
     ("The original training pool must contain ..."); the run is still labelled "mistral" (system turn, padding).
 Every injection is listed in OUT/FRAME.json with sha256 of the unmodified Paper 1 files and of the injected source.
-FRAME.json also records ckeys/encoding.py and ckeys/story.py (raw_prompt's text), one framed prompt, and the git
-commit and dirty state. It is written before the run; the COMPLETE.json sha256 and the basis validation are added
-after it. --preflight runs the cheap checks (release, P1 equality, NONE prefix, fix_mistral_regex ids) before fits.
+FRAME.json also records the sha256 of experiments/paper1_frames.py (fixed_tokenizer) and ckeys/*.py (raw_prompt's
+text), one framed prompt, and the git commit and dirty state. It is written before the run; the COMPLETE.json sha256
+and the basis validation are added after it (status COMPLETE, else FAILED or POST_RUN_FAILED with the error).
+--preflight runs the cheap checks (release, P1 equality, NONE prefix, fix_mistral_regex installed and ids unchanged)
+before the fits.
 """
 from __future__ import annotations
 
@@ -65,6 +67,7 @@ PINNED = {  # the reviewed copy of Paper 1's v5.5 reviewer repository: RELEASE.j
 P1_FILES = tuple(PINNED)
 REPO = Path(__file__).resolve().parent.parent
 CKEYS = ("ckeys/__init__.py", "ckeys/encoding.py", "ckeys/story.py")
+DEPS = ("experiments/paper1_frames.py", *CKEYS)  # imported by the injected code (fixed_tokenizer, raw_prompt)
 ENDS = {"NONE": "\nAnswer with one word.\nAnswer:", "P1": "\nAnswer with exactly one choice.\nAnswer:"}
 ARMS5 = ("P1", "NONE", "BEFORE", "POST", "LETTER")
 TOLERATED = {"README.md"}
@@ -210,10 +213,15 @@ def prefix_check(be, tok, pairs, frame, model="mistral", padding=1024):
     return n
 
 
-def git_state():
+def git_state(out=None):
+    """HEAD, untracked/modified paths (excluding the stage-4 output root, the parent of --out, when inside the
+    repository) and the sha256 of `git diff HEAD`."""
+    root = Path(out).resolve().parent if out else None
+    ex = [f":(exclude){root.relative_to(REPO)}"] if root and root != REPO and root.is_relative_to(REPO) else []
     try:
         g = lambda *c: subprocess.run(["git", "-C", str(REPO), *c], capture_output=True, text=True, check=True).stdout
-        return {"head": g("rev-parse", "HEAD").strip(), "status_porcelain": g("status", "--porcelain").splitlines(),
+        return {"head": g("rev-parse", "HEAD").strip(), "status_excluded": [e[10:] for e in ex],
+                "status_porcelain": g("status", "--porcelain", "--", ".", *ex).splitlines(),
                 "diff_head_sha256": hashlib.sha256(g("diff", "HEAD").encode()).hexdigest()}
     except (OSError, subprocess.CalledProcessError) as e:
         return {"error": f"{type(e).__name__}: {e}"}
@@ -253,9 +261,10 @@ def ours_loader(repo, revision, device, test):
     """Reproduces Paper 1 mistral_engine.Engine L192-202 without its Python/package/device-count pins."""
     def load_engine(model, *, model_path, model_receipt=None, native_call_limit, journal_path, deadline_seconds):
         import torch
-        from transformers import AutoModelForCausalLM, AutoTokenizer
+        from transformers import AutoModelForCausalLM
+        from experiments.paper1_frames import fixed_tokenizer
         kw = dict(revision=revision) if revision else {}
-        tok = AutoTokenizer.from_pretrained(repo, **kw, use_fast=True, trust_remote_code=False, fix_mistral_regex=True)
+        tok, tok_fix = fixed_tokenizer(repo, revision, strict=not test)
         mdl = AutoModelForCausalLM.from_pretrained(repo, **kw, trust_remote_code=False, torch_dtype=torch.bfloat16,
                                                    device_map={"": device}, low_cpu_mem_usage=True,
                                                    attn_implementation="sdpa")
@@ -276,7 +285,7 @@ def ours_loader(repo, revision, device, test):
                    device=str(dev), gpu=torch.cuda.get_device_name(dev) if dev.type == "cuda" else "cpu",
                    gpu_bytes=torch.cuda.get_device_properties(dev).total_memory if dev.type == "cuda" else None,
                    packages=versions(), cuda_runtime=torch.version.cuda, padding=1024, attention="sdpa",
-                   tokenizer=dict(use_fast=True, fix_mistral_regex=True, pad_token_id=tok.pad_token_id),
+                   tokenizer=dict(use_fast=True, fix_mistral_regex=tok_fix, pad_token_id=tok.pad_token_id),
                    native_call_limit=native_call_limit, deadline_seconds=deadline_seconds, test_mode=test)
         if journal_path is not None:
             with Path(journal_path).open("x") as f:
@@ -316,25 +325,24 @@ def validate_run(run, p1_root=None, model="mistral"):
     return res
 
 
-def preflight(a, repo, revision):
+def preflight(a, repo, revision, test):
     """Before any fit: release integrity + pins, P1 equality, NONE event prefix, and Paper 1's tokenizer identity
     with and without fix_mistral_regex on every prompt the frames step evaluates (paper1_frames.tokenizer_check)."""
     from transformers import AutoTokenizer
-    from experiments.paper1_frames import tokenizer_check
+    from experiments.paper1_frames import fixed_tokenizer, tokenizer_check
     out = Path(a.out)
     be, _, _, integ = import_paper1(a.p1_root)
     res = {"integrity": tolerant_verify(integ.ROOT, out)["status"]}
     pairs = be.datasets()["training"]
     res["p1_equality_records"] = check_p1_equality(be, pairs)
     res["none_prompt"] = prompt_identity(make_framed(be, "NONE"), "NONE", pairs[0]["base"])
-    kw = dict(revision=revision) if revision else {}
-    tok_fix = AutoTokenizer.from_pretrained(repo, **kw, use_fast=True, trust_remote_code=False, fix_mistral_regex=True)
+    tok_fix, _ = fixed_tokenizer(repo, revision, strict=not test)
     res["none_prefix_pairs"] = prefix_check(be, tok_fix, pairs, "NONE")
     cores = json.loads((Path(a.p1_root) / "gpu/component_data/native_story_120.json").read_text())["stories"]
     cores = cores[: a.cores] if a.cores else cores
     tok = AutoTokenizer.from_pretrained(repo, revision=revision)  # as paper1_frames.main loads it
-    res["tokenizer_check"] = tokenizer_check(repo, revision, tok, ARMS5, cores, ["", "Answer:"])
-    res.update(repo=repo, revision=revision, cores=len(cores), versions=versions(), git=git_state())
+    res["tokenizer_check"] = tokenizer_check(repo, revision, tok, ARMS5, cores, ["", "Answer:"], strict=not test)
+    res.update(repo=repo, revision=revision, cores=len(cores), versions=versions(), git=git_state(a.out))
     (out / "PREFLIGHT.json").write_text(json.dumps(res, indent=2, sort_keys=True) + "\n")
     stamp("preflight PASS", integrity=res["integrity"], tokenizer_prompts=res["tokenizer_check"]["prompts"])
 
@@ -361,11 +369,12 @@ def main():
         return
     test = a.test_model is not None
     repo = a.test_model or a.model_path or MISTRAL[0]
-    revision = a.revision or (MISTRAL[1] if repo == MISTRAL[0] else None)
+    revision = a.revision or (None if test else MISTRAL[1])  # outside TEST_MODE, also for a local --model-path
+    assert test or revision == MISTRAL[1], f"stage 4 is preregistered at revision {MISTRAL[1]}"
     if a.preflight:
         assert a.out, "--out is required"
         Path(a.out).mkdir(parents=True, exist_ok=True)
-        return preflight(a, repo, revision)
+        return preflight(a, repo, revision, test)
     assert a.frame and a.out, "--frame and --out are required"
     assert sys.version_info >= (3, 11), "Paper 1's train.py needs Python >= 3.11 (hashlib.file_digest)"
     assert not test or (a.loader == "ours" and a.test_pairs >= 3), "TEST_MODE needs --loader ours and K >= 3"
@@ -382,11 +391,10 @@ def main():
     all_pairs = be.datasets()["training"]
     n_eq = check_p1_equality(be, all_pairs)
     stamp("p1_equality", records=n_eq)
-    from transformers import AutoTokenizer
-    tkw = dict(revision=revision) if revision else {}
-    if a.loader == "paper1" and a.model_path:
-        tkw = dict(local_files_only=True)
-    tok = AutoTokenizer.from_pretrained(repo, **tkw, use_fast=True, trust_remote_code=False, fix_mistral_regex=True)
+    from experiments.paper1_frames import fixed_tokenizer
+    local = a.loader == "paper1" and a.model_path
+    tok, tok_fix = fixed_tokenizer(repo, None if local else revision, strict=not test,
+                                   **(dict(local_files_only=True) if local else {}))
     n_pref = prefix_check(be, tok, all_pairs, a.frame) if a.frame == "NONE" else None
     stamp("prefix_check", frame=a.frame, pairs=n_pref)
     del tok
@@ -421,9 +429,10 @@ def main():
              "test_pairs": a.test_pairs if test else None, "p1_root": str(root),
              "paper1_unmodified_sha256": unmodified, "injected_file": "experiments/refit_remap.py",
              "injected_file_sha256": SELF_SHA256, "injections": injections, "prompt_identity": prompt_id,
-             "git": git_state(),
+             "injected_dependencies_sha256": {f: sha(REPO / f) for f in DEPS},
+             "git": git_state(out),
              "p1_prompt_equality_records": n_eq, "event_prefix_identical_to_p1_pairs": n_pref,
-             "integrity_status": integrity["status"],
+             "integrity_status": integrity["status"], "tokenizer_fix_mistral_regex": tok_fix,
              "pins_waived": ["python==3.12.14 and exact package versions", "exactly one CUDA device",
                              ">= 75 GiB", "Paper 1 asset receipt"] if a.loader == "ours" else [],
              "versions": versions(), "argv": sys.argv, "status": "RUNNING"}
@@ -439,10 +448,16 @@ def main():
         frame.update(status="FAILED", error=f"{type(e).__name__}: {e}", seconds=time.time() - t0)
         write()
         raise
-    assert all(sha(root / f) == h for f, h in unmodified.items()), "Paper 1 files changed during the run"
-    frame.update(status="COMPLETE", seconds=time.time() - t0, complete_sha256=sha(run / "COMPLETE.json"),
-                 validation=validate_run(run, root))
-    write()
+    c = run / "COMPLETE.json"
+    frame.update(seconds=time.time() - t0, complete_sha256=sha(c) if c.exists() else None)
+    try:  # train() returned: a failure here is recorded as POST_RUN_FAILED (the fit is not evaluated)
+        assert all(sha(root / f) == h for f, h in unmodified.items()), "Paper 1 files changed during the run"
+        frame.update(validation=validate_run(run, root), status="COMPLETE")
+    except BaseException as e:
+        frame.update(status="POST_RUN_FAILED", error=f"{type(e).__name__}: {e}")
+        raise
+    finally:
+        write()
     stamp("done", seconds=round(time.time() - t0), complete_sha256=frame["complete_sha256"],
           load_training_bases=frame["validation"]["paper1_load_training_bases"]["status"])
 

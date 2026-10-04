@@ -2,7 +2,7 @@
 
 \section{Preregistration log and claim status}\label{app:prereg}
 
-We made five preregistrations, A--E. Each was committed to version control before its run, and each scoring script was committed before its outputs were inspected. \Cref{tab:prereg-ab,tab:prereg-c,tab:prereg-de} give every prediction with its outcome as recorded in the preregistration log of the repository (\texttt{docs/PREREGISTRATION.md}). The anonymised code release adds \texttt{PREREGISTRATION\_HISTORY.txt}, which lists, without author information, every commit that changed the log or a scoring script, with its time and diff, and every commit that changed the results, experiment code or GPU scripts, so that the order of preregistration, run and scoring can be checked; each result file also records the commit of the code that produced it. We keep the wording of the log, with two changes: format names are replaced by ours, and long entries are shortened without changing their content. In the log, the ``critical token'' or ``state token'' is the writing token, identity(K) is $\mathrm{ID}_K$, and $l_0$ is $\ell_0$. The log rounds independently of the tables in \cref{app:additional}, so a few values and intervals differ in the last digit (for example, the interval of the Qwen2.5-32B key share).
+We made six preregistrations, A--F. Each was committed to version control before its run, and each scoring script was committed before its outputs were inspected. \Cref{tab:prereg-ab,tab:prereg-c,tab:prereg-de,tab:prereg-f} give every prediction with its outcome as recorded in the preregistration log of the repository (\texttt{docs/PREREGISTRATION.md}). The anonymised code release adds \texttt{PREREGISTRATION\_HISTORY.txt}, which lists, without author information, every commit that changed the log or a scoring script, with its time and diff, and every commit that changed the results, experiment code or GPU scripts, so that the order of preregistration, run and scoring can be checked; each result file also records the commit of the code that produced it. We keep the wording of the log, with two changes: format names are replaced by ours, and long entries are shortened without changing their content. In the log, the ``critical token'' or ``state token'' is the writing token, identity(K) is $\mathrm{ID}_K$, and $l_0$ is $\ell_0$. The log rounds independently of the tables in \cref{app:additional}, so a few values and intervals differ in the last digit (for example, the interval of the Qwen2.5-32B key share).
 
 \begin{table}[!ht]
 \centering
@@ -90,6 +90,33 @@ E4 & Value-only exchange in the frames of \citet{anonymous2026fitted}: $\psi_V(\
 \end{minipage}
 \end{table}
 
+\begin{table}[!ht]
+\centering
+\footnotesize
+\caption{\textbf{Preregistration F.} GPU stage 4: the remap of \citet{anonymous2026fitted} refit at Mistral-Small-24B with their released training code, under \fmtNone{} (fit\_none) and under their own format (fit\_p1, same-code control). Predictions, gates and the scoring script \texttt{analysis/stage4\_score.py} committed before the run, which ran at that commit (\texttt{1ef8696}). Thresholds refer to point estimates except F3; every statistic is per run, with the three seeds averaged within core; 96 cores, 95\% core bootstrap.}
+\label{tab:prereg-f}
+\begin{tabular}{p{0.06\textwidth}p{0.40\textwidth}p{0.36\textwidth}p{0.08\textwidth}}
+\toprule
+ & Prediction or gate & Result & Verdict \\
+\midrule
+G1 & Each refit P spans the released P of the same seed: mean squared principal cosine $\geq 0.99$ & \refGOneMin{} for all six & \textbf{met} \\
+G2 & $\varphi \geq 0.5$ under each run's fitting prompt & fit\_none \phiNoneRefNone{}; fit\_p1 \phiOptRefOpt{} & \textbf{met} \\
+G3 & fit\_p1 reproduces the released crossover: $\psi_K(\text{\fmtLetter{}}) \geq 0.5$, $\psi_V(\text{\fmtNone{}}) \geq 0.5$ & \psiLetterRefOpt{}, \psiVNoneRefOpt{} & \textbf{met} \\
+\midrule
+F1 & fit\_none: $\psi_K(\text{\fmtLetter{}}) \geq 0.5$ and $\psi_V(\text{\fmtNone{}}) \geq 0.5$ & \psiLetterRefNone{}, \psiVNoneRefNone{} & \textbf{met} \\
+F2 & fit\_none: $\varphi(\text{\fmtLetter{}}) \geq 0.5$ & \phiLetterRefNone{} & \textbf{met} \\
+F3 & $D = [\psi_K(\text{\fmtLetter{}}) - \psi_K(\text{\fmtNone{}})]_{\text{fit\_none}} - [\cdot]_{\text{fit\_p1}}$, paired over cores: CI within $[-0.25, +0.25]$ & $\refD{}$ [$\refDLo{}$, $\refDHi{}$] & \textbf{met} \\
+F4 & For each run, $\psi_K/(\psi_K+\psi_V)$ over the five formats correlates with the natural $s_{\mathrm{ID}}$ of Mistral-Small-24B at $r \geq 0.9$ & fit\_none \refRNone{}; fit\_p1 \refROpt{} & \textbf{met} \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\begin{minipage}{0.94\textwidth}
+\footnotesize
+\emph{Stated alternative.} If the fitting format decided which channel carries the remap, F1 and F2 would fail with $\psi_V(\text{\fmtLetter{}}) \geq 0.5$ for fit\_none and $D \leq -0.4$; this pattern was not observed. \emph{Exploratory parts of F}, with no prediction: evaluation without the ``Answer:'' prefill; $\rho_K$ and $\rho_V$; principal cosines between the remaps; loss curves; the identity-objective fits that the training code makes alongside the remap.
+\end{minipage}
+\end{table}
+
 \paragraph{History of the claim, including post hoc steps.}
 The account of when keys carry the value was revised twice after seeing data. We list every step.
 \begin{enumerate}\setlength\itemsep{1pt}
@@ -100,6 +127,7 @@ The account of when keys carry the value was revised twice after seeing data. We
   \item \emph{Preregistration C} added a transfer law derived from the fixed-value data of \citet{anonymous2026fitted}. It failed at Mistral-Small-24B (C1 and C2 not met) and held only marginally at Qwen2.5-72B. C3 was met in both models. The key-share threshold of C4 was met only at Qwen2.5-32B; its \fmtBefore{} control was met in all three models. The reading that the intervention is written into both channels, and that the format decides which one appears to carry it, was formed after seeing these data.
   \item \emph{Preregistration D} retested the options-list part of the account on two new tasks (D1, D2) and localised the readers at 7--14B (D3). It contains no test of whether \fmtPost{} opens the key channel; \fmtPost{} on the new tasks was exploratory.
   \item \emph{Preregistration E} was written in response to two internal reviews of a draft. It tested the revised account with an instruction-matched $2{\times}2$ (E1), including the first confirmatory test that a sentence after the story opens the key channel (E1c, \fmtPost{} $-$ \fmtSentB{}). It also tested the value half of the post hoc reading of C (E4), the role control (E2) and the software environment (E3). All its predictions were met.
+  \item \emph{Preregistration F} tested the other half of that reading: whether the format in which a remap is read, rather than the one in which it was fit, decides which channel appears to carry it, by refitting the remap without later mentions. All gates and predictions were met.
 \end{enumerate}
 
 \Cref{tab:claims} lists each main claim with its status. ``Confirmatory'' means that a preregistered prediction tested the claim in the stated models and was met. ``Exploratory'' means that the measurement was planned or run without a prediction. ``Post hoc'' means that the claim was formed after seeing the data it rests on.
@@ -131,8 +159,9 @@ Section & Claim & Status \\
 \cref{sec:intervention} & Reproduction of \citet{anonymous2026fitted} under \fmtOpt{} & Confirmatory gate (C), passed \\
 \cref{sec:intervention} & $\psi_K$ is much smaller without a later mention & Confirmatory (C3) \\
 \cref{sec:intervention} & Without a later mention, values carry the intervention & Confirmatory (E4) \\
-\cref{sec:intervention} & $\varphi$ varies little across formats (\phiOptMistral{}--\phiLetterMistral{} at Mistral-Small-24B, \phiNoneQwen{}--\phiBeforeQwen{} at Qwen2.5-72B); the full crossover of $\psi_K$ and $\psi_V$ over five formats & Exploratory; the one preregistered contrast (C2, \fmtOpt{} $-$ \fmtNone{}) was null at Mistral-Small-24B and small but positive at Qwen2.5-72B ($+0.034$ [$+0.018$, $+0.049$]) \\
-\cref{sec:intervention} & The intervention is written into both channels; the format decides which appears to carry it & Post hoc reading of C; its value half then confirmed (E4) \\
+\cref{sec:intervention} & $\varphi$ varies little across formats (\phiOptMistral{}--\phiLetterMistral{} at Mistral-Small-24B, \phiNoneQwen{}--\phiBeforeQwen{} at Qwen2.5-72B); the full crossover of $\psi_K$ and $\psi_V$ over five formats & Exploratory for the released remaps (the refit test is F); the one preregistered contrast (C2, \fmtOpt{} $-$ \fmtNone{}) was null at Mistral-Small-24B and small but positive at Qwen2.5-72B ($+0.034$ [$+0.018$, $+0.049$]) \\
+\cref{sec:intervention} & The intervention is written into both channels; the format decides which appears to carry it & Post hoc reading of C; then confirmed for its value half (E4) and for a remap fit without later mentions (F1--F4) \\
+\cref{sec:refit} & A remap fit under \fmtNone{} shows the same crossover as one fit under \fmtOpt{}: the format in which it is read, not the one in which it was fit, decides the carrying channel & Confirmatory at Mistral-Small-24B (F1--F4); its smaller transfer to \fmtLetter{} is exploratory \\
 \cref{sec:failed} & The transfer law from clamping-estimated $\kappa_V$ fails & Confirmatory test, failed at Mistral-Small-24B (C1, C2) and marginal at Qwen2.5-72B \\
 \bottomrule
 \end{tabular}
@@ -334,21 +363,38 @@ with $m = m_{\mathrm{TS}}$, averaged over the three fits within each core before
 
 \paragraph{Code audit.} Before the GPU runs, an independent review of the measurement code led to fixes made before any GPU result existed, among them the batched self-clamp baseline, depth-matched onsets, a seeded third value X, core-bootstrap CIs computed in the experiment scripts, the competence filter (now a secondary analysis) and provenance written into every output file.
 
-\paragraph{Mistral-Small-24B tokenizer warning.} When loading the Mistral-Small-24B tokenizer, transformers warns that its pre-tokenisation regex is incorrect and suggests \texttt{fix\_mistral\_regex=True}. We kept the default, under which the reproduction gate of preregistration C passed. We have not measured how the flag would change the results.
+\paragraph{Mistral-Small-24B tokenizer warning.} When loading the Mistral-Small-24B tokenizer, transformers warns that its pre-tokenisation regex is incorrect and suggests \texttt{fix\_mistral\_regex=True}. We kept the default, under which the reproduction gate of preregistration C passed. In stage 4 we checked that the flag leaves the token ids of all 3{,}600 frames prompts (five formats, both prefills) unchanged; we have not checked the natural-factorial prompts.
 
-\paragraph{Compute.} All experiments are forward passes; nothing is trained. Pilots with models of at most 1.7B parameters, the first format factorials, preregistration A, the 1.5B row-restricted splices and the attention probe ran on CPU in FP32; the preregistration-A output records transformers 5.18.0 and Python 3.11.15. All GPU runs used NVIDIA A100-SXM4-80GB GPUs in BF16, torch 2.11.0 with CUDA 12.8 and Python 3.12.14, as recorded in each stage's \texttt{ENV.txt} and output files:
+\paragraph{Compute.} Except for the stage-4 refits (\cref{app:refit}), all experiments are forward passes, and no model weights are ever trained. Pilots with models of at most 1.7B parameters, the first format factorials, preregistration A, the 1.5B row-restricted splices and the attention probe ran on CPU in FP32; the preregistration-A output records transformers 5.18.0 and Python 3.11.15. All GPU runs used NVIDIA A100-SXM4-80GB GPUs in BF16, torch 2.11.0 with CUDA 12.8 and Python 3.12.14, as recorded in each stage's \texttt{ENV.txt} and output files:
 \begin{itemize}\setlength\itemsep{1pt}
   \item stage 1 (preregistration B; Qwen2.5-1.5B to 14B, Qwen3-8B, Mistral-7B, OLMo-2-7B): one GPU, transformers 5.18.0, commit \texttt{f706ef5};
   \item stage 2 (preregistration C; frames at 24B and 72B, natural factorial at 24--72B): two GPUs with \texttt{device\_map="auto"}, transformers 5.9.0, pinned by the stage-2 script for the reproduction gate, commit \texttt{2b1eca7};
   \item stage 3 (preregistration D; new tasks and localisation at 7--14B): one GPU, transformers 5.18.0, commit \texttt{b8815cb};
-  \item stage 3b (preregistration E): two GPUs, commit \texttt{3ca63f1}; the $2{\times}2$, the role control at 7--14B and the Qwen2.5-32B environment re-run under transformers 5.18.0 (the re-run on one GPU), and the Qwen2.5-14B environment re-run, the value-only frames and the role control at 72B under transformers 5.9.0.
+  \item stage 3b (preregistration E): two GPUs, commit \texttt{3ca63f1}; the $2{\times}2$, the role control at 7--14B and the Qwen2.5-32B environment re-run under transformers 5.18.0 (the re-run on one GPU), and the Qwen2.5-14B environment re-run, the value-only frames and the role control at 72B under transformers 5.9.0;
+  \item stage 4 (preregistration F): two GPUs, one per refit (55 minutes each), then the frames on both, transformers 5.9.0, commit \texttt{1ef8696}.
 \end{itemize}
 
 \paragraph{Model revisions.} For the two models of \citet{anonymous2026fitted} we pin the revisions used for the reproduction: Mistral-Small-24B-Instruct-2501 at \texttt{9527884be6e5616bdd54de542f9ae13384489724} and Qwen2.5-72B-Instruct at \texttt{495f39366efef23836d0cfae4fbe635880d2be31}. The pins apply to the frames and to the stage-2 natural factorial at those sizes. All other runs, including Qwen2.5-32B and the role control at Qwen2.5-72B, load the default revision available at run time.
 
-\paragraph{Released code.} The code release contains the story generator, encoder, tasks and hook primitives (\texttt{ckeys/}); one script per experiment (\texttt{experiments/}); the preregistered scoring scripts (\texttt{analysis/stage1\_prereg.py}, \texttt{stage2\_score.py}, \texttt{stage3\_score.py}, \texttt{stage3b\_score.py}); one shell script per GPU stage, which pins the library version and records the commit and environment (\texttt{scripts/}); the exactness tests (\texttt{tests/}); and \texttt{paper/make\_figures.py}, which generates every result figure, every table in \cref{app:additional} and every result macro in the text from the saved results (the schematic in \cref{fig:schematic} is drawn by \texttt{paper/make\_schematic.py}).
+\paragraph{Released code.} The code release contains the story generator, encoder, tasks and hook primitives (\texttt{ckeys/}); one script per experiment (\texttt{experiments/}); the preregistered scoring scripts (\texttt{analysis/stage1\_prereg.py}, \texttt{stage2\_score.py}, \texttt{stage3\_score.py}, \texttt{stage3b\_score.py}, \texttt{stage4\_score.py}); the refit wrapper (\texttt{experiments/refit\_remap.py}); one shell script per GPU stage, which pins the library version and records the commit and environment (\texttt{scripts/}); the exactness tests (\texttt{tests/}); and \texttt{paper/make\_figures.py}, which generates every result figure, every table in \cref{app:additional} and every result macro in the text from the saved results (the schematic in \cref{fig:schematic} is drawn by \texttt{paper/make\_schematic.py}).
 
 \clearpage
+\section{Refitting the remap (preregistration F)}\label{app:refit}
+
+\paragraph{Recipe.} We ran the released training code of \citet{anonymous2026fitted} (\texttt{gpu/train.py} and \texttt{gpu/behavior\_engine.py}, unmodified) through \texttt{experiments/refit\_remap.py}. Its recipe: a rank-16 basis at the output of (1-based) block 4 over every event-span token; the pair-swap objective with a six-way conditional cross-entropy at the start of the reply (no prefill); AdamW, learning rate $10^{-3}$, batch 1, one shuffled epoch of their 1000 training pairs (2000 stories); seeds 101--103; each fit initialised at its own PCA basis of source-minus-base differences, which also serves as its control P. The code fits an identity-objective basis alongside each remap, which we do not analyse. The training stories are disjoint from the 120 evaluation cores, but most evaluation event sentences also occur in some training story, as for the released remap.
+
+\paragraph{What the wrapper replaces.} At import time, and recorded with hashes in each run's \texttt{FRAME.json}: the prompt function, for fit\_none only, by our \fmtNone{} prompt, which agrees token for token with the original prompt up to the end of the story in all 1000 training pairs; the release-integrity check, by one that tolerates only the release's mismatched \texttt{README.md}; and the model loader, by one with the same load arguments (BF16, sdpa, eval mode, no gradients, no cache, pad = eos, \texttt{fix\_mistral\_regex}) at the pinned revision, waiving the release's exact Python, package and device pins. Under the causal mask the activations up to the end of the story are the same in both runs, so both start from the same P; the bases came out bitwise identical across runs.
+
+\paragraph{Results.} \Cref{tab:refit} gives every frame quantity for the two refits and for the released bases re-run in the same job. The control matches the released remap to within \refMaxDiffOpt{} in every quantity and format, although its subspace overlaps the released one only at \refCosOptMin{}--\refCosOptMax{} (mean squared principal cosine). fit\_none and fit\_p1 overlap at \refCosNoneOptMin{}--\refCosNoneOptMax{}, about as much as two seeds of one fit (\refCosSeedMin{}--\refCosSeedMax{}). Without the ``Answer:'' prefill, which matches the interface the remaps were fit at, the difference in differences is $\refDNoPre{}$ [$\refDNoPreLo{}$, $\refDNoPreHi{}$]. Training loss fell from about 3--5 nats in the first 100 steps to 0.1--0.5 in the last 100 for every remap fit (\texttt{STAGE4\_SCORE.txt}).
+
+\begin{table}[!ht]
+\centering
+\footnotesize
+\caption{\textbf{Refit remaps in the frames of \citet{anonymous2026fitted}} (Mistral-Small-24B, ``Answer:'' prefill). fit\_none: refit under \fmtNone{}; fit\_p1: refit under \fmtOpt{} with the same code; released: the released bases, re-run in the same job. Each refit is paired with its own PCA control. $n = 96$ cores, three fits averaged within core; 95\% core bootstrap.}
+\label{tab:refit}
+{\setlength{\tabcolsep}{4pt}\input{tables/tab_refit.tex}}
+\end{table}
+
 \section{Additional results}\label{app:additional}
 
 Unless stated otherwise, intervals are 95\% percentile intervals from 10{,}000 bootstrap resamples of stories (cores), with ratios recomputed within each resample. Each estimate is printed with its interval below it, except in \cref{tab:onset,tab:decomposition}, where the intervals of the individual effects are in the result summaries released with the code.

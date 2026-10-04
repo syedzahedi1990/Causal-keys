@@ -199,6 +199,55 @@ cx = np.array([v[0][0] for v in cross.values()]); cy = np.array([v[1][0] for v i
 mac("crossR", float(np.corrcoef(cx, cy)[0, 1]))
 mac("crossMaxGap", float(np.max(np.abs(cx - cy))))
 
+# ---------------------------------------------------------------- stage 4 (preregistration F, paper v2): remap refit under NO-MENTION
+import contextlib, io, re  # noqa: E402
+import stage4_score as s4  # noqa: E402
+REFAM = {"none/": "RefNone", "p1/": "RefOpt"}
+with contextlib.redirect_stdout(io.StringIO()):
+    _, rows4 = s4.load_frames(ROOT / "results/gpu_stage4/frames/mistral.json")
+    est4 = s4.table(rows4, "")
+    _, rows4n = s4.load_frames(ROOT / "results/gpu_stage4/frames_noprefill/mistral.json")
+QK = {"phi": "phi", "psiK": "psi", "psiV": "psiV", "rhoK": "rho", "rhoV": "rhoV"}
+for fam, tag in REFAM.items():
+    for a in FRAME_ARMS:
+        for k, q in QK.items():
+            t = est4[fam, a, k]
+            mac(f"{q}{ARM_TAG[a]}{tag}", t[0]); mac(f"{q}Lo{ARM_TAG[a]}{tag}", t[1]); mac(f"{q}Hi{ARM_TAG[a]}{tag}", t[2])
+D4 = s4.did(rows4); D4n = s4.did(rows4n)
+mac("refD", D4[0], "{:+.3f}"); mac("refDLo", D4[1], "{:+.3f}"); mac("refDHi", D4[2], "{:+.3f}")
+mac("refDNoPre", D4n[0], "{:+.3f}"); mac("refDNoPreLo", D4n[1], "{:+.3f}"); mac("refDNoPreHi", D4n[2], "{:+.3f}")
+sid4 = s4.s_id(ROOT / "results/gpu_stage2/format_factorial/Mistral-Small-24B-Instruct-2501_s0.json")
+refshare = {}
+for fam, tag in REFAM.items():
+    sh = {a: est4[fam, a, "psiK"][0] / (est4[fam, a, "psiK"][0] + est4[fam, a, "psiV"][0]) for a in FRAME_ARMS}
+    refshare[fam] = sh
+    mac(f"refR{tag[3:]}", float(np.corrcoef([sh[a] for a in FRAME_ARMS], [sid4[a] for a in FRAME_ARMS])[0, 1]), "{:.2f}")
+three = [("", "none/"), ("", "p1/"), ("none/", "p1/")]
+mac("refMaxDiff", max(abs(est4[x, a, k][0] - est4[y, a, k][0]) for x, y in three for a in FRAME_ARMS for k in ("psiK", "psiV")))
+mac("refMaxDiffOpt", max(abs(est4["", a, k][0] - est4["p1/", a, k][0]) for a in FRAME_ARMS for k in ("phi", "psiK", "psiV", "rhoK", "rhoV")))
+cos = {}
+for line in open(ROOT / "results/gpu_stage4/STAGE4_SCORE.txt"):
+    m_ = re.match(r"\s+(\w+) m3_(\d+) vs (\w+) m3_(\d+): ([0-9.]+)$", line)
+    if m_:
+        cos.setdefault((m_[1], m_[3]), []).append(float(m_[5]))
+    g_ = re.match(r"\s+fit_\w+ seed \d+: ([0-9.]+)$", line)
+    if g_:
+        cos.setdefault("G1", []).append(float(g_[1]))
+for key, tag in ((("fit_none", "released"), "None"), (("fit_p1", "released"), "Opt"), (("released", "released"), "Seed"),
+                 (("fit_none", "fit_p1"), "NoneOpt")):
+    mac(f"refCos{tag}Min", min(cos[key])); mac(f"refCos{tag}Max", max(cos[key]))
+mac("refGOneMin", min(cos["G1"]), "{:.3f}")
+lines = [r"\begin{tabular}{llccccc}", r"\toprule",
+         r"Remap & Format & $\varphi$ & $\psi_K$ & $\rho_K$ & $\psi_V$ & $\rho_V$ \\", r"\midrule"]
+for fam, name in (("none/", "fit\\_none"), ("p1/", "fit\\_p1"), ("", "released")):
+    for i, a in enumerate(FRAME_ARMS):
+        f3 = lambda k: f"{est4[fam, a, k][0]:.2f} [{est4[fam, a, k][1]:.2f}, {est4[fam, a, k][2]:.2f}]"
+        lines.append(f"{name if i == 0 else ''} & {ARM_TEX[a]} & {f3('phi')} & {f3('psiK')} & {f3('rhoK')} & {f3('psiV')} & {f3('rhoV')} \\\\")
+    lines.append(r"\midrule" if fam != "" else r"\bottomrule")
+lines.append(r"\end{tabular}")
+(ROOT / "paper/tables").mkdir(exist_ok=True)
+(ROOT / "paper/tables/tab_refit.tex").write_text("\n".join(lines) + "\n")
+
 fig = plt.figure(figsize=(6.8, 2.35))
 gs = fig.add_gridspec(1, 4, width_ratios=[1, 1, 0.2, 0.8], wspace=0.08)
 axes = [fig.add_subplot(gs[0, 0])]
@@ -229,18 +278,21 @@ for (label, a), (nx, cy_) in cross.items():
     mist = label.startswith("Mistral")
     ax.errorbar(nx[0], cy_[0], xerr=[[nx[0] - nx[1]], [nx[2] - nx[0]]], yerr=[[cy_[0] - cy_[1]], [cy_[2] - cy_[0]]],
                 fmt="o" if mist else "s", ms=3.4, color=INK2, mfc="white" if mist else INK, mec=INK, mew=0.7,
-                elinewidth=0.6, zorder=3, label=label if a == "LETTER" else None)
+                elinewidth=0.6, zorder=3, label=(label.split("-")[-1] + " released") if a == "LETTER" else None)
     if label.startswith("Qwen"):
         ax.annotate(ABBR[a], (nx[0], cy_[0]), textcoords="offset points",
-                    xytext={"LETTER": (-24, -3), "P1": (5, -5), "POST": (5, -6), "NONE": (6, 0), "BEFORE": (5, -7)}[a],
+                    xytext={"LETTER": (-16, -10), "P1": (5, -5), "POST": (5, -6), "NONE": (6, 0), "BEFORE": (5, -7)}[a],
                     fontsize=5.6, color=INK2)
+for fam, mk, nm in (("none/", "^", "24B refit, no mention"), ("p1/", "v", "24B refit, options")):
+    ax.scatter([sid4[a] for a in FRAME_ARMS], [refshare[fam][a] for a in FRAME_ARMS], marker=mk, s=13,
+               facecolor="#9a9893" if fam == "none/" else "white", edgecolor=INK, linewidth=0.6, zorder=4, label=nm)
 ax.set_xlim(-0.15, 1.05); ax.set_ylim(-0.15, 1.05)
 ax.set_xticks([0, 0.5, 1]); ax.set_yticks([0, 0.5, 1])
 ax.set_xlabel("natural read: identity key share", fontsize=6.5)
 ax.set_ylabel("remap: $\\psi_K/(\\psi_K+\\psi_V)$", fontsize=6.5, labelpad=2)
 ax.set_title("(c) remap vs. natural read", fontsize=7.5, color=INK)
 ax.grid(color=GRID, lw=0.6)
-ax.legend(frameon=False, fontsize=5.8, loc="lower right", handletextpad=0.1, borderaxespad=0.2)
+ax.legend(frameon=False, fontsize=5.2, loc="upper left", handletextpad=0.1, borderaxespad=0.2, labelspacing=0.25)
 fig.subplots_adjust(left=0.075, right=0.99, bottom=0.2, top=0.8)
 fig.savefig(FIG / "fig_frames.pdf")
 plt.close(fig)

@@ -283,4 +283,4 @@ H_fit would predict instead: F1 fails with ψ_V(LETTER) ≥ 0.5 for fit_none, F2
 - The three remaps (released, fit_p1, fit_none) have nearly the same ψ_K and ψ_V in every format (within 0.10), although fit_none's subspace overlaps the released M (mean squared principal cosine 0.37–0.39) no more than two seeds of one run overlap each other (0.41–0.44). fit_p1 overlaps the released M at 0.71–0.79.
 - The fitting format changes behaviour a little: fit_none transfers more without a later mention (φ 0.81 under NONE and POST, against 0.72–0.73 for fit_p1) and less with lettered options (0.67 against 0.77).
 - Without the "Answer:" prefill the pattern is the same (D = +0.004 [−0.014, +0.021]).
-- The same-code control reproduces the released M's frame quantities to within 0.02 in every format.
+- The same-code control reproduces the released M's frame quantities (φ, ψ_K, ψ_V, ρ_K, ρ_V) to within 0.03 in every format.

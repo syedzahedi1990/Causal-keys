@@ -225,6 +225,8 @@ for fam, tag in REFAM.items():
 three = [("", "none/"), ("", "p1/"), ("none/", "p1/")]
 mac("refMaxDiff", max(abs(est4[x, a, k][0] - est4[y, a, k][0]) for x, y in three for a in FRAME_ARMS for k in ("psiK", "psiV")))
 mac("refMaxDiffOpt", max(abs(est4["", a, k][0] - est4["p1/", a, k][0]) for a in FRAME_ARMS for k in ("phi", "psiK", "psiV", "rhoK", "rhoV")))
+# subspace overlaps: refit-vs-refit and floors computed from the saved bases; refit-vs-released (released bases are
+# not in this repository) parsed from the preregistered score output, whose 3-decimal values are not on a .xx5 boundary
 cos = {}
 for line in open(ROOT / "results/gpu_stage4/STAGE4_SCORE.txt"):
     m_ = re.match(r"\s+(\w+) m3_(\d+) vs (\w+) m3_(\d+): ([0-9.]+)$", line)
@@ -233,13 +235,40 @@ for line in open(ROOT / "results/gpu_stage4/STAGE4_SCORE.txt"):
     g_ = re.match(r"\s+fit_\w+ seed \d+: ([0-9.]+)$", line)
     if g_:
         cos.setdefault("G1", []).append(float(g_[1]))
-for key, tag in ((("fit_none", "released"), "None"), (("fit_p1", "released"), "Opt"), (("released", "released"), "Seed"),
-                 (("fit_none", "fit_p1"), "NoneOpt")):
+RB = {(f, o, sd): s4.load_basis(ROOT / f"results/gpu_stage4/fit_{f}/run/bases/{o}_ts{sd}.npz")
+      for f in ("none", "p1") for o in ("m3", "pca") for sd in s4.SEEDS}
+SP4 = ((101, 102), (101, 103), (102, 103))
+cos["noneopt"] = [s4.msq_cos(RB["none", "m3", sd], RB["p1", "m3", sd]) for sd in s4.SEEDS]
+cos["seed"] = cos[("released", "released")] + [s4.msq_cos(RB[f, "m3", a], RB[f, "m3", b]) for f in ("none", "p1") for a, b in SP4]
+cos["floor"] = [s4.msq_cos(RB[f, "m3", sd], RB[f, "pca", sd]) for f in ("none", "p1") for sd in s4.SEEDS]
+for key, tag in ((("fit_none", "released"), "None"), (("fit_p1", "released"), "Opt"), ("seed", "Seed"), ("noneopt", "NoneOpt"),
+                 ("floor", "Floor")):
     mac(f"refCos{tag}Min", min(cos[key])); mac(f"refCos{tag}Max", max(cos[key]))
+mac("refCosChance", 16 / RB["none", "m3", 101].shape[1], "{:.3f}")
+mac("refPcaSame", min(s4.msq_cos(RB[f, "pca", 101], RB[f, "pca", sd]) for f in ("none", "p1") for sd in s4.SEEDS), "{:.3f}")
+# post hoc: paired fit_none - fit_opt difference in psi_K per format (same cores, same resamples)
+for a in FRAME_ARMS:
+    ids = sorted(set(rows4["none/", a]) & set(rows4["p1/", a]))
+    x = s4.stat(rows4["none/", a], ids, *s4.STATS["psiK"]); y = s4.stat(rows4["p1/", a], ids, *s4.STATS["psiK"])
+    dd = x[3] - y[3]
+    mac(f"refDiff{ARM_TAG[a]}", -(x[0] - y[0])); mac(f"refDiffLo{ARM_TAG[a]}", -np.percentile(dd, 97.5)); mac(f"refDiffHi{ARM_TAG[a]}", -np.percentile(dd, 2.5))
+# identity-objective (f_star) fits, exploratory: (F - P) / (T - S)
+for fam, tag in REFAM.items():
+    mac(f"refFstarMax{tag[3:]}", max(abs(est4[fam, a, "phiF"][0]) for a in FRAME_ARMS))
+    mac(f"refFstarLetter{tag[3:]}", est4[fam, "LETTER", "phiF"][0])
+# training loss of the remap (m3) fits, first and last 100 updates
+loss = {}
+for f in ("none", "p1"):
+    for line in open(ROOT / f"results/gpu_stage4/fit_{f}/run/updates.jsonl"):
+        r = json.loads(line)
+        if r["fit"].startswith("m3"):
+            loss.setdefault(r["fit"] + f, []).append(r["loss"])
+mac("refLossFirstMin", min(np.mean(v[:100]) for v in loss.values()), "{:.1f}"); mac("refLossFirstMax", max(np.mean(v[:100]) for v in loss.values()), "{:.1f}")
+mac("refLossLastMin", min(np.mean(v[-100:]) for v in loss.values())); mac("refLossLastMax", max(np.mean(v[-100:]) for v in loss.values()))
 mac("refGOneMin", min(cos["G1"]), "{:.3f}")
 lines = [r"\begin{tabular}{llccccc}", r"\toprule",
          r"Remap & Format & $\varphi$ & $\psi_K$ & $\rho_K$ & $\psi_V$ & $\rho_V$ \\", r"\midrule"]
-for fam, name in (("none/", "fit\\_none"), ("p1/", "fit\\_p1"), ("", "released")):
+for fam, name in (("none/", "fit\\_none"), ("p1/", "fit\\_opt"), ("", "released")):
     for i, a in enumerate(FRAME_ARMS):
         f3 = lambda k: f"{est4[fam, a, k][0]:.2f} [{est4[fam, a, k][1]:.2f}, {est4[fam, a, k][2]:.2f}]"
         lines.append(f"{name if i == 0 else ''} & {ARM_TEX[a]} & {f3('phi')} & {f3('psiK')} & {f3('rhoK')} & {f3('psiV')} & {f3('rhoV')} \\\\")

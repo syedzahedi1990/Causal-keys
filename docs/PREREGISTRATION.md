@@ -258,3 +258,29 @@ Thresholds on φ, ψ_K and ψ_V refer to the ratio-of-means point estimates; onl
 H_fit would predict instead: F1 fails with ψ_V(LETTER) ≥ 0.5 for fit_none, F2 fails, and D ≤ −0.4.
 
 **Exploratory:** evaluation without the "Answer:" prefill; ρ_K and ρ_V; principal cosines between fit_none, fit_p1 and the released M, against the between-seed baseline; loss curves; the f_star fits that `train.py` makes alongside m3.
+
+---
+
+## Outcome of P-2026-10-05-F (GPU stage 4; scored by analysis/stage4_score.py at the finalising commit 1ef8696, which the run used)
+
+**Run.** 2× A100-SXM4-80GB, Python 3.12.14, torch 2.11.0+cu128, transformers 5.9.0, clean checkout of 1ef8696. The two fits ran in parallel (3,293 s each); the evaluation with and without the prefill took about 20 min each. No step failed. Paper 1's `load_training_bases` passed for both runs, and the tokenizer check found identical ids with and without `fix_mistral_regex` on all 3,600 evaluation prompts. Re-scoring the archive off the GPU box gives an identical `STAGE4_SCORE.txt` (apart from the path of Paper 1's repository).
+
+**Gates: all met.**
+- G1: mean squared principal cosine 1.0000 for all six refit P bases.
+- G2: φ_none(NONE) 0.813, φ_p1(P1) 0.720.
+- G3: fit_p1 ψ_K(LETTER) 0.776, ψ_V(NONE) 0.809.
+
+**Predictions: all met.**
+- F1: fit_none ψ_K(LETTER) 0.768 and ψ_V(NONE) 0.798.
+- F2: fit_none φ(LETTER) 0.666.
+- F3: D = −0.008 [−0.027, +0.009].
+- F4: Pearson r = 0.957 (fit_none) and 0.978 (fit_p1).
+- The H_fit pattern is not met (fit_none ψ_V(LETTER) 0.024).
+
+**Reading.** H_read is supported: a remap fit with no later mention shows the same crossover as one fit with the options listed, so the format the remap is read in, not the format it was fit in, decides which channel appears to carry it.
+
+**Exploratory.**
+- The three remaps (released, fit_p1, fit_none) have nearly the same ψ_K and ψ_V in every format (within 0.10), although fit_none's subspace overlaps the released M (mean squared principal cosine 0.37–0.39) no more than two seeds of one run overlap each other (0.41–0.44). fit_p1 overlaps the released M at 0.71–0.79.
+- The fitting format changes behaviour a little: fit_none transfers more without a later mention (φ 0.81 under NONE and POST, against 0.72–0.73 for fit_p1) and less with lettered options (0.67 against 0.77).
+- Without the "Answer:" prefill the pattern is the same (D = +0.004 [−0.014, +0.021]).
+- The same-code control reproduces the released M's frame quantities to within 0.02 in every format.

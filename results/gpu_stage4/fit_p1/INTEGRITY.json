@@ -1,0 +1,127 @@
+{
+  "bytes_checked": 36966102,
+  "files_checked": 123,
+  "files_in_manifest": 123,
+  "mismatches": [
+    {
+      "actual": {
+        "bytes": 374,
+        "sha256": "6ede18256b139d72e22bc8805ca3530c16e82b3c67ee73168bc3bdc37aa68a93"
+      },
+      "expected": {
+        "bytes": 4929,
+        "sha256": "e39742e72a6150a6e2ef666b1f43162a2a51a9141369e03fce8e1d39bdb19f7a"
+      },
+      "file": "README.md",
+      "reason": "differs"
+    }
+  ],
+  "must_match_sha256": {
+    "gpu/behavior_data/PROVENANCE.json": "518f9995c508e9984a93ec472f374fa256ca0cf8c0914ee0509b0c2b58580bc9",
+    "gpu/behavior_data/datasets.json.gz": "c3c3027bd57a5ec4a28df7975e0d9820fd5f67ff4c1739aefdb34540524002b1",
+    "gpu/behavior_engine.py": "90327f1269a4ebc169df7ccd85aa52ab966728aa2433f1add19054f50032c2cb",
+    "gpu/runtime/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gpu/runtime/color_task.py": "38253949129e403a29f54d2b83061ac15a45c73491c2774f4b864c4b3644a3d0",
+    "gpu/runtime/encoding.py": "6f19193267b7ff09d329f8e8d290862c66b7bd302e6237dd5282c94e79264785",
+    "gpu/runtime/hybrid_refs.py": "684d626b3230e6c05ed52f66771eb8ada0df6ae66cafed34f4a0acc8c7531827",
+    "gpu/runtime/key_engine.py": "d123a5556eec495ff303d1a2d32eccd0513ddd5f69e45d3c8925847e540277a5",
+    "gpu/runtime/load.py": "6bf86df6d1173b7d2e701c3d030a7f2651c546ab696a556d214ffc6531da99a7",
+    "gpu/runtime/mistral_engine.py": "1ff1027a9fc2ddc840cf38c679920dbc0942d8f2f5c921557243ffde71493df8",
+    "gpu/runtime/mistral_relay.py": "8d06406fbc0ab5bedb8336bb44301d3f924534e55c6e834799d36b716537c2ad",
+    "gpu/runtime/null_control.py": "e5d276c652e06240b6ff53150f669ac9e1b1c88ff1640dfb12d357ef3f15d5b7",
+    "gpu/runtime/qwen_engine.py": "a1cf60bd8ae774314146d334dc2531a1ba3b99bccfaca18d8617d9dba480ab86",
+    "gpu/runtime/qwen_geometry.py": "e5fcbe40cea881161dbab00f82221cf89c5c81ebaf9eb8a52d71726ddc1e5528",
+    "gpu/runtime/qwen_relay.py": "6a50eef9eb2fe25185495f6c0d86f49b4ee26aa38032b4ff8d6bfe9a1cabc84f",
+    "gpu/runtime/story_task.py": "0f537050bd183ea15f60eef0a4e482a4984ae2a9be1f338c4c734c42596f5cb4",
+    "gpu/train.py": "23600ac49a932724ee743f950b4f35bac1d06c06b29fbdc22fcd25dde89d798d"
+  },
+  "pinned_mismatches": [],
+  "pinned_sha256": {
+    "RELEASE.json": {
+      "actual": "2dea297d508e51f07b927e9eb0571f40e99d25d996ccd7ad3342cb46942d0416",
+      "expected": "2dea297d508e51f07b927e9eb0571f40e99d25d996ccd7ad3342cb46942d0416"
+    },
+    "gpu/__init__.py": {
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "gpu/behavior_data/datasets.json.gz": {
+      "actual": "c3c3027bd57a5ec4a28df7975e0d9820fd5f67ff4c1739aefdb34540524002b1",
+      "expected": "c3c3027bd57a5ec4a28df7975e0d9820fd5f67ff4c1739aefdb34540524002b1"
+    },
+    "gpu/behavior_engine.py": {
+      "actual": "90327f1269a4ebc169df7ccd85aa52ab966728aa2433f1add19054f50032c2cb",
+      "expected": "90327f1269a4ebc169df7ccd85aa52ab966728aa2433f1add19054f50032c2cb"
+    },
+    "gpu/runtime/__init__.py": {
+      "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "gpu/runtime/color_task.py": {
+      "actual": "38253949129e403a29f54d2b83061ac15a45c73491c2774f4b864c4b3644a3d0",
+      "expected": "38253949129e403a29f54d2b83061ac15a45c73491c2774f4b864c4b3644a3d0"
+    },
+    "gpu/runtime/encoding.py": {
+      "actual": "6f19193267b7ff09d329f8e8d290862c66b7bd302e6237dd5282c94e79264785",
+      "expected": "6f19193267b7ff09d329f8e8d290862c66b7bd302e6237dd5282c94e79264785"
+    },
+    "gpu/runtime/hybrid_refs.py": {
+      "actual": "684d626b3230e6c05ed52f66771eb8ada0df6ae66cafed34f4a0acc8c7531827",
+      "expected": "684d626b3230e6c05ed52f66771eb8ada0df6ae66cafed34f4a0acc8c7531827"
+    },
+    "gpu/runtime/key_engine.py": {
+      "actual": "d123a5556eec495ff303d1a2d32eccd0513ddd5f69e45d3c8925847e540277a5",
+      "expected": "d123a5556eec495ff303d1a2d32eccd0513ddd5f69e45d3c8925847e540277a5"
+    },
+    "gpu/runtime/load.py": {
+      "actual": "6bf86df6d1173b7d2e701c3d030a7f2651c546ab696a556d214ffc6531da99a7",
+      "expected": "6bf86df6d1173b7d2e701c3d030a7f2651c546ab696a556d214ffc6531da99a7"
+    },
+    "gpu/runtime/mistral_engine.py": {
+      "actual": "1ff1027a9fc2ddc840cf38c679920dbc0942d8f2f5c921557243ffde71493df8",
+      "expected": "1ff1027a9fc2ddc840cf38c679920dbc0942d8f2f5c921557243ffde71493df8"
+    },
+    "gpu/runtime/mistral_relay.py": {
+      "actual": "8d06406fbc0ab5bedb8336bb44301d3f924534e55c6e834799d36b716537c2ad",
+      "expected": "8d06406fbc0ab5bedb8336bb44301d3f924534e55c6e834799d36b716537c2ad"
+    },
+    "gpu/runtime/null_control.py": {
+      "actual": "e5d276c652e06240b6ff53150f669ac9e1b1c88ff1640dfb12d357ef3f15d5b7",
+      "expected": "e5d276c652e06240b6ff53150f669ac9e1b1c88ff1640dfb12d357ef3f15d5b7"
+    },
+    "gpu/runtime/qwen_engine.py": {
+      "actual": "a1cf60bd8ae774314146d334dc2531a1ba3b99bccfaca18d8617d9dba480ab86",
+      "expected": "a1cf60bd8ae774314146d334dc2531a1ba3b99bccfaca18d8617d9dba480ab86"
+    },
+    "gpu/runtime/qwen_geometry.py": {
+      "actual": "e5fcbe40cea881161dbab00f82221cf89c5c81ebaf9eb8a52d71726ddc1e5528",
+      "expected": "e5fcbe40cea881161dbab00f82221cf89c5c81ebaf9eb8a52d71726ddc1e5528"
+    },
+    "gpu/runtime/qwen_relay.py": {
+      "actual": "6a50eef9eb2fe25185495f6c0d86f49b4ee26aa38032b4ff8d6bfe9a1cabc84f",
+      "expected": "6a50eef9eb2fe25185495f6c0d86f49b4ee26aa38032b4ff8d6bfe9a1cabc84f"
+    },
+    "gpu/runtime/story_task.py": {
+      "actual": "0f537050bd183ea15f60eef0a4e482a4984ae2a9be1f338c4c734c42596f5cb4",
+      "expected": "0f537050bd183ea15f60eef0a4e482a4984ae2a9be1f338c4c734c42596f5cb4"
+    },
+    "gpu/train.py": {
+      "actual": "23600ac49a932724ee743f950b4f35bac1d06c06b29fbdc22fcd25dde89d798d",
+      "expected": "23600ac49a932724ee743f950b4f35bac1d06c06b29fbdc22fcd25dde89d798d"
+    },
+    "reproduce/__init__.py": {
+      "actual": "cc54c795d06647945e882dee499f159193848abb6cabf97a41b509611047953b",
+      "expected": "cc54c795d06647945e882dee499f159193848abb6cabf97a41b509611047953b"
+    },
+    "reproduce/integrity.py": {
+      "actual": "c6da1d455387ef1ab615a5a86f9b25f9a0d6810b3f367a30113841d31011b3f1",
+      "expected": "c6da1d455387ef1ab615a5a86f9b25f9a0d6810b3f367a30113841d31011b3f1"
+    }
+  },
+  "release_sha256": "2dea297d508e51f07b927e9eb0571f40e99d25d996ccd7ad3342cb46942d0416",
+  "root": "/root/paper1/v5.5-reviewer-repository",
+  "status": "PASS_EXCEPT_README",
+  "tolerated": [
+    "README.md"
+  ]
+}

@@ -1,0 +1,207 @@
+{
+  "artifacts": {
+    "ENVIRONMENT.json": {
+      "sha256": "cc409141c5fe045ed29b8064329bd2c95adf7fc79edcbc287e6debd6a21916e1",
+      "size_bytes": 1148
+    },
+    "RUN.json": {
+      "sha256": "7342dce134da8cf67f29250ca3c083d11d43ec43242ccd13ff105b94b359b30c",
+      "size_bytes": 549
+    },
+    "bases/f_star_ts101.npz": {
+      "sha256": "365ab84304548e767c1e269e9f2f7614ce33a0055d72d16c698786a6aa415995",
+      "size_bytes": 327948
+    },
+    "bases/f_star_ts102.npz": {
+      "sha256": "f9a5467476e25c63f71b6cce60fefe06a113674966a1e230adafadad0e5f8629",
+      "size_bytes": 327948
+    },
+    "bases/f_star_ts103.npz": {
+      "sha256": "bf1127eaac0a25de4e60dd04b4d5b0b9216b1b69fca04289c647f64d88fbeccb",
+      "size_bytes": 327948
+    },
+    "bases/m3_ts101.npz": {
+      "sha256": "2d0eca168b0d565d1f5e9d69ea05eb841d4b6750f866afe2d172af25af743cd8",
+      "size_bytes": 327948
+    },
+    "bases/m3_ts102.npz": {
+      "sha256": "234a0f957f8bd6be66d5d723f8222bcbcd2b5338f2b13368cf4fd371e7d9ca09",
+      "size_bytes": 327948
+    },
+    "bases/m3_ts103.npz": {
+      "sha256": "76b7e5dab68b6632f9995a569e9e43708c9feff4c3361c858d7774ca2d3bd04b",
+      "size_bytes": 327948
+    },
+    "bases/pca_ts101.npz": {
+      "sha256": "6be861c1bf753200ba7d53c2d9b1b5da4faedd6f3dec8ec1aa3a5837babba42c",
+      "size_bytes": 327948
+    },
+    "bases/pca_ts102.npz": {
+      "sha256": "eff9699c40ca4121c40e9f5e7079f0d1dc50983baeb534a138d5731c93c47b92",
+      "size_bytes": 327948
+    },
+    "bases/pca_ts103.npz": {
+      "sha256": "d2d86f8f00c2d5ef5b1a31892017bbe7b5ebfcd3df0fc3a98a8f2ef3c8aa50da",
+      "size_bytes": 327948
+    },
+    "bases/raw_pca_ts101.npz": {
+      "sha256": "e2a65d2c20b63e006e2b362b25699725380d07c65b107a7cfe97db289091d833",
+      "size_bytes": 327948
+    },
+    "bases/raw_pca_ts102.npz": {
+      "sha256": "c4fc2661b514600a86a18acc1b83a2cbc191e5e7d43c8312770d4a3692780d41",
+      "size_bytes": 327948
+    },
+    "bases/raw_pca_ts103.npz": {
+      "sha256": "7c8cbd123a763ee3a5c2fcdea0caad87015c6f4da5d6eac211986dcc5d711036",
+      "size_bytes": 327948
+    },
+    "calls.jsonl": {
+      "sha256": "84ed1ab5afc34f6913e4c250e5f67d6dbee2d4dbf12805c02a64805c403185a4",
+      "size_bytes": 5782079
+    },
+    "gradient_checks.jsonl": {
+      "sha256": "f1a3b9c3dbafdcaa65c0cd35671b4a488be5ee49d4f7d1ed7c31cdd9630741b5",
+      "size_bytes": 2274
+    },
+    "native_loader.jsonl": {
+      "sha256": "ed631703f57c9497b145e845b0047ae663893d194ae110192d74be7ea4d77313",
+      "size_bytes": 1040
+    },
+    "schedule_ts101.json": {
+      "sha256": "c506bd6832dac6078ec4e181f74f2457c7b37cb33f96537b96ab77660e44db43",
+      "size_bytes": 6893
+    },
+    "schedule_ts102.json": {
+      "sha256": "20c57bc02ad485750c98ef2437faec20cb0cbd78e75d0989652df3760ca0b59c",
+      "size_bytes": 6893
+    },
+    "schedule_ts103.json": {
+      "sha256": "d2b9c99e28d14b467bba41d6a6b9b1e0a620cb71e7e755b140a0d9e7b1a3ff4c",
+      "size_bytes": 6893
+    },
+    "updates.jsonl": {
+      "sha256": "1f62ec72a104ec5a0b41608e7a675cad09ce923fd5cea9e8dc9b16ba86279f2a",
+      "size_bytes": 762969
+    }
+  },
+  "bases": [
+    {
+      "file": "bases/pca_ts101.npz",
+      "initializer_identity": "exact_saved_this_rerun",
+      "objective": "pca",
+      "seed": 101,
+      "sha256": "6be861c1bf753200ba7d53c2d9b1b5da4faedd6f3dec8ec1aa3a5837babba42c",
+      "tensor_sha256": "4bd38642ee88f844089313929ae8d2c21ac2ef2a15a5cb2a9ebb684ba93f3094",
+      "updates": 0
+    },
+    {
+      "file": "bases/f_star_ts101.npz",
+      "initializer": "bases/pca_ts101.npz",
+      "initializer_identity": "exact_saved_this_rerun",
+      "objective": "f_star",
+      "seed": 101,
+      "sha256": "365ab84304548e767c1e269e9f2f7614ce33a0055d72d16c698786a6aa415995",
+      "tensor_sha256": "e9032ded262022527798bbc2c555bbda602262f685488caf132b16deff4ab734",
+      "updates": 1000
+    },
+    {
+      "file": "bases/m3_ts101.npz",
+      "initializer": "bases/pca_ts101.npz",
+      "initializer_identity": "exact_saved_this_rerun",
+      "objective": "m3",
+      "seed": 101,
+      "sha256": "2d0eca168b0d565d1f5e9d69ea05eb841d4b6750f866afe2d172af25af743cd8",
+      "tensor_sha256": "2a0239091f29c0f7a88bbb77b41e8bab14490b8a1923bede73f2945b5b0fcf74",
+      "updates": 1000
+    },
+    {
+      "file": "bases/pca_ts102.npz",
+      "initializer_identity": "exact_saved_this_rerun",
+      "objective": "pca",
+      "seed": 102,
+      "sha256": "eff9699c40ca4121c40e9f5e7079f0d1dc50983baeb534a138d5731c93c47b92",
+      "tensor_sha256": "2bcf7b55e798261b2d551dedd8e8713552d54c491c143ae2ee36c5556ef7ac2e",
+      "updates": 0
+    },
+    {
+      "file": "bases/f_star_ts102.npz",
+      "initializer": "bases/pca_ts102.npz",
+      "initializer_identity": "exact_saved_this_rerun",
+      "objective": "f_star",
+      "seed": 102,
+      "sha256": "f9a5467476e25c63f71b6cce60fefe06a113674966a1e230adafadad0e5f8629",
+      "tensor_sha256": "d10a73191f411ac0214822b08bf59a13f386dc8117e80750511ae6d26330ae3b",
+      "updates": 1000
+    },
+    {
+      "file": "bases/m3_ts102.npz",
+      "initializer": "bases/pca_ts102.npz",
+      "initializer_identity": "exact_saved_this_rerun",
+      "objective": "m3",
+      "seed": 102,
+      "sha256": "234a0f957f8bd6be66d5d723f8222bcbcd2b5338f2b13368cf4fd371e7d9ca09",
+      "tensor_sha256": "df91e301c81c09dad8f1ad169e30af2339fc422003214b5af943937106fa8805",
+      "updates": 1000
+    },
+    {
+      "file": "bases/pca_ts103.npz",
+      "initializer_identity": "exact_saved_this_rerun",
+      "objective": "pca",
+      "seed": 103,
+      "sha256": "d2d86f8f00c2d5ef5b1a31892017bbe7b5ebfcd3df0fc3a98a8f2ef3c8aa50da",
+      "tensor_sha256": "450080a0cf28a860a54fcaa1a43951c3702c01c8e47b1d77fcd20a4195869313",
+      "updates": 0
+    },
+    {
+      "file": "bases/f_star_ts103.npz",
+      "initializer": "bases/pca_ts103.npz",
+      "initializer_identity": "exact_saved_this_rerun",
+      "objective": "f_star",
+      "seed": 103,
+      "sha256": "bf1127eaac0a25de4e60dd04b4d5b0b9216b1b69fca04289c647f64d88fbeccb",
+      "tensor_sha256": "0ad083c88c567841d87c500b9a57c113a5bb99a8d6f7608bf7eddfba0103df9c",
+      "updates": 1000
+    },
+    {
+      "file": "bases/m3_ts103.npz",
+      "initializer": "bases/pca_ts103.npz",
+      "initializer_identity": "exact_saved_this_rerun",
+      "objective": "m3",
+      "seed": 103,
+      "sha256": "76b7e5dab68b6632f9995a569e9e43708c9feff4c3361c858d7774ca2d3bd04b",
+      "tensor_sha256": "48d930afddddcd24b504eed40b062fc8ccbeff060157902c717f6d3a3140a005",
+      "updates": 1000
+    }
+  ],
+  "gradient_qualification_records": 18,
+  "historical_identity_claimed": false,
+  "native_calls": 8036,
+  "seconds": 3292.6832706640125,
+  "specification": {
+    "block": 4,
+    "code_identity": "derived_reviewer_implementation",
+    "cohort": "original_1000",
+    "gradient_clip_norm": 1,
+    "interface": "original",
+    "learning_rate": 0.001,
+    "model": "mistral",
+    "model_weights_optimized": false,
+    "objectives": [
+      "f_star",
+      "m3"
+    ],
+    "rank": 16,
+    "release_sha256": "2dea297d508e51f07b927e9eb0571f40e99d25d996ccd7ad3342cb46942d0416",
+    "sampling": "one_shuffled_epoch",
+    "scientific_success_gate": null,
+    "seeds": [
+      101,
+      102,
+      103
+    ],
+    "updates_per_fit": 1000,
+    "weight_decay": 0
+  },
+  "status": "COMPLETE"
+}

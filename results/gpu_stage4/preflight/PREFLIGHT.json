@@ -1,0 +1,57 @@
+{
+  "cores": 120,
+  "git": {
+    "diff_head_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "head": "1ef86960c38ce9d6b5b7782da265386c010aff86",
+    "status_excluded": [
+      "results/gpu_stage4"
+    ],
+    "status_porcelain": []
+  },
+  "integrity": "PASS_EXCEPT_README",
+  "none_prefix_pairs": 1000,
+  "none_prompt": {
+    "ckeys_sha256": {
+      "ckeys/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ckeys/encoding.py": "a7e7e5bf21159c153beb5eccabd4b496d5f21f0deeca02a711ce2de074297d99",
+      "ckeys/story.py": "a44f9db7d35059bf752df33c11d3082ebe14cef658126172c203ba5fcde8f28f"
+    },
+    "example_prompt": "Read the story and answer the question.\n\nStory: Everyone initially sees that the badge is in the cabinet. Everyone initially sees that the book is in the drawer. Everyone initially sees that the bottle is in the shelf. Everyone initially sees that the candle is in the shelf. Everyone initially sees that the card is in the basket. Everyone initially sees that the coin is in the shelf. Everyone initially sees that the cup is in the drawer. Everyone initially sees that the key is in the drawer. Everyone initially sees that the letter is in the box. Everyone initially sees that the map is in the cabinet. Everyone initially sees that the notebook is in the cabinet. Everyone initially sees that the pen is in the shelf. Everyone initially sees that the phone is in the shelf. Everyone initially sees that the photo is in the basket. Everyone initially sees that the ring is in the basket. Everyone initially sees that the scarf is in the cabinet. Everyone initially sees that the ticket is in the cabinet. Everyone initially sees that the toy is in the basket. Everyone initially sees that the wallet is in the closet. Everyone initially sees that the watch is in the box. Alice is told that the badge is in the shelf. Bob does not receive this information.\nQuestion: Where does Alice think the badge is?\nAnswer with one word.\nAnswer:",
+    "example_prompt_sha256": "82d5685760eb619d13b1bd22ae3a9bf11dd96e27758e3fa4c6674e9e5132e3d0",
+    "example_record": "training[0].base",
+    "raw_prompt_source_sha256": "682eba1b1ca3db1c565223249c14ca203070107bcc39dfecb37f9e705daa2b50"
+  },
+  "p1_equality_records": 2000,
+  "repo": "mistralai/Mistral-Small-24B-Instruct-2501",
+  "revision": "9527884be6e5616bdd54de542f9ae13384489724",
+  "tokenizer_check": {
+    "fix_mistral_regex": {
+      "fix_applied": true,
+      "local_retry": null,
+      "pre_tokenizer_sha256": {
+        "fixed": "3b27505c3aa8d25375cb2b5dd868f03e5e42db06974d6404d1246f7fbc550e0b",
+        "unfixed": "3a6f48a55f745cfecbcc761de4b7c16a378860cebd6f72a6eca4ca7733d8cdc5"
+      },
+      "strict": true
+    },
+    "identical": true,
+    "prefills": [
+      "",
+      "Answer:"
+    ],
+    "prompts": 3600
+  },
+  "versions": {
+    "Jinja2": "3.1.6",
+    "MarkupSafe": "3.0.3",
+    "accelerate": "1.13.0",
+    "huggingface_hub": "1.30.0",
+    "numpy": "2.5.3",
+    "python": "3.12.14",
+    "regex": "2026.9.29",
+    "safetensors": "0.8.0",
+    "tokenizers": "0.22.2",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.9.0"
+  }
+}

@@ -1,0 +1,38 @@
+==== 2026-10-04T19:02:28Z env CUDA_VISIBLE_DEVICES=0 python experiments/refit_remap.py --frame NONE --p1-root /root/paper1/v5.5-reviewer-repository --out results/gpu_stage4/fit_none --loader ours --revision 9527884be6e5616bdd54de542f9ae13384489724
+2026-10-04T19:02:29Z start {"frame": "NONE", "loader": "ours", "repo": "mistralai/Mistral-Small-24B-Instruct-2501", "revision": "9527884be6e5616bdd54de542f9ae13384489724", "device": "cuda:0", "test": false}
+2026-10-04T19:02:30Z integrity {"status": "PASS_EXCEPT_README", "mismatches": ["README.md"]}
+2026-10-04T19:02:30Z p1_equality {"records": 2000}
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[transformers] The tokenizer you are loading from 'mistralai/Mistral-Small-24B-Instruct-2501' with an incorrect regex pattern: https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503/discussions/84#69121093e8b480e709447d5e. This will lead to incorrect tokenization. You should set the `fix_mistral_regex=True` flag when loading this tokenizer to fix this issue.
+2026-10-04T19:02:54Z prefix_check {"frame": "NONE", "pairs": 1000}
+2026-10-04T19:02:54Z frame_written {"injections": ["gpu.behavior_engine.prompt", "reproduce.integrity.verify", "gpu.runtime.load.load_engine"]}
+[transformers] The tokenizer you are loading from 'mistralai/Mistral-Small-24B-Instruct-2501' with an incorrect regex pattern: https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503/discussions/84#69121093e8b480e709447d5e. This will lead to incorrect tokenization. You should set the `fix_mistral_regex=True` flag when loading this tokenizer to fix this issue.
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/363 [00:00<?, ?it/s]Loading weights:   0%|          | 1/363 [00:00<00:56,  6.46it/s]Loading weights:   1%|          | 2/363 [00:00<00:47,  7.63it/s]Loading weights:   4%|▎         | 13/363 [00:00<00:08, 43.23it/s]Loading weights:   6%|▌         | 22/363 [00:00<00:06, 55.05it/s]Loading weights:   9%|▊         | 31/363 [00:00<00:05, 62.81it/s]Loading weights:  11%|█         | 40/363 [00:00<00:04, 66.95it/s]Loading weights:  13%|█▎        | 49/363 [00:00<00:04, 71.72it/s]Loading weights:  16%|█▌        | 58/363 [00:00<00:04, 73.07it/s]Loading weights:  18%|█▊        | 67/363 [00:01<00:04, 71.32it/s]Loading weights:  21%|██        | 76/363 [00:01<00:03, 73.23it/s]Loading weights:  23%|██▎       | 85/363 [00:01<00:03, 73.97it/s]Loading weights:  26%|██▌       | 94/363 [00:01<00:03, 71.15it/s]Loading weights:  28%|██▊       | 103/363 [00:01<00:03, 67.34it/s]Loading weights:  31%|███       | 112/363 [00:01<00:03, 65.29it/s]Loading weights:  33%|███▎      | 119/363 [00:01<00:03, 65.24it/s]Loading weights:  35%|███▍      | 126/363 [00:02<00:03, 61.03it/s]Loading weights:  37%|███▋      | 133/363 [00:02<00:03, 59.75it/s]Loading weights:  39%|███▉      | 141/363 [00:02<00:03, 59.63it/s]Loading weights:  41%|████      | 149/363 [00:02<00:03, 64.48it/s]Loading weights:  43%|████▎     | 157/363 [00:02<00:03, 66.40it/s]Loading weights:  45%|████▌     | 164/363 [00:02<00:02, 67.03it/s]Loading weights:  47%|████▋     | 171/363 [00:02<00:03, 63.48it/s]Loading weights:  49%|████▉     | 178/363 [00:02<00:03, 58.39it/s]Loading weights:  51%|█████     | 185/363 [00:02<00:02, 60.31it/s]Loading weights:  53%|█████▎    | 193/363 [00:03<00:02, 64.66it/s]Loading weights:  55%|█████▌    | 200/363 [00:03<00:02, 64.15it/s]Loading weights:  57%|█████▋    | 207/363 [00:03<00:02, 58.55it/s]Loading weights:  59%|█████▊    | 213/363 [00:03<00:02, 54.38it/s]Loading weights:  61%|██████    | 221/363 [00:03<00:02, 60.70it/s]Loading weights:  63%|██████▎   | 230/363 [00:03<00:02, 59.72it/s]Loading weights:  66%|██████▌   | 238/363 [00:03<00:01, 63.91it/s]Loading weights:  68%|██████▊   | 248/363 [00:03<00:01, 66.21it/s]Loading weights:  71%|███████   | 256/363 [00:04<00:01, 67.76it/s]Loading weights:  72%|███████▏  | 263/363 [00:04<00:01, 66.05it/s]Loading weights:  74%|███████▍  | 270/363 [00:04<00:01, 65.68it/s]Loading weights:  76%|███████▋  | 277/363 [00:04<00:01, 65.45it/s]Loading weights:  79%|███████▊  | 285/363 [00:04<00:01, 64.69it/s]Loading weights:  81%|████████  | 294/363 [00:04<00:00, 69.59it/s]Loading weights:  83%|████████▎ | 303/363 [00:04<00:00, 69.82it/s]Loading weights:  86%|████████▌ | 312/363 [00:04<00:00, 71.72it/s]Loading weights:  88%|████████▊ | 321/363 [00:05<00:00, 72.67it/s]Loading weights:  91%|█████████ | 330/363 [00:05<00:00, 72.65it/s]Loading weights:  93%|█████████▎| 338/363 [00:05<00:00, 73.44it/s]Loading weights:  95%|█████████▌| 346/363 [00:05<00:00, 74.20it/s]Loading weights:  98%|█████████▊| 354/363 [00:05<00:00, 73.00it/s]Loading weights: 100%|█████████▉| 362/363 [00:05<00:00, 65.21it/s]Loading weights: 100%|██████████| 363/363 [00:05<00:00, 64.62it/s]
+2026-10-04T19:03:30Z {"stage": "cache", "pairs": 50, "total": 1000}
+2026-10-04T19:03:53Z {"stage": "cache", "pairs": 100, "total": 1000}
+2026-10-04T19:04:16Z {"stage": "cache", "pairs": 150, "total": 1000}
+2026-10-04T19:04:39Z {"stage": "cache", "pairs": 200, "total": 1000}
+2026-10-04T19:05:02Z {"stage": "cache", "pairs": 250, "total": 1000}
+2026-10-04T19:05:25Z {"stage": "cache", "pairs": 300, "total": 1000}
+2026-10-04T19:05:49Z {"stage": "cache", "pairs": 350, "total": 1000}
+2026-10-04T19:06:12Z {"stage": "cache", "pairs": 400, "total": 1000}
+2026-10-04T19:06:35Z {"stage": "cache", "pairs": 450, "total": 1000}
+2026-10-04T19:06:58Z {"stage": "cache", "pairs": 500, "total": 1000}
+2026-10-04T19:07:22Z {"stage": "cache", "pairs": 550, "total": 1000}
+2026-10-04T19:07:45Z {"stage": "cache", "pairs": 600, "total": 1000}
+2026-10-04T19:08:08Z {"stage": "cache", "pairs": 650, "total": 1000}
+2026-10-04T19:08:31Z {"stage": "cache", "pairs": 700, "total": 1000}
+2026-10-04T19:08:54Z {"stage": "cache", "pairs": 750, "total": 1000}
+2026-10-04T19:09:18Z {"stage": "cache", "pairs": 800, "total": 1000}
+2026-10-04T19:09:41Z {"stage": "cache", "pairs": 850, "total": 1000}
+2026-10-04T19:10:04Z {"stage": "cache", "pairs": 900, "total": 1000}
+2026-10-04T19:10:27Z {"stage": "cache", "pairs": 950, "total": 1000}
+2026-10-04T19:10:51Z {"stage": "cache", "pairs": 1000, "total": 1000}
+2026-10-04T19:18:40Z {"stage": "fit_complete", "fit": "f_star_ts101", "updates": 1000}
+2026-10-04T19:26:29Z {"stage": "fit_complete", "fit": "m3_ts101", "updates": 1000}
+2026-10-04T19:34:19Z {"stage": "fit_complete", "fit": "f_star_ts102", "updates": 1000}
+2026-10-04T19:42:08Z {"stage": "fit_complete", "fit": "m3_ts102", "updates": 1000}
+2026-10-04T19:49:58Z {"stage": "fit_complete", "fit": "f_star_ts103", "updates": 1000}
+2026-10-04T19:57:47Z {"stage": "fit_complete", "fit": "m3_ts103", "updates": 1000}
+2026-10-04T19:57:47Z done {"seconds": 3293, "complete_sha256": "b681653b4d74507e23b53221d03d2dc4aa206792d438d7c191eb53158ddfd691", "load_training_bases": "PASS"}

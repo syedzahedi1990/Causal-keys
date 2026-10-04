@@ -1,0 +1,25 @@
+{
+  "block": 4,
+  "code_identity": "derived_reviewer_implementation",
+  "cohort": "original_1000",
+  "gradient_clip_norm": 1,
+  "interface": "original",
+  "learning_rate": 0.001,
+  "model": "mistral",
+  "model_weights_optimized": false,
+  "objectives": [
+    "f_star",
+    "m3"
+  ],
+  "rank": 16,
+  "release_sha256": "2dea297d508e51f07b927e9eb0571f40e99d25d996ccd7ad3342cb46942d0416",
+  "sampling": "one_shuffled_epoch",
+  "scientific_success_gate": null,
+  "seeds": [
+    101,
+    102,
+    103
+  ],
+  "updates_per_fit": 1000,
+  "weight_decay": 0
+}

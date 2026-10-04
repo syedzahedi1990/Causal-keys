@@ -1,0 +1,210 @@
+{
+  "argv": [
+    "experiments/refit_remap.py",
+    "--frame",
+    "NONE",
+    "--p1-root",
+    "/root/paper1/v5.5-reviewer-repository",
+    "--out",
+    "results/gpu_stage4/fit_none",
+    "--loader",
+    "ours",
+    "--revision",
+    "9527884be6e5616bdd54de542f9ae13384489724"
+  ],
+  "cohort": "original_1000",
+  "complete_sha256": "b681653b4d74507e23b53221d03d2dc4aa206792d438d7c191eb53158ddfd691",
+  "device": "cuda:0",
+  "event_prefix_identical_to_p1_pairs": 1000,
+  "frame": "NONE",
+  "git": {
+    "diff_head_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "head": "1ef86960c38ce9d6b5b7782da265386c010aff86",
+    "status_excluded": [
+      "results/gpu_stage4"
+    ],
+    "status_porcelain": []
+  },
+  "injected_dependencies_sha256": {
+    "ckeys/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "ckeys/encoding.py": "a7e7e5bf21159c153beb5eccabd4b496d5f21f0deeca02a711ce2de074297d99",
+    "ckeys/story.py": "a44f9db7d35059bf752df33c11d3082ebe14cef658126172c203ba5fcde8f28f",
+    "experiments/paper1_frames.py": "96abae64531d7ba0351d2290395f4bb744217838d697301c235d3d2b3bf330f0"
+  },
+  "injected_file": "experiments/refit_remap.py",
+  "injected_file_sha256": "6419f14bfb8626a7dca0146a998020fc6a7bb790bfbeb37d656e6b08d4cfc963",
+  "injections": [
+    {
+      "note": "raw_prompt('NONE', story, query) after Paper 1's six-choice support check",
+      "source_sha256": "d80cdda20dbfb5ddd1889e5c483c2c479075d83c900f175f995839c4767e2639",
+      "target": "gpu.behavior_engine.prompt"
+    },
+    {
+      "note": "only README.md may mismatch RELEASE.json; see INTEGRITY.json",
+      "source_sha256": "3fa6eb5c11fe9eda9a3e35965234f6d26c9499a268eaea4f68e9edc0ae5823b2",
+      "target": "reproduce.integrity.verify"
+    },
+    {
+      "note": "mistral_engine.py L192-202 reproduced; Python/package/device-count pins waived",
+      "source_sha256": "c5b1a78e7d9e22f3c334a012c09a39001a42da1afd243e7e89e72e8e922d1759",
+      "target": "gpu.runtime.load.load_engine"
+    }
+  ],
+  "integrity_status": "PASS_EXCEPT_README",
+  "interface": "original",
+  "interface_note": "RUN.json's 'interface': 'original' is literal (no assistant prefill, readout at the reply start); the prompt text is set by 'frame'",
+  "loader": "ours",
+  "model_label": "mistral",
+  "p1_prompt_equality_records": 2000,
+  "p1_root": "/root/paper1/v5.5-reviewer-repository",
+  "paper1_unmodified_sha256": {
+    "RELEASE.json": "2dea297d508e51f07b927e9eb0571f40e99d25d996ccd7ad3342cb46942d0416",
+    "gpu/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gpu/behavior_data/datasets.json.gz": "c3c3027bd57a5ec4a28df7975e0d9820fd5f67ff4c1739aefdb34540524002b1",
+    "gpu/behavior_engine.py": "90327f1269a4ebc169df7ccd85aa52ab966728aa2433f1add19054f50032c2cb",
+    "gpu/runtime/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gpu/runtime/color_task.py": "38253949129e403a29f54d2b83061ac15a45c73491c2774f4b864c4b3644a3d0",
+    "gpu/runtime/encoding.py": "6f19193267b7ff09d329f8e8d290862c66b7bd302e6237dd5282c94e79264785",
+    "gpu/runtime/hybrid_refs.py": "684d626b3230e6c05ed52f66771eb8ada0df6ae66cafed34f4a0acc8c7531827",
+    "gpu/runtime/key_engine.py": "d123a5556eec495ff303d1a2d32eccd0513ddd5f69e45d3c8925847e540277a5",
+    "gpu/runtime/load.py": "6bf86df6d1173b7d2e701c3d030a7f2651c546ab696a556d214ffc6531da99a7",
+    "gpu/runtime/mistral_engine.py": "1ff1027a9fc2ddc840cf38c679920dbc0942d8f2f5c921557243ffde71493df8",
+    "gpu/runtime/mistral_relay.py": "8d06406fbc0ab5bedb8336bb44301d3f924534e55c6e834799d36b716537c2ad",
+    "gpu/runtime/null_control.py": "e5d276c652e06240b6ff53150f669ac9e1b1c88ff1640dfb12d357ef3f15d5b7",
+    "gpu/runtime/qwen_engine.py": "a1cf60bd8ae774314146d334dc2531a1ba3b99bccfaca18d8617d9dba480ab86",
+    "gpu/runtime/qwen_geometry.py": "e5fcbe40cea881161dbab00f82221cf89c5c81ebaf9eb8a52d71726ddc1e5528",
+    "gpu/runtime/qwen_relay.py": "6a50eef9eb2fe25185495f6c0d86f49b4ee26aa38032b4ff8d6bfe9a1cabc84f",
+    "gpu/runtime/story_task.py": "0f537050bd183ea15f60eef0a4e482a4984ae2a9be1f338c4c734c42596f5cb4",
+    "gpu/train.py": "23600ac49a932724ee743f950b4f35bac1d06c06b29fbdc22fcd25dde89d798d",
+    "reproduce/__init__.py": "cc54c795d06647945e882dee499f159193848abb6cabf97a41b509611047953b",
+    "reproduce/integrity.py": "c6da1d455387ef1ab615a5a86f9b25f9a0d6810b3f367a30113841d31011b3f1"
+  },
+  "pins_waived": [
+    "python==3.12.14 and exact package versions",
+    "exactly one CUDA device",
+    ">= 75 GiB",
+    "Paper 1 asset receipt"
+  ],
+  "preregistration": "P-2026-10-05-F",
+  "prompt_identity": {
+    "ckeys_sha256": {
+      "ckeys/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "ckeys/encoding.py": "a7e7e5bf21159c153beb5eccabd4b496d5f21f0deeca02a711ce2de074297d99",
+      "ckeys/story.py": "a44f9db7d35059bf752df33c11d3082ebe14cef658126172c203ba5fcde8f28f"
+    },
+    "example_prompt": "Read the story and answer the question.\n\nStory: Everyone initially sees that the badge is in the cabinet. Everyone initially sees that the book is in the drawer. Everyone initially sees that the bottle is in the shelf. Everyone initially sees that the candle is in the shelf. Everyone initially sees that the card is in the basket. Everyone initially sees that the coin is in the shelf. Everyone initially sees that the cup is in the drawer. Everyone initially sees that the key is in the drawer. Everyone initially sees that the letter is in the box. Everyone initially sees that the map is in the cabinet. Everyone initially sees that the notebook is in the cabinet. Everyone initially sees that the pen is in the shelf. Everyone initially sees that the phone is in the shelf. Everyone initially sees that the photo is in the basket. Everyone initially sees that the ring is in the basket. Everyone initially sees that the scarf is in the cabinet. Everyone initially sees that the ticket is in the cabinet. Everyone initially sees that the toy is in the basket. Everyone initially sees that the wallet is in the closet. Everyone initially sees that the watch is in the box. Alice is told that the badge is in the shelf. Bob does not receive this information.\nQuestion: Where does Alice think the badge is?\nAnswer with one word.\nAnswer:",
+    "example_prompt_sha256": "82d5685760eb619d13b1bd22ae3a9bf11dd96e27758e3fa4c6674e9e5132e3d0",
+    "example_record": "training[0].base",
+    "raw_prompt_source_sha256": "682eba1b1ca3db1c565223249c14ca203070107bcc39dfecb37f9e705daa2b50"
+  },
+  "repo": "mistralai/Mistral-Small-24B-Instruct-2501",
+  "revision": "9527884be6e5616bdd54de542f9ae13384489724",
+  "seconds": 3292.8282408714294,
+  "status": "COMPLETE",
+  "test_mode": false,
+  "test_pairs": null,
+  "tokenizer_fix_mistral_regex": {
+    "fix_applied": true,
+    "local_retry": null,
+    "pre_tokenizer_sha256": {
+      "fixed": "3b27505c3aa8d25375cb2b5dd868f03e5e42db06974d6404d1246f7fbc550e0b",
+      "unfixed": "3a6f48a55f745cfecbcc761de4b7c16a378860cebd6f72a6eca4ca7733d8cdc5"
+    },
+    "strict": true
+  },
+  "validation": {
+    "bases": {
+      "f_star_ts101": {
+        "orthonormality_error": 3.8958506798358883e-07,
+        "sha256": "365ab84304548e767c1e269e9f2f7614ce33a0055d72d16c698786a6aa415995",
+        "shape": [
+          16,
+          5120
+        ]
+      },
+      "f_star_ts102": {
+        "orthonormality_error": 2.538396803863918e-07,
+        "sha256": "f9a5467476e25c63f71b6cce60fefe06a113674966a1e230adafadad0e5f8629",
+        "shape": [
+          16,
+          5120
+        ]
+      },
+      "f_star_ts103": {
+        "orthonormality_error": 3.152662895189451e-07,
+        "sha256": "bf1127eaac0a25de4e60dd04b4d5b0b9216b1b69fca04289c647f64d88fbeccb",
+        "shape": [
+          16,
+          5120
+        ]
+      },
+      "m3_ts101": {
+        "orthonormality_error": 1.897102417380836e-07,
+        "sha256": "2d0eca168b0d565d1f5e9d69ea05eb841d4b6750f866afe2d172af25af743cd8",
+        "shape": [
+          16,
+          5120
+        ]
+      },
+      "m3_ts102": {
+        "orthonormality_error": 1.9611450163825594e-07,
+        "sha256": "234a0f957f8bd6be66d5d723f8222bcbcd2b5338f2b13368cf4fd371e7d9ca09",
+        "shape": [
+          16,
+          5120
+        ]
+      },
+      "m3_ts103": {
+        "orthonormality_error": 2.1424731388997031e-07,
+        "sha256": "76b7e5dab68b6632f9995a569e9e43708c9feff4c3361c858d7774ca2d3bd04b",
+        "shape": [
+          16,
+          5120
+        ]
+      },
+      "pca_ts101": {
+        "orthonormality_error": 3.5063668568646733e-07,
+        "sha256": "6be861c1bf753200ba7d53c2d9b1b5da4faedd6f3dec8ec1aa3a5837babba42c",
+        "shape": [
+          16,
+          5120
+        ]
+      },
+      "pca_ts102": {
+        "orthonormality_error": 3.4890768474404865e-07,
+        "sha256": "eff9699c40ca4121c40e9f5e7079f0d1dc50983baeb534a138d5731c93c47b92",
+        "shape": [
+          16,
+          5120
+        ]
+      },
+      "pca_ts103": {
+        "orthonormality_error": 3.518628137744173e-07,
+        "sha256": "d2d86f8f00c2d5ef5b1a31892017bbe7b5ebfcd3df0fc3a98a8f2ef3c8aa50da",
+        "shape": [
+          16,
+          5120
+        ]
+      }
+    },
+    "complete_sha256": "b681653b4d74507e23b53221d03d2dc4aa206792d438d7c191eb53158ddfd691",
+    "hidden": 5120,
+    "paper1_load_training_bases": {
+      "n": 9,
+      "status": "PASS"
+    }
+  },
+  "versions": {
+    "Jinja2": "3.1.6",
+    "MarkupSafe": "3.0.3",
+    "accelerate": "1.13.0",
+    "huggingface_hub": "1.30.0",
+    "numpy": "2.5.3",
+    "python": "3.12.14",
+    "regex": "2026.9.29",
+    "safetensors": "0.8.0",
+    "tokenizers": "0.22.2",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.9.0"
+  }
+}

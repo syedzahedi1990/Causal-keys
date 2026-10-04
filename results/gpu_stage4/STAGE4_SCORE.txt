@@ -1,0 +1,107 @@
+Stage 4 scoring, preregistration P-2026-10-05-F
+  fit_none: results/gpu_stage4/fit_none/run  frame NONE  status COMPLETE  repo mistralai/Mistral-Small-24B-Instruct-2501  test_mode False
+  fit_p1: results/gpu_stage4/fit_p1/run  frame P1  status COMPLETE  repo mistralai/Mistral-Small-24B-Instruct-2501  test_mode False
+  frames: mistralai/Mistral-Small-24B-Instruct-2501 @ 9527884be6e5616bdd54de542f9ae13384489724, NVIDIA A100-SXM4-80GB x2, transformers 5.9.0, prefill 'Answer:', tokenizer check {'prompts': 3600, 'identical': True, 'prefills': ['', 'Answer:'], 'fix_mistral_regex': {'strict': True, 'fix_applied': True, 'local_retry': None, 'pre_tokenizer_sha256': {'fixed': '3b27505c3aa8d25375cb2b5dd868f03e5e42db06974d6404d1246f7fbc550e0b', 'unfixed': '3a6f48a55f745cfecbcc761de4b7c16a378860cebd6f72a6eca4ca7733d8cdc5'}}}
+  p1_root: /root/paper1/v5.5-reviewer-repository
+  factorial (s_ID): results/gpu_stage2/format_factorial/Mistral-Small-24B-Instruct-2501_s0.json sha256 5fb20f70084fac20
+  provenance: OK, scored families = gated fit runs, basis files as evaluated, prefills as named
+  population: OK, 96 cores in every family x format cell
+
+Primary evaluation ('Answer:' prefill): family x format
+  (rho_K, rho_V and the f_star column are exploratory)
+  fit_none  P1     n= 96  phi +0.718 [+0.700,+0.736]  psiK +0.429 [+0.386,+0.473]  psiV +0.247 [+0.233,+0.260]  rhoK +0.741 [+0.726,+0.755]  rhoV +0.539 [+0.496,+0.582]  f_star (F-P)/(T-S) +0.103 [+0.091,+0.115]
+  fit_none  NONE   n= 96  phi +0.813 [+0.789,+0.837]  psiK +0.071 [+0.059,+0.083]  psiV +0.798 [+0.771,+0.824]  rhoK +0.183 [+0.162,+0.203]  rhoV +0.926 [+0.912,+0.939]  f_star (F-P)/(T-S) -0.011 [-0.020,-0.002]
+  fit_none  BEFORE n= 96  phi +0.761 [+0.738,+0.785]  psiK +0.008 [-0.003,+0.019]  psiV +0.974 [+0.957,+0.990]  rhoK -0.001 [-0.013,+0.011]  rhoV +0.949 [+0.937,+0.962]  f_star (F-P)/(T-S) +0.057 [+0.042,+0.073]
+  fit_none  POST   n= 96  phi +0.810 [+0.789,+0.831]  psiK +0.125 [+0.098,+0.153]  psiV +0.500 [+0.474,+0.525]  rhoK +0.467 [+0.442,+0.493]  rhoV +0.846 [+0.813,+0.879]  f_star (F-P)/(T-S) -0.029 [-0.039,-0.018]
+  fit_none  LETTER n= 96  phi +0.666 [+0.636,+0.695]  psiK +0.768 [+0.729,+0.805]  psiV +0.024 [+0.019,+0.030]  rhoK +0.978 [+0.972,+0.984]  rhoV +0.155 [+0.127,+0.186]  f_star (F-P)/(T-S) +0.178 [+0.150,+0.206]
+  fit_p1    P1     n= 96  phi +0.720 [+0.695,+0.744]  psiK +0.523 [+0.482,+0.564]  psiV +0.229 [+0.216,+0.242]  rhoK +0.759 [+0.745,+0.773]  rhoV +0.441 [+0.404,+0.479]  f_star (F-P)/(T-S) +0.038 [+0.029,+0.048]
+  fit_p1    NONE   n= 96  phi +0.719 [+0.692,+0.743]  psiK +0.070 [+0.057,+0.082]  psiV +0.809 [+0.783,+0.834]  rhoK +0.173 [+0.154,+0.192]  rhoV +0.930 [+0.918,+0.942]  f_star (F-P)/(T-S) +0.020 [+0.011,+0.031]
+  fit_p1    BEFORE n= 96  phi +0.765 [+0.741,+0.790]  psiK -0.002 [-0.013,+0.009]  psiV +0.975 [+0.962,+0.988]  rhoK +0.005 [-0.007,+0.016]  rhoV +0.963 [+0.951,+0.975]  f_star (F-P)/(T-S) -0.004 [-0.011,+0.004]
+  fit_p1    POST   n= 96  phi +0.730 [+0.705,+0.755]  psiK +0.197 [+0.160,+0.233]  psiV +0.522 [+0.500,+0.544]  rhoK +0.449 [+0.428,+0.471]  rhoV +0.766 [+0.727,+0.806]  f_star (F-P)/(T-S) +0.001 [-0.006,+0.008]
+  fit_p1    LETTER n= 96  phi +0.770 [+0.739,+0.801]  psiK +0.776 [+0.734,+0.816]  psiV +0.020 [+0.015,+0.024]  rhoK +0.984 [+0.978,+0.990]  rhoV +0.155 [+0.126,+0.187]  f_star (F-P)/(T-S) +0.038 [+0.025,+0.051]
+  released  P1     n= 96  phi +0.705 [+0.677,+0.732]  psiK +0.528 [+0.491,+0.565]  psiV +0.229 [+0.216,+0.243]  rhoK +0.762 [+0.748,+0.776]  rhoV +0.443 [+0.407,+0.481]  f_star (F-P)/(T-S) +0.041 [+0.031,+0.052]
+  released  NONE   n= 96  phi +0.708 [+0.681,+0.733]  psiK +0.069 [+0.058,+0.080]  psiV +0.803 [+0.777,+0.827]  rhoK +0.182 [+0.162,+0.202]  rhoV +0.934 [+0.923,+0.944]  f_star (F-P)/(T-S) +0.024 [+0.016,+0.034]
+  released  BEFORE n= 96  phi +0.738 [+0.713,+0.763]  psiK -0.001 [-0.012,+0.010]  psiV +0.971 [+0.959,+0.984]  rhoK +0.007 [-0.004,+0.018]  rhoV +0.963 [+0.951,+0.975]  f_star (F-P)/(T-S) -0.005 [-0.012,+0.002]
+  released  POST   n= 96  phi +0.719 [+0.691,+0.746]  psiK +0.196 [+0.160,+0.232]  psiV +0.523 [+0.502,+0.543]  rhoK +0.454 [+0.434,+0.474]  rhoV +0.770 [+0.730,+0.810]  f_star (F-P)/(T-S) +0.007 [+0.000,+0.013]
+  released  LETTER n= 96  phi +0.749 [+0.711,+0.785]  psiK +0.777 [+0.735,+0.817]  psiV +0.018 [+0.013,+0.023]  rhoK +0.986 [+0.980,+0.992]  rhoV +0.157 [+0.127,+0.188]  f_star (F-P)/(T-S) +0.036 [+0.026,+0.046]
+
+GATES
+
+G1 same activations: each refit P vs the released P of the same seed, mean squared principal cosine >= 0.99
+  fit_none seed 101: 1.0000
+  fit_none seed 102: 1.0000
+  fit_none seed 103: 1.0000
+  fit_p1 seed 101: 1.0000
+  fit_p1 seed 102: 1.0000
+  fit_p1 seed 103: 1.0000
+  G1 -> MET
+G2 the fits work (primary evaluation, fitting prompt): phi_none(NONE) +0.813, phi_p1(P1) +0.720, both >= 0.5 -> MET
+G3 the control reproduces the released crossover: fit_p1 psi_K(LETTER) +0.776, psi_V(NONE) +0.809, both >= 0.5 -> MET
+ALL GATES MET: the predictions are interpreted
+
+PREDICTIONS (H_read)
+F1 crossover without later mentions at fitting: fit_none psi_K(LETTER) +0.768, psi_V(NONE) +0.798, both >= 0.5 -> MET
+F2 transfer to lettered options: fit_none phi(LETTER) +0.666 >= 0.5 -> MET
+F3 no fit-format effect on the crossover: D = -0.008 [-0.027,+0.009] (n=96), 95% CI within [-0.25, +0.25] -> MET
+F4 the channel follows the natural read, for each of fit_none and fit_p1 (fits averaged within core): s_ID = mean ID_K / (mean ID_K + mean ID_V) over the factorial items (not stage 2's share@0) by format {'P1': 0.728, 'NONE': 0.043, 'BEFORE': -0.062, 'POST': 0.452, 'LETTER': 0.979}
+  fit_none: key share psi_K/(psi_K+psi_V) P1 +0.635, NONE +0.081, BEFORE +0.008, POST +0.199, LETTER +0.969; Pearson r = +0.957 (>= 0.9: MET)
+  fit_p1: key share psi_K/(psi_K+psi_V) P1 +0.696, NONE +0.079, BEFORE -0.002, POST +0.274, LETTER +0.975; Pearson r = +0.978 (>= 0.9: MET)
+F4 -> MET
+H_fit pattern as stated: F1 fails, fit_none psi_V(LETTER) +0.024 >= 0.5, F2 fails, D <= -0.4 -> NOT MET
+
+######## EXPLORATORY
+
+Exploratory: evaluation without the 'Answer:' prefill: family x format
+  (rho_K, rho_V and the f_star column are exploratory)
+  fit_none  P1     n= 96  phi +0.730 [+0.708,+0.750]  psiK +0.434 [+0.394,+0.475]  psiV +0.233 [+0.220,+0.246]  rhoK +0.758 [+0.743,+0.772]  rhoV +0.531 [+0.492,+0.570]  f_star (F-P)/(T-S) +0.084 [+0.071,+0.097]
+  fit_none  NONE   n= 96  phi +0.823 [+0.799,+0.846]  psiK +0.080 [+0.067,+0.093]  psiV +0.787 [+0.760,+0.812]  rhoK +0.194 [+0.174,+0.214]  rhoV +0.911 [+0.897,+0.925]  f_star (F-P)/(T-S) -0.012 [-0.022,-0.000]
+  fit_none  BEFORE n= 96  phi +0.775 [+0.753,+0.798]  psiK +0.052 [+0.037,+0.067]  psiV +0.939 [+0.922,+0.954]  rhoK +0.029 [+0.018,+0.041]  rhoV +0.893 [+0.877,+0.909]  f_star (F-P)/(T-S) +0.039 [+0.022,+0.056]
+  fit_none  POST   n= 96  phi +0.820 [+0.800,+0.840]  psiK +0.148 [+0.119,+0.177]  psiV +0.502 [+0.473,+0.531]  rhoK +0.465 [+0.436,+0.494]  rhoV +0.814 [+0.778,+0.848]  f_star (F-P)/(T-S) -0.025 [-0.038,-0.012]
+  fit_none  LETTER n= 96  phi +0.666 [+0.635,+0.696]  psiK +0.777 [+0.738,+0.813]  psiV +0.014 [+0.007,+0.021]  rhoK +0.983 [+0.977,+0.991]  rhoV +0.138 [+0.109,+0.169]  f_star (F-P)/(T-S) +0.170 [+0.141,+0.200]
+  fit_p1    P1     n= 96  phi +0.739 [+0.712,+0.764]  psiK +0.516 [+0.476,+0.555]  psiV +0.212 [+0.201,+0.225]  rhoK +0.778 [+0.765,+0.791]  rhoV +0.448 [+0.412,+0.484]  f_star (F-P)/(T-S) +0.010 [-0.002,+0.023]
+  fit_p1    NONE   n= 96  phi +0.733 [+0.707,+0.756]  psiK +0.082 [+0.070,+0.095]  psiV +0.795 [+0.770,+0.818]  rhoK +0.189 [+0.171,+0.208]  rhoV +0.910 [+0.897,+0.922]  f_star (F-P)/(T-S) +0.004 [-0.007,+0.016]
+  fit_p1    BEFORE n= 96  phi +0.775 [+0.750,+0.799]  psiK +0.024 [+0.012,+0.036]  psiV +0.948 [+0.936,+0.960]  rhoK +0.027 [+0.017,+0.037]  rhoV +0.923 [+0.910,+0.935]  f_star (F-P)/(T-S) -0.022 [-0.036,-0.009]
+  fit_p1    POST   n= 96  phi +0.747 [+0.722,+0.771]  psiK +0.218 [+0.182,+0.253]  psiV +0.526 [+0.502,+0.549]  rhoK +0.446 [+0.423,+0.470]  rhoV +0.736 [+0.695,+0.776]  f_star (F-P)/(T-S) -0.018 [-0.030,-0.006]
+  fit_p1    LETTER n= 96  phi +0.781 [+0.751,+0.809]  psiK +0.776 [+0.734,+0.816]  psiV +0.012 [+0.007,+0.018]  rhoK +0.986 [+0.981,+0.992]  rhoV +0.145 [+0.116,+0.177]  f_star (F-P)/(T-S) +0.030 [+0.016,+0.044]
+  released  P1     n= 96  phi +0.726 [+0.699,+0.753]  psiK +0.516 [+0.479,+0.551]  psiV +0.216 [+0.204,+0.228]  rhoK +0.778 [+0.765,+0.792]  rhoV +0.452 [+0.418,+0.488]  f_star (F-P)/(T-S) +0.015 [+0.003,+0.028]
+  released  NONE   n= 96  phi +0.722 [+0.698,+0.744]  psiK +0.081 [+0.070,+0.092]  psiV +0.789 [+0.765,+0.811]  rhoK +0.199 [+0.180,+0.218]  rhoV +0.913 [+0.902,+0.924]  f_star (F-P)/(T-S) +0.011 [+0.000,+0.022]
+  released  BEFORE n= 96  phi +0.753 [+0.731,+0.775]  psiK +0.026 [+0.014,+0.040]  psiV +0.941 [+0.929,+0.954]  rhoK +0.034 [+0.024,+0.043]  rhoV +0.920 [+0.906,+0.933]  f_star (F-P)/(T-S) -0.018 [-0.030,-0.006]
+  released  POST   n= 96  phi +0.736 [+0.712,+0.759]  psiK +0.215 [+0.180,+0.250]  psiV +0.527 [+0.503,+0.549]  rhoK +0.451 [+0.429,+0.473]  rhoV +0.742 [+0.701,+0.783]  f_star (F-P)/(T-S) -0.009 [-0.021,+0.003]
+  released  LETTER n= 96  phi +0.754 [+0.717,+0.790]  psiK +0.779 [+0.735,+0.820]  psiV +0.013 [+0.007,+0.018]  rhoK +0.986 [+0.980,+0.991]  rhoV +0.141 [+0.111,+0.173]  f_star (F-P)/(T-S) +0.029 [+0.017,+0.040]
+  D without prefill = +0.004 [-0.014,+0.021] (n=96)
+
+Exploratory: rho_K and rho_V are the rhoK/rhoV columns above; f_star fits are the f_star column above
+
+Exploratory: mean squared principal cosines of M (m3) between fits, against the between-seed baseline
+  fit_none m3_101 vs released m3_101: 0.368
+  fit_none m3_102 vs released m3_102: 0.387
+  fit_none m3_103 vs released m3_103: 0.369
+  fit_p1 m3_101 vs released m3_101: 0.713
+  fit_p1 m3_102 vs released m3_102: 0.787
+  fit_p1 m3_103 vs released m3_103: 0.716
+  fit_none m3_101 vs fit_p1 m3_101: 0.383
+  fit_none m3_102 vs fit_p1 m3_102: 0.386
+  fit_none m3_103 vs fit_p1 m3_103: 0.365
+  released m3_101 vs released m3_102: 0.421
+  released m3_101 vs released m3_103: 0.409
+  released m3_102 vs released m3_103: 0.441
+  fit_none m3_101 vs fit_none m3_102: 0.425
+  fit_none m3_101 vs fit_none m3_103: 0.430
+  fit_none m3_102 vs fit_none m3_103: 0.419
+  fit_p1 m3_101 vs fit_p1 m3_102: 0.423
+  fit_p1 m3_101 vs fit_p1 m3_103: 0.415
+  fit_p1 m3_102 vs fit_p1 m3_103: 0.423
+
+Exploratory: loss curves (updates.jsonl; six-way conditional CE, chance ln 6 = 1.792); mean loss by decile of steps
+  fit_none f_star_ts101  steps 1000  first 100 0.157  last 100 0.041  deciles 0.157 0.062 0.044 0.053 0.048 0.028 0.060 0.013 0.024 0.041
+  fit_none f_star_ts102  steps 1000  first 100 0.150  last 100 0.029  deciles 0.150 0.109 0.054 0.080 0.026 0.042 0.043 0.034 0.016 0.029
+  fit_none f_star_ts103  steps 1000  first 100 0.101  last 100 0.034  deciles 0.101 0.095 0.080 0.051 0.036 0.034 0.057 0.018 0.047 0.034
+  fit_none m3_ts101      steps 1000  first 100 3.436  last 100 0.107  deciles 3.436 0.623 0.273 0.353 0.286 0.254 0.115 0.176 0.216 0.107
+  fit_none m3_ts102      steps 1000  first 100 2.861  last 100 0.152  deciles 2.861 0.769 0.305 0.336 0.181 0.190 0.195 0.107 0.128 0.152
+  fit_none m3_ts103      steps 1000  first 100 3.192  last 100 0.132  deciles 3.192 0.680 0.434 0.216 0.285 0.195 0.182 0.105 0.329 0.132
+  fit_p1   f_star_ts101  steps 1000  first 100 0.266  last 100 0.058  deciles 0.266 0.186 0.050 0.072 0.079 0.060 0.178 0.120 0.045 0.058
+  fit_p1   f_star_ts102  steps 1000  first 100 0.238  last 100 0.046  deciles 0.238 0.220 0.165 0.108 0.067 0.078 0.051 0.062 0.032 0.046
+  fit_p1   f_star_ts103  steps 1000  first 100 0.165  last 100 0.037  deciles 0.165 0.166 0.107 0.119 0.087 0.058 0.127 0.061 0.107 0.037
+  fit_p1   m3_ts101      steps 1000  first 100 4.331  last 100 0.280  deciles 4.331 0.714 0.676 0.589 0.422 0.627 0.345 0.299 0.262 0.280
+  fit_p1   m3_ts102      steps 1000  first 100 4.076  last 100 0.482  deciles 4.076 1.741 0.509 0.634 0.504 0.332 0.476 0.461 0.257 0.482
+  fit_p1   m3_ts103      steps 1000  first 100 4.769  last 100 0.405  deciles 4.769 1.188 0.843 0.528 0.663 0.324 0.378 0.393 0.300 0.405

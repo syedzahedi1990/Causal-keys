@@ -21,7 +21,8 @@ ARXIV = {
     "vig2020causal": "2004.12265", "venkatesh2026steering": "2602.06801", "hewitt2019control": "1909.03368",
     "huang2024ravel": "2402.17700", "arora2024causalgym": "2402.12560", "li2026bucketing": "2605.02234",
     "yang2024qwen25": "2412.15115", "olmo2025two": "2501.00656", "bojieli2026notes": "2606.17107",
-    "pustovit2026packs": "2604.03270",
+    "pustovit2026packs": "2604.03270", "zhou2026ordinal": "2610.00910", "feucht2025dualroute": "2504.03022",
+    "ma2025addressbook": "2512.10547", "tan2024steering": "2407.12404",
 }
 
 # Corrections to arXiv author metadata (diacritics, team names, name order), applied after fetching.

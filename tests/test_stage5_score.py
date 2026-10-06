@@ -2,7 +2,7 @@
 provenance and population checks, and writes STAGE5_SCORE.txt: on an empty root (every line NOT EVALUABLE), and on a
 synthetic root holding every part (the writers of the part tests) under the preregistered tag, where the combination
 rules are checked: G7 is H_redundant with H_replaced beside it, a Gate b failure makes G5-G8 NOT EVALUABLE, G4b without
-H_diss is NOT APPLICABLE and left out while no gated-in small model makes it NOT EVALUABLE (G4 NOT MET), a missing
+H_diss (H_track, mixed, or no gated-in small model) is NOT APPLICABLE and left out, G2 under H_track is NOT MET, a missing
 knockout file is MISSING in Gate b (k/k semantics) and not an M8 failure, part (e) evaluability is judged on the scored
 models only, a corrupt file is a SCORER ERROR (exit 1), and the provenance / population checks report MISMATCH (exit 2
 outside a TEST_ tag; a smaller part must hold the first k cores of the larger one)."""
@@ -117,10 +117,10 @@ def test_full_root(tmp_path):
     assert "SUMMARY: 21 MET, 1 NOT MET, 0 NOT EVALUABLE of 22; provenance OK; population OK" in text
     assert "Gate b (part b, M8 sanity)" in text and "-> MET" in text.split("Gate b (part b")[1].split("\n")[0]
     for d, n in (("attention/Qwen2.5-7B-Instruct.json: n = 150", 150), ("knockout/Qwen2.5-7B-Instruct_s0.json: n = 150", 150),
-                 ("row_restricted/Qwen2.5-7B-Instruct_direct.json: n = 60", 60), ("ioi/gpt2_s0.json: n = 200", 200)):
+                 ("row_restricted/Qwen2.5-7B-Instruct_direct.json: n = 60", 60), ("ioi/gpt2_s1.json: n = 200", 200)):
         assert d in text and f"(expected {n}): OK" in text.split(d)[1].split("\n")[0]
-    assert "Qwen2.5-7B-Instruct: seed-0 cores across parts: attention same, knockout same, factorial same, row_restricted the first 60 of 150, form_attention the first 60 of 150" in text
-    assert "gpt2 (IOI): seed-0 cores across parts: ioi same" in text
+    assert "Qwen2.5-7B-Instruct: cores across parts: attention same, knockout same, factorial same, row_restricted the first 60 of 150, form_attention the first 60 of 150" in text
+    assert "gpt2 (IOI): cores across parts: ioi same" in text
     # the H_replaced alternative and the partial takeover are reported beside G7, never as its verdict
     for m in knockout.MODELS:
         synth_knockout(tmp_path / "knockout", m, replaced=True)
@@ -154,22 +154,22 @@ def test_full_root(tmp_path):
     text = run(tmp_path, "stage5")
     v = verdict_lines(text)
     assert "(a): MET (2/2 anchors); (b): NOT APPLICABLE (G2 did not declare H_diss) -> MET" in v["G4"]
-    assert "H_track" in v["G2"] and "-> MET" in v["G2"]
-    # no gated-in small model (ID_K(P1) < 1 at both): G2 NOT EVALUABLE, G4b NOT EVALUABLE (not applicable only under a declared account) and G4 NOT MET
+    assert "alternative H_track declared" in v["G2"] and "-> NOT MET" in v["G2"] and "(under H_track, 2/2) -> MET" in v["G3"]
+    # no gated-in small model (ID_K(P1) < 1 at both): G2 NOT EVALUABLE, G4b NOT APPLICABLE (no H_diss declared, as under mixed) and G4 follows (a)
     attention_synth(tmp_path / "attention", "Qwen2.5-1.5B-Instruct", 150, E=0.5, F=0.8, G=0.05, idk_post=-0.4, idk_p1=0.5)
     attention_synth(tmp_path / "attention", "Qwen2.5-3B-Instruct", 150, E=0.45, F=0.7, G=0.08, idk_post=0.0, idk_p1=0.5, cap=True)
     real_cores(tmp_path / "attention" / "Qwen2.5-1.5B-Instruct.json"), real_cores(tmp_path / "attention" / "Qwen2.5-3B-Instruct.json")
     text = run(tmp_path, "stage5")
     v = verdict_lines(text)
     assert "Qwen2.5-1.5B-Instruct (small) GATED OUT, Qwen2.5-3B-Instruct (small) GATED OUT" in text
-    assert "NOT EVALUABLE (no gated-in small model)" in v["G2"] and "(a): MET (2/2 anchors); (b): NOT EVALUABLE (no gated-in small model) -> NOT MET" in v["G4"]
+    assert "NOT EVALUABLE (no gated-in small model)" in v["G2"] and "(a): MET (2/2 anchors); (b): NOT APPLICABLE (no gated-in small model, G2 did not declare H_diss) -> MET" in v["G4"]
     for m in ("Qwen2.5-1.5B-Instruct", "Qwen2.5-3B-Instruct"):
         attention_synth(tmp_path / "attention", m, 150, E=ATT[m][0], F=ATT[m][1], G=ATT[m][2], idk_post=ATT[m][3], idk_p1=ATT[m][4], cap="3B" in m)
         real_cores(tmp_path / "attention" / f"{m}.json")
     # part (e): an exploratory model with a value does not make a pair line whose cells are all not evaluable print NOT MET
     ioi_fixture(tmp_path, "Qwen2.5-14B-Instruct", IOI, n=200)
     for m in ioi.PAIR:
-        f = tmp_path / "ioi" / f"{m}_s0.json"
+        f = tmp_path / "ioi" / f"{m}_s1.json"
         d = json.load(open(f))
         for it in d["results"]:
             if it["arm"] == "AFTER":
@@ -188,10 +188,20 @@ def test_full_root(tmp_path):
     text = run(tmp_path, "stage5")
     assert "provenance OK; population OK" in text and "SCORER ERROR" not in text
     # provenance: two commits or a results file without a provenance block are MISMATCH outside TEST tags (exit 2, the score still written)
-    f = tmp_path / "ioi" / "gpt2_s0.json"
+    f = tmp_path / "ioi" / "gpt2_s1.json"
     d = json.load(open(f)); d["provenance"]["git_commit"] = "other"; json.dump(d, open(f, "w"))
     text = run(tmp_path, "stage5", rc=2)
     assert "MISMATCH: not one commit" in text and "provenance MISMATCH; population OK" in text and "SCORER ERROR" not in text
+    d["provenance"]["git_commit"] = json.load(open(tmp_path / "ioi" / "Qwen2.5-7B-Instruct_s1.json"))["provenance"].get("git_commit")
+    json.dump(d, open(f, "w"))
+    g = tmp_path / "ioi" / "Qwen2.5-7B-Instruct_s1.json"   # one model, files at two revisions
+    e = json.load(open(g)); ea = e["provenance"].setdefault("args", {}); rev = ea.get("revision"); ea["revision"] = "rev-other"; json.dump(e, open(g, "w"))
+    text = run(tmp_path, "stage5", rc=2)
+    assert "Qwen2.5-7B-Instruct: MISMATCH: files with different revisions" in text and "revisions MISMATCH in ['Qwen2.5-7B-Instruct']" in text
+    ea["revision"] = rev; json.dump(e, open(g, "w"))
+    (tmp_path / "ENV.txt").write_text("".join(f"m{i} revision {i:040d}\n" for i in range(12)))
+    text = run(tmp_path, "stage5")
+    assert "    m11 revision " + "0" * 38 + "11" in text and "revisions: one per model" in text   # every ENV.txt line echoed, none cut
     f = tmp_path / "row_restricted" / "Qwen2.5-7B-Instruct_direct.json"
     json.dump(json.load(open(f))["results"], open(f, "w"))
     text = run(tmp_path, "stage5", rc=2)

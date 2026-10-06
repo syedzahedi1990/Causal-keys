@@ -5,7 +5,8 @@
 #   (b) attention knockout, experiments/attention_knockout.py:              Qwen2.5-7B/14B, Mistral-7B (+EXTRA exploratory)
 #   (c) membership and dose: format_factorial.py with the 13 subset arms (seeds 0 and 1) + row_restricted_keys.py splice
 #   (d) non-identical re-mentions: the same seed-0 factorial with the 17 variant arms, form_competence.py, form_attention.py
-#       (c, d) Qwen2.5-7B/14B, Mistral-7B, OLMo-2-7B (+EXTRA Qwen3-8B); seed 1 and the splice at the three primary models;
+#       (c, d) Qwen2.5-7B/14B, Mistral-7B, OLMo-2-7B (+EXTRA Qwen3-8B); seed 1 at the three primary models, the splice at
+#       those and OLMo-2-7B (exploratory; + Qwen3-8B with EXTRA=1);
 #       the seed-0 factorial always carries both the subset and the variant arms (one file per model serves both parts)
 #   (e) IOI: ioi_factorial.py at GPT-2 small/XL (FP32), Qwen2.5-7B-Instruct, Mistral-7B, Qwen2.5-7B base, Qwen2.5-14B;
 #       ioi_attention.py at GPT-2 small (its head labels); the AFTER row splice at the 7B pair
@@ -18,18 +19,23 @@
 #                                               # small into a scratch OUT, then the scorer; 18 min + pytest on a 4-core CPU
 # Optional: PARTS=a,b,c,d,e (default all; a part not listed is skipped everywhere), ONLY=<comma-separated model names,
 # e.g. Qwen2.5-7B-Instruct,gpt2> (the loop runs those models only; an unlisted name is an error), EXTRA=1 (Qwen3-8B, and
-# the exploratory models of (a) and (b)), N=150, OUT=<dir>, KEEP_CACHE=1, TESTS=0 (skip pytest, 22 min on a 4-core CPU),
-# PY=<python>, FORCE=1 (redo a step whose results file already exists in OUT; without it such a step is kept, which makes
-# a rerun with the same OUT resume where it failed: a file left by a FAILED step, or one that is not readable JSON, is
-# moved aside to <file>.failed.<UTC> and the step is run again; part (a) writes its .npz before its .json, so a readable
+# the exploratory models of (a) and (b)), N=150, OUT=<dir>, KEEP_CACHE=1, TESTS=0 (skip pytest, 22 min on a 4-core CPU;
+# the switches TEST_MODE, EXTRA, KEEP_CACHE, FORCE, TESTS take 0 or 1 only, unset = 0 except TESTS = 1),
+# PY=<python>, FORCE=1 (redo a step whose results file already exists in OUT; an earlier file is replaced only when the
+# step writes a new one, so a forced step that FAILS before writing leaves the earlier file in place, noted in COMMIT.txt;
+# without FORCE such a step is kept, which makes a rerun with the same OUT resume where it failed: a file written by a
+# FAILED step, or one that is not readable JSON, is moved aside to <file>.failed.<UTC> and the step is run again; part (a) writes its .npz before its .json, so a readable
 # .json certifies both), MINGIB=<GiB> (GPU memory floor, default 75; the 7B parts fit a 40 GB card), IOI_EXACT=no (rerun
 # only: keep an ioi_factorial.py file whose FP32 batch-noise floor exceeds 1e-3 instead of failing the step; the floors and
-# exact_violations stay in the file and the score, the default 'auto' asserts exactness in FP32 as the entry says). Each model's Hub revision is resolved before its steps, passed to every step as --revision
-# (so every results file's provenance carries it) and appended to ENV.txt with the snapshot that was loaded.
+# exact_violations stay in the file and the score, the default 'auto' asserts exactness in FP32 as the entry says). Each model's Hub revision is resolved before its first step and
+# pinned in $OUT/REVISIONS.txt (a rerun into the same OUT, or into an unpacked earlier archive, reuses it instead of asking
+# the Hub again), passed to every step as --revision (so every results file's provenance carries it; the scorer flags a
+# model whose files carry different revisions) and appended to ENV.txt with the snapshot that was loaded.
 # The output of a step is one results file; the scorer reads whatever OUT holds, so the archive of a partial rerun on a
 # fresh clone holds only that part unless the earlier archive was unpacked into OUT first (docs/GPU_RUNBOOK.md).
-# Outside TEST_MODE it pins transformers 5.18.0 (the stage-1/3b environment), refuses a DRAFT P-2026-10-05-G or modified
-# tracked files, runs pytest and the preflights (ckeys.subsets.check_rules, the IOI entry facts) before any model.
+# Outside TEST_MODE it pins transformers 5.18.0 (the stage-1/3b environment), refuses a DRAFT P-2026-10-05-G, modified
+# tracked files, or code (ckeys experiments analysis scripts tests) that differs from the commit 'Finalise preregistration
+# G', and rejects a PARTS x ONLY choice that selects no step before any install or test; it then runs pytest and the preflights (ckeys.subsets.check_rules, the IOI entry facts) before any model.
 # A failed step is recorded in $OUT/FAILED.txt and the pipeline goes on; exit status 1 if any step FAILED (the score step
 # FAILS with exit 2 when the provenance or population check reports MISMATCH outside TEST_MODE; the score is still written).
 # Output: gpu_stage5_results.tgz (TEST_MODE: $OUT.tgz), a few hundred MB (part (a) stores per-head attention arrays);
@@ -37,6 +43,9 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 PY=${PY:-python}
+for v in TEST_MODE EXTRA KEEP_CACHE FORCE TESTS; do case ${!v:-} in ""|0|1) ;; *) echo "bad $v='${!v}' (0 or 1)"; exit 2;; esac; done
+on() { [ "${!1:-0}" = 1 ]; }   # a switch is on only when it is 1
+on TEST_MODE || unset TEST_MODE   # the experiments read TEST_MODE as set / unset
 PARTS=${PARTS:-a,b,c,d,e}; PARTS=${PARTS// /}; ONLY=${ONLY:-}; ONLY=${ONLY// /}
 for p in ${PARTS//,/ }; do case $p in a|b|c|d|e) ;; *) echo "bad PARTS item '$p' (a,b,c,d,e)"; exit 2;; esac; done
 has() { case ",$PARTS," in *",$1,"*) return 0;; esac; return 1; }
@@ -47,7 +56,7 @@ VAR=POST_THE,POST_MODIF,POST_TITLE,POST_UPPER,POST_PLURAL,POST_SYN,POST_FRMIX,PO
 SPLICE=S2,S3,L2,L3,S3out,L3out,S6,L6
 Q7=Qwen/Qwen2.5-7B-Instruct; Q14=Qwen/Qwen2.5-14B-Instruct; MI=mistralai/Mistral-7B-Instruct-v0.3; OL=allenai/OLMo-2-1124-7B-Instruct
 Q15=Qwen/Qwen2.5-1.5B-Instruct; Q3=Qwen/Qwen2.5-3B-Instruct; Q3_8=Qwen/Qwen3-8B; Q7B=Qwen/Qwen2.5-7B
-if [ -n "${TEST_MODE:-}" ]; then
+if on TEST_MODE; then
   OUT=${OUT:-$(mktemp -d)/gpu_stage5}; TGZ=${TGZ:-$OUT.tgz}
   TINY=Qwen/Qwen2.5-0.5B-Instruct; DT=float32; TAG=TEST_${TINY##*/}
   export TEST_MODE=1 KEEP_CACHE=1   # the experiments then force Qwen2.5-0.5B, FP32, CPU and keep --n
@@ -61,12 +70,16 @@ else
   MODELS=(gpt2 gpt2-xl "$Q15" "$Q3" "$Q7" "$Q14" "$MI" "$OL" "$Q7B")
   A=("$Q15" "$Q3" "$Q7" "$Q14"); B=("$Q7" "$Q14" "$MI"); CD=("$Q7" "$Q14" "$MI" "$OL"); C1=("$Q7" "$Q14" "$MI"); CS=("$Q7" "$Q14" "$MI" "$OL")
   D=("$Q7" "$Q14" "$MI" "$OL"); E=(gpt2 gpt2-xl "$Q7" "$MI" "$Q7B" "$Q14"); EA=(gpt2); ES=("$Q7" "$MI")
-  if [ -n "${EXTRA:-}" ]; then MODELS+=("$Q3_8"); A+=("$MI" "$OL" "$Q3_8"); B+=("$Q15" "$Q3" "$OL"); CD+=("$Q3_8"); CS+=("$Q3_8"); fi
+  if on EXTRA; then MODELS+=("$Q3_8"); A+=("$MI" "$OL" "$Q3_8"); B+=("$Q15" "$Q3" "$OL"); CD+=("$Q3_8"); CS+=("$Q3_8"); fi
 fi
 for o in ${ONLY//,/ }; do among "$o" "${MODELS[@]}" "${MODELS[@]##*/}" || { echo "bad ONLY item '$o' (not among ${MODELS[*]})"; exit 2; }; done
+wanted() { { has a && among "$1" "${A[@]}"; } || { has b && among "$1" "${B[@]}"; } || { { has c || has d; } && among "$1" "${CD[@]}"; } || { has e && among "$1" "${E[@]}"; }; }
+SEL=0; for m in "${MODELS[@]}"; do selected "$m" && wanted "$m" && SEL=1; done
+[ $SEL = 1 ] || { echo "no step selected: PARTS=$PARTS with ONLY=${ONLY:-all} names no model x part"; exit 2; }
+IOI_SEED=1  # part (e): fresh cores (ckeys.ioi.SEED); seed 0 was the disclosed GPT-2 small CPU pilot
 ARMS=NONE,POST,AFTER,$SUB,$VAR   # parts (c) and (d) share the seed-0 factorial file: both arm sets whenever either part runs
 mkdir -p "$OUT"
-echo "PARTS=$PARTS ONLY=${ONLY:-all} EXTRA=${EXTRA:-} FORCE=${FORCE:-} models: ${MODELS[*]}"
+echo "PARTS=$PARTS ONLY=${ONLY:-all} EXTRA=${EXTRA:-0} FORCE=${FORCE:-0} models: ${MODELS[*]}"
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 run() {
   local name=$1 rc=0; shift
@@ -82,49 +95,56 @@ run() {
 aside() { local old="$1.failed.$(date -u +%Y%m%dT%H%M%SZ)"; mv "$1" "$old"; echo "moved aside $old: $2" | tee -a "$OUT/COMMIT.txt"; }
 STEPS=0
 keep() {  # keep <results file> <name> <command...>: a step whose results file exists and is readable JSON is kept unless
-  local f=$1 name=$2 rc=0; shift   # FORCE=1; a file left by a FAILED step, or unreadable, is moved aside and the step run again
+  local f=$1 name=$2 rc=0 stamp; shift   # FORCE=1; a file written by a FAILED step, or unreadable, is moved aside and the step run again
   STEPS=$((STEPS + 1))
-  if [ -e "$f" ] && [ -z "${FORCE:-}" ]; then
-    if $PY -c "import json, sys; json.load(open(sys.argv[1]))" "$f" 2>/dev/null; then echo "==================== $name kept: $f exists (FORCE=1 to redo)"; return 0; fi
-    aside "$f" "not readable JSON (a step interrupted while writing); $name is run again"
+  if [ -e "$f" ]; then
+    if ! $PY -c "import json, sys; json.load(open(sys.argv[1]))" "$f" 2>/dev/null; then aside "$f" "not readable JSON (a step interrupted while writing); $name is run again"
+    elif ! on FORCE; then echo "==================== $name kept: $f exists (FORCE=1 to redo)"; return 0; fi
   fi
-  run "$@" || { rc=$?; [ -e "$f" ] && aside "$f" "left by the FAILED step $name (exit $rc); the scorer does not read it"; }
+  stamp="$OUT/.stamp_$name"; touch "$stamp"; sleep 1   # a file older than the stamp was not written by this step
+  run "$@" || { rc=$?; if [ -e "$f" ] && [ "$f" -nt "$stamp" ]; then aside "$f" "written by the FAILED step $name (exit $rc); the scorer does not read it"
+                elif [ -e "$f" ]; then echo "kept $f: the FAILED step $name (exit $rc, FORCE=1) wrote no new file, the earlier one stays and is scored" | tee -a "$OUT/COMMIT.txt"; fi; }
+  rm -f "$stamp"
   return $rc
 }
 die() {  # fatal before the models: record, archive the logs, stop
   echo "FAILED $1" | tee -a "$OUT/FAILED.txt"
   tar czf "$TGZ" "$OUT"; echo "Results archive (logs): $TGZ"; exit 1
 }
-HUB=$($PY -c "from huggingface_hub.constants import HF_HUB_CACHE; print(HF_HUB_CACHE)" 2>/dev/null) || HUB=~/.cache/huggingface/hub   # honours HF_HOME / HF_HUB_CACHE
-clean() { [ -z "${KEEP_CACHE:-}" ] && rm -rf "$HUB"; }
 [ -f "$OUT/FAILED.txt" ] && mv "$OUT/FAILED.txt" "$OUT/FAILED.$(date -u +%Y%m%dT%H%M%SZ).txt"
-{ echo "==== $(date -u +%Y-%m-%dT%H:%M:%SZ) PARTS=$PARTS EXTRA=${EXTRA:-} TEST_MODE=${TEST_MODE:-}"; git rev-parse HEAD; git status --short; } | tee -a "$OUT/COMMIT.txt"
-if [ -z "${TEST_MODE:-}" ]; then  # the preregistered code only: the finalised entry, no local changes
+{ echo "==== $(date -u +%Y-%m-%dT%H:%M:%SZ) PARTS=$PARTS EXTRA=${EXTRA:-0} TEST_MODE=${TEST_MODE:-0} FORCE=${FORCE:-0}"; git rev-parse HEAD; git status --short; } | tee -a "$OUT/COMMIT.txt"
+if ! on TEST_MODE; then  # the preregistered code only: the finalised entry, no local changes, the code of the finalising commit
   awk '/^## /{f = ($0 ~ /P-2026-10-05-G/)} f && /DRAFT, not yet final/{d = 1} END{exit !d}' docs/PREREGISTRATION.md \
     && die "preregistration P-2026-10-05-G is still a DRAFT: check out the commit 'Finalise preregistration G' (docs/GPU_RUNBOOK.md)"
   # (awk decides alone: an awk | grep -q pipeline under pipefail gets status 141 when grep exits first, and the refusal is skipped)
   git rev-parse HEAD > /dev/null 2>&1 && [ -z "$(git status --porcelain --untracked-files=no)" ] \
     || die "not a clean git checkout (modified tracked files above): run from a clean checkout of 'Finalise preregistration G'"
+  G=$(git log --format=%H -1 --grep='^Finalise preregistration G')
+  [ -n "$G" ] || die "no commit 'Finalise preregistration G' in the history of HEAD (docs/GPU_RUNBOOK.md)"
+  git diff --quiet "$G" HEAD -- ckeys experiments analysis scripts tests docs/PREREGISTRATION.md \
+    || die "the code at HEAD differs from the commit 'Finalise preregistration G' ($G): check that commit out (docs/GPU_RUNBOOK.md)"
 fi
 
 # ---- software environment of stages 1 and 3b
 LOGENV="$OUT/log_env.txt"
-if [ -z "${TEST_MODE:-}" ]; then
+if ! on TEST_MODE; then
   $PY -m pip install 'transformers==5.18.0' accelerate numpy pytest >> "$LOGENV" 2>&1; tail -n 1 "$LOGENV"
   $PY -c "import transformers as t; assert t.__version__ == '5.18.0', t.__version__" >> "$LOGENV" 2>&1 || die "transformers is not 5.18.0 (see $LOGENV)"
 fi
-$PY -m pip freeze 2>/dev/null > "$OUT/PIP_FREEZE.txt"
+{ echo "==== $(date -u +%Y-%m-%dT%H:%M:%SZ)"; $PY -m pip freeze 2>/dev/null; } >> "$OUT/PIP_FREEZE.txt"   # appended, like ENV.txt
+HUB=$($PY -c "from huggingface_hub.constants import HF_HUB_CACHE; print(HF_HUB_CACHE)" 2>/dev/null) || HUB=${HF_HUB_CACHE:-${HF_HOME:-$HOME/.cache/huggingface}/hub}   # after the install; honours HF_HOME / HF_HUB_CACHE
+clean() { on KEEP_CACHE || rm -rf "$HUB"; }
 echo "==== $(date -u +%Y-%m-%dT%H:%M:%SZ) PARTS=$PARTS ONLY=${ONLY:-all} TEST_MODE=${TEST_MODE:-} HF hub cache $HUB" >> "$OUT/ENV.txt"   # appended, like COMMIT.txt: a rerun keeps the earlier models' lines
 $PY -c "import sys, torch, transformers, numpy; print('python', sys.version.split()[0], 'torch', torch.__version__, 'transformers', transformers.__version__, 'numpy', numpy.__version__, 'gpus', torch.cuda.device_count(), torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'cpu')" | tee -a "$OUT/ENV.txt"
 command -v nvidia-smi > /dev/null && nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv >> "$OUT/ENV.txt"
 MINGIB=${MINGIB:-75}
-[ -n "${TEST_MODE:-}" ] || $PY -c "import torch; assert torch.cuda.device_count() >= 1 and torch.cuda.get_device_properties(0).total_memory / 2**30 >= $MINGIB" \
+on TEST_MODE || $PY -c "import torch; assert torch.cuda.device_count() >= 1 and torch.cuda.get_device_properties(0).total_memory / 2**30 >= $MINGIB" \
   || die "no CUDA device with >= $MINGIB GiB visible to torch (MINGIB=<GiB> lowers the floor for a rerun of the 7B parts)"
 
 # ---- unit tests (FP32 exactness at Qwen2.5-0.5B and GPT-2 small) and preflights, before any 7B model
 [ "${TESTS:-1}" = 0 ] || run pytest $PY -m pytest tests/ -q || die "pytest (see $OUT/log_pytest.txt)"
 run check_rules $PY -c "from ckeys.subsets import check_rules; print(check_rules())" || die "check_rules (see $OUT/log_check_rules.txt)"
-run entry_facts $PY analysis/ioi_entry_facts.py --out "$OUT/ENTRY_FACTS.preflight.txt" || die "entry_facts (see $OUT/log_entry_facts.txt)"
+run entry_facts $PY analysis/ioi_entry_facts.py --seed "$IOI_SEED" --out "$OUT/ENTRY_FACTS.preflight.txt" || die "entry_facts (see $OUT/log_entry_facts.txt)"
 [ -f results/gpu_stage5/ioi/ENTRY_FACTS.txt ] \
   || die "results/gpu_stage5/ioi/ENTRY_FACTS.txt is missing: it belongs to the commit 'Finalise preregistration G' (the IOI facts quoted by part (e) of the entry)"
 diff -q "$OUT/ENTRY_FACTS.preflight.txt" results/gpu_stage5/ioi/ENTRY_FACTS.txt > /dev/null \
@@ -133,13 +153,15 @@ diff -q "$OUT/ENTRY_FACTS.preflight.txt" results/gpu_stage5/ioi/ENTRY_FACTS.txt 
 # ---- per-model loop (each model downloaded once, used by every part that lists it, then the cache is cleaned)
 for m in "${MODELS[@]}"; do
   selected "$m" || continue
-  { has a && among "$m" "${A[@]}"; } || { has b && among "$m" "${B[@]}"; } || { { has c || has d; } && among "$m" "${CD[@]}"; } \
-    || { has e && among "$m" "${E[@]}"; } || continue   # no step of PARTS lists this model: no revision or snapshot line in ENV.txt
+  wanted "$m" || continue   # no step of PARTS lists this model: no revision or snapshot line in ENV.txt
   s=${m##*/}; echo "######## $m  $(date -u +%H:%M:%S)"
   case $m in gpt2*) EDT=float32;; *) EDT=$DT;; esac   # GPT-2 in FP32 (exactness asserted), the rest BF16
   # the Hub revision, resolved before the steps and pinned in every step (--revision) and results file; the loaded snapshot recorded after them
-  REV=$($PY -c "from huggingface_hub import model_info; print(model_info('$m').sha)" 2>/dev/null) && [ -n "$REV" ] && RV="--revision $REV" || { REV=""; RV=""; }
-  echo "$m revision ${REV:-unavailable (offline: the steps load the cached snapshot, recorded below)}" | tee -a "$OUT/ENV.txt"
+  REV=$(awk -v m="$m" '$1 == m {r = $2} END {print r}' "$OUT/REVISIONS.txt" 2>/dev/null); PIN=pinned   # the revision of the earlier steps in OUT
+  [ -n "$REV" ] || { PIN=resolved; REV=$($PY -c "from huggingface_hub import model_info; print(model_info('$m').sha)" 2>/dev/null) && [ -n "$REV" ] && echo "$m $REV" >> "$OUT/REVISIONS.txt"; }
+  [ -n "$REV" ] && RV="--revision $REV" || { REV=""; RV=""; }
+  [ -n "$REV" ] && REVTXT="$REV ($PIN)" || REVTXT="unavailable (offline: the steps load the cached snapshot, recorded below)"
+  echo "$m revision $REVTXT" | tee -a "$OUT/ENV.txt"
   has a && among "$m" "${A[@]}" && keep "$OUT/attention/$s.json" "attention_$s" $PY experiments/remention_attention.py --model "$m" --n "$NA" --dtype "$DT" --out "$OUT/attention" $RV
   has b && among "$m" "${B[@]}" && keep "$OUT/knockout/${s}_s0.json" "knockout_$s" $PY experiments/attention_knockout.py --model "$m" --n "$NB" --dtype "$DT" --out "$OUT/knockout" $RV
   { has c || has d; } && among "$m" "${CD[@]}" && keep "$OUT/factorial/${s}_s0.json" "factorial_$s" $PY experiments/format_factorial.py --model "$m" --n "$NC" --seed 0 --dtype "$DT" \
@@ -150,9 +172,9 @@ for m in "${MODELS[@]}"; do
       --arm-modules ckeys.subsets --out "$OUT/row_restricted" $RV
   has d && among "$m" "${D[@]}" && keep "$OUT/competence/$s.json" "competence_$s" $PY experiments/form_competence.py --model "$m" --dtype "$DT" --out "$OUT/competence" $RV
   has d && among "$m" "${D[@]}" && keep "$OUT/form_attention/$s.json" "form_attention_$s" $PY experiments/form_attention.py --model "$m" --n "$ND" --dtype "$DT" --out "$OUT/form_attention" $RV
-  has e && among "$m" "${E[@]}" && keep "$OUT/ioi/${s}_s0.json" "ioi_$s" $PY experiments/ioi_factorial.py --model "$m" --n "$NE" --dtype "$EDT" --out "$OUT/ioi" --assert-exact "${IOI_EXACT:-auto}" $RV
-  has e && among "$m" "${EA[@]}" && keep "$OUT/ioi_attention/$s.json" "ioi_attention_$s" $PY experiments/ioi_attention.py --model "$m" --n "$NP" --dtype "$EDT" --out "$OUT/ioi_attention" $RV
-  has e && among "$m" "${ES[@]}" && keep "$OUT/row_restricted/${s}_ioi.json" "ioi_splice_$s" $PY experiments/row_restricted_keys.py --task ioi --arms AFTER --model "$m" --n "$NS" --dtype "$DT" --out "$OUT/row_restricted" $RV
+  has e && among "$m" "${E[@]}" && keep "$OUT/ioi/${s}_s${IOI_SEED}.json" "ioi_$s" $PY experiments/ioi_factorial.py --model "$m" --n "$NE" --seed "$IOI_SEED" --dtype "$EDT" --out "$OUT/ioi" --assert-exact "${IOI_EXACT:-auto}" $RV
+  has e && among "$m" "${EA[@]}" && keep "$OUT/ioi_attention/$s.json" "ioi_attention_$s" $PY experiments/ioi_attention.py --model "$m" --n "$NP" --seed "$IOI_SEED" --dtype "$EDT" --out "$OUT/ioi_attention" $RV
+  has e && among "$m" "${ES[@]}" && keep "$OUT/row_restricted/${s}_ioi.json" "ioi_splice_$s" $PY experiments/row_restricted_keys.py --task ioi --arms AFTER --model "$m" --n "$NS" --seed "$IOI_SEED" --dtype "$DT" --out "$OUT/row_restricted" $RV
   echo "$m loaded snapshot(s): $(ls "$HUB/models--${m//\//--}/snapshots" 2>/dev/null | tr '\n' ' ')" >> "$OUT/ENV.txt"
   clean
 done

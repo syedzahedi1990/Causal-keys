@@ -36,6 +36,7 @@ from ckeys.encoding import WRAPPER_USED, build_prompt, candidate_ids, chat_text
 from ckeys.interventions import blocks
 from ckeys.knockout import groups, masks_for_model, on_target, target_ids
 from ckeys.story import LOCATIONS, make_cores, pick_x, record
+from experiments.ioi_factorial import device_name
 
 ROWS = [("B", "B", "ID"), ("B", "B", "ID2"), ("S", "B", "K_S"), ("B", "S", "V_S"), ("S", "S", "KV_S"),
         ("X", "B", "K_X"), ("B", "X", "V_X"), ("X", "X", "KV_X")]  # (key donor, value donor, label)
@@ -142,7 +143,8 @@ def run_item(model, tok, core, arm, device, tidx, emit_steps=12, chunk=0):
 def per_core(results, arm, mask):
     """Per-core derived quantities of one arm x mask: ID_K, ID_V, d_K/d_V/d_KV (span), restricted accuracy and
     full-vocab on-target flags (acc/on_B from the self-clamp row, acc/on_S from the KV_S row), location and candidate
-    mass of the self-clamp row, the within-batch and batch-vs-clean noise floors, |C_init|, competence."""
+    mass of the self-clamp row, the within-batch noise floor, floor_clean = |self-clamp row - clean unmasked run| (the
+    batch-vs-clean noise floor under M0, the mask's own effect under M1-M8), |C_init|, competence."""
     out = {}
     for r in results:
         if r["arm"] != arm or mask not in r["m"]:
@@ -185,7 +187,7 @@ def summarize(res, arms=ARMS):
             lines.append(f"{arm:5s} {mask:5s} n={len(P):3d} ID_K {fmt(boot(v('idK')))} r_K {rK:+5.2f}  ID_V {fmt(boot(v('idV')))}  "
                          f"span {v('dKV').mean():+6.2f} q_V {v('idV').mean() / v('dKV').mean():+5.2f}  acc_B {v('accB').mean():.2f} "
                          f"acc_S {v('accS').mean():.2f} on_B {v('onB').mean():.2f} on_S {v('onS').mean():.2f} loc {v('loc').mean():.2f} "
-                         f"floor {v('floor').mean():.3f}/{v('floor_clean').mean():.3f}")
+                         f"floor {v('floor').mean():.3f}" + (f"/{v('floor_clean').mean():.3f}" if mask == "M0" else f" mask effect {v('floor_clean').mean():.3f}"))
     return "\n".join(lines)
 
 
@@ -199,7 +201,7 @@ def provenance(a, model, tok, res, skipped):
                   {i for r in res for row in r["clean"].values() for i in row["top5"][0]})
     return {"args": vars(a), "git_commit": commit, "torch": torch.__version__, "transformers": transformers.__version__,
             "python": platform.python_version(), "dtype": str(next(model.parameters()).dtype),
-            "device": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu",
+            "device": device_name(next(model.parameters()).device),
             "attn_implementation": model.config._attn_implementation, "wrapper": dict(WRAPPER_USED),
             "target_ids": target_ids(tok), "rows": ROWS, "masks": MASKS, "none_masks": NONE_MASKS, "skipped_items": skipped,
             "chat_sha256_core0": {arm: r["chat_sha256"] for arm, r in first.items() if r}, "len_core0": {arm: r["len"] for arm, r in first.items() if r},

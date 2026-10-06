@@ -64,6 +64,7 @@ def main(root="results/gpu_stage3"):
             print(f"  {m}: MISSING")
             continue
         res = json.load(open(fs[0]))
+        res = res["results"] if isinstance(res, dict) else res  # stage-5 code writes {"provenance", "results"}
         for arm in ("P1", "POST", "LETTER"):
             R = [r for r in res if r["arm"] == arm]
             full = [r["m"]["all"] - r["m_B"] for r in R]

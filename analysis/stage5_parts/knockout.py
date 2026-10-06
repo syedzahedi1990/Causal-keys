@@ -15,7 +15,7 @@ G7  AFTER and P1 with M1: (a) q_V^M1 >= 0.5 x q_V^M0(NONE) and paired ID_V^M1 - 
     with on_B^M1 <= 0.60 or loc ratio <= 0.50 in >= 2/3 (a model counts when it shows the pattern in both formats).
 G8  (a) NONE with M3: mean ID_V^M3 <= 0.60 x mean ID_V^M0, paired diff < 0 (CI excl. 0), >= 2/3; (b) AFTER with M3:
     r_K(M3) >= 0.80, acc_B and on_B >= 0.90, 3/3; (c) AFTER and P1, M4 vs M1: mean ID_V^M4 <= 0.60 x mean ID_V^M1,
-    paired diff < 0 (CI excl. 0), in >= 2/3 of the models meeting G7a in that format (G7a failing = not met).
+    paired diff < 0 (CI excl. 0), in >= 2/3 per format, a model counting only if it meets G7a (both formats, as in G7).
 """
 import argparse
 import glob
@@ -124,7 +124,7 @@ def score(root, models=MODELS, stage3b="results/gpu_stage3b/format_2x2", out=pri
             f"attn {p.get('attn_implementation')}, dtype {p.get('dtype')}, transformers {p.get('transformers')}, torch {p.get('torch')}, "
             f"commit {str(p.get('git_commit'))[:10]}, C_init counts {p.get('c_init_counts')}, len core 0 {p.get('len_core0')}")
 
-    out("\n-- per arm x mask (all items): ID_K, r_K, ID_V, span = mean d_KV, q_V, acc_B/acc_S, on_B/on_S, loc mass, noise floors (batch / vs clean)")
+    out("\n-- per arm x mask (all items): ID_K, r_K, ID_V, span = mean d_KV, q_V, acc_B/acc_S, on_B/on_S, loc mass, noise floor (within-batch duplicate row; under M0 also / batch vs clean unmasked run; under M1-M8 that difference is the mask's own effect, printed as 'mask effect')")
     for m, c in cells.items():
         for f in ("AFTER", "P1", "POST", "NONE"):
             for M in masks_of(f):
@@ -133,7 +133,7 @@ def score(root, models=MODELS, stage3b="results/gpu_stage3b/format_2x2", out=pri
                 out(f"   {m:26s} {f:5s} {M:5s} n={len(c.P[f, M]):3d} ID_K {fmt(boot(c.v(f, M, 'idK')))} r_K {fmt(c.rat(f, M, 'idK'))}  "
                     f"ID_V {fmt(boot(c.v(f, M, 'idV')))} span {c.mean(f, M, 'dKV'):+7.2f} q_V {fmt(c.q_V(f, M))}  "
                     f"acc {c.mean(f, M, 'accB'):.2f}/{c.mean(f, M, 'accS'):.2f} on {c.mean(f, M, 'onB'):.2f}/{c.mean(f, M, 'onS'):.2f} "
-                    f"loc {c.mean(f, M, 'loc'):.3f} floor {c.mean(f, M, 'floor'):.3f}/{c.mean(f, M, 'floor_clean'):.3f}")
+                    f"loc {c.mean(f, M, 'loc'):.3f} floor {c.mean(f, M, 'floor'):.3f}" + (f"/{c.mean(f, M, 'floor_clean'):.3f}" if M == "M0" else f" mask effect {c.mean(f, M, 'floor_clean'):.3f}"))
 
     out("\n== Gate b (sanity, M8 in every arm): |mean ID_K| <= 0.1, |mean ID_V| <= 0.1 nats, acc_B <= 0.5, on_B <= 0.5")
     gate = {}  # True / False / None (file MISSING: not measured, counts as not met in the k/k lines but is not an M8 failure)
@@ -191,15 +191,14 @@ def score(root, models=MODELS, stage3b="results/gpu_stage3b/format_2x2", out=pri
     out(f"   G6 -> {verdict(G6)} ({k6}/{N})")
 
     out("\n== G7 the copy takes over and the answer stays (AFTER and P1 with M1); H_redundant vs H_replaced")
-    g7a, g7a_f, g7b, g7span, hrep, hbeh = {}, {}, {}, {}, {}, {}
+    g7a, g7b, g7span, hrep, hbeh = {}, {}, {}, {}, {}
     for m in models:
         if m not in cells:
-            g7a[m] = g7b[m] = g7span[m] = hrep[m] = hbeh[m] = False; g7a_f[m] = {"AFTER": False, "P1": False}; continue
+            g7a[m] = g7b[m] = g7span[m] = hrep[m] = hbeh[m] = False; continue
         c = cells[m]
         qN = c.q_V("NONE", "M0")
         out(f"   {m:26s} q_V^M0(NONE) {fmt(qN)} (stage-3b reference {Q_V_NONE_3B.get(m, float('nan')):.3f}); threshold 0.5 x = {0.5 * qN[0]:.3f}")
         A, Bk, sp, rep, beh = True, True, True, True, True
-        g7a_f[m] = {}
         for f in ("AFTER", "P1"):
             q1 = c.q_V(f, "M1")
             dV = c.paired(f, "M1", "M0", "idV")
@@ -210,7 +209,6 @@ def score(root, models=MODELS, stage3b="results/gpu_stage3b/format_2x2", out=pri
             lr = c.rat(f, "M1", "loc")
             sr = c.rat(f, "M1", "dKV")
             b_ok = min(acc + on) >= 0.90 and lr[0] >= 0.50 and lr[1] >= 0.40
-            g7a_f[m][f] = a_ok
             A &= a_ok; Bk &= b_ok; sp &= sr[0] >= 0.5
             rep &= dV[2] <= 1.0 and q1[0] <= 0.5 * qN[0]
             beh &= on[0] <= 0.60 or lr[0] <= 0.50
@@ -246,9 +244,9 @@ def score(root, models=MODELS, stage3b="results/gpu_stage3b/format_2x2", out=pri
             r4 = c.rat(f, "M4", "idV", "M1")
             d4 = c.paired(f, "M4", "M1", "idV")
             ok = r4[0] <= 0.60 and d4[2] < 0
-            g8c[m][f] = ok and g7a_f[m][f]
+            g8c[m][f] = ok and g7a[m]  # "a model meeting G7a" = the model's G7a verdict (both formats), as counted in G7
             out(f"   {m:26s} (c) {f:5s} M4 vs M1: ID_V^M4/ID_V^M1 {fmt(r4)} <= 0.60; paired {fmt(d4)} < 0 -> {verdict(ok)}; "
-                f"G7a({f}) {verdict(g7a_f[m][f])}; on_B^M4 {c.mean(f, 'M4', 'onB'):.2f} loc^M4 {c.mean(f, 'M4', 'loc'):.3f} -> {verdict(g8c[m][f])}")
+                f"G7a (both formats) {verdict(g7a[m])}; on_B^M4 {c.mean(f, 'M4', 'onB'):.2f} loc^M4 {c.mean(f, 'M4', 'loc'):.3f} -> {verdict(g8c[m][f])}")
     k8a, k8b = sum(g8a.values()), sum(g8b.values())
     k8c = {f: sum(d[f] for d in g8c.values()) for f in ("AFTER", "P1")}
     G8a, G8b, G8c = k8a >= TWO, k8b == N, all(k >= TWO for k in k8c.values())

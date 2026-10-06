@@ -16,15 +16,18 @@ Gate a (per model): lowercase ID_K(P1) > 1.0 with CI excluding 0; anchors ID_K(P
   same side (positive cells: > 0 with CI excluding 0; null cells: CI within [-1, +1]); E(P1) >= 0.30 with lower bound
   > 0.15 and F/E(P1) >= 0.5.  A failing model is gated out (statistics exploratory).
 G1  anchors, POST: E >= 0.20 (lower > 0.10) and F/E >= 0.5 in 2/2 anchors (an anchor gated out or missing is not
-    evaluable, which counts as not met in the k/k line; G3 and G4b take their minimum over the gated-in anchors).
+    evaluable, which counts as not met in the k/k line; with no anchor gated in the line is NOT EVALUABLE, as every line
+    with nothing evaluable; G3 and G4b take their minimum over the gated-in anchors).
 G2  small models, POST: H_diss if E >= 0.20 (lower > 0.10) and F/E >= 0.5 in every gated-in one; H_track if the upper
-    bound of E < 0.10 in every one; else mixed. Qualifier "embedding-level heads only" if all H*(POST) lie in layers < 2
-    or below the lowest layer of H*(P1); Jaccard of the two H* and d_K reported beside the call.
+    bound of E < 0.10 in every one; else mixed. G2 is MET only under H_diss; H_track is the entry's Alternative, declared
+    and printed NOT MET (G3 is then judged under it); mixed declares no account. Qualifier "embedding-level heads only"
+    if all H*(POST) lie in layers < 2 or below the lowest layer of H*(P1); Jaccard of the two H* and d_K reported beside
+    the call.
 G3  under H_diss: R_A = E(POST)/E(P1) >= 0.5 and E(m, POST) >= 0.5 x min over gated-in anchors of E(anchor, POST), each
     gated-in small model; under H_track: R_A <= 0.10 each.
 G4  (a) anchors, POST: G >= 0.10 with lower > 0.05 in 2/2 (as G1); if instead G's upper bound < 0.10 at both, hop 2 is
     unsuitable and (b) is not evaluable. (b) under H_diss and (a): Q(m) <= 0.5 with upper bound < 1.0 at each gated-in
-    small model.
+    small model; NOT APPLICABLE when G2 declared no H_diss (H_track, mixed or no gated-in small model) or (a) failed.
 """
 import argparse
 import json
@@ -266,7 +269,7 @@ def score(root, roles=None, out=print, exploratory=True):
         return {t: np.array([v for i, v in zip(post(t).i[post(t).ev], post(t).E_i) if i in common]) for t in ts}, \
                {t: np.array([v for i, v in zip(post(t).i[post(t).ev], post(t).G_i) if i in common]) for t in ts}
 
-    out("\n== Verdicts (G1-G4; the G2 call is provisional when one small model is evaluable; an anchor gated out or missing counts as not met in G1 and G4a)")
+    out("\n== Verdicts (G1-G4; the G2 call is provisional when one small model is evaluable; an anchor gated out or missing counts as not met in G1 and G4a, no anchor gated in makes them NOT EVALUABLE; G2 is MET only under H_diss, H_track is the declared alternative)")
     V = {}  # name -> (True / False / None, text) for analysis/stage5_score.py
     kk = lambda ok: f"{sum(ok.values())}/{len(ok)} anchors" + (f" ({', '.join(f'{t} {w}' for t, w in not_in.items())})" if not_in else "")  # noqa: E731
     # G1
@@ -293,10 +296,10 @@ def score(root, roles=None, out=print, exploratory=True):
             out(f"  G2 {t}: E {fmt(c.E)} F/E {fmt(c.FE, 2)}; H_diss cell {E_ok(c)}, H_track cell {c.E[2] < 0.10}; Jaccard(H*POST, H*P1) "
                 f"{data[t]['jaccard']:.2f}, H*(POST) layers {[l for l, _ in c.Hs]}; d_K lower {fmt(boot(c.key['lower']['dK']), 2)} "
                 f"cap {fmt(boot(c.key['cap']['dK']), 2)} beside ID_K lower {fmt(c.idk('lower'), 2)} cap {fmt(c.idk('cap'), 2)}")
-        out(f"  G2 dissociation: {len(smalls)}/{len(smalls)} gated-in small models -> {'H_diss MET' if diss else 'H_track MET' if track else 'mixed: NOT MET (no account declared)'}{qual}"
+        out(f"  G2 dissociation: {len(smalls)}/{len(smalls)} gated-in small models -> {'H_diss MET' if diss else 'NOT MET (alternative H_track declared)' if track else 'mixed: NOT MET (no account declared)'}{qual}"
             + (" [provisional, one model evaluable]" if len(smalls) == 1 else ""))
         out(f"  CALL: {call}{qual}" + (" (provisional, one model evaluable)" if len(smalls) == 1 else " (full, 2/2)" if len(smalls) == 2 else ""))
-        V["G2"] = (call != "mixed", f"{call}{qual}, {len(smalls)}/{len(smalls)} gated-in small models" + (" (provisional)" if len(smalls) == 1 else ""))
+        V["G2"] = (call == "H_diss", f"{'alternative H_track declared' if call == 'H_track' else 'mixed, no account declared' if call == 'mixed' else call}{qual}, {len(smalls)}/{len(smalls)} gated-in small models" + (" (provisional)" if len(smalls) == 1 else ""))
     else:
         out("  G2 dissociation: NOT EVALUABLE (no gated-in small model)")
         out("  CALL: no call (0 small models evaluable)")
@@ -351,7 +354,7 @@ def score(root, roles=None, out=print, exploratory=True):
         out(f"  G4b hop-2 cross-scale (Q(m) <= 0.5, upper < 1.0): " + "; ".join(lines) + f" -> {sum(oks)}/{len(oks)} {verdict(all(oks))}")
         V["G4b"] = (all(oks), f"{sum(oks)}/{len(oks)} gated-in small models")
     else:
-        why = "no gated-in small model" if call is None else "G2 did not declare H_diss" if call != "H_diss" else "G4a not met" if g4a is False else "G4a not evaluable"
+        why = "no gated-in small model, G2 did not declare H_diss" if call is None else "G2 did not declare H_diss" if call != "H_diss" else "G4a not met" if g4a is False else "G4a not evaluable"
         out(f"  G4b hop-2 cross-scale: NOT EVALUABLE ({why})")
         V["G4b"] = (None, why)
     if exploratory:

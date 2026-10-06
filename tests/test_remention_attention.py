@@ -221,6 +221,7 @@ def test_rules_h_track_and_gates():
     res, txt = run_score(out)
     assert res["gated"]["Qwen2.5-7B-Instruct"] and not res["gated"]["Qwen2.5-14B-Instruct"]
     assert "Gated-in anchors: ['Qwen2.5-7B-Instruct']" in txt and res["call"] == "H_track"
+    assert res["verdicts"]["G2"][0] is False and "NOT MET (alternative H_track declared)" in txt   # G2 is met only under H_diss
     assert "1/2 anchors (Qwen2.5-14B-Instruct gated out) NOT MET" in txt.split("G1 anchor")[1].split("\n")[0]   # a gated-out anchor counts as not met
     assert res["verdicts"]["G1"] == (False, "1/2 anchors (Qwen2.5-14B-Instruct gated out)") and res["g1"] is False
     assert "G3 magnitude under H_track" in txt and "2/2 MET" in txt.split("G3 magnitude")[1].split("\n")[0]

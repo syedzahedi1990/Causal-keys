@@ -62,6 +62,9 @@ INSTR = "Answer with one name."
 QUESTION = "Question: Which name completes the sentence?"
 
 
+SEED = 1  # confirmatory IOI cores of preregistration G; seed 0 is the disclosed GPT-2 small CPU pilot (pilots/ioi_gpt2_cpu)
+
+
 def make_cores(n: int, rng: random.Random) -> list[dict]:
     cores = []
     for i in range(n):
@@ -175,6 +178,7 @@ class RowTask:
     IO_S and IO_X), ``choices`` (the whole list span) and ``tail`` (everything after the list, or after the sentence
     when nothing is listed after it: instruction, chat tokens, prefill, answer position).
     """
+    seed = SEED  # default core seed for row_restricted_keys.py --task ioi
     bos = None
 
     def __init__(self, chat=True):
@@ -184,7 +188,7 @@ class RowTask:
     def chat(self):
         return arm_chat(self._arm, self.chat_models)
 
-    def cores(self, n, seed=0):
+    def cores(self, n, seed=SEED):
         return make_cores(n, random.Random(seed))
 
     def prompts(self, core, arm):

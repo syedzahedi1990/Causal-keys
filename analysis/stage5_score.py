@@ -7,11 +7,12 @@ Output, also written to --out (default {root}/STAGE5_SCORE.txt): the gates of ev
 per prediction G1-G22 in order (a prediction with sub-verdicts is MET when every sub-verdict is met, NOT EVALUABLE when
 none can be evaluated, else NOT MET: not evaluable counts as not met, so an anchor gated out of part (a) counts as not
 met in G1 and G4a, whereas G3 and G4b take their minimum over the gated-in anchors; a sub-verdict whose stated precondition failed,
-G4b when G2 declared H_track or mixed or when G4a is not met, is NOT APPLICABLE and left out, whereas G4b not evaluable
-for any other reason, no gated-in small model, counts as not met; G7's verdict is H_redundant, H_replaced is reported
+G4b when G2 declared no H_diss (H_track, mixed, or no gated-in small model) or when G4a is not met, is NOT APPLICABLE and
+left out; G2 is MET only under H_diss, H_track printing NOT MET as the declared alternative; G7's verdict is H_redundant, H_replaced is reported
 beside it; an M8 failure of a present knockout model makes G5-G8 NOT EVALUABLE, a missing knockout file only counts as
 not met in the k/k lines), the provenance of every results file (commit, model and revision, dtype, device, transformers,
-torch, attention implementation, skipped items) with the pipeline's COMMIT.txt / ENV.txt, the population checks (n per
+torch, attention implementation, skipped items; MISMATCH when the files hold more than one commit or one model's files more
+than one revision) with every line of the pipeline's COMMIT.txt / ENV.txt / REVISIONS.txt, the population checks (n per
 arm against the preregistered sizes, the same cores in every arm of a file, and across the parts sharing a model: a
 smaller part must hold the first k cores of the larger one in item order), and then each part's full report (tables,
 exploratory block).
@@ -36,7 +37,7 @@ from stage5_parts import attention, ioi, knockout, subsets, variants  # noqa: E4
 MAIN = {"a": "attention", "b": "knockout", "c": "factorial", "d": "factorial", "e": "ioi"}
 DIRS = ("attention", "knockout", "factorial", "row_restricted", "competence", "form_attention", "ioi", "ioi_attention")
 NAME = {"a": "re-mention attention", "b": "attention knockout", "c": "membership and dose", "d": "non-identical re-mentions", "e": "IOI"}
-TITLE = {"G1": "anchors attend: E, F/E at 7B/14B under SENTENCE-AFTER", "G2": "dissociation at the small models (H_diss / H_track)",
+TITLE = {"G1": "anchors attend: E, F/E at 7B/14B under SENTENCE-AFTER", "G2": "dissociation at the small models (H_diss; H_track = the alternative)",
          "G3": "magnitude under the declared account (R_A, story-paired anchor ratio)", "G4": "hop 2: (a) anchors G, (b) cross-scale Q",
          "G5": "necessity of the candidate-word edges, r_K(M1)", "G6": "matched control column M2", "G7": "the copy takes over and the answer stays (H_redundant)",
          "G8": "routes at the answer position: (a) NONE M3, (b) AFTER M3, (c) M4 vs M1", "G9": "membership (sentence S, list L)",
@@ -113,7 +114,7 @@ def verdicts(R, out):
     for g in ("G1", "G2", "G3"):
         line(g, [("", *v.get(g, (None, "")))], na)
     g4a, g4b = v.get("G4a", (None, "")), v.get("G4b", (None, ""))
-    if g4b[0] is None and g4b[1] in ("G2 did not declare H_diss", "G4a not met"):  # the entry's precondition of (b) failed (not: no small model gated in)
+    if g4b[0] is None and g4b[1].endswith(("G2 did not declare H_diss", "G4a not met")):  # the entry's precondition of (b) failed (also: no small model gated in)
         g4b = (NA, g4b[1])
     line("G4", [("(a)", *g4a), ("(b)", *g4b)], na)
     b = res.get("b")
@@ -200,11 +201,11 @@ def load_json(f):
 
 
 def provenance(root, out, test=False):
-    out("PROVENANCE (every results file; the pipeline's COMMIT.txt and ENV.txt)")
-    for name in ("COMMIT.txt", "ENV.txt"):
+    out("PROVENANCE (every results file; the pipeline's COMMIT.txt, ENV.txt and REVISIONS.txt, every line)")
+    for name in ("COMMIT.txt", "ENV.txt", "REVISIONS.txt"):
         f = root / name
-        out(f"  {name}: " + (" | ".join(l.strip() for l in f.read_text().splitlines() if l.strip())[:600] if f.exists() else "absent"))
-    commits, bad = set(), []
+        out(f"  {name}:" + ("".join(f"\n    {l.rstrip()}" for l in f.read_text().splitlines() if l.strip()) if f.exists() else " absent"))
+    commits, bad, revs = set(), [], {}
     for d in DIRS:
         for f in sorted((root / d).glob("*.json")) if (root / d).is_dir() else []:
             j = load_json(f)
@@ -215,12 +216,17 @@ def provenance(root, out, test=False):
                     + ("" if test else "  MISMATCH")); bad.append(f.name) if not test else None; continue
             p, a = j["provenance"], j["provenance"].get("args", {})
             commits.add(p.get("git_commit"))
+            revs.setdefault(str(a.get("model") or f.stem.split("_s")[0].removesuffix("_direct").removesuffix("_ioi")).split("/")[-1], {}).setdefault(a.get("revision"), []).append(f"{d}/{f.name}")
             out(f"  {d}/{f.name}: commit {str(p.get('git_commit'))[:10]}, model {a.get('model')} rev {a.get('revision')}, dtype {a.get('dtype', p.get('dtype'))}, "
                 f"device {p.get('device')}, transformers {p.get('transformers')}, torch {p.get('torch')}, python {p.get('python')}, attn {p.get('attn_implementation', '-')}, "
                 f"skipped {p.get('skipped_items', '-')}, n {a.get('n', '-')}, seed {a.get('seed', '-')}" + (f", label {p['label']!r}" if p.get("label") else ""))
+    mixed = {m: r for m, r in revs.items() if len(r) > 1}
+    for m, r in mixed.items():
+        out(f"  {m}: MISMATCH: files with different revisions: " + "; ".join(f"{str(v)[:10]} ({', '.join(fs)})" for v, fs in r.items()))
     out(f"  commits: {sorted(str(c)[:10] for c in commits)}" + ("  MISMATCH: not one commit" if len(commits) > 1 else "")
+        + (f"; revisions: one per model ({len(revs)} models)" if not mixed else f"; revisions MISMATCH in {sorted(mixed)}")
         + ("  UNREADABLE or without provenance: " + ", ".join(bad) if bad else ""))
-    return len(commits) <= 1 and not bad
+    return len(commits) <= 1 and not bad and not mixed
 
 
 def items_of(j):
@@ -246,7 +252,7 @@ def population(root, out, test=False):
             ok &= same and n_ok
             out(f"  {d}/{f.name}: " + (f"n = {next(iter(ns.values()))} in each of {len(ns)} arms" if len(set(ns.values())) == 1 else f"n per arm {ns}")
                 + ("" if test else f" (expected {EXPECTED_N[d]}): {'OK' if n_ok else 'MISMATCH'}") + f"; same cores across arms: {'OK' if same else 'MISMATCH'}")
-            if same and not f.stem.endswith("_s1"):  # seed 0 only; the belief parts share a model's cores, the IOI splice those of the IOI factorial
+            if same and (d == "ioi" or f.stem.endswith("_ioi") or not f.stem.endswith("_s1")):  # belief parts: seed 0 (a model's cores); IOI: the seed-1 cores shared by the factorial and the splice
                 m = f.stem.split("_s")[0] if d in ("knockout", "factorial", "ioi") else f.stem.removesuffix("_direct").removesuffix("_ioi")
                 cores.setdefault(m + (" (IOI)" if d == "ioi" or f.stem.endswith("_ioi") else ""), {})[d] = next(iter(by.values()))
     for m, parts in cores.items():
@@ -254,7 +260,7 @@ def population(root, out, test=False):
         rel = {d: "same" if set(s) == set(ref) else f"the first {len(s)} of {len(ref)}" if s == ref[:len(s)]
                else f"a subset of {len(ref)}, NOT the first {len(s)}: MISMATCH" if set(s) <= set(ref) else "MISMATCH" for d, s in parts.items()}
         ok &= all("MISMATCH" not in v for v in rel.values())
-        out(f"  {m}: seed-0 cores across parts: " + ", ".join(f"{d} {v}" for d, v in rel.items()))
+        out(f"  {m}: cores across parts: " + ", ".join(f"{d} {v}" for d, v in rel.items()))
     out(f"  population: {'OK' if ok else 'MISMATCH (a cell does not hold the expected n or the same cores)'}")
     return ok
 
@@ -274,7 +280,7 @@ def main(argv=None):
     R = score_parts(root, test)
     out("")
     gates(R, out)
-    out("\nVERDICTS (G1-G22; sub-verdicts in order; not evaluable counts as not met in every k/k line, a gated-out anchor included (G1, G4a);"
+    out("\nVERDICTS (G1-G22; sub-verdicts in order; not evaluable counts as not met in every k/k line, a gated-out anchor included (G1, G4a); a line with nothing evaluable is NOT EVALUABLE;"
         " a sub-verdict whose precondition failed is not applicable and left out)")
     F = verdicts(R, out)
     out("")

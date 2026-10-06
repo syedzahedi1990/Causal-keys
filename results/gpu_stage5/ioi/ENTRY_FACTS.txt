@@ -1,16 +1,16 @@
-ckeys/ioi.py make_cores(200, random.Random(0)): 15 templates, reduced pools
-core 0: {'template': 6, 'pattern': 'ABBA', 'place': 'beach', 'object': 'ticket', 'io_b': 'Ruth', 'io_s': 'Erik', 'io_x': 'Joan', 'subj': 'Charles', 'order': [0, 1, 3, 2]}
-  B: When Ruth and Charles got a ticket at the beach, Charles decided to give it to
-  S: When Erik and Charles got a ticket at the beach, Charles decided to give it to
-  X: When Joan and Charles got a ticket at the beach, Charles decided to give it to
-  listing: Choices: Ruth, Erik, Charles, Joan
-  INLINE: When Ruth and Charles got a ticket at the beach ( Ruth, Erik, Charles, Joan), Charles decided to give it to
-  INLINE_BEFORE: ( Ruth, Erik, Charles, Joan) When Ruth and Charles got a ticket at the beach, Charles decided to give it to
-  AFTER (chat user turn): 'Complete the sentence with the right name.\n\nSentence: When Ruth and Charles got a ticket at the beach, Charles decided to give it to\nChoices: Ruth, Erik, Charles, Joan\nAnswer with one name.\nAnswer:'
-  AFTER (raw): 'When Ruth and Charles got a ticket at the beach, Charles decided to give it to\nChoices: Ruth, Erik, Charles, Joan\nAnswer:'
-IO_B list slot counts (slot 0..3): 0:40 1:55 2:58 3:47
+ckeys/ioi.py make_cores(200, random.Random(1)): 15 templates, reduced pools
+core 0: {'template': 12, 'pattern': 'ABBA', 'place': 'museum', 'object': 'ticket', 'io_b': 'Scott', 'io_s': 'Matt', 'io_x': 'Lars', 'subj': 'Steven', 'order': [3, 1, 0, 2]}
+  B: Then, Scott and Steven had a long argument. Afterwards Steven said to
+  S: Then, Matt and Steven had a long argument. Afterwards Steven said to
+  X: Then, Lars and Steven had a long argument. Afterwards Steven said to
+  listing: Choices: Steven, Matt, Scott, Lars
+  INLINE: Then, Scott and Steven had a long argument ( Steven, Matt, Scott, Lars). Afterwards Steven said to
+  INLINE_BEFORE: ( Steven, Matt, Scott, Lars) Then, Scott and Steven had a long argument. Afterwards Steven said to
+  AFTER (chat user turn): 'Complete the sentence with the right name.\n\nSentence: Then, Scott and Steven had a long argument. Afterwards Steven said to\nChoices: Steven, Matt, Scott, Lars\nAnswer with one name.\nAnswer:'
+  AFTER (raw): 'Then, Scott and Steven had a long argument. Afterwards Steven said to\nChoices: Steven, Matt, Scott, Lars\nAnswer:'
+IO_B list slot counts (slot 0..3): 0:58 1:46 2:51 3:45
 pattern counts: {'ABBA': 100, 'BABA': 100}
-template histogram (index: count): 0:17 1:11 2:13 3:14 4:15 5:13 6:14 7:9 8:9 9:16 10:11 11:9 12:18 13:9 14:22
+template histogram (index: count): 0:16 1:16 2:16 3:8 4:8 5:13 6:13 7:9 8:19 9:7 10:16 11:12 12:14 13:19 14:14
 tokenizer gpt2 (gpt2; chat False; BOS '<|endoftext|>')
   PLAIN          chat=False skipped=0 p 2..7 len 15-21 IO-count {1: 200} S-count {2: 200} -> ok
   AFTER          chat=False skipped=0 p 2..7 len 29-35 IO-count {2: 200} S-count {3: 200} -> ok

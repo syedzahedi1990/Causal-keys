@@ -38,7 +38,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from ckeys.clamp import capture_kv, clamp_kv, stack_rows
 from ckeys.encoding import WRAPPER_USED
 from ckeys.interventions import blocks
-from ckeys.ioi import ARMS, arm_chat, check_occurrences, encode_runs, identity_measures, make_cores, name_ids
+from ckeys.ioi import ARMS, SEED, arm_chat, check_occurrences, encode_runs, identity_measures, make_cores, name_ids
 from experiments.format_factorial import LABEL, boot, boot_ratio, fmt, last_logprobs
 
 L0_FRACS = (0.0, 0.3)
@@ -115,21 +115,26 @@ def summarize(res, arms=ARMS):
     return "\n".join(lines)
 
 
-def provenance(a, label=None):
+def provenance(a, label=None, device=None):
     try:
         commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
     except Exception:
         commit = None
     return {"args": vars(a), "git_commit": commit, "torch": torch.__version__, "transformers": transformers.__version__,
-            "python": platform.python_version(), "device": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu",
-            "wrapper": dict(WRAPPER_USED), "l0_fracs": L0_FRACS, "label": label}
+            "python": platform.python_version(), "device": device_name(device), "wrapper": dict(WRAPPER_USED), "l0_fracs": L0_FRACS, "label": label}
+
+
+def device_name(device):
+    """The device the model actually ran on (the GPU's name when it is CUDA), not merely the device visible."""
+    d = torch.device(device) if device is not None else None
+    return torch.cuda.get_device_name(d) if d is not None and d.type == "cuda" else str(d or "unknown")
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default=None, help=f"default gpt2 ({TEST_MODEL} in TEST_MODE)")
     ap.add_argument("--n", type=int, default=200)
-    ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--seed", type=int, default=SEED)
     ap.add_argument("--arms", default=",".join(ARMS))
     ap.add_argument("--dtype", default="float32")
     ap.add_argument("--bos", default="auto", help="auto (iff the tokenizer has a BOS), yes, no")
@@ -176,8 +181,10 @@ def main(argv=None):
               + ("  WARNING: batch-noise floor > 1 nat, cell is NOISY" if max(fB, fS) > 1 else ""), flush=True)
     Path(a.out).mkdir(parents=True, exist_ok=True)
     tag = f"{a.model.split('/')[-1]}_s{a.seed}"
-    bad = [r for r in res if max(r["floor_B"], r["floor_S"]) > 1e-3] if exact else []
-    prov = provenance(a, a.label) | {"skipped_items": skipped, "chat": chat, "bos": bos, "assert_exact": exact, "exact_violations": len(bad),
+    bad = [r for r in res if max(r["floor_B"], r["floor_S"]) > 1e-3]  # counted whether or not asserted (FP32 only: BF16 floors exceed 1e-3 by construction)
+    prov = provenance(a, a.label, device) | {"skipped_items": skipped, "chat": chat, "bos": bos, "assert_exact": exact,
+                                     "exact_violations": len(bad) if a.dtype == "float32" else None, "exact_threshold": 1e-3,
+                                     "max_floor": max((max(r["floor_B"], r["floor_S"]) for r in res), default=None),
                                      "attn_implementation": model.config._attn_implementation, "test_mode": test, "n_items": len(res)}
     json.dump({"provenance": prov, "results": res}, open(f"{a.out}/{tag}.json", "w"))
     s = json.dumps(prov) + "\n" + summarize(res, arms)
@@ -186,7 +193,7 @@ def main(argv=None):
     print(f"wrote {a.out}/{tag}.json")
     if not res:
         raise SystemExit("no valid items")
-    if bad:
+    if exact and bad:
         raise SystemExit(f"clamp not exact in {len(bad)} items (floor > 1e-3; the file is written): first "
                          f"{bad[0]['arm']} floor_B {bad[0]['floor_B']:.2e} floor_S {bad[0]['floor_S']:.2e}")
 

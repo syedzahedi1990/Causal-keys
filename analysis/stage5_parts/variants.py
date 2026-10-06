@@ -9,8 +9,10 @@ Per core and arm v (lp of the English tokens S, X, B and of the arm's form token
   (= the English measure when f = y, so POST^any = POST).
   r_K(v) = [ID_K(v) - ID_K(FLOOR_v)] / [ID_K(ANCHOR_v) - ID_K(FLOOR_v)] (ratio of means, paired cores, floor POST_OTHER /
   POST_FR_OTHER / POST_DE_OTHER / AFTER_OTHER, anchor POST or AFTER; NONE-floored r reported beside it);
-  rho_s(v) = s_ID(v)/s_ID(POST), the shares computed inside every resample; r_K^any and rho_s^any likewise with the
-  any-form numerators and the denominators on the same cores; D(v) = ID_K(POST) - ID_K(v) paired (reported);
+  rho_s(v) = s_ID(v)/s_ID(ANCHOR_v) (POST; AFTER for the list family), the shares computed inside every resample;
+  r_K^any(v) = [ID_K^any(v) - ID_K(FLOOR_v)] / [ID_K(ANCHOR_v) - ID_K(FLOOR_v)] and rho_s^any likewise: only v's
+  numerator is any-form, floor and anchor are scored on the English tokens (the floor arms carry other words' forms),
+  on the same cores; D(v) = ID_K(ANCHOR_v) - ID_K(v) paired (reported);
   A_v = layer mean of 1/2 [att_S(K_S) - att_S(K_X) + att_X(K_X) - att_X(K_S)] (span-summed, head-averaged attention of
   the form's tokens to p), a_v = A_v / A_POST (ratio of means over the probe cores).
 Populations: primary = all cores; SYN/FRMIX/DEMIX/FR/DE and AFTER_* cells = the per-word competence-gated subset
@@ -116,9 +118,9 @@ def r_K(arms, v, ids, floor, anchor, key="idK"):
     return ratio(vec(arms[v], ids, key) - vec(arms[floor], ids), vec(arms[anchor], ids) - vec(arms[floor], ids))
 
 
-def rho(arms, v, ids, key="idK", keyv="idV"):
+def rho(arms, v, ids, anchor="POST", key="idK", keyv="idV"):
     return boot_fn(lambda k, vv, kp, vp: (k / (k + vv)) / (kp / (kp + vp)), vec(arms[v], ids, key), vec(arms[v], ids, keyv),
-                   vec(arms["POST"], ids), vec(arms["POST"], ids, "idV"))
+                   vec(arms[anchor], ids), vec(arms[anchor], ids, "idV"))
 
 
 def load_probe(root, model):
@@ -224,7 +226,7 @@ class Model:
             return c
         a = self.arms
         c["r"], c["r_none"] = r_K(a, v, ids, floor, anchor), r_K(a, v, ids, "NONE", anchor)
-        c["rho"], c["D"] = rho(a, v, ids), boot(vec(a["POST"], ids) - vec(a[v], ids))
+        c["rho"], c["D"] = rho(a, v, ids, anchor), boot(vec(a[anchor], ids) - vec(a[v], ids))
         c["idK"], c["idV"], c["sum"] = boot(vec(a[v], ids)), boot(vec(a[v], ids, "idV")), boot(vec(a[v], ids, "sum"))
         c["dV"] = boot(vec(a[v], ids, "idV") - vec(a["POST"], ids, "idV"))
         c["sID"] = boot_fn(lambda k, vv: k / (k + vv), vec(a[v], ids), vec(a[v], ids, "idV"))
@@ -232,7 +234,7 @@ class Model:
         c["n_any"] = len(nc)
         if nc:
             c["r_any"], c["r_form"] = r_K(a, v, nc, floor, anchor, "idKa"), r_K(a, v, nc, floor, anchor, "idKf")
-            c["rho_any"] = rho(a, v, nc, "idKa", "idVa")
+            c["rho_any"] = rho(a, v, nc, anchor, "idKa", "idVa")
         c["a"], c["n_probe"] = self.a_v(v)
         return c
 

@@ -14,13 +14,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from transformers import AutoTokenizer  # noqa: E402
 
-from ckeys.ioi import ARMS, LIST_ARMS, TEMPLATES, arm_chat, encode_runs, inline, listing, make_cores, name_ids, raw_prompt, sentence  # noqa: E402
+from ckeys.ioi import ARMS, LIST_ARMS, SEED, TEMPLATES, arm_chat, encode_runs, inline, listing, make_cores, name_ids, raw_prompt, sentence  # noqa: E402
 
 TOKENIZERS = (("gpt2", "gpt2", False), ("Qwen2.5", "Qwen/Qwen2.5-7B-Instruct", True), ("Qwen2.5 raw", "Qwen/Qwen2.5-7B-Instruct", False),
               ("Mistral-v0.3", "mistralai/Mistral-7B-Instruct-v0.3", True))
 
 
-def facts(n=200, seed=0, tokenizers=TOKENIZERS):
+def facts(n=200, seed=SEED, tokenizers=TOKENIZERS):
     cores = make_cores(n, random.Random(seed))
     c0 = cores[0]
     lines = [f"ckeys/ioi.py make_cores({n}, random.Random({seed})): {len(TEMPLATES)} templates, reduced pools",
@@ -56,7 +56,7 @@ def facts(n=200, seed=0, tokenizers=TOKENIZERS):
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--n", type=int, default=200)
-    ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--seed", type=int, default=SEED)
     ap.add_argument("--out", default="results/gpu_stage5/ioi/ENTRY_FACTS.txt")
     a = ap.parse_args(argv)
     s = facts(a.n, a.seed)

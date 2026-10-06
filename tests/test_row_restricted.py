@@ -24,6 +24,7 @@ def test_registered_arm_groups():
     for r in res:
         assert abs(r["m"]["none"] - r["m_B"]) < 1e-4 and abs(r["m"]["all"] - r["m_S"]) > 1e-3
         assert set(r["sizes"]) | {"none"} == set(r["m"])
+        assert {g: len(v) for g, v in r["groups"].items()} == {g: n for g, n in r["sizes"].items() if g != "all"} and r["groups"]["self"] == [r["p"]]
     assert "rows=mention_words" in rr.summarize(res, ["T_ROOM3"]) and "rows=remention_words" in rr.summarize(res, ["POST"])
 
 

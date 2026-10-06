@@ -1,5 +1,5 @@
 """Part (e) of P-2026-10-05-G (docs/PREREGISTRATION.md): Gate e and predictions G18-G22 on the IOI factorial
-({root}/ioi/{model}_s0.json from experiments/ioi_factorial.py), exactly as drafted; the row splice
+({root}/ioi/{model}_s1.json from experiments/ioi_factorial.py; seed 1 = ckeys.ioi.SEED, the confirmatory cores; seed 0 is the disclosed GPT-2 pilot), exactly as drafted; the row splice
 ({root}/row_restricted/{model}_ioi.json) and the GPT-2 attention probe ({root}/ioi_attention/{model}.json) are
 exploratory. Called by analysis/stage5_score.py (``score(root)``) or standalone.
 
@@ -36,7 +36,7 @@ import numpy as np
 
 np.seterr(all="ignore")
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from ckeys.ioi import ARMS, identity_measures  # noqa: E402
+from ckeys.ioi import ARMS, SEED as IOI_SEED, identity_measures  # noqa: E402
 
 IOI, ROWS, ATT = "ioi", "row_restricted", "ioi_attention"
 GPT2 = "gpt2"
@@ -99,7 +99,7 @@ def ioi_dir(root):
     return Path(root) / IOI if (Path(root) / IOI).is_dir() else Path(root)  # a bare pilot directory holds the files itself
 
 
-def load(root, model, seed=0):
+def load(root, model, seed=IOI_SEED):
     f = ioi_dir(root) / f"{model}_s{seed}.json"
     if not f.exists():
         return {}, {}
@@ -204,9 +204,9 @@ def probe(root, model, out):
             out("    " + line)
 
 
-def score(root, pair=None, gpt2=GPT2, exploratory_models=None, test=False, out=print):
+def score(root, pair=None, gpt2=GPT2, exploratory_models=None, test=False, out=print, seed=IOI_SEED):
     root = Path(root)
-    found = sorted(f.stem[:-3] for f in ioi_dir(root).glob("*_s0.json"))
+    found = sorted(f.stem[:-3] for f in ioi_dir(root).glob(f"*_s{seed}.json"))
     if test:
         out("TEST MODE: verdict lines are not preregistered results; every non-GPT-2 model found stands in for the 7B pair")
         pair, exploratory_models = [m for m in found if not m.startswith("gpt2")], []
@@ -216,7 +216,7 @@ def score(root, pair=None, gpt2=GPT2, exploratory_models=None, test=False, out=p
     out(f"== Part (e): IOI, K/V clamps at the IO mention (Gate e, G18-G22); GPT-2 small = {gpt2}; 7B pair = {pair}")
     G, V = {}, {}   # G[model][arm] gate; V[model][pred] True / False / None
     for m in plain3 + exploratory_models:
-        prov, arms = load(root, m)
+        prov, arms = load(root, m, seed)
         role = "GPT-2 small" if m == gpt2 else "7B pair" if m in pair else "exploratory"
         out(f"\n## {m} ({role})")
         V[m], G[m] = {}, {}
@@ -224,7 +224,8 @@ def score(root, pair=None, gpt2=GPT2, exploratory_models=None, test=False, out=p
             out("  ioi factorial MISSING (every cell not evaluable)")
             continue
         out(f"  skipped_items {prov.get('skipped_items')}, chat {prov.get('chat')}, bos {prov.get('bos')}, dtype {prov.get('args', {}).get('dtype')}, "
-            f"assert_exact {prov.get('assert_exact')}, exact_violations {prov.get('exact_violations', '-')}, arms {[a for a in ARMS if a in arms]}"
+            f"assert_exact {prov.get('assert_exact')}, exact_violations {prov.get('exact_violations', '-')} (floor > {prov.get('exact_threshold', 1e-3):g}; FP32 only), "
+            f"max floor {'-' if prov.get('max_floor') is None else format(prov['max_floor'], '.2e')}, arms {[a for a in ARMS if a in arms]}"
             + (f", label: {prov['label']}" if prov.get("label") else ""))
         for arm in ARMS:
             if arm in arms:

@@ -27,7 +27,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from ckeys.clamp import capture_kv, clamp_kv
 from ckeys.interventions import blocks
-from ckeys.ioi import check_occurrences, encode_runs, make_cores, name_ids
+from ckeys.ioi import SEED, check_occurrences, encode_runs, make_cores, name_ids
 from experiments.ioi_factorial import provenance
 
 HEADS = {"name_mover": [(9, 9), (9, 6), (10, 0)], "duplicate": [(0, 1), (3, 0), (0, 10)]}
@@ -96,7 +96,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="gpt2")
     ap.add_argument("--n", type=int, default=200)
-    ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--seed", type=int, default=SEED)
     ap.add_argument("--dtype", default="float32")
     ap.add_argument("--out", default="results/gpu_stage5/ioi_attention")
     ap.add_argument("--revision", default=None)
@@ -115,7 +115,7 @@ def main(argv=None):
     Path(a.out).mkdir(parents=True, exist_ok=True)
     tag = a.model.split("/")[-1]
     label = "exploratory attention probe" + (", TEST_MODE" if test else "") + ("" if a.model == "gpt2" else "; the head labels are GPT-2 small's")
-    json.dump({"provenance": provenance(a, label) | {"attn_implementation": model.config._attn_implementation, "skipped_items": skipped, "n_items": n}, "n": n, "heads": HEADS,
+    json.dump({"provenance": provenance(a, label, next(model.parameters()).device) | {"attn_implementation": model.config._attn_implementation, "skipped_items": skipped, "n_items": n}, "n": n, "heads": HEADS,
                "mats": mats, "summary": s}, open(f"{a.out}/{tag}.json", "w"))
     open(f"{a.out}/{tag}_summary.txt", "w").write(s + "\n")
     print(s)

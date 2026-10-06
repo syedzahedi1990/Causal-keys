@@ -18,7 +18,7 @@ import experiments.ioi_factorial as ff
 import experiments.row_restricted_keys as rr
 from analysis.stage5_parts import ioi as sc
 from ckeys.clamp import capture_kv, clamp_kv
-from ckeys.ioi import (ARMS, LIST_ARMS, NAMES, OBJECTS, PLACES, TEMPLATES, RowTask, check_occurrences, encode_runs, identity_measures,
+from ckeys.ioi import (ARMS, LIST_ARMS, NAMES, SEED, OBJECTS, PLACES, TEMPLATES, RowTask, check_occurrences, encode_runs, identity_measures,
                        inline, listing, make_cores, name_ids, raw_prompt, sentence)
 from ckeys.interventions import blocks
 
@@ -133,7 +133,7 @@ def test_qwen_chat_exact():
 def test_rowtask_gpt2():
     model, tok = AutoModelForCausalLM.from_pretrained("gpt2", dtype=torch.float32).eval(), AutoTokenizer.from_pretrained("gpt2")
     task = RowTask(chat=False)
-    res = rr.run(model, tok, task, ["AFTER", "INLINE", "QUESTION"], 2, log=lambda s: None)
+    res = rr.run(model, tok, task, ["AFTER", "INLINE", "QUESTION"], 2, task.seed, log=lambda s: None)
     assert len(res) == 6
     for r in res:
         assert abs(r["m"]["none"] - r["m_B"]) < 1e-4 and abs(r["m"]["all"] - r["m_B"]) > 1e-2
@@ -200,11 +200,11 @@ def _item(core, arm, idK, idV, idKV, rng, L=12):
 
 
 def _fixture(root, model, spec, n=40, seed=1):
-    rng, cores = np.random.default_rng(seed), make_cores(n, random.Random(0))
+    rng, cores = np.random.default_rng(seed), make_cores(n, random.Random(SEED))
     res = [_item(c, arm, *spec[arm], rng) for arm in spec for c in cores]
     (root / "ioi").mkdir(parents=True, exist_ok=True)
     json.dump({"provenance": {"skipped_items": 0, "chat": True, "bos": None, "args": {"dtype": "float32"}, "assert_exact": True, "label": "synthetic"},
-               "results": res}, open(root / "ioi" / f"{model}_s0.json", "w"))
+               "results": res}, open(root / "ioi" / f"{model}_s{SEED}.json", "w"))
 
 
 def _score(root, **kw):
@@ -245,7 +245,7 @@ def test_scorer_sign_handling(tmp_path):
     assert r["models"]["G18"] == ["gpt2", "Qwen2.5-7B-Instruct", "Mistral-7B-Instruct-v0.3"] and r["models"]["G22b"] == ["gpt2"] and r["models"]["G20"] == sc.PAIR
     _fixture(tmp_path, "Qwen2.5-7B-Instruct", base | {"AFTER": (4.0, 1.0, 5.0)})
     # a failing gate (four-way) makes the cell not evaluable
-    f = tmp_path / "ioi" / "gpt2_s0.json"
+    f = tmp_path / "ioi" / f"gpt2_s{SEED}.json"
     d = json.load(open(f))
     for it in d["results"]:
         if it["arm"] == "INLINE":
@@ -263,8 +263,8 @@ def test_scorer_on_test_mode_output(tmp_path):
     ff.main(["--test", "--out", str(tmp_path / "ioi")])                                       # Qwen2.5-0.5B, n = 3, all arms
     ff.main(["--model", "gpt2", "--n", "2", "--test", "--out", str(tmp_path / "ioi")])         # GPT-2 small (--test keeps a given --model, n = 3)
     files = sorted(f.name for f in (tmp_path / "ioi").glob("*.json"))
-    assert files == ["Qwen2.5-0.5B-Instruct_s0.json", "gpt2_s0.json"]
-    d = json.load(open(tmp_path / "ioi" / "Qwen2.5-0.5B-Instruct_s0.json"))
+    assert files == ["Qwen2.5-0.5B-Instruct_s1.json", "gpt2_s1.json"]
+    d = json.load(open(tmp_path / "ioi" / "Qwen2.5-0.5B-Instruct_s1.json"))
     assert d["provenance"]["test_mode"] and d["provenance"]["assert_exact"] and d["provenance"]["skipped_items"] == 0 and len(d["results"]) == 18
     assert {r["arm"] for r in d["results"]} == set(ARMS) and all(r["chat"] == (r["arm"] in ("AFTER", "BEFORE", "QUESTION")) for r in d["results"])
     assert max(max(r["floor_B"], r["floor_S"]) for r in d["results"]) <= 1e-3
@@ -277,6 +277,26 @@ def test_scorer_on_test_mode_output(tmp_path):
         assert re.search(rf"^  {pred}.*-> (MET|NOT MET|NOT EVALUABLE)", text, re.M), pred
     assert "NOT EVALUABLE" in text and "7B pair = ['Qwen2.5-0.5B-Instruct']" in text
     assert "ioi factorial MISSING" not in text
-    (tmp_path / "ioi" / "gpt2_s0.json").unlink()
+    (tmp_path / "ioi" / "gpt2_s1.json").unlink()
     r, text = _score(tmp_path, test=True)
     assert "ioi factorial MISSING" in text and r["final"]["G22a"] is False
+
+
+def test_exact_violations_recorded_without_assert(tmp_path, monkeypatch):
+    """--assert-exact no (IOI_EXACT=no) keeps the file and still counts the FP32 items above the 1e-3 floor; auto raises."""
+    run = ff.run_item
+
+    def noisy(*a, **k):
+        r = run(*a, **k)
+        return r if r is None else r | {"floor_B": 0.02}
+    monkeypatch.setattr(ff, "run_item", noisy)
+    monkeypatch.setenv("TEST_MODE", "1")   # FP32 on the CPU, keeps n = 1
+    for flag, raises in (("no", False), ("auto", True)):
+        argv = ["--model", "gpt2", "--n", "1", "--arms", "PLAIN", "--assert-exact", flag, "--out", str(tmp_path / flag)]
+        if raises:
+            with pytest.raises(SystemExit, match="clamp not exact in 1 items"):
+                ff.main(argv)
+        else:
+            ff.main(argv)
+        p = json.load(open(tmp_path / flag / "gpt2_s1.json"))["provenance"]
+        assert p["assert_exact"] is raises and p["exact_violations"] == 1 and p["max_floor"] == 0.02 and p["device"] == "cpu"

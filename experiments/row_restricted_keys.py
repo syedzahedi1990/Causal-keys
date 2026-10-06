@@ -193,6 +193,7 @@ def run(model, tok, task, arms, n, seed=0, windows=0, log=print):
             rs.pos = p
             lpB = torch.log_softmax(model(ib, use_cache=False).logits[0, -1].float(), -1)
             out = {"core": core, "arm": arm, "p": p, "T": T, "sizes": {g: len(v) for g, v in groups.items()},
+                   "groups": {g: [int(i) for i in v] for g, v in groups.items() if g != "all"},
                    "m_B": (lpB[iS] - lpB[iB]).item(), "m_S": (lpS[iS] - lpS[iB]).item(), "m": {}}
             rs.active = True
             for g, idx in list(groups.items()) + [("none", [])]:
@@ -248,7 +249,7 @@ def main():
     ap.add_argument("--arms", default="P1,LETTER")
     ap.add_argument("--view", default="direct")
     ap.add_argument("--task", default="belief")
-    ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--seed", type=int, default=None, help="core seed; default the task's own (belief 0, ioi ckeys.ioi.SEED)")
     ap.add_argument("--arm-modules", default="", help="comma-separated modules registering further arms")
     ap.add_argument("--out", default="results/row_restricted")
     ap.add_argument("--dtype", default="float32")
@@ -260,6 +261,7 @@ def main():
     test = a.test or bool(os.environ.get("TEST_MODE"))
     import_arm_modules(a.arm_modules)
     task = get_task(a.task, view=a.view) if a.task == "belief" else get_task(a.task)
+    a.seed = getattr(task, "seed", 0) if a.seed is None else a.seed
     tok = AutoTokenizer.from_pretrained(a.model, revision=a.revision)
     kw = {"dtype": getattr(torch, a.dtype), "revision": a.revision}
     if a.device_map:

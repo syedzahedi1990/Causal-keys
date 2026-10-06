@@ -161,7 +161,7 @@ def provenance(a):
     except Exception:
         commit = None
     return {"args": vars(a), "git_commit": commit, "torch": torch.__version__, "transformers": transformers.__version__,
-            "python": platform.python_version(), "device": torch.cuda.get_device_name(0) if torch.cuda.is_available() else "cpu",
+            "python": platform.python_version(), "device": torch.cuda.get_device_name(0) if torch.cuda.is_available() and not os.environ.get("TEST_MODE") else "cpu",
             "wrapper": dict(WRAPPER_USED), "l0_fracs": L0_FRACS}
 
 

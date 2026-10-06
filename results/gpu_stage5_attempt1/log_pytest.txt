@@ -1,0 +1,68 @@
+==== 2026-10-06T13:15:01Z python -m pytest tests/ -q
+............................F................ssssss...sss...........................                                                                            [100%]
+============================================================================== FAILURES ===============================================================================
+_________________________________________________________________________ test_knockout_exact _________________________________________________________________________
+
+mt = (Qwen2ForCausalLM(
+  (model): Qwen2Model(
+    (embed_tokens): Embedding(151936, 896)
+    (layers): ModuleList(
+      (...151664: AddedToken("<|file_sep|>", rstrip=False, lstrip=False, single_word=False, normalized=False, special=False),
+}))
+
+    def test_knockout_exact(mt):
+        model, tok = mt
+        core, tb, ib, is_, off, p, g = item(tok, "AFTER")
+        T, nL = ib.shape[1], len(blocks(model))
+        cand = g["R_cand"]
+        pairs = [(r, p) for r in cand]
+        ans = [(T - 1, p)]
+        lg = {}
+        for impl in ("sdpa", "eager"):
+            model.set_attn_implementation(impl)
+            lg0 = model(ib, use_cache=False).logits[0, -1]
+            lg1 = model(ib, attention_mask=mask_for_model(model, T, []), use_cache=False).logits[0, -1]
+            assert torch.allclose(lg0, lg1, atol=1e-4), impl                       # (i) causal 4D mask is a no-op
+            lgK = model(ib, attention_mask=mask_for_model(model, T, pairs), use_cache=False, logits_to_keep=1).logits[0, -1]
+            assert (lgK - lg0).abs().max() > 1e-2
+            lgA = model(ib, attention_mask=mask_for_model(model, T, ans), use_cache=False, logits_to_keep=1).logits[0, -1]
+            lgb = model(ib.expand(3, -1), attention_mask=masks_for_model(model, T, [[], pairs, ans]), use_cache=False, logits_to_keep=1).logits[:, -1]
+            for row, ref in zip(lgb, (lg0, lgK, lgA)):                                  # (iv) per-row masks == separate runs
+                assert torch.allclose(row, ref, atol=1e-4), impl
+            lg[impl] = lgK
+            if impl == "eager":                                                          # (ii) weights exactly 0, rows renormalised
+                a0 = model(ib, use_cache=False, output_attentions=True).attentions
+                aK = model(ib, attention_mask=mask_for_model(model, T, pairs), use_cache=False, output_attentions=True).attentions
+                assert all(aK[l][0, :, r, p].abs().max().item() == 0.0 for l in range(nL) for r in cand)
+                keep = [j for j in range(T) if j != p]
+                for r in cand:
+                    ren = a0[0][0, :, r][:, keep] / (1 - a0[0][0, :, r, p:p + 1])
+                    assert torch.allclose(aK[0][0, :, r][:, keep], ren, atol=1e-5)
+                other = [i for i in range(T) if i not in cand]
+                assert torch.allclose(aK[0][0, :, other], a0[0][0, :, other], atol=1e-6)
+        assert torch.allclose(lg["sdpa"], lg["eager"], atol=1e-4)                       # (iii) sdpa == eager under the mask
+        # (v) with K/V clamps from S at p: KV_S without knockout == source run; under M8 every clamp row == self-clamp row
+        model.set_attn_implementation("sdpa")
+        L = range(nL)
+        with capture_kv(model, [p], L) as tB:
+            model(ib, use_cache=False, logits_to_keep=1)
+        with capture_kv(model, [p], L) as tS:
+            lgS = model(is_, use_cache=False, logits_to_keep=1).logits[0, -1]
+        rows = [lambda l, ch: "B", lambda l, ch: "S" if ch == "k" else "B", lambda l, ch: "S" if ch == "v" else "B", lambda l, ch: "S"]
+        tabs = stack_rows({"B": {k: v[0] for k, v in tB.items()}, "S": {k: v[0] for k, v in tS.items()}}, rows, L)
+        with clamp_kv(model, [p], tabs, L):
+            full = model(ib.expand(4, -1), attention_mask=mask_for_model(model, T, [], B=4), use_cache=False, logits_to_keep=1).logits[:, -1]
+            cut = model(ib.expand(4, -1), attention_mask=mask_for_model(model, T, [(r, p) for r in g["R_all"]], B=4), use_cache=False, logits_to_keep=1).logits[:, -1]
+        assert torch.allclose(full[3], lgS, atol=1e-4) and (full[1] - full[0]).abs().max() > 1e-2
+>       assert torch.allclose(cut[1:], cut[0].expand(3, -1), atol=1e-5)
+E       assert False
+E        +  where False = <built-in method allclose of type object at 0x7aba5cee5180>(tensor([[ 0.8737,  0.4174, -2.4641,  ..., -3.9234, -3.9219, -3.9233],\n        [ 0.8737,  0.4174, -2.4641,  ..., -3.9234, -3.9219, -3.9233],\n        [ 0.8737,  0.4174, -2.4641,  ..., -3.9234, -3.9219, -3.9233]]), tensor([[ 0.8737,  0.4174, -2.4641,  ..., -3.9234, -3.9219, -3.9233],\n        [ 0.8737,  0.4174, -2.4641,  ..., -3.9234, -3.9219, -3.9233],\n        [ 0.8737,  0.4174, -2.4641,  ..., -3.9234, -3.9219, -3.9233]]), atol=1e-05)
+E        +    where <built-in method allclose of type object at 0x7aba5cee5180> = torch.allclose
+E        +    and   tensor([[ 0.8737,  0.4174, -2.4641,  ..., -3.9234, -3.9219, -3.9233],\n        [ 0.8737,  0.4174, -2.4641,  ..., -3.9234, -3.9219, -3.9233],\n        [ 0.8737,  0.4174, -2.4641,  ..., -3.9234, -3.9219, -3.9233]]) = <built-in method expand of Tensor object at 0x7ab8bb05e0d0>(3, -1)
+E        +      where <built-in method expand of Tensor object at 0x7ab8bb05e0d0> = tensor([ 0.8737,  0.4174, -2.4641,  ..., -3.9234, -3.9219, -3.9233]).expand
+
+tests/test_knockout.py:122: AssertionError
+======================================================================= short test summary info =======================================================================
+FAILED tests/test_knockout.py::test_knockout_exact - assert False
+1 failed, 74 passed, 9 skipped in 1130.10s (0:18:50)
+==== 2026-10-06T13:33:52Z FAILED exit 1

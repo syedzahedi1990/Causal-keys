@@ -119,7 +119,9 @@ def test_knockout_exact(mt):
         full = model(ib.expand(4, -1), attention_mask=mask_for_model(model, T, [], B=4), use_cache=False, logits_to_keep=1).logits[:, -1]
         cut = model(ib.expand(4, -1), attention_mask=mask_for_model(model, T, [(r, p) for r in g["R_all"]], B=4), use_cache=False, logits_to_keep=1).logits[:, -1]
     assert torch.allclose(full[3], lgS, atol=1e-4) and (full[1] - full[0]).abs().max() > 1e-2
-    assert torch.allclose(cut[1:], cut[0].expand(3, -1), atol=1e-5)
+    # equal up to FP32 rounding: on a many-core CPU the batched GEMMs block rows by batch position (a 4-core Xeon at 64
+    # threads gives 1.6e-5 between bitwise-equal inputs), so this uses the 1e-4 of the other batched logit checks
+    assert torch.allclose(cut[1:], cut[0].expand(3, -1), atol=1e-4)
 
 
 # ---- experiments/attention_knockout.py on the tiny model (part (b) of P-2026-10-05-G)

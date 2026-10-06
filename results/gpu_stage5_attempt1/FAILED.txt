@@ -1,0 +1,2 @@
+FAILED pytest exit 1 (see results/gpu_stage5/log_pytest.txt)
+FAILED pytest (see results/gpu_stage5/log_pytest.txt)

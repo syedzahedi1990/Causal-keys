@@ -1,4 +1,4 @@
-"""Intervention primitives for HF decoder-only LMs (Qwen2/Llama/Mistral/Gemma layouts).
+"""Intervention primitives for HF decoder-only LMs (Qwen2/Llama/Mistral/Gemma layouts; GPT-2 for ``blocks``).
 
 Sites:
   * residual stream output of decoder block ``layer`` (``resid``),
@@ -16,7 +16,7 @@ from torch import nn
 
 
 def blocks(model) -> nn.ModuleList:
-    return model.model.layers
+    return model.transformer.h if hasattr(model, "transformer") else model.model.layers
 
 
 def _out_tensor(out):

@@ -18,8 +18,8 @@ with core-bootstrap 95% CIs.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
+import os
 import platform
 import random
 import subprocess
@@ -31,9 +31,10 @@ import torch
 import transformers
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from ckeys.encoding import ARMS, WRAPPER_USED, alphabet, candidate_ids, encode, raw_prompt
-from ckeys.interventions import blocks, capture, hooks
-from ckeys.story import LOCATIONS, make_cores, record
+from ckeys.clamp import capture_kv, clamp_kv, stack_rows
+from ckeys.encoding import ALL_ARMS, ARM_BUILDERS, ARMS, WRAPPER_USED, build_prompt, candidate_ids, encode, import_arm_modules
+from ckeys.interventions import blocks
+from ckeys.story import LOCATIONS, make_cores, pick_x, record  # noqa: F401  (pick_x re-exported)
 
 L0_FRACS = (0.0, 0.0625, 0.3)
 LABEL = {("S", "B"): "K_S", ("B", "S"): "V_S", ("S", "S"): "KV_S", ("X", "B"): "K_X", ("B", "X"): "V_X",
@@ -49,13 +50,6 @@ def row_specs(nL: int) -> list[tuple[str, str, int]]:
     return rows
 
 
-def pick_x(core: dict) -> str:
-    used = {core["base"], core["source"], core["initial"], core["distractor_location"]}
-    pool = [l for l in LOCATIONS if l not in used]
-    seed = int(hashlib.sha256(json.dumps(core, sort_keys=True).encode()).hexdigest()[:8], 16)
-    return random.Random(seed).choice(pool)
-
-
 def last_logprobs(model, ids):
     out = model(ids, use_cache=False, logits_to_keep=1)
     return torch.log_softmax(out.logits[:, -1].float(), -1)
@@ -68,7 +62,7 @@ def run_item(model, tok, core, arm, view, device):
     ids = {}
     for name, loc in locs.items():
         r = record(core, view, loc)
-        ids[name] = encode(tok, raw_prompt(arm, r["story"], r["query"])).to(device)
+        ids[name] = encode(tok, build_prompt(arm, r["story"], r["query"], core, X)).to(device)
     if len({tuple(v.shape) for v in ids.values()}) > 1:
         return None
     diff = (ids["B"][0] != ids["S"][0]).nonzero().flatten().tolist()
@@ -79,37 +73,29 @@ def run_item(model, tok, core, arm, view, device):
     cid = candidate_ids(tok, arm)
     track = {"S": core["source"], "B": core["base"], "X": X, "init": core["initial"]}
     tid = {k: cid[LOCATIONS.index(v)] for k, v in track.items()}
+    spec = ARM_BUILDERS[arm]
+    if spec.forms is not None:  # the arm's own form of each tracked word (variant arms)
+        fid = spec.forms(tok)
+        tid |= {k + "f": fid[LOCATIONS.index(v)] for k, v in track.items() if k != "init"}
     kv, clean = {}, {}
     for name in ("B", "S", "X"):
-        with capture(model, range(nL), "k") as K, capture(model, range(nL), "v") as V:
+        with capture_kv(model, [pos], range(nL)) as t:
             lp = last_logprobs(model, ids[name])[0]
-        kv[name] = ({l: K[l][0, pos] for l in range(nL)}, {l: V[l][0, pos] for l in range(nL)})
+        kv[name] = {k: v[0] for k, v in t.items()}
         clean[name] = {"lp": {k: lp[i].item() for k, i in tid.items()}, "m": (lp[tid["S"]] - lp[tid["B"]]).item(),
                        "mass": lp[cid].exp().sum().item(), "argmax_cand": LOCATIONS[int(lp[cid].argmax())]}
     rows = row_specs(nL)
-
-    def who(row, l, ch):
-        ks, vs, l0 = row
-        return (ks if ch == "K" else vs) if l >= l0 else "B"
-
-    tabs = {(l, ch): torch.stack([kv[who(r, l, ch)][0 if ch == "K" else 1][l] for r in rows])
-            for l in range(nL) for ch in "KV"}
-    hs = []
-    for l in range(nL):
-        at = blocks(model)[l].self_attn
-        for mod, ch in ((at.k_proj, "K"), (at.v_proj, "V")):
-            def hk(_m, _i, out, t=tabs[(l, ch)]):
-                out = out.clone()
-                out[:, pos] = t.to(out.device, out.dtype)
-                return out
-            hs.append(mod.register_forward_hook(hk))
-    with hooks(hs):
+    tabs = stack_rows(kv, [lambda l, ch, r=r: (r[0] if ch == "k" else r[1]) if l >= r[2] else "B" for r in rows], range(nL))
+    with clamp_kv(model, [pos], tabs, range(nL)):
         lp = last_logprobs(model, ids["B"].expand(len(rows), -1))
     out = {f"{LABEL[(k, v)]}@{l0}": {"m": (lp[i, tid["S"]] - lp[i, tid["B"]]).item(),
                                       "lp": {t: lp[i, j].item() for t, j in tid.items()}}
            for i, (k, v, l0) in enumerate(rows)}
-    return {"core": core, "X": X, "arm": arm, "view": view, "pos": pos, "len": ids["B"].shape[1],
+    item = {"core": core, "X": X, "arm": arm, "view": view, "pos": pos, "len": ids["B"].shape[1],
             "n_layers": nL, "clean": clean, "m": out}
+    if spec.meta is not None:
+        item["arm_meta"] = spec.meta(core, X)
+    return item
 
 
 def boot(x, n=10000, seed=0):
@@ -138,7 +124,7 @@ def correct(r, run):
 
 def summarize(res):
     lines = []
-    for arm in ARMS:
+    for arm in ALL_ARMS:
         for view in ("direct", "world", "other_agent"):
             R_all = [r for r in res if r["arm"] == arm and r["view"] == view]
             if not R_all:
@@ -190,8 +176,12 @@ def main():
     ap.add_argument("--out", default="results/format_factorial")
     ap.add_argument("--device-map", default=None, help="'auto' to shard a large model across GPUs")
     ap.add_argument("--revision", default=None)
+    ap.add_argument("--arm-modules", default="", help="comma-separated modules registering further arms (ckeys.subsets,...)")
     a = ap.parse_args()
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    import_arm_modules(a.arm_modules)
+    unknown = [x for x in a.arms.split(",") if x not in ARM_BUILDERS]
+    assert not unknown, f"unregistered arms {unknown}: pass --arm-modules"
+    device = "cuda" if torch.cuda.is_available() and not os.environ.get("TEST_MODE") else "cpu"   # TEST_MODE=1: the CPU, as every stage-5 step
     tok = AutoTokenizer.from_pretrained(a.model, revision=a.revision)
     kw = {"dtype": getattr(torch, a.dtype), "revision": a.revision}
     if "gemma-2" in a.model.lower():
@@ -215,7 +205,7 @@ def main():
             print(f"  {arm}/{view} done ({time.time() - t0:.0f}s)", flush=True)
     Path(a.out).mkdir(parents=True, exist_ok=True)
     tag = f"{a.model.split('/')[-1]}_s{a.seed}"
-    prov = provenance(a) | {"skipped_items": skipped}
+    prov = provenance(a) | {"skipped_items": skipped, "attn_implementation": model.config._attn_implementation}
     json.dump({"provenance": prov, "results": res}, open(f"{a.out}/{tag}.json", "w"))
     s = json.dumps(prov) + "\n" + summarize(res)
     open(f"{a.out}/{tag}_summary.txt", "w").write(s + "\n")

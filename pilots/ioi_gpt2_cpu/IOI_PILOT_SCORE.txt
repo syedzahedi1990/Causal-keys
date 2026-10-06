@@ -1,0 +1,93 @@
+CPU PILOT of GPT-2 small (independent FP32 cross-check on a 4-core CPU box, n = 200, seed 0); not the preregistered GPU run. Scored by analysis/stage5_parts/ioi.py; the 7B-pair lines are not evaluable here by construction.
+== Part (e): IOI, K/V clamps at the IO mention (Gate e, G18-G22); GPT-2 small = gpt2; 7B pair = ['Qwen2.5-7B-Instruct', 'Mistral-7B-Instruct-v0.3']
+
+## gpt2 (GPT-2 small)
+  skipped_items 0, chat False, bos None, dtype float32, assert_exact True, arms ['PLAIN', 'AFTER', 'BEFORE', 'QUESTION', 'INLINE', 'INLINE_BEFORE'], label: CPU pilot: independent FP32 cross-check of GPT-2 small on this box, not the preregistered GPU run
+  gate e PLAIN          n=200 two-way 0.99 (>= 0.75) four-way 0.99 (>= 0.50) LD +3.65 [+3.43,+3.88] (> 0, CI excl. 0) cand-mass 0.53 -> passed
+  gate e AFTER          n=200 two-way 0.45 (>= 0.75) four-way 0.30 (>= 0.50) LD -0.20 [-0.41,+0.00] (> 0, CI excl. 0) cand-mass 0.12 -> FAILED (not evaluable)
+  gate e BEFORE         n=200 two-way 0.51 (>= 0.75) four-way 0.29 (>= 0.50) LD +0.02 [-0.18,+0.23] (> 0, CI excl. 0) cand-mass 0.11 -> FAILED (not evaluable)
+  gate e QUESTION       n=200 two-way 0.49 (>= 0.75) four-way 0.49 (>= 0.50) LD -0.14 [-0.35,+0.07] (> 0, CI excl. 0) cand-mass 0.06 -> FAILED (not evaluable)
+  gate e INLINE         n=200 two-way 0.97 (>= 0.75) four-way 0.94 (>= 0.50) LD +2.54 [+2.32,+2.76] (> 0, CI excl. 0) cand-mass 0.48 -> passed
+  gate e INLINE_BEFORE  n=200 two-way 0.95 (>= 0.75) four-way 0.82 (>= 0.50) LD +2.26 [+2.05,+2.49] (> 0, CI excl. 0) cand-mass 0.36 -> passed
+  PLAIN          n=200 sign(ID_K) -  ID_K -0.11 [-0.15,-0.08]  ID_V +14.13 [+13.78,+14.47]  ID_KV +8.58 [+8.39,+8.78]  f_K -0.01 [-0.02,-0.01]  f_V +1.65 [+1.62,+1.67]  s_ID -0.01 [-0.01,-0.01]  s_K -0.32 [-0.34,-0.30]  interaction -0.19 [-0.50,+0.11]  floors B 0.000 S 0.000
+  AFTER          n=200 sign(ID_K) -  ID_K -1.74 [-1.81,-1.68]  ID_V +2.50 [+2.37,+2.63]  ID_KV +0.97 [+0.86,+1.09]  f_K -1.79 [-2.06,-1.58]  f_V +2.57 [+2.36,+2.82]  s_ID -2.31 [-2.93,-1.89]  s_K -1.65 [-1.99,-1.40]  interaction -0.00 [-0.19,+0.19]  floors B 0.000 S 0.000
+  BEFORE         n=200 sign(ID_K) -  ID_K -0.04 [-0.06,-0.03]  ID_V +1.09 [+0.98,+1.21]  ID_KV +0.87 [+0.79,+0.96]  f_K -0.05 [-0.07,-0.03]  f_V +1.25 [+1.18,+1.32]  s_ID -0.04 [-0.06,-0.03]  s_K -0.08 [-0.13,-0.04]  interaction -0.15 [-0.28,-0.02]  floors B 0.000 S 0.000
+  QUESTION       n=200 sign(ID_K) -  ID_K -0.03 [-0.05,-0.01]  ID_V +5.43 [+5.19,+5.68]  ID_KV +4.35 [+4.21,+4.49]  f_K -0.01 [-0.01,-0.00]  f_V +1.25 [+1.21,+1.28]  s_ID -0.01 [-0.01,-0.00]  s_K -0.13 [-0.15,-0.11]  interaction -0.05 [-0.30,+0.21]  floors B 0.000 S 0.000
+  INLINE         n=200 sign(ID_K) -  ID_K -2.34 [-2.46,-2.23]  ID_V +6.94 [+6.68,+7.21]  ID_KV +3.74 [+3.53,+3.94]  f_K -0.63 [-0.69,-0.57]  f_V +1.86 [+1.79,+1.93]  s_ID -0.51 [-0.56,-0.46]  s_K -0.71 [-0.79,-0.64]  interaction -0.05 [-0.40,+0.31]  floors B 0.000 S 0.000
+  INLINE_BEFORE  n=200 sign(ID_K) -  ID_K -0.22 [-0.26,-0.18]  ID_V +4.84 [+4.54,+5.15]  ID_KV +3.23 [+3.06,+3.40]  f_K -0.07 [-0.08,-0.05]  f_V +1.50 [+1.44,+1.56]  s_ID -0.05 [-0.06,-0.04]  s_K -0.27 [-0.32,-0.23]  interaction -0.11 [-0.43,+0.22]  floors B 0.000 S 0.000
+  G18 PLAIN f_K -0.01 [-0.02,-0.01] (|.| <= 0.10, CI within [-0.20, +0.20]); precondition ID_KV +8.58 [+8.39,+8.78] >= 3 -> ok; ID_K -0.11 [-0.15,-0.08] -> MET
+  G19a/G19b/G20/G21b: not evaluable (AFTER or QUESTION cell missing or gate failed)
+  G21a BEFORE: not evaluable (cell missing or gate failed)
+  G21c INLINE_BEFORE ID_K -0.22 [-0.26,-0.18] |mean| <= 0.5 -> MET
+  G22a INLINE ID_K -2.34 [-2.46,-2.23] sign -: CI excl. 0 True, |mean| >= 0.5; signed contrast vs PLAIN +2.23 [+2.11,+2.34] (>= 0.5, CI excl. 0; dropped 0), vs INLINE_BEFORE +2.12 [+2.01,+2.24] (> 0, CI excl. 0; dropped 0) -> MET
+  G22b INLINE ID_K < 0 with CI excluding 0 (inhibitory): upper -2.23 -> MET
+  exploratory: four-way renormalised ID, LD-based d_C, onset 0.3 L key share, ABBA/BABA, competent subset, clean log-probs
+    PLAIN          ID4_K -0.11 [-0.15,-0.08] ID4_V +14.13 [+13.78,+14.47] ID4_KV +8.58 [+8.39,+8.78] f4_K -0.01 [-0.02,-0.01] | d^LD K +1.66 V +16.03 KV +8.59 | l0=4/12 dK -5.62 dV +22.82 s_K -0.33 [-0.35,-0.31]
+      ABBA n=100 ID_K -0.16 [-0.21,-0.10] ID_V +14.00 [+13.50,+14.50] ID_KV +8.40 [+8.16,+8.65] f_K -0.02 [-0.02,-0.01] two-way 0.99
+      BABA n=100 ID_K -0.07 [-0.11,-0.04] ID_V +14.26 [+13.77,+14.73] ID_KV +8.76 [+8.47,+9.05] f_K -0.01 [-0.01,-0.00] two-way 0.99
+      competent (two-way correct in B and S) n=197 ID_K -0.12 [-0.15,-0.08] f_K -0.01 [-0.02,-0.01] f_V +1.65 [+1.62,+1.67] s_ID -0.01 [-0.01,-0.01]
+      clean-B lp mean [q1, median, q3]: B -0.80 [-1.0,-0.7,-0.4]  S -9.41 [-10.3,-9.4,-8.3]  X -9.55 [-10.7,-9.5,-8.3]  Subj -4.45 [-5.4,-4.3,-3.6]
+    AFTER          ID4_K -1.74 [-1.81,-1.68] ID4_V +2.50 [+2.37,+2.63] ID4_KV +0.97 [+0.86,+1.09] f4_K -1.79 [-2.06,-1.58] | d^LD K -1.74 V +2.59 KV +0.95 | l0=4/12 dK -0.27 dV +5.46 s_K -0.05 [-0.07,-0.03]
+      ABBA n=100 ID_K -1.68 [-1.77,-1.59] ID_V +2.92 [+2.75,+3.09] ID_KV +1.51 [+1.38,+1.64] f_K -1.11 [-1.25,-0.99] two-way 0.80
+      BABA n=100 ID_K -1.81 [-1.91,-1.72] ID_V +2.08 [+1.93,+2.24] ID_KV +0.44 [+0.33,+0.55] f_K -4.14 [-5.56,-3.24] two-way 0.10
+      competent (two-way correct in B and S) n= 71 ID_K -1.71 [-1.81,-1.62] f_K -1.26 [-1.46,-1.10] f_V +2.05 [+1.87,+2.24] s_ID -1.62 [-2.11,-1.29]
+      clean-B lp mean [q1, median, q3]: B -3.78 [-4.4,-3.7,-3.0]  S -4.61 [-5.5,-4.6,-3.7]  X -4.69 [-5.5,-4.6,-3.9]  Subj -3.58 [-4.2,-3.6,-2.8]
+    BEFORE         ID4_K -0.04 [-0.06,-0.03] ID4_V +1.09 [+0.98,+1.21] ID4_KV +0.87 [+0.79,+0.96] f4_K -0.05 [-0.07,-0.03] | d^LD K -0.01 V +1.11 KV +0.86 | l0=4/12 dK -0.16 dV +2.02 s_K -0.08 [-0.13,-0.04]
+      ABBA n=100 ID_K -0.07 [-0.10,-0.04] ID_V +1.64 [+1.50,+1.79] ID_KV +1.24 [+1.13,+1.35] f_K -0.06 [-0.08,-0.03] two-way 0.69
+      BABA n=100 ID_K -0.02 [-0.03,-0.00] ID_V +0.54 [+0.46,+0.62] ID_KV +0.50 [+0.45,+0.57] f_K -0.03 [-0.06,-0.00] two-way 0.33
+      competent (two-way correct in B and S) n= 71 ID_K -0.06 [-0.09,-0.03] f_K -0.05 [-0.08,-0.02] f_V +1.31 [+1.20,+1.42] s_ID -0.04 [-0.07,-0.02]
+      clean-B lp mean [q1, median, q3]: B -3.89 [-4.5,-3.8,-3.2]  S -4.55 [-5.7,-4.6,-3.5]  X -4.70 [-5.8,-4.7,-3.6]  Subj -3.91 [-4.5,-3.9,-3.3]
+    QUESTION       ID4_K -0.03 [-0.05,-0.01] ID4_V +5.43 [+5.19,+5.68] ID4_KV +4.35 [+4.21,+4.49] f4_K -0.01 [-0.01,-0.00] | d^LD K +0.15 V +5.68 KV +4.36 | l0=4/12 dK -1.13 dV +9.60 s_K -0.13 [-0.16,-0.11]
+      ABBA n=100 ID_K -0.07 [-0.11,-0.04] ID_V +6.38 [+6.06,+6.70] ID_KV +4.94 [+4.76,+5.12] f_K -0.01 [-0.02,-0.01] two-way 0.89
+      BABA n=100 ID_K +0.00 [-0.02,+0.02] ID_V +4.49 [+4.23,+4.74] ID_KV +3.76 [+3.60,+3.92] f_K +0.00 [-0.00,+0.01] two-way 0.10
+      competent (two-way correct in B and S) n= 86 ID_K -0.07 [-0.11,-0.03] f_K -0.01 [-0.02,-0.01] f_V +1.30 [+1.25,+1.35] s_ID -0.01 [-0.02,-0.00]
+      clean-B lp mean [q1, median, q3]: B -4.05 [-4.8,-4.0,-3.3]  S -8.32 [-8.9,-8.4,-7.7]  X -8.42 [-9.2,-8.5,-7.6]  Subj -3.91 [-4.6,-3.9,-3.3]
+    INLINE         ID4_K -2.34 [-2.46,-2.23] ID4_V +6.94 [+6.68,+7.21] ID4_KV +3.74 [+3.53,+3.94] f4_K -0.63 [-0.69,-0.57] | d^LD K -2.17 V +7.22 KV +3.79 | l0=4/12 dK -2.49 dV +13.18 s_K -0.23 [-0.26,-0.21]
+      ABBA n=100 ID_K -1.94 [-2.07,-1.81] ID_V +7.79 [+7.44,+8.16] ID_KV +4.67 [+4.44,+4.90] f_K -0.42 [-0.46,-0.38] two-way 0.99
+      BABA n=100 ID_K -2.74 [-2.90,-2.58] ID_V +6.09 [+5.78,+6.40] ID_KV +2.80 [+2.60,+3.01] f_K -0.98 [-1.09,-0.88] two-way 0.95
+      competent (two-way correct in B and S) n=191 ID_K -2.31 [-2.43,-2.19] f_K -0.61 [-0.67,-0.55] f_V +1.84 [+1.77,+1.91] s_ID -0.49 [-0.55,-0.45]
+      clean-B lp mean [q1, median, q3]: B -1.15 [-1.5,-1.0,-0.6]  S -4.93 [-6.0,-4.9,-3.6]  X -4.97 [-6.1,-4.9,-3.7]  Subj -3.69 [-4.4,-3.7,-2.8]
+    INLINE_BEFORE  ID4_K -0.22 [-0.26,-0.18] ID4_V +4.84 [+4.54,+5.15] ID4_KV +3.23 [+3.06,+3.40] f4_K -0.07 [-0.08,-0.05] | d^LD K +0.15 V +5.24 KV +3.18 | l0=4/12 dK -1.78 dV +8.23 s_K -0.28 [-0.32,-0.23]
+      ABBA n=100 ID_K -0.25 [-0.32,-0.19] ID_V +5.67 [+5.24,+6.11] ID_KV +3.65 [+3.42,+3.90] f_K -0.07 [-0.09,-0.05] two-way 0.97
+      BABA n=100 ID_K -0.18 [-0.24,-0.13] ID_V +4.01 [+3.65,+4.36] ID_KV +2.81 [+2.58,+3.03] f_K -0.06 [-0.09,-0.05] two-way 0.93
+      competent (two-way correct in B and S) n=185 ID_K -0.21 [-0.26,-0.17] f_K -0.07 [-0.08,-0.05] f_V +1.52 [+1.45,+1.58] s_ID -0.04 [-0.06,-0.04]
+      clean-B lp mean [q1, median, q3]: B -1.68 [-2.2,-1.5,-1.0]  S -4.82 [-6.1,-4.9,-3.4]  X -4.95 [-6.1,-4.6,-3.7]  Subj -3.94 [-4.5,-3.7,-3.0]
+    nats ratio ID_V(AFTER)/ID_V(QUESTION) +0.46 [+0.44,+0.48] (descriptive, floor-confounded)
+  attention probe (exploratory, gpt2.json):
+    n=200; mean attention weight per head (labels are Wang et al.'s GPT-2 small heads)
+      PLAIN END->p                 name 9.9 0.753  name 9.6 0.677  name 10.0 0.424  dupl 0.1 0.000  dupl 3.0 0.000  dupl 0.10 0.028   top-5: 10.7=0.797 9.9=0.753 9.6=0.677 11.10=0.657 10.0=0.424
+      PLAIN S2->S1                 name 9.9 0.013  name 9.6 0.011  name 10.0 0.032  dupl 0.1 0.519  dupl 3.0 0.793  dupl 0.10 0.223   top-5: 3.0=0.793 1.11=0.696 0.5=0.600 0.1=0.519 5.10=0.230
+      INLINE END->p                name 9.9 0.511  name 9.6 0.463  name 10.0 0.326  dupl 0.1 0.000  dupl 3.0 0.000  dupl 0.10 0.018   top-5: 9.9=0.511 9.6=0.463 10.7=0.412 11.10=0.381 10.10=0.329
+      INLINE END->IO_B(list)       name 9.9 0.060  name 9.6 0.043  name 10.0 0.037  dupl 0.1 0.000  dupl 3.0 0.000  dupl 0.10 0.022   top-5: 10.7=0.243 11.10=0.169 8.10=0.068 9.8=0.061 9.7=0.061
+      INLINE IO_B(list)->p         name 9.9 0.027  name 9.6 0.018  name 10.0 0.042  dupl 0.1 0.493  dupl 3.0 0.674  dupl 0.10 0.201   top-5: 3.0=0.674 0.5=0.615 1.11=0.610 0.1=0.493 0.10=0.201
+      INLINE IO_S(list)->p         name 9.9 0.007  name 9.6 0.014  name 10.0 0.035  dupl 0.1 0.001  dupl 3.0 0.002  dupl 0.10 0.048   top-5: 1.5=0.121 0.6=0.112 0.8=0.077 0.0=0.065 1.7=0.060
+      INLINE K_S: END->p           name 9.9 0.504  name 9.6 0.460  name 10.0 0.425  dupl 0.1 0.000  dupl 3.0 0.000  dupl 0.10 0.018   top-5: 9.9=0.504 9.6=0.460 10.0=0.425 10.10=0.412 10.1=0.376
+      INLINE K_S: IO_B(list)->p    name 9.9 0.013  name 9.6 0.020  name 10.0 0.046  dupl 0.1 0.001  dupl 3.0 0.002  dupl 0.10 0.047   top-5: 1.5=0.120 0.6=0.102 0.8=0.076 1.7=0.062 0.0=0.060
+      INLINE K_S: IO_S(list)->p    name 9.9 0.033  name 9.6 0.015  name 10.0 0.052  dupl 0.1 0.496  dupl 3.0 0.669  dupl 0.10 0.203   top-5: 3.0=0.669 0.5=0.616 1.11=0.612 0.1=0.496 0.10=0.203
+
+## Qwen2.5-7B-Instruct (7B pair)
+  ioi factorial MISSING (every cell not evaluable)
+
+## Mistral-7B-Instruct-v0.3 (7B pair)
+  ioi factorial MISSING (every cell not evaluable)
+
+## Qwen2.5-7B (exploratory)
+  ioi factorial MISSING (every cell not evaluable)
+
+## Qwen2.5-14B-Instruct (exploratory)
+  ioi factorial MISSING (every cell not evaluable)
+
+## gpt2-xl (exploratory)
+  ioi factorial MISSING (every cell not evaluable)
+
+== Verdicts (G18-G22; not evaluable counts as not met; GPT-2 small = gpt2, 7B pair = ['Qwen2.5-7B-Instruct', 'Mistral-7B-Instruct-v0.3'])
+  Gate e: gpt2 PLAIN:ok,AFTER:FAIL,BEFORE:FAIL,QUESTION:FAIL,INLINE:ok,INLINE_BEFORE:ok; Qwen2.5-7B-Instruct ; Mistral-7B-Instruct-v0.3 
+  G18   no key read in plain IOI                   1/3 -> NOT MET   per model: [('gpt2', True), ('Qwen2.5-7B-Instruct', None), ('Mistral-7B-Instruct-v0.3', None)]
+  G19a  a later list opens a key read (existence)  0/2 -> NOT MET   per model: [('Qwen2.5-7B-Instruct', None), ('Mistral-7B-Instruct-v0.3', None)]
+  G19b  the sign is positive (selection)           0/2 -> NOT MET   per model: [('Qwen2.5-7B-Instruct', None), ('Mistral-7B-Instruct-v0.3', None)]
+  G20   the lookup replaces the copy               0/2 -> NOT MET   per model: [('Qwen2.5-7B-Instruct', None), ('Mistral-7B-Instruct-v0.3', None)]
+  G21a  position control (BEFORE)                  0/2 -> NOT MET   per model: [('Qwen2.5-7B-Instruct', None), ('Mistral-7B-Instruct-v0.3', None)]
+  G21b  wrapper control (QUESTION)                 0/2 -> NOT MET   per model: [('Qwen2.5-7B-Instruct', None), ('Mistral-7B-Instruct-v0.3', None)]
+  G21c  GPT-2 small INLINE_BEFORE |ID_K| <= 0.5    -> MET
+  G22a  GPT-2 small in-sentence re-mention opens a key read -> MET
+  G22b  GPT-2 small in-sentence read is inhibitory -> MET

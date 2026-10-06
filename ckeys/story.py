@@ -7,6 +7,8 @@ appears in context.
 """
 from __future__ import annotations
 
+import hashlib
+import json
 import random
 
 LOCATIONS = ("box", "basket", "shelf", "drawer", "cabinet", "closet")
@@ -36,6 +38,14 @@ def make_cores(n: int, rng: random.Random, distinct: bool = True) -> list[dict]:
         cores.append(dict(agent=a, other=b, object=o, distractor=d, initial=init,
                           distractor_location=dloc, base=base, source=src))
     return cores
+
+
+def pick_x(core: dict) -> str:
+    """Third location X, absent from the story and from {base, source}; seeded by the core."""
+    used = {core["base"], core["source"], core["initial"], core["distractor_location"]}
+    pool = [l for l in LOCATIONS if l not in used]
+    seed = int(hashlib.sha256(json.dumps(core, sort_keys=True).encode()).hexdigest()[:8], 16)
+    return random.Random(seed).choice(pool)
 
 
 def record(core: dict, view: str, location: str) -> dict:

@@ -1,0 +1,41 @@
+ckeys/ioi.py make_cores(200, random.Random(0)): 15 templates, reduced pools
+core 0: {'template': 6, 'pattern': 'ABBA', 'place': 'beach', 'object': 'ticket', 'io_b': 'Ruth', 'io_s': 'Erik', 'io_x': 'Joan', 'subj': 'Charles', 'order': [0, 1, 3, 2]}
+  B: When Ruth and Charles got a ticket at the beach, Charles decided to give it to
+  S: When Erik and Charles got a ticket at the beach, Charles decided to give it to
+  X: When Joan and Charles got a ticket at the beach, Charles decided to give it to
+  listing: Choices: Ruth, Erik, Charles, Joan
+  INLINE: When Ruth and Charles got a ticket at the beach ( Ruth, Erik, Charles, Joan), Charles decided to give it to
+  INLINE_BEFORE: ( Ruth, Erik, Charles, Joan) When Ruth and Charles got a ticket at the beach, Charles decided to give it to
+  AFTER (chat user turn): 'Complete the sentence with the right name.\n\nSentence: When Ruth and Charles got a ticket at the beach, Charles decided to give it to\nChoices: Ruth, Erik, Charles, Joan\nAnswer with one name.\nAnswer:'
+  AFTER (raw): 'When Ruth and Charles got a ticket at the beach, Charles decided to give it to\nChoices: Ruth, Erik, Charles, Joan\nAnswer:'
+IO_B list slot counts (slot 0..3): 0:40 1:55 2:58 3:47
+pattern counts: {'ABBA': 100, 'BABA': 100}
+template histogram (index: count): 0:17 1:11 2:13 3:14 4:15 5:13 6:14 7:9 8:9 9:16 10:11 11:9 12:18 13:9 14:22
+tokenizer gpt2 (gpt2; chat False; BOS '<|endoftext|>')
+  PLAIN          chat=False skipped=0 p 2..7 len 15-21 IO-count {1: 200} S-count {2: 200} -> ok
+  AFTER          chat=False skipped=0 p 2..7 len 29-35 IO-count {2: 200} S-count {3: 200} -> ok
+  BEFORE         chat=False skipped=0 p 13..18 len 29-35 IO-count {2: 200} S-count {3: 200} -> ok
+  QUESTION       chat=False skipped=0 p 2..7 len 27-33 IO-count {1: 200} S-count {2: 200} -> ok
+  INLINE         chat=False skipped=0 p 2..7 len 23-29 IO-count {2: 200} S-count {3: 200} -> ok
+  INLINE_BEFORE  chat=False skipped=0 p 11..16 len 24-30 IO-count {2: 200} S-count {3: 200} -> ok
+tokenizer Qwen2.5 (Qwen/Qwen2.5-7B-Instruct; chat True; BOS None)
+  PLAIN          chat=False skipped=0 p 1..6 len 14-20 IO-count {1: 200} S-count {2: 200} -> ok
+  AFTER          chat=True  skipped=0 p 25..30 len 63-69 IO-count {2: 200} S-count {3: 200} -> ok
+  BEFORE         chat=True  skipped=0 p 35..40 len 63-69 IO-count {2: 200} S-count {3: 200} -> ok
+  QUESTION       chat=True  skipped=0 p 25..30 len 61-67 IO-count {1: 200} S-count {2: 200} -> ok
+  INLINE         chat=False skipped=0 p 1..6 len 22-28 IO-count {2: 200} S-count {3: 200} -> ok
+  INLINE_BEFORE  chat=False skipped=0 p 10..15 len 23-29 IO-count {2: 200} S-count {3: 200} -> ok
+tokenizer Qwen2.5 raw (Qwen/Qwen2.5-7B-Instruct; chat False; BOS None)
+  PLAIN          chat=False skipped=0 p 1..6 len 14-20 IO-count {1: 200} S-count {2: 200} -> ok
+  AFTER          chat=False skipped=0 p 1..6 len 27-33 IO-count {2: 200} S-count {3: 200} -> ok
+  BEFORE         chat=False skipped=0 p 11..16 len 27-33 IO-count {2: 200} S-count {3: 200} -> ok
+  QUESTION       chat=False skipped=0 p 1..6 len 25-31 IO-count {1: 200} S-count {2: 200} -> ok
+  INLINE         chat=False skipped=0 p 1..6 len 22-28 IO-count {2: 200} S-count {3: 200} -> ok
+  INLINE_BEFORE  chat=False skipped=0 p 10..15 len 23-29 IO-count {2: 200} S-count {3: 200} -> ok
+tokenizer Mistral-v0.3 (mistralai/Mistral-7B-Instruct-v0.3; chat True; BOS '<s>')
+  PLAIN          chat=False skipped=0 p 2..7 len 15-21 IO-count {1: 200} S-count {2: 200} -> ok
+  AFTER          chat=True  skipped=0 p 24..29 len 64-70 IO-count {2: 200} S-count {3: 200} -> ok
+  BEFORE         chat=True  skipped=0 p 36..41 len 64-70 IO-count {2: 200} S-count {3: 200} -> ok
+  QUESTION       chat=True  skipped=0 p 24..29 len 62-68 IO-count {1: 200} S-count {2: 200} -> ok
+  INLINE         chat=False skipped=0 p 2..7 len 23-29 IO-count {2: 200} S-count {3: 200} -> ok
+  INLINE_BEFORE  chat=False skipped=0 p 11..16 len 24-30 IO-count {2: 200} S-count {3: 200} -> ok

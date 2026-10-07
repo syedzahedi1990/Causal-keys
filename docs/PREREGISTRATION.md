@@ -601,3 +601,236 @@ Qwen2.5-14B-Instruct; their template-2 stories, raw prompt (no chat template), p
 Alternative: H10 is the explicit rival of H7/H9; a flat-high kappa (address read by the answer position) and interaction-carried cells are reported as such; failure of H11 means the in-sample law does not transfer to their stories and wrapper even for an identity edit.
 
 **Exploratory:** f+/d− rankings and grids, layer profile, split-half reliability of a3, zero-ablation and top-10/20, K-only/V-only hop rows and row restrictions, previous-token scores, optional Qwen2.5-14B (a); IIA/Phi sweeps under every format, FP32 re-check at l* ± 2, words-only and periods-only exchanges, rho_K/rho_V and the interaction, QNAMES2, LETTERS-AFTER as a fourth point, the full onset sweep of s_ID on their stories, a multi-position row splice if kappa(OPTIONS-AFTER) ≥ 0.3, per-pair scatter, the overlap with their 80 validation pairs (b).
+
+---
+
+## Outcome of P-2026-10-05-H (GPU stage 6; scored by analysis/stage6_score.py at the finalising commit cc3a3e0, which the run used)
+
+**Run.**
+- **Hardware and software:** one A100-SXM4-80GB, Python 3.12.14, torch 2.11.0+cu128, transformers 5.18.0, numpy 2.5.3. The run used a clean checkout of cc3a3e0 (`COMMIT.txt`: only `results/gpu_stage6/` untracked) with `PART=all` and `TEST_MODE=0`, started 2026-10-07T10:57Z. The score was written on the box at 17:13Z.
+- **Order:** the FP32 unit tests of stage 6 ran first (10:57Z), followed by the earlier stages' regression tests (`log_pytest.txt`, 11:01Z, 10 passed). Part (a) followed: Qwen2.5-7B-Instruct (6964 s), then Mistral-7B-Instruct-v0.3 (9765 s). Part (b) came last, at Qwen2.5-14B-Instruct: preflight, LM filter, sweeps, exchange and clamps, and then the exploratory FP32 re-check sweeps.
+- **Precision and attention:**
+  - Part (a) used BF16 with eager attention.
+  - Part (b) used BF16 with sdpa.
+  - The exception is the two exploratory re-check sweeps (`sweep_*_fp32.json`), which ran in FP32 with sdpa.
+- **Prakash et al.'s release:** fetched at run time at 0579347e3c. All six file hashes and the sha256 of the seed-10 pool (4451da1a…, n = 320) were checked (`RELEASE.txt`).
+- **Provenance and population:**
+  - One Hub revision per model, for three models (`REVISIONS.txt`). Every results file carries commit cc3a3e0.
+  - Part (a): in both arms and both models, R = make_cores(60, Random(0)) and E = make_cores(60, Random(1)). The duplicate scores use 100 sequences.
+  - Part (b): the LM filter passed 315 of the 320 pairs. The population is the first 150 passing pairs in pool order. All 13 exchange cells and all 38 clamp cells are over this population.
+  - The scorer prints "provenance OK; population OK".
+- **What failed:** no step failed.
+- **Not run:** the optional Llama-3-70B run (H12) was not made.
+  - Reason: the plan agreed before the stage-6 run (budget) was to make the 70B run only if Qwen2.5-14B failed to reproduce Prakash et al.'s edit, i.e. failed Gate b1. Gate b1 passed (IIA 0.993 at l* = 28), and the run was not made. It needs a separate 2×80GB box and a Hugging Face token for the gated weights (`docs/GPU_RUNBOOK.md`); the main run had `HF_TOKEN` unset (`ENV.txt`).
+  - The entry and the runbook allow it to be run later and scored against the fixed 14B results. Because none of H7, H9 and H10 was met at 14B, it would test Gate b1 (l* in 30–40), H8 and H11 Part 1 only. Paper v3 reports H12 as not run.
+- **Re-score:** re-scoring the archive off the box with the committed scorer at cc3a3e0 reproduces `STAGE6_SCORE.txt` byte for byte (default `--root`, run from a checkout root).
+- **What changed between cc3a3e0 and the results commit (f24586a).**
+  - No scorer, experiment, test or `ckeys/` file changed. The only code change is one line of `scripts/make_anonymous_release.py`, which adds `docs/V3_STAGE5_IMPLICATIONS.md` to the release's exclusion list.
+  - The other changes are documentation and repository settings: the stage-5 outcome record G (+191 lines, insertions only, placed above entry H in `docs/PREREGISTRATION.md`), the stage-5 memo `docs/V3_STAGE5_IMPLICATIONS.md`, a one-line timing edit in `docs/GPU_RUNBOOK.md` and one `.gitignore` line.
+  - Entry H itself is byte-identical to cc3a3e0: the section from "## P-2026-10-05-H" to the end of the file has the same SHA-256 (1c01221a…) in both versions.
+- **Timeline relative to stage 5.**
+  - H was finalised at cc3a3e0, committed 2026-10-07T01:16Z. The entry and the commit message state that no stage-5 output had been inspected.
+  - The stage-5 GPU run had started at 2026-10-06T21:25Z (`results/gpu_stage5/COMMIT.txt`). Its results were first committed at 08:41Z (88bb877) and its outcome at 09:37Z (e24e928), both after cc3a3e0.
+  - The stage-6 run started at 10:57Z on cc3a3e0, unchanged.
+- **Independent checks:** four recomputations from the raw files reproduce every gate value, point estimate and verdict (details under Deviations). None of them imports the scorer.
+- **Summary line:** 6 MET (H1–H5, H11), 4 NOT MET (H7–H10), 1 NOT EVALUABLE (H6), 1 NOT RUN (H12) of 12.
+
+Numbers below are from `STAGE6_SCORE.txt` unless marked. *(recomputed)* means recomputed from the raw files and not printed in the score file. "Our arithmetic" marks a difference or ratio of printed score-file values. In part (a), pairs are Qwen2.5-7B-Instruct / Mistral-7B-Instruct-v0.3. Part (b) is Qwen2.5-14B-Instruct, and its format triples are NO-MENTION / QNAMES / OPTIONS-AFTER unless stated. Formats are named as in the paper; the code arms are OPTIONS-AFTER (P1) and SENTENCE-AFTER (POST).
+
+### Gates
+
+- **Gate a1 (FP32 exactness): met.**
+  - `tests/test_head_splice.py`: 7 passed, 0 failed in `log_pytest_stage6.txt`. This is the only run recorded in that log (2026-10-07T10:57:32Z, commit cc3a3e0).
+  - The same run passed 29 tests and skipped 1, the Llama-3 tokenizer test of `tests/test_prakash.py`.
+- **Gate a2 (BF16 floor, per model and format).** Each line gives |none − clean| and |all_T − full| against the bound, then the hop exactness row (max |exact − K_S|) against 0.1 nats.
+
+  | Model | Format | \|none − clean\| | \|all_T − full\| | Bound | Hop exactness | Verdict |
+  |---|---|---|---|---|---|---|
+  | Qwen2.5-7B | OPTIONS-AFTER | 0.606 | 0.669 | 0.719 | 0.0000 | **met** |
+  | Qwen2.5-7B | SENTENCE-AFTER | 0.770 | 0.489 | 0.500 | 0.0000 | **not met** (\|none − clean\| exceeds the bound) |
+  | Mistral-7B | OPTIONS-AFTER | 0.079 | 0.162 | 0.529 | 0.0000 | **met** |
+  | Mistral-7B | SENTENCE-AFTER | 0.069 | 0.224 | 0.500 | 0.0000 | **met** |
+
+  - The bound is max(0.5, 0.02 × mean d_full). For Qwen2.5-7B SENTENCE-AFTER, 0.02 × 10.438 = 0.209 (our arithmetic), so the 0.5-nat floor applies.
+  - The raw floor |all_G − full| is printed beside the gate, as the entry requires. It is 3.000 and 4.624 at Qwen2.5-7B, and 1.097 and 3.743 at Mistral-7B (OPTIONS-AFTER, SENTENCE-AFTER).
+- **Gate a3 (D3 replicates on E): met in both models.**
+  - Mean d_full under OPTIONS-AFTER is +35.969 [+34.591, +37.333] and +26.469 [+24.548, +28.259], each ≥ 10.
+  - Under SENTENCE-AFTER it is +10.438 [+9.462, +11.475] and +12.254 [+10.716, +13.799], each > 0.
+  - d_G/d_full under OPTIONS-AFTER is 0.926 [0.905, 0.946] and 0.982 [0.969, 0.997], each ≥ 0.8.
+- **Evaluability, part (a).**
+  - Both models are evaluable in H1–H5.
+  - H5's SENTENCE-AFTER line and H6 need Gate a2 under SENTENCE-AFTER. They are therefore not evaluable at Qwen2.5-7B, and by the entry's rule for combining the two models they are NOT EVALUABLE overall.
+- **Gate b1 (reproduction, NO-MENTION sweeps): met.**
+  - BIND: IIA(l* = 28) = 0.993. The IIA is 1.00 at blocks 29–34, and the tie rule (within 0.01, earliest) selects 28.
+  - ID: IIA_ID(l*_ID = 0) = 1.000, and IIA_ID(l*) = IIA_ID(28) = 1.000, so H11 Part 2 and Gate b3(b) are evaluable.
+  - l* and l*_ID re-derived from the sweep files equal `lstar.json`.
+- **Gate b0 (exactness, 13 cells): met in every cell.** mean|m(r4) − m(r1)| is 0.099–0.194 and mean|m(r0) − m(unbatched B)| is 0.141–0.203, against 0.3 nats.
+- **Gate b2 (effect size Phi ≥ 3 nats): met in every cell except the two LETTERS-AFTER cells at depth 28.**
+
+  | Cell | NO-MENTION | QNAMES | OPTIONS-AFTER | LETTERS-AFTER | QNAMES2 |
+  |---|---|---|---|---|---|
+  | BIND@28 | +31.616 | +5.814 | +6.523 | +0.225 (**not met**) | +7.285 |
+  | ID@0 | +46.005 | +39.606 | +54.550 | +38.255 | – |
+  | ID@28 | +45.797 | +9.321 | +10.885 | +0.034 (**not met**) | – |
+
+- **kappa evaluability rule: holds in every cell except ID@28 LETTERS-AFTER.** That cell has psi_K −0.171, psi_V +3.024 and interaction −1.854, so it is not interaction-carried. In every cell where the rule holds, 0.0 % of resamples are dropped, except BIND@28 LETTERS-AFTER (0.2 %).
+- **Gate b3 (H10 as a dissociation): not met.**
+  - (a) ID_K(OPTIONS-AFTER, l*+1 = 29) = −0.092 [−0.123, −0.063], and s_ID = −0.015. The gate needs ID_K > 0 with the CI excluding 0, and s_ID ≥ 0.5.
+  - (b) kappa_ID at depth 28 under OPTIONS-AFTER = +0.006 [−0.003, +0.013], against ≥ 0.5. The cell itself is evaluable.
+
+### Predictions
+
+**Part (a), reader heads and the second hop (OPTIONS-AFTER; Qwen2.5-7B / Mistral-7B; k* = 40 / 52).**
+
+| Prediction | Observed | Verdict |
+|---|---|---|
+| H1 sparsity: R(k*) ≥ 0.8, lower bound ≥ 0.7 | R(40) +0.967 [+0.952, +0.982]; R(52) +0.942 [+0.919, +0.961]. k80: a3 20 / 16; f+ none / none; d− none / 12 | **met** (2/2) |
+| H2 necessity and specificity: KO(k*) ≥ 0.8; R_rand, KO_rand ≤ 0.25 (means over 3 draws) | KO +0.977 [+0.966, +0.987] / +0.971 [+0.954, +0.984]; R_rand +0.004 / +0.007; KO_rand +0.011 / +0.010 | **met** (2/2) |
+| H3 ablation: (a) rho_K ≤ 0.5, upper ≤ 0.6; (b) clean-B candidate mass ≥ 0.9 in ≥ 80 % of stories; (c) every random set and the active-at-G set rho_K ≥ 0.75; (d) dV > 0 (CI excl. 0) and ≥ floor; base-argmax rate ≥ 0.8 | (a) 0.238 [0.205, 0.270] / 0.059 [0.040, 0.079]; (b) 1.00 / 0.97 of stories; (c) random sets 1.002, 0.978, 0.953, active set 1.018 / random sets 1.002, 1.009, 1.006, active set 1.009; (d) +6.907 [+6.264, +7.561] against floor 2.7 / +10.861 [+9.995, +11.677] against 2.8; base-argmax 0.87 / 1.00 | **met** (2/2) |
+| H4 canonical duplicate-token heads, over C = top-k_C by a3, k_C = min(k80, k*) = 20 / 16: (i) median D ≥ 0.2 and median I ≤ 0.1; (ii) median T_dup ≥ 0.2 | (i) D +0.370 [+0.361, +0.378] / +0.232 [+0.227, +0.238]; I +0.011 / +0.022. (ii) T_dup +0.459 [+0.445, +0.475] / +0.433 [+0.407, +0.446] (control words T_ctrl 0.027 / 0.065). Secondary: \|top-10(a3) ∩ top-10(D)\| 6 (P = 1.4e-10) / 5 (P = 6.7e-09); Spearman(a3, D) +0.185 / +0.230; Spearman(a3, T_dup) +0.146 / +0.251 | **met** (2/2) |
+| H5 second hop: r_ans(KV) ≥ 0.5 (lower ≥ 0.4); r_ans − r_other > 0 (CI excl. 0); r_all(KV) ≥ 0.8 | r_ans(KV) +0.899 [+0.886, +0.913] / +0.859 [+0.845, +0.872]; r_other +0.118 / +0.165; r_ans − r_other +0.782 [+0.749, +0.813] / +0.694 [+0.671, +0.714]; r_all(KV) +0.992 / +0.992. Secondary (reported, not scored): r_ans(K) 0.797 / 0.683 against r_ans(V) 0.080 / 0.023, K − V +0.717 / +0.660 (CIs exclude 0); the strong version r_ans(KV) ≥ 0.7 holds in both | **met** (2/2) |
+| H5, SENTENCE-AFTER line (reported against r_ans(KV) ≥ 0.35 and r_all ≥ 0.5) | Qwen2.5-7B r_ans(KV) +0.788 [+0.751, +0.824], r_all +0.841 (computed met; not evaluable, Gate a2 under SENTENCE-AFTER failed); Mistral-7B +0.780 [+0.761, +0.799], r_all +0.939 (met) | **not evaluable** (reported line; it does not enter the H5 verdict) |
+| H6 the same readers: \|top-20(a3, OPTIONS-AFTER) ∩ top-20(a3, SENTENCE-AFTER)\| ≥ 10 per model | 13 (P = 9.2e-19; computed met, not evaluable: Gate a2 under SENTENCE-AFTER failed) / 14 (P = 9.9e-23; met) | **not evaluable** |
+
+**Part (b), the exchange on Prakash et al.'s intervention (Qwen2.5-14B-Instruct, n = 150; l* = 28, l*_ID = 0).**
+
+Evaluable formats: BIND@28 and ID@0 are evaluable under NO-MENTION, QNAMES and OPTIONS-AFTER. ID@28 is evaluable under those three formats. Each LETTERS-AFTER cell at depth 28 fails Gate b2, and ID@28 LETTERS-AFTER also fails the kappa rule. LETTERS-AFTER is exploratory in every cell.
+
+| Prediction | Observed | Verdict |
+|---|---|---|
+| H7 the law on the binding swap, depth-matched: \|kappa(f) − s_ID(f, 29)\| ≤ 0.25 for every evaluable f, and Pearson r(kappa, s_ID(·, 29)) ≥ 0.9 | kappa +0.618 / +0.906 / +0.864 against s_ID(f, 29) +0.017 / −0.028 / −0.015; gaps 0.601 / 0.934 / 0.879; r = −0.986. Secondary, against s_ID(f, 0): gaps 0.600 / 0.181 / 0.163 | **not met** |
+| H8 shared prediction under NO-MENTION: psi_V ≥ 0.5, psi_K ≤ 0.25, CI of psi_V − psi_K excluding 0 | psi_V +0.435, psi_K +0.703; psi_V − psi_K −0.268 [−0.317, −0.219] (the CI excludes 0, with the opposite sign) | **not met** |
+| H9 crossover (H_read): kappa(OPTIONS-AFTER) − kappa(NO-MENTION) ≥ 0.4 (paired CI excl. 0); kappa(QNAMES) between the two | +0.247 [+0.211, +0.281], 0.0 % dropped; kappa(QNAMES) +0.906 is not between +0.618 and +0.864 | **not met** |
+| H10 the rival (H_binding): kappa(f) ≤ 0.25 for every evaluable f | +0.618 / +0.906 / +0.864. Flat-high (kappa ≥ 0.75 in every evaluable f) does not hold either (NO-MENTION 0.618). Gate b3 not passed: "not evaluable as a dissociation at this depth" | **not met** |
+| H11 positive control, identity edit. Part 1 (own depth, s_ID(f, 1)): every gap ≤ 0.25 and kappa_ID(OPTIONS-AFTER) − kappa_ID(NO-MENTION) ≥ 0.4 (CI excl. 0). Part 2 (depth 28, s_ID(f, 29)): every gap ≤ 0.25 | Part 1: kappa_ID +0.131 / +0.773 / +0.779 against s_ID +0.017 / +0.724 / +0.702, gaps 0.114 / 0.048 / 0.077; difference +0.648 [+0.630, +0.666], 0.0 % dropped. Part 2: kappa_ID +0.129 / +0.007 / +0.006 against s_ID +0.017 / −0.028 / −0.015, gaps 0.113 / 0.036 / 0.020 | **met** (Part 1 met, Part 2 met) |
+| H12 optional Llama-3-70B | No Llama-3-70B results | **not run** |
+
+**Status of the preregistered alternatives.**
+- **(a) The read is distributed beyond 5 % of heads (H1/H2 fail):** not supported. H1 and H2 are met with large margins: R(k*) 0.967 / 0.942, KO(k*) 0.977 / 0.971. Random sets of equal size give R_rand 0.004 / 0.007 and KO_rand 0.011 / 0.010 (means over three draws); no single draw exceeds 0.02 *(recomputed: KO per draw at most 0.020 / 0.013)*. The set is not reducible to single heads, though; see the unpredicted observations.
+- **(a) Task-tuned lookup heads rather than general duplicate heads (H4 (i) fails):** not supported. H4 (i) is met in both models: median D 0.370 / 0.232, median I 0.011 / 0.022. At Mistral-7B the margin over 0.2 is 0.032 (our arithmetic), and it depends on the size of C (see Deviations).
+- **(a) Three-hop route through the instruction and template rows (H5 fails with r_all ≥ 0.8):** not supported. r_ans(KV) is 0.899 / 0.859 and r_other 0.118 / 0.165.
+- **(a) No head-level trade-off (H3d fails, as at 0.5B):** not supported. dV is +6.907 / +10.861 with CIs excluding 0, and the base-argmax rate is 0.87 / 1.00.
+- **(b) H10 as the rival (binding in values, "keys carry identity, values carry binding"):** not met. kappa is 0.618 / 0.906 / 0.864, against ≤ 0.25. Gate b3 also fails, so the dissociation reading is not available either way.
+- **(b) Flat-high kappa (address read by the answer position):** not observed as defined. kappa ≥ 0.75 under QNAMES and OPTIONS-AFTER, but 0.618 under NO-MENTION.
+- **(b) Interaction-carried cells:** none. No evaluable cell fails the kappa rule. The one cell that fails the rule (ID@28 LETTERS-AFTER) has interaction −1.854, below the 0.5 that would make it interaction-carried.
+- **(b) H11 failure ("the in-sample law does not transfer to their stories and wrapper even for an identity edit"):** does not apply, because H11 is met. Its limits are stated under Deviations.
+
+### Deviations and disclosures
+
+- **No deviation from the entry in the run.** Every preregistered cell and population is present, every gate was evaluated as written, and no verdict is changed here.
+- **Gate a2 compares batched rows with single passes (design, not a scorer bug).** The Qwen2.5-7B SENTENCE-AFTER failure is a BF16 batch-shape offset, not a splice error, on the following evidence *(recomputed)*:
+  - Within each batch, every none row of the six sufficiency batches is identical (mean difference 0.000).
+  - The single-pass clean B run of the ablation batch equals the single clean pass exactly.
+  - Under SENTENCE-AFTER, the reference rows of the knockout batch (B = 17) and the hop batch (B = 8) match each other but differ from the B = 18 sufficiency rows by 0.624 nats. Under OPTIONS-AFTER they coincide (0.000).
+  - Per story under SENTENCE-AFTER, |none − clean| has median 0.625 and maximum 3.125, with 31/60 stories above 0.5 and 18/60 above 1.0. The signed mean is +0.049.
+  - The hop exactness row is 0.0000 in every story and cell.
+
+  Every scored quantity is a difference against an in-batch reference row. The H6 quantity uses the single-pass a3 rankings on R. The rule nevertheless ties H5's SENTENCE-AFTER line and H6 to this gate, and they stay NOT EVALUABLE.
+- **Qwen2.5-7B's OPTIONS-AFTER pass of Gate a2 is narrow.**
+  - |all_T − full| is 0.669 against a bound of 0.719, and the bound exceeds the 0.5-nat floor only because it scales with d_full (35.969).
+  - The bootstrap interval of that mean is [0.534, 0.816] *(recomputed)*, which crosses the bound. The verdict uses the point estimate, as the entry specifies.
+- **The FP32 re-check (exploratory) is not in the score file.** The scorer skips labelled files by design.
+  - Values *(recomputed)*, BIND IIA FP32 / BF16 at blocks 26–30: 0.747 / 0.747, 0.880 / 0.887, 0.993 / 0.993, 1.000 / 1.000, 1.000 / 1.000. The tie rule on the FP32 blocks also selects 28.
+  - Per-pair agreement at block 28 is 0.987: a different single pair fails in FP32. Phi differs by about 0.13 nats.
+  - ID: IIA 1.000 at blocks 0–2 in both precisions.
+  - The command line in `log_fp32_Qwen2.5-14B-Instruct.txt` passes `--dtype` twice (bfloat16, then float32). The last value applies, and both files record torch.float32.
+- **Null probabilities.**
+  - The entry quotes hypergeometric P at the threshold: 1.7e-4 / 7.8e-5 for overlap ≥ 3 of the top-10 (H4), and 1.3e-12 / 9.3e-14 for overlap ≥ 10 of the top-20 (H6). These reproduce *(recomputed)*.
+  - The scorer prints P(overlap ≥ observed) instead: 1.4e-10 / 6.7e-09 (H4) and 9.2e-19 / 9.9e-23 (H6).
+  - Both are correct; they differ in conditioning.
+- **H3 (d) floors.** The entry and the scorer use 2.7 and 2.8 nats. Recomputed from the stage-1 summaries, the floors are 2.710 and 2.838 *(recomputed)*. Both are far below the observed dV.
+- **H4 (ii) averaging.** The scorer pools T_dup over (story, repeated word) pairs as a ratio of means, which is within the entry's wording. A per-story average gives 0.468 / 0.430, against 0.459 / 0.433 *(recomputed)*.
+- **H5 paired condition.** "r_ans(KV) > r_other (paired, CI excluding 0)" is checked as the lower bound of the paired difference > 0. This is equivalent here.
+- **Duplicate-score sequences at Qwen2.5-7B have no BOS token.** The tokenizer has none, and the file records `bos: False`, so the first repeated query's duplicate key is position 0, which is also the attention sink. This can raise a head's D by at most 1/30 = 0.033 (our arithmetic), which cannot move the median of 0.370 below 0.2. Mistral-7B's sequences have a BOS token.
+- **Format evaluability in part (b) takes the arm's reproduction from the NO-MENTION sweep for every format, as the entry specifies.**
+  - As a result, BIND@28 and ID@28 under QNAMES and OPTIONS-AFTER are evaluable, although the edit flips 0/150 answers there.
+  - In the exchange cells the M row's argmax among the roles is s_q in 150/150 pairs for BIND under OPTIONS-AFTER and QNAMES *(recomputed)*.
+  - These kappas therefore decompose a shift of the logit margin (Phi 6.5 and 5.8 nats against base margins m(B) of −27.69 and −20.06 *(recomputed)*), not a reproduced swap.
+- **kappa and s_ID are different statistics (design).**
+  - kappa is one-sided: m = log p(target) − log p(s_q), with K/V exchanged at the state word and its following punctuation token.
+  - s_ID is the symmetric S-versus-X identity contrast at the word only.
+  - With l*_ID = 0, the ID@0 exchange and the natural clamp from block 1 are nearly the same intervention. Their one-sided kappas agree to within 0.001 (NO-MENTION), 0.029 (QNAMES), 0.044 (OPTIONS-AFTER) and 0.012 (LETTERS-AFTER) *(recomputed)*.
+  - The H11 Part 1 gaps (0.114 / 0.048 / 0.077) split between the two differences as follows, using the one-sided clamp kappas 0.132 / 0.744 / 0.735 *(recomputed; the split is our arithmetic)*:
+    - NO-MENTION: almost all of the gap is the difference between the statistics (0.115), with the exchange 0.001 below the clamp.
+    - QNAMES: 0.029 is exchange versus clamp and 0.020 the difference between the statistics.
+    - OPTIONS-AFTER: 0.044 is exchange versus clamp and 0.033 the difference between the statistics.
+  - For H7, the one-sided clamp analogue at l0 = 29 is 0.131 / 0.012 / 0.005 *(recomputed)*, which would still leave gaps of 0.49 or more. No verdict depends on the difference between the statistics.
+- **l*_ID = 0 comes from the earliest-maximum rule on a flat curve.** The ID NO-MENTION sweep is 1.00 at every block 0–35 (Phi 46.0 to 41.2), so the rule picks block 0 by default, not by localisation. H11 Part 1 thus compares two near-identical interventions, and Part 2 compares cells whose kappa and s_ID are both near 0 under QNAMES and OPTIONS-AFTER.
+- **l* = 28 rests on one pair.** IIA(28) = 149/150, against the tie threshold of 0.990; pair 60 is the only failure. One more failure would have made l* = 29. The FP32 re-check selects 28 as well.
+- **Disclosed pilots (entry H) and how the outcome compares.**
+  - Pilot (a), Qwen2.5-0.5B FP32: the a3-ranked top heads were duplicate heads, with k80 = 12 of 336. At 7B, H4 is met, which is consistent; k80 is 20 of 784 and 16 of 1024.
+  - The same pilot's ablation of 16 heads took ID_K from 1.69 to −0.09 with no head-level trade-off (the entry's H3 alternative, "as at 0.5B"). Its answer-only hop gave r_ans(KV) 0.37 and 0.04 on two stories. At 7B both differ from the pilot: H3 (d) is met (dV +6.907 / +10.861) and H5 is met (r_ans(KV) 0.899 / 0.859).
+  - Pilot (b), the 0.5B prototype of the exchange: exact (B + KV_M = M to 0.0), with psi_K +1.54 and psi_V −0.61 under NO-MENTION, which the evaluability rule marks not evaluable. At 14B, Gate b0 is met in all 13 cells and the rule holds in every NO-MENTION cell.
+  - The release's own 14B per-layer IIA (1.00 at blocks 28–34) predicted l* = 27–28, and l* is 28. The per-layer replication table under Part (b) therefore compares against material seen before finalisation. It is a reproduction check, not an independent prediction.
+- **Validation-split overlap.** The scorer computes "70/80" from our filter's passing list. Prakash et al.'s own filter could select slightly different pairs, so the figure is approximate.
+- **Cosmetic.** For the cell that fails the kappa rule, the scorer does not print the dropped-resample fraction (ID@28 LETTERS-AFTER: 56.6 % *(recomputed)*). The cell enters no verdict.
+- **Independent verification** *(recomputed)*:
+  - Four recomputations from the raw files, none importing the scorer: gates a2/a3 with H1–H3, H5s and H6; gates a2/a3 with k80, H4–H6 and the exploratory part (a) lines; the part (b) sweeps, exchanges, gates and H7–H11; and the part (b) natural clamps and the law. Every gate value, point estimate and verdict agrees.
+  - With independent seeds and 2000–4000 resamples, CI bounds agree with the scorer's 10,000-resample bounds to within about 0.01 on ratio scales and about 0.05 nats on nat-scale quantities. Examples: BIND@28 LETTERS-AFTER kappa upper 0.846 against 0.854; BIND@28 NO-MENTION Phi [+30.235, +32.979] against [+30.193, +32.985]; Gate a3 d_full at Qwen2.5-7B [34.574, 37.356] against [34.591, 37.333].
+  - The exception is s_ID(LETTERS-AFTER, 29), whose denominator is near zero: lower bound −2.202 against −2.155. That cell enters no verdict.
+  - Among the MET criteria, the narrowest bound-based margins are the H1 lower bounds (0.952 / 0.919 against 0.7, margins 0.252 / 0.219) and the H3 (a) upper bound at Qwen2.5-7B (0.270 against 0.6). On the NOT MET side, the H8 upper bound of psi_V − psi_K is −0.219 against 0. No bound is within 0.2 of its threshold (margins are our arithmetic).
+  - The narrow margins are point estimates: Qwen2.5-7B's Gate a2 OPTIONS-AFTER pass (0.669 against 0.719; see above), H4 (i) at Mistral-7B (median D 0.232 against 0.2) and H3's base-argmax rate at Qwen2.5-7B (0.87 against 0.8). Qwen2.5-7B's SENTENCE-AFTER |all_T − full| (0.489 against 0.5) is also narrow, but that gate failed on its other line.
+  - The SHA-256 hashes of all 37 files listed in `MANIFEST.sha256` verify.
+  - Off the box, the committed scorer reproduces the score file byte for byte.
+
+### Unpredicted observations (reported, not reinterpreted)
+
+**Part (a).**
+- **Single-head rankings.** Rankings by single-head causal effect do not find the set.
+  - At Qwen2.5-7B, f+ reaches R(128) = 0.06 and d− reaches R(128) = 0.58.
+  - At Mistral-7B, f+ reaches R(128) = 0.66, while d− reaches k80 = 12.
+  - The a3 curve rises steeply: Qwen2.5-7B R(8) 0.16, R(12) 0.77.
+  - At Mistral-7B, blinding the top 3 heads removes 0.83 (KO(3)), while those 3 alone recover 0.08 (R(3)).
+- **Layer profile.** Letting all heads of one layer read K_S recovers at most 0.05 of d_G under OPTIONS-AFTER (Qwen2.5-7B layer 15, Mistral-7B layer 12). The single-layer shares sum to 0.163 / 0.094 *(recomputed)*. The top-20 / top-16 heads span 12 / 10 layers *(recomputed)*.
+- **H4 depends on the size of the head set.**
+  - Median D over the top-k* set is 0.179 / 0.065 *(recomputed)*. At Mistral-7B it is 0.156 over the top-20 and 0.294 over the top-12 *(recomputed)*.
+  - Only 13 of the 20 heads in C (Qwen2.5-7B) and 9 of the 16 (Mistral-7B) have D ≥ 0.2. Over the whole model, 26 and 11 heads have D ≥ 0.2, and the whole-model median D is 0.028 / 0.007 *(recomputed)*.
+  - At Qwen2.5-7B, R(16) = 0.792, just under 0.8, so k_C = 20. With C = top-16 the median D would also be 0.370 *(recomputed)*.
+- **The copy after ablation.** At Mistral-7B, ID_V under ablation of the top-k* is 2.593 + 10.861 = 13.45 (our arithmetic). This is close to the stage-1 NO-MENTION ID_V of 13.65, a cross-stage comparison on different stories.
+- **Answer preservation, compared with stage 5.**
+  - At Qwen2.5-7B the base-argmax rate under head ablation is 0.87, against 0.97 under no ablation. The stage-5 edge knockout M1 (G7b) gave acc_B 0.37 / 0.30 (LIST-AFTER / OPTIONS-AFTER).
+  - The interventions and populations differ: mean-ablation at six option rows leaves rho_K 0.238, while the knockout leaves r_K(M1) ≈ 0.
+  - Zero-ablation of the top-k* (exploratory) gives rho_K 0.081, dV +11.315 and a base-argmax rate of 1.00 at Qwen2.5-7B, and rho_K 0.057 and a rate of 0.95 at Mistral-7B.
+- **The second hop in detail (OPTIONS-AFTER).**
+  - The routes add up: r_ans + r_other = 1.017 / 1.024 against r_all 0.992 / 0.992.
+  - Restricted to single option rows, the source-word row gives r_ans 0.605 / 0.557 and the base-word row 0.414 / 0.391; the separator rows give 0.049 / 0.016.
+  - Under SENTENCE-AFTER, r_ans(K) is 0.875 / 0.732 and r_ans(V) −0.046 / 0.052.
+- **SENTENCE-AFTER (reported, not scored).**
+  - At Qwen2.5-7B, R(k) and KO(k) exceed 1 (R up to 1.06 for k = 16–48).
+  - At Qwen2.5-7B, mean-ablation of the top-k* drives rho_K negative: −0.080 [−0.123, −0.044].
+  - One random set changes rho_K substantially: 0.655 at Qwen2.5-7B and 1.289 at Mistral-7B.
+  - d_G/d_full is 0.572 / 0.728 *(recomputed)*, against 0.926 / 0.982 under OPTIONS-AFTER.
+  - Clean-B candidate mass ≥ 0.9 holds in 0/60 stories in every ablation condition, as expected for the format.
+- **Rank stability.**
+  - Split-half Spearman of a3 (R against E) is 0.973 / 0.956 under OPTIONS-AFTER and 0.985 / 0.981 under SENTENCE-AFTER.
+  - Across formats, the top-10 a3 heads overlap 7 / 9, and the full a3 grids correlate at Spearman 0.520 / 0.573 *(recomputed)*.
+- **Previous-token scores.** The median previous-token score over C is 0.017 / 0.004, and the maximum 0.083 / 0.049 *(recomputed)*.
+
+**Part (b).**
+- **The intervention reproduces.** The BIND swap reproduces Prakash et al.'s released per-layer IIA for Qwen2.5-14B on their pool and wrapper. All values below are *(recomputed)*.
+
+  | Block | Theirs (80 validation pairs) | Ours (150 pairs) | Ours, on the 70 pairs shared with their validation split |
+  |---|---|---|---|
+  | 24 | 0.69 | 0.720 | 0.700 |
+  | 26 | 0.72 | 0.747 | 0.729 |
+  | 28 | 1.00 | 0.993 | 1.000 |
+  | 30–34 | 1.00 | 1.000 | 1.000 |
+  | 36 | 0.06 | 0.080 | 0.057 |
+
+- **The binding swap reproduces only under NO-MENTION.**
+  - Under OPTIONS-AFTER, QNAMES and LETTERS-AFTER, its IIA is 0.00 at every swept block 18–40 (at most 0.01 under QNAMES).
+  - Phi peaks at 6.5 (OPTIONS-AFTER, block 28), 6.1 (QNAMES, block 31) and 2.8 (LETTERS-AFTER, block 23).
+- **The identity edit stops flipping the answer from about block 20 when candidates are named after the question.**
+  - IIA_ID under OPTIONS-AFTER is 1.00 through block 11, 0.89 at block 14, 0.66 at 16, 0.17 at 19, and 0.00 from block 20.
+  - Under QNAMES it is 0.90 at block 0 and 0.00 from block 20.
+  - Under NO-MENTION it is 1.00 through block 35.
+- **The identity key route closes with depth under OPTIONS-AFTER.** s_ID(OPTIONS-AFTER, l0) is 0.702 at l0 ≤ 3, 0.587 at 14, 0.218 at 18, 0.041 at 24 and −0.014 at 27. Under NO-MENTION it stays at 0.017–0.036 at every onset.
+- **Binding swap against identity edit at the same positions and depth (block 28; exploratory, no verdict).**
+  - BIND: psi_K +0.703 / +1.020 / +1.025, psi_V +0.435 / +0.106 / +0.161.
+  - ID@28: psi_K +0.129 / +0.006 / +0.005, psi_V +0.872 / +0.827 / +0.811.
+  - QNAMES2 (BIND): psi_K +1.016, psi_V −0.014.
+- **Punctuation positions under NO-MENTION.** For BIND, the words-only kappa_w is 0.779 against kappa 0.618; words-only psi_V is 0.238 against the full 0.435 *(recomputed)*. Under OPTIONS-AFTER and QNAMES, kappa_w is within 0.013 of kappa.
+- **Split by question.** BIND NO-MENTION gives psi_K 0.648 and psi_V 0.464 for q = 0 (n = 71), and 0.772 and 0.400 for q = 1 (n = 79).
+- **The H7 correlation.** r = −0.986 is computed over s_ID(·, 29) values that span 0.045 around zero (+0.017, −0.028, −0.015).
+- **s_ID(LETTERS-AFTER, 29) is undetermined.** It is +0.098 with CI [−2.155, +1.750], because its denominator ID_K + ID_V is 0.021 nats (our arithmetic).
+- **Per-pair Gate b0 noise.** Single pairs reach 1.5 nats (BIND NO-MENTION, |m(r0) − m(B)|), although every cell mean is ≤ 0.203 *(recomputed)*.

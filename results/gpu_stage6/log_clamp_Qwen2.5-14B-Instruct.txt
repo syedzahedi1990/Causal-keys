@@ -1,0 +1,11 @@
+==== 2026-10-07T16:38:35Z python experiments/prakash_swap.py --model Qwen/Qwen2.5-14B-Instruct --dtype bfloat16 --n 150 --out results/gpu_stage6/prakash --revision cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8 --stage clamp
+preflight OK: pool 4451da1a1bcde9ce, 147 single-token words, n_bos 0, LETTERS-AFTER T=203 P=[154, 155, 166, 167], NO-MENTION T=180 P=[154, 155, 166, 167], OPTIONS-AFTER T=196 P=[154, 155, 166, 167], QNAMES T=186 P=[154, 155, 166, 167], QNAMES2 T=182 P=[154, 155, 166, 167]
+loaded Qwen/Qwen2.5-14B-Instruct (48 layers, torch.bfloat16, NVIDIA A100-SXM4-80GB) in 9s
+population: 150 pairs (first [0, 1, 2, 3, 4] ...)
+  NO-MENTION: 150 pairs, depths [('BIND', 28), ('ID', 0), ('ID', 28)], onsets [0, 1, 3, 6, 12, 14, 18, 24, 27, 29, 30, 33, 36, 42] (414s)
+  QNAMES: 150 pairs, depths [('BIND', 28), ('ID', 0), ('ID', 28)], onsets [0, 1, 3, 14, 29] (193s)
+  OPTIONS-AFTER: 150 pairs, depths [('BIND', 28), ('ID', 0), ('ID', 28)], onsets [0, 1, 3, 6, 12, 14, 18, 24, 27, 29, 30, 33, 36, 42] (482s)
+  LETTERS-AFTER: 150 pairs, depths [('BIND', 28), ('ID', 0), ('ID', 28)], onsets [0, 1, 3, 14, 29] (200s)
+  QNAMES2: 150 pairs, depths [('BIND', 28)], onsets [] (36s)
+wrote results/gpu_stage6/prakash/Qwen2.5-14B-Instruct/clamp.json
+done (1333s)

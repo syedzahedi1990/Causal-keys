@@ -1,0 +1,15 @@
+==== 2026-10-07T15:41:31Z python experiments/prakash_swap.py --model Qwen/Qwen2.5-14B-Instruct --dtype bfloat16 --n 150 --out results/gpu_stage6/prakash --revision cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8 --stage filter
+preflight OK: pool 4451da1a1bcde9ce, 147 single-token words, n_bos 0, LETTERS-AFTER T=203 P=[154, 155, 166, 167], NO-MENTION T=180 P=[154, 155, 166, 167], OPTIONS-AFTER T=196 P=[154, 155, 166, 167], QNAMES T=186 P=[154, 155, 166, 167], QNAMES2 T=182 P=[154, 155, 166, 167]
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+loaded Qwen/Qwen2.5-14B-Instruct (48 layers, torch.bfloat16, NVIDIA A100-SXM4-80GB) in 40s
+  filter 40/320: 39 pass
+  filter 80/320: 78 pass
+  filter 120/320: 118 pass
+  filter 160/320: 158 pass
+  filter 200/320: 196 pass
+  filter 240/320: 236 pass
+  filter 280/320: 276 pass
+  filter 320/320: 315 pass
+wrote results/gpu_stage6/prakash/Qwen2.5-14B-Instruct/filter.json
+population: 150 pairs (first [0, 1, 2, 3, 4] ...)
+done (68s)

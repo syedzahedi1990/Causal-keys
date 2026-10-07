@@ -1,0 +1,8 @@
+==== 2026-10-07T12:58:16Z python experiments/stage6_heads.py --model mistralai/Mistral-7B-Instruct-v0.3 --dtype bfloat16 --out results/gpu_stage6/heads --revision c170c708c41dac9275d15a8fff4eca08d52bab71
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+duplicate scores: 100 sequences (9s)
+[P1] phase 1: 60 ranking stories (3394s)
+[P1] phase 2: 60 evaluation stories (5110s)
+[POST] phase 1: 60 ranking stories (3051s)
+[POST] phase 2: 60 evaluation stories (4644s)
+wrote results/gpu_stage6/heads/Mistral-7B-Instruct-v0.3.json (9765s)

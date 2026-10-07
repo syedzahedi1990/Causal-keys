@@ -1,0 +1,31 @@
+==== 2026-10-07T11:01:07Z python -m pytest tests/test_interventions.py tests/test_encoding.py tests/test_row_restricted.py -v -rA -p no:cacheprovider
+=============== test session starts ===============
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /venv/main/bin/python
+rootdir: /workspace/Causal-keys
+plugins: anyio-4.15.1
+collecting ... collected 10 items
+
+tests/test_interventions.py::test_identity_edit_is_noop PASSED [ 10%]
+tests/test_interventions.py::test_full_resid_patch_transfers_source PASSED [ 20%]
+tests/test_interventions.py::test_self_key_exchange_noop_and_null_norm PASSED [ 30%]
+tests/test_interventions.py::test_rotated_subspace_orthonormal PASSED [ 40%]
+tests/test_interventions.py::test_row_splice_exact PASSED [ 50%]
+tests/test_encoding.py::test_standard_arms_registered_and_unchanged PASSED [ 60%]
+tests/test_encoding.py::test_register_core_dependent_and_independent_arms PASSED [ 70%]
+tests/test_encoding.py::test_encode_raw_and_any PASSED [ 80%]
+tests/test_row_restricted.py::test_registered_arm_groups PASSED [ 90%]
+tests/test_row_restricted.py::test_gpt2_rowsplice_exact PASSED [100%]
+
+===================== PASSES ======================
+============= short test summary info =============
+PASSED tests/test_interventions.py::test_identity_edit_is_noop
+PASSED tests/test_interventions.py::test_full_resid_patch_transfers_source
+PASSED tests/test_interventions.py::test_self_key_exchange_noop_and_null_norm
+PASSED tests/test_interventions.py::test_rotated_subspace_orthonormal
+PASSED tests/test_interventions.py::test_row_splice_exact
+PASSED tests/test_encoding.py::test_standard_arms_registered_and_unchanged
+PASSED tests/test_encoding.py::test_register_core_dependent_and_independent_arms
+PASSED tests/test_encoding.py::test_encode_raw_and_any
+PASSED tests/test_row_restricted.py::test_registered_arm_groups
+PASSED tests/test_row_restricted.py::test_gpt2_rowsplice_exact
+=============== 10 passed in 19.60s ===============

@@ -1,0 +1,374 @@
+==== 2026-10-07T17:13:24Z python analysis/stage6_score.py --root results/gpu_stage6 --tag stage6
+Stage 6 scoring, preregistration P-2026-10-05-H; root results/gpu_stage6; tag stage6
+
+PROVENANCE (the pipeline's COMMIT.txt, ENV.txt, REVISIONS.txt and RELEASE.txt, every line; every results file)
+  COMMIT.txt:
+    ==== 2026-10-07T10:57:09Z PART=all MODEL= TEST_MODE=0 FORCE=0
+    cc3a3e0f42e7b73e8f0ddd90e41c8f1acc0bdb40
+    ?? results/gpu_stage6/
+  ENV.txt:
+    ==== 2026-10-07T10:57:25Z PART=all MODEL= TEST_MODE= HF hub cache /workspace/.hf_home/hub HF_TOKEN unset
+    python 3.12.14 torch 2.11.0+cu128 transformers 5.18.0 numpy 2.5.3 gpus 1 NVIDIA A100-SXM4-80GB
+    name, memory.total [MiB], driver_version
+    NVIDIA A100-SXM4-80GB, 81920 MiB, 580.173.02
+    Qwen/Qwen2.5-7B-Instruct revision a09a35458c702b33eeacc393d103063234e8bc28 (resolved)
+    mistralai/Mistral-7B-Instruct-v0.3 revision c170c708c41dac9275d15a8fff4eca08d52bab71 (resolved)
+    Qwen/Qwen2.5-14B-Instruct revision cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8 (resolved)
+    Qwen/Qwen2.5-7B-Instruct loaded snapshot(s): a09a35458c702b33eeacc393d103063234e8bc28
+    Qwen/Qwen2.5-7B-Instruct removed from the HF cache (/workspace/.hf_home/hub/models--Qwen--Qwen2.5-7B-Instruct)
+    mistralai/Mistral-7B-Instruct-v0.3 loaded snapshot(s): c170c708c41dac9275d15a8fff4eca08d52bab71
+    mistralai/Mistral-7B-Instruct-v0.3 removed from the HF cache (/workspace/.hf_home/hub/models--mistralai--Mistral-7B-Instruct-v0.3)
+    Qwen/Qwen2.5-14B-Instruct loaded snapshot(s): cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8
+    Qwen/Qwen2.5-14B-Instruct removed from the HF cache (/workspace/.hf_home/hub/models--Qwen--Qwen2.5-14B-Instruct)
+  REVISIONS.txt:
+    Qwen/Qwen2.5-7B-Instruct a09a35458c702b33eeacc393d103063234e8bc28
+    mistralai/Mistral-7B-Instruct-v0.3 c170c708c41dac9275d15a8fff4eca08d52bab71
+    Qwen/Qwen2.5-14B-Instruct cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8
+  RELEASE.txt:
+    ==== 2026-10-07T10:57:32Z https://github.com/Nix07/mind at 0579347e3cf963d13d55edf041c7b595b0dcd88b in /root/.cache/causal-keys/mind-0579347e3cf963d13d55edf041c7b595b0dcd88b
+    release 0579347e3cf963d13d55edf041c7b595b0dcd88b at /root/.cache/causal-keys/mind-0579347e3cf963d13d55edf041c7b595b0dcd88b: data/story_templates.json e89df933496e, data/synthetic_entities/characters.json ef6a30630738, data/synthetic_entities/bottles.json ad22ef58cfcd, data/synthetic_entities/drinks.json 055ae58e9675, src/dataset.py 915c1d3c86ab, notebooks/causalToM_novis/utils.py 91a0d58a7bac
+    pool sha256 4451da1a1bcde9ceac0508a839af9c1e1a7f0ab9c3c875cd46d35e3dd3c55099 (n = 320, seed 10): OK
+  heads/Mistral-7B-Instruct-v0.3.json: commit cc3a3e0f42, model mistralai/Mistral-7B-Instruct-v0.3 rev c170c708c41dac9275d15a8fff4eca08d52bab71, dtype torch.bfloat16, attn eager, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, torch 2.11.0+cu128, python 3.12.14
+  heads/Qwen2.5-7B-Instruct.json: commit cc3a3e0f42, model Qwen/Qwen2.5-7B-Instruct rev a09a35458c702b33eeacc393d103063234e8bc28, dtype torch.bfloat16, attn eager, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, torch 2.11.0+cu128, python 3.12.14
+  prakash/Qwen2.5-14B-Instruct/clamp.json: commit cc3a3e0f42, model Qwen/Qwen2.5-14B-Instruct rev cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, torch 2.11.0+cu128, python 3.12.14, release 0579347e3c, pool 4451da1a1bcd
+  prakash/Qwen2.5-14B-Instruct/exchange.json: commit cc3a3e0f42, model Qwen/Qwen2.5-14B-Instruct rev cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, torch 2.11.0+cu128, python 3.12.14, release 0579347e3c, pool 4451da1a1bcd
+  prakash/Qwen2.5-14B-Instruct/filter.json: commit cc3a3e0f42, model Qwen/Qwen2.5-14B-Instruct rev cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, torch 2.11.0+cu128, python 3.12.14, release 0579347e3c, pool 4451da1a1bcd
+  prakash/Qwen2.5-14B-Instruct/lstar.json: commit cc3a3e0f42, model Qwen/Qwen2.5-14B-Instruct rev cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, torch 2.11.0+cu128, python 3.12.14, release 0579347e3c, pool 4451da1a1bcd
+  prakash/Qwen2.5-14B-Instruct/preflight.json: commit cc3a3e0f42, model Qwen/Qwen2.5-14B-Instruct rev cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, dtype -, attn -, device -, transformers 5.18.0, torch 2.11.0+cu128, python 3.12.14, release 0579347e3c, pool 4451da1a1bcd
+  prakash/Qwen2.5-14B-Instruct/sweep_BIND_LETTERS-AFTER.json: commit cc3a3e0f42, model Qwen/Qwen2.5-14B-Instruct rev cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, torch 2.11.0+cu128, python 3.12.14, release 0579347e3c, pool 4451da1a1bcd
+  prakash/Qwen2.5-14B-Instruct/sweep_BIND_NO-MENTION.json: commit cc3a3e0f42, model Qwen/Qwen2.5-14B-Instruct rev cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, torch 2.11.0+cu128, python 3.12.14, release 0579347e3c, pool 4451da1a1bcd
+  prakash/Qwen2.5-14B-Instruct/sweep_BIND_NO-MENTION_fp32.json: commit cc3a3e0f42, model Qwen/Qwen2.5-14B-Instruct rev cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, dtype torch.float32, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, torch 2.11.0+cu128, python 3.12.14, release 0579347e3c, pool 4451da1a1bcd, label '_fp32'
+  prakash/Qwen2.5-14B-Instruct/sweep_BIND_OPTIONS-AFTER.json: commit cc3a3e0f42, model Qwen/Qwen2.5-14B-Instruct rev cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, torch 2.11.0+cu128, python 3.12.14, release 0579347e3c, pool 4451da1a1bcd
+  prakash/Qwen2.5-14B-Instruct/sweep_BIND_QNAMES.json: commit cc3a3e0f42, model Qwen/Qwen2.5-14B-Instruct rev cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, torch 2.11.0+cu128, python 3.12.14, release 0579347e3c, pool 4451da1a1bcd
+  prakash/Qwen2.5-14B-Instruct/sweep_ID_LETTERS-AFTER.json: commit cc3a3e0f42, model Qwen/Qwen2.5-14B-Instruct rev cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, torch 2.11.0+cu128, python 3.12.14, release 0579347e3c, pool 4451da1a1bcd
+  prakash/Qwen2.5-14B-Instruct/sweep_ID_NO-MENTION.json: commit cc3a3e0f42, model Qwen/Qwen2.5-14B-Instruct rev cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, torch 2.11.0+cu128, python 3.12.14, release 0579347e3c, pool 4451da1a1bcd
+  prakash/Qwen2.5-14B-Instruct/sweep_ID_NO-MENTION_fp32.json: commit cc3a3e0f42, model Qwen/Qwen2.5-14B-Instruct rev cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, dtype torch.float32, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, torch 2.11.0+cu128, python 3.12.14, release 0579347e3c, pool 4451da1a1bcd, label '_fp32'
+  prakash/Qwen2.5-14B-Instruct/sweep_ID_OPTIONS-AFTER.json: commit cc3a3e0f42, model Qwen/Qwen2.5-14B-Instruct rev cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, torch 2.11.0+cu128, python 3.12.14, release 0579347e3c, pool 4451da1a1bcd
+  prakash/Qwen2.5-14B-Instruct/sweep_ID_QNAMES.json: commit cc3a3e0f42, model Qwen/Qwen2.5-14B-Instruct rev cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, torch 2.11.0+cu128, python 3.12.14, release 0579347e3c, pool 4451da1a1bcd
+  release used by Qwen2.5-14B-Instruct: https://github.com/Nix07/mind at 0579347e3cf963d13d55edf041c7b595b0dcd88b; data/story_templates.json e89df933496e, data/synthetic_entities/characters.json ef6a30630738, data/synthetic_entities/bottles.json ad22ef58cfcd, data/synthetic_entities/drinks.json 055ae58e9675, src/dataset.py 915c1d3c86ab, notebooks/causalToM_novis/utils.py 91a0d58a7bac; pool sha256 4451da1a1bcde9ce (n 320): OK (ckeys.causaltom pins)
+  commits: ['cc3a3e0f42']; revisions: one per model (3 models)
+
+POPULATION (part a: R and E cores per arm; part b: the filtered population and every preregistered cell)
+  heads/Mistral-7B-Instruct-v0.3.json: P1 R n=60 (OK) make_cores(n, Random(0)) OK; P1 E n=60 (OK) make_cores(n, Random(1)) OK; POST R n=60 (OK) make_cores(n, Random(0)) OK; POST E n=60 (OK) make_cores(n, Random(1)) OK; duplicate-score sequences 100
+  heads/Qwen2.5-7B-Instruct.json: P1 R n=60 (OK) make_cores(n, Random(0)) OK; P1 E n=60 (OK) make_cores(n, Random(1)) OK; POST R n=60 (OK) make_cores(n, Random(0)) OK; POST E n=60 (OK) make_cores(n, Random(1)) OK; duplicate-score sequences 100
+  prakash/Qwen2.5-14B-Instruct: LM filter 315/320 pass; population n = 150 (OK), the first passing pairs in pool order: OK; l* = 28, l*_ID = 0; exchange 13 cells (arm, depth, format), clamp 38 cells (format, onset), each over the population: OK; preregistered cells present: OK
+  population: OK
+
+GATES (part a: a1 before any model, a2 per model and format, a3 per model; part b: per model, arm, depth and format)
+  Gate a1  FP32 exactness, tests/test_head_splice.py in log_pytest_stage6.txt (last of 1 run(s), 2026-10-07T10:57:32Z, commit cc3a3e0f42): 7 passed, 0 failed (>= 7 tests, none failing) -> MET
+  Gate a2  Qwen2.5-7B-Instruct          P1   |none - clean| 0.606, |all_T - full| 0.669 <= 0.719; hop |exact - K_S| max 0.0000 (mean 0.0000) <= 0.1  [raw: |all_G - full| 3.000] -> MET
+  Gate a2  Qwen2.5-7B-Instruct          POST |none - clean| 0.770, |all_T - full| 0.489 <= 0.500; hop |exact - K_S| max 0.0000 (mean 0.0000) <= 0.1  [raw: |all_G - full| 4.624] -> NOT MET
+  Gate a3  Qwen2.5-7B-Instruct          d_full OPTIONS-AFTER +35.969 [+34.591,+37.333] >= 10: MET; SENTENCE-AFTER +10.438 [+9.462,+11.475] > 0: MET; d_G/d_full OPTIONS-AFTER +0.926 [+0.905,+0.946] >= 0.8: MET -> MET
+  Gate a2  Mistral-7B-Instruct-v0.3     P1   |none - clean| 0.079, |all_T - full| 0.162 <= 0.529; hop |exact - K_S| max 0.0000 (mean 0.0000) <= 0.1  [raw: |all_G - full| 1.097] -> MET
+  Gate a2  Mistral-7B-Instruct-v0.3     POST |none - clean| 0.069, |all_T - full| 0.224 <= 0.500; hop |exact - K_S| max 0.0000 (mean 0.0000) <= 0.1  [raw: |all_G - full| 3.743] -> MET
+  Gate a3  Mistral-7B-Instruct-v0.3     d_full OPTIONS-AFTER +26.469 [+24.548,+28.259] >= 10: MET; SENTENCE-AFTER +12.254 [+10.716,+13.799] > 0: MET; d_G/d_full OPTIONS-AFTER +0.982 [+0.969,+0.997] >= 0.8: MET -> MET
+  Qwen2.5-14B-Instruct:
+    Gate b1 reproduction (NO-MENTION sweep): BIND IIA(l* = 28) = 0.993 (>= 0.7) -> MET; ID IIA_ID(l*_ID = 0) = 1.000 (>= 0.7) -> MET; IIA_ID(l*) = 1.000 (H11 Part 2 and Gate b3(b) need >= 0.7)
+    BIND @28 LETTERS-AFTER n=150 Gate b0 mean|m(r4)-m(r1)| 1.22e-01 mean|m(r0)-m(B)| 1.92e-01 (<= 0.3) -> MET;  Gate b2 Phi +0.225 [+0.170,+0.282] (>= 3) -> NOT MET;  rule holds;  kappa +0.658 [+0.559,+0.854] (dropped 0.2%)
+    BIND @28 NO-MENTION    n=150 Gate b0 mean|m(r4)-m(r1)| 1.31e-01 mean|m(r0)-m(B)| 1.69e-01 (<= 0.3) -> MET;  Gate b2 Phi +31.616 [+30.193,+32.985] (>= 3) -> MET;  rule holds;  kappa +0.618 [+0.595,+0.640] (dropped 0.0%)
+    BIND @28 OPTIONS-AFTER n=150 Gate b0 mean|m(r4)-m(r1)| 1.56e-01 mean|m(r0)-m(B)| 2.02e-01 (<= 0.3) -> MET;  Gate b2 Phi +6.523 [+5.905,+7.171] (>= 3) -> MET;  rule holds;  kappa +0.864 [+0.839,+0.889] (dropped 0.0%)
+    BIND @28 QNAMES        n=150 Gate b0 mean|m(r4)-m(r1)| 1.16e-01 mean|m(r0)-m(B)| 1.47e-01 (<= 0.3) -> MET;  Gate b2 Phi +5.814 [+5.187,+6.456] (>= 3) -> MET;  rule holds;  kappa +0.906 [+0.879,+0.931] (dropped 0.0%)
+    BIND @28 QNAMES2       n=150 Gate b0 mean|m(r4)-m(r1)| 1.19e-01 mean|m(r0)-m(B)| 1.60e-01 (<= 0.3) -> MET;  Gate b2 Phi +7.285 [+6.734,+7.861] (>= 3) -> MET;  rule holds;  kappa +1.014 [+0.992,+1.034] (dropped 0.0%)
+    ID   @ 0 LETTERS-AFTER n=150 Gate b0 mean|m(r4)-m(r1)| 1.70e-01 mean|m(r0)-m(B)| 1.76e-01 (<= 0.3) -> MET;  Gate b2 Phi +38.255 [+37.690,+38.788] (>= 3) -> MET;  rule holds;  kappa +0.969 [+0.960,+0.977] (dropped 0.0%)
+    ID   @ 0 NO-MENTION    n=150 Gate b0 mean|m(r4)-m(r1)| 1.39e-01 mean|m(r0)-m(B)| 1.45e-01 (<= 0.3) -> MET;  Gate b2 Phi +46.005 [+45.276,+46.725] (>= 3) -> MET;  rule holds;  kappa +0.131 [+0.119,+0.142] (dropped 0.0%)
+    ID   @ 0 OPTIONS-AFTER n=150 Gate b0 mean|m(r4)-m(r1)| 1.94e-01 mean|m(r0)-m(B)| 2.03e-01 (<= 0.3) -> MET;  Gate b2 Phi +54.550 [+53.652,+55.462] (>= 3) -> MET;  rule holds;  kappa +0.779 [+0.764,+0.793] (dropped 0.0%)
+    ID   @ 0 QNAMES        n=150 Gate b0 mean|m(r4)-m(r1)| 1.32e-01 mean|m(r0)-m(B)| 1.47e-01 (<= 0.3) -> MET;  Gate b2 Phi +39.606 [+38.747,+40.488] (>= 3) -> MET;  rule holds;  kappa +0.773 [+0.759,+0.786] (dropped 0.0%)
+    ID   @28 LETTERS-AFTER n=150 Gate b0 mean|m(r4)-m(r1)| 1.57e-01 mean|m(r0)-m(B)| 1.74e-01 (<= 0.3) -> MET;  Gate b2 Phi +0.034 [-0.012,+0.078] (>= 3) -> NOT MET;  rule fails;  kappa NOT EVALUABLE (psi_K -0.171, psi_V +3.024, interaction -1.854)
+    ID   @28 NO-MENTION    n=150 Gate b0 mean|m(r4)-m(r1)| 9.91e-02 mean|m(r0)-m(B)| 1.53e-01 (<= 0.3) -> MET;  Gate b2 Phi +45.797 [+45.069,+46.514] (>= 3) -> MET;  rule holds;  kappa +0.129 [+0.118,+0.140] (dropped 0.0%)
+    ID   @28 OPTIONS-AFTER n=150 Gate b0 mean|m(r4)-m(r1)| 1.57e-01 mean|m(r0)-m(B)| 1.79e-01 (<= 0.3) -> MET;  Gate b2 Phi +10.885 [+10.314,+11.513] (>= 3) -> MET;  rule holds;  kappa +0.006 [-0.003,+0.013] (dropped 0.0%)
+    ID   @28 QNAMES        n=150 Gate b0 mean|m(r4)-m(r1)| 1.08e-01 mean|m(r0)-m(B)| 1.41e-01 (<= 0.3) -> MET;  Gate b2 Phi +9.321 [+8.653,+9.995] (>= 3) -> MET;  rule holds;  kappa +0.007 [-0.004,+0.018] (dropped 0.0%)
+    Gate b3 (H10 as a dissociation): (a) ID_K(OPTIONS-AFTER, l*+1) -0.092 [-0.123,-0.063] > 0, CI excl. 0; s_ID -0.015 >= 0.5 -> NOT MET;  (b) kappa_ID at l* (OPTIONS-AFTER) kappa +0.006 [-0.003,+0.013] (dropped 0.0%), >= 0.5 and evaluable (IIA_ID(l*) >= 0.7) -> NOT MET;  Gate b3 -> NOT MET
+
+VERDICTS (H1-H12 in order; part (a) over the required models (Qwen2.5-7B, Mistral-7B): MET if met in both, NOT MET if not met in an evaluable model, else NOT EVALUABLE; part (b) at Qwen2.5-14B)
+  H1   sparsity: the top-k* heads by a3 suffice           Qwen2.5-7B-Instruct MET; Mistral-7B-Instruct-v0.3 MET -> MET
+  H2   necessity and specificity (knockout, random sets)  Qwen2.5-7B-Instruct MET; Mistral-7B-Instruct-v0.3 MET -> MET
+  H3   mean-ablation of the top-k* heads                  Qwen2.5-7B-Instruct MET; Mistral-7B-Instruct-v0.3 MET -> MET
+  H4   canonical duplicate-token heads                    Qwen2.5-7B-Instruct MET; Mistral-7B-Instruct-v0.3 MET -> MET
+  H5   the second hop at the answer                       Qwen2.5-7B-Instruct MET; Mistral-7B-Instruct-v0.3 MET -> MET  [SENTENCE-AFTER reported: Qwen2.5-7B-Instruct NOT EVALUABLE; Mistral-7B-Instruct-v0.3 MET -> NOT EVALUABLE]
+  H6   the same readers for list and sentence             Qwen2.5-7B-Instruct NOT EVALUABLE (gate failed; computed MET); Mistral-7B-Instruct-v0.3 MET -> NOT EVALUABLE
+  H7   the law on the binding swap, depth-matched         -> NOT MET
+         NO-MENTION kappa +0.618 s_ID +0.017 gap 0.601; QNAMES kappa +0.906 s_ID -0.028 gap 0.934; OPTIONS-AFTER kappa +0.864 s_ID -0.015 gap 0.879; r = -0.986
+  H8   shared prediction under NO-MENTION                 -> NOT MET
+         psi_V +0.435 psi_K +0.703 psi_V - psi_K -0.268 [-0.317,-0.219]
+  H9   crossover on their intervention (H_read)           -> NOT MET
+         kappa(OA) - kappa(NM) +0.247 [+0.211,+0.281] dropped 0.0%; kappa(QNAMES) +0.906 between: False
+  H10  the rival (H_binding)                              -> NOT MET
+         NO-MENTION kappa +0.618; QNAMES kappa +0.906; OPTIONS-AFTER kappa +0.864; Gate b3 not passed: not evaluable as a dissociation at this depth
+  H11  positive control: the law on an identity edit      -> MET
+         Part 1 MET (NO-MENTION kappa +0.131 s_ID +0.017 gap 0.114; QNAMES kappa +0.773 s_ID +0.724 gap 0.048; OPTIONS-AFTER kappa +0.779 s_ID +0.702 gap 0.077; kappa_ID(OA) - kappa_ID(NM) +0.648 [+0.630,+0.666] dropped 0.0%); Part 2 MET (NO-MENTION kappa +0.129 s_ID +0.017 gap 0.113; QNAMES kappa +0.007 s_ID -0.028 gap 0.036; OPTIONS-AFTER kappa +0.006 s_ID -0.015 gap 0.020)
+  H12  optional Llama-3-70B                               -> NOT RUN
+         NOT RUN (optional; no Llama-3-70B results)
+
+SUMMARY: 6 MET, 4 NOT MET, 1 NOT EVALUABLE, 1 NOT RUN of 12; provenance OK; population OK
+
+######## PART (a) reader heads and the second hop: full report
+== Part (a) reader heads and second hop (P-2026-10-05-H, Gates a2-a3, H1-H6): root results/gpu_stage6/heads
+   required models: ['Qwen2.5-7B-Instruct', 'Mistral-7B-Instruct-v0.3']; found: ['Mistral-7B-Instruct-v0.3', 'Qwen2.5-7B-Instruct']
+   Gate a1 (FP32 exactness, tests/test_head_splice.py) runs in scripts/gpu_stage6.sh before any model; not scored here
+   Mistral-7B-Instruct-v0.3: git_commit=cc3a3e0f42e7b73e8f0ddd90e41c8f1acc0bdb40, model=mistralai/Mistral-7B-Instruct-v0.3, revision=c170c708c41dac9275d15a8fff4eca08d52bab71, dtype=torch.bfloat16, attn_implementation=eager, device=NVIDIA A100-SXM4-80GB, transformers=5.18.0, torch=2.11.0+cu128, test_mode=False
+      n_heads=1024 (32x32, 8 KV), k*=52, KS_eff=[1, 2, 3, 5, 8, 12, 16, 20, 24, 32, 40, 48, 52, 64, 96, 128], n_rand=3, loo=True, grid layers all, dup {'pool_size': 31741, 'pool_min': 1027, 'pool_max': 32767, 'bos': True, 'half': 30, 'n_seq': 100, 'seed': 0}
+      P1: n_rank=60, n_eval=60
+      POST: n_rank=60, n_eval=60
+   Qwen2.5-7B-Instruct: git_commit=cc3a3e0f42e7b73e8f0ddd90e41c8f1acc0bdb40, model=Qwen/Qwen2.5-7B-Instruct, revision=a09a35458c702b33eeacc393d103063234e8bc28, dtype=torch.bfloat16, attn_implementation=eager, device=NVIDIA A100-SXM4-80GB, transformers=5.18.0, torch=2.11.0+cu128, test_mode=False
+      n_heads=784 (28x28, 4 KV), k*=40, KS_eff=[1, 2, 3, 5, 8, 12, 16, 20, 24, 32, 40, 48, 64, 96, 128], n_rand=3, loo=True, grid layers all, dup {'pool_size': 151643, 'pool_min': 0, 'pool_max': 151642, 'bos': False, 'half': 30, 'n_seq': 100, 'seed': 0}
+      P1: n_rank=60, n_eval=60
+      POST: n_rank=60, n_eval=60
+-- gates
+  Gate a2  Qwen2.5-7B-Instruct          P1   |none - clean| 0.606, |all_T - full| 0.669 <= 0.719; hop |exact - K_S| max 0.0000 (mean 0.0000) <= 0.1  [raw: |all_G - full| 3.000] -> MET
+  Gate a2  Qwen2.5-7B-Instruct          POST |none - clean| 0.770, |all_T - full| 0.489 <= 0.500; hop |exact - K_S| max 0.0000 (mean 0.0000) <= 0.1  [raw: |all_G - full| 4.624] -> NOT MET
+  Gate a3  Qwen2.5-7B-Instruct          d_full OPTIONS-AFTER +35.969 [+34.591,+37.333] >= 10: MET; SENTENCE-AFTER +10.438 [+9.462,+11.475] > 0: MET; d_G/d_full OPTIONS-AFTER +0.926 [+0.905,+0.946] >= 0.8: MET -> MET
+  Gate a2  Mistral-7B-Instruct-v0.3     P1   |none - clean| 0.079, |all_T - full| 0.162 <= 0.529; hop |exact - K_S| max 0.0000 (mean 0.0000) <= 0.1  [raw: |all_G - full| 1.097] -> MET
+  Gate a2  Mistral-7B-Instruct-v0.3     POST |none - clean| 0.069, |all_T - full| 0.224 <= 0.500; hop |exact - K_S| max 0.0000 (mean 0.0000) <= 0.1  [raw: |all_G - full| 3.743] -> MET
+  Gate a3  Mistral-7B-Instruct-v0.3     d_full OPTIONS-AFTER +26.469 [+24.548,+28.259] >= 10: MET; SENTENCE-AFTER +12.254 [+10.716,+13.799] > 0: MET; d_G/d_full OPTIONS-AFTER +0.982 [+0.969,+0.997] >= 0.8: MET -> MET
+-- predictions (OPTIONS-AFTER unless stated; per model, then over the required models)
+  H1   Qwen2.5-7B-Instruct          R(40) +0.967 [+0.952,+0.982] (>= 0.8, lower >= 0.7); k80 a3 20, fplus None, dminus None -> MET
+  H1   Mistral-7B-Instruct-v0.3     R(52) +0.942 [+0.919,+0.961] (>= 0.8, lower >= 0.7); k80 a3 16, fplus None, dminus 12 -> MET
+  H1   sparsity: top-k* by a3 suffice                     over 2 model(s) -> MET
+  H2   Qwen2.5-7B-Instruct          KO(40) +0.977 [+0.966,+0.987] >= 0.8: MET; R_rand +0.004 [-0.001,+0.009] <= 0.25: MET; KO_rand +0.011 [+0.005,+0.019] <= 0.25: MET (means over 3 draws) -> MET
+  H2   Mistral-7B-Instruct-v0.3     KO(52) +0.971 [+0.954,+0.984] >= 0.8: MET; R_rand +0.007 [+0.003,+0.013] <= 0.25: MET; KO_rand +0.010 [+0.005,+0.015] <= 0.25: MET (means over 3 draws) -> MET
+  H2   necessity and specificity (knockout, random sets)  over 2 model(s) -> MET
+  H3   Qwen2.5-7B-Instruct          (a) rho_K +0.238 [+0.205,+0.270] <= 0.5, upper <= 0.6: MET; (b) clean-B mass >= 0.9 in 1.00 of stories (>= 0.8): MET; (c) rho_K rand0 +1.002, rand1 +0.978, rand2 +0.953, active +1.018 each >= 0.75: MET; (d) dV +6.907 [+6.264,+7.561] > 0 (CI excl. 0) and >= floor 2.7: MET; base-argmax rate 0.87 >= 0.8 (predicted as (d) is met): MET -> MET
+  H3   Mistral-7B-Instruct-v0.3     (a) rho_K +0.059 [+0.040,+0.079] <= 0.5, upper <= 0.6: MET; (b) clean-B mass >= 0.9 in 0.97 of stories (>= 0.8): MET; (c) rho_K rand0 +1.002, rand1 +1.009, rand2 +1.006, active +1.009 each >= 0.75: MET; (d) dV +10.861 [+9.995,+11.677] > 0 (CI excl. 0) and >= floor 2.8: MET; base-argmax rate 1.00 >= 0.8 (predicted as (d) is met): MET -> MET
+  H3   ablation: ID_K drop, specificity, copy route       over 2 model(s) -> MET
+  H4   Qwen2.5-7B-Instruct          C = top-20 by a3: median D +0.370 [+0.361,+0.378] >= 0.2: MET; median I +0.011 [+0.010,+0.012] <= 0.1: MET; median T_dup +0.459 [+0.445,+0.475] >= 0.2: MET; secondary: |top10(a3) & top10(D)| = 6 (>= 3: MET, P = 1.4e-10), Spearman(a3, D) +0.185, Spearman(a3, T_dup) +0.146 -> MET
+  H4   Mistral-7B-Instruct-v0.3     C = top-16 by a3: median D +0.232 [+0.227,+0.238] >= 0.2: MET; median I +0.022 [+0.020,+0.023] <= 0.1: MET; median T_dup +0.433 [+0.407,+0.446] >= 0.2: MET; secondary: |top10(a3) & top10(D)| = 5 (>= 3: MET, P = 6.7e-09), Spearman(a3, D) +0.230, Spearman(a3, T_dup) +0.251 -> MET
+  H4   canonical duplicate-token heads                    over 2 model(s) -> MET
+  H5   Qwen2.5-7B-Instruct          r_ans(KV) +0.899 [+0.886,+0.913] >= 0.5, lower >= 0.4: MET; r_ans - r_other +0.782 [+0.749,+0.813] > 0 (CI excl. 0): MET [r_other +0.118 [+0.093,+0.143]]; r_all(KV) +0.992 [+0.986,+0.999] >= 0.8: MET; secondary r_ans(K) - r_ans(V) +0.717 [+0.681,+0.752] > 0: MET [r_ans(K) +0.797, r_ans(V) +0.080]; strong r_ans(KV) >= 0.7: MET -> MET
+  H5   Mistral-7B-Instruct-v0.3     r_ans(KV) +0.859 [+0.845,+0.872] >= 0.5, lower >= 0.4: MET; r_ans - r_other +0.694 [+0.671,+0.714] > 0 (CI excl. 0): MET [r_other +0.165 [+0.147,+0.183]]; r_all(KV) +0.992 [+0.990,+0.995] >= 0.8: MET; secondary r_ans(K) - r_ans(V) +0.660 [+0.627,+0.694] > 0: MET [r_ans(K) +0.683, r_ans(V) +0.023]; strong r_ans(KV) >= 0.7: MET -> MET
+  H5   the second hop at the answer                       over 2 model(s) -> MET
+  H5s  Qwen2.5-7B-Instruct          r_ans(KV) +0.788 [+0.751,+0.824] >= 0.35: MET; r_all(KV) +0.841 [+0.802,+0.879] >= 0.5: MET; r_other +0.049 [+0.028,+0.070] -> NOT EVALUABLE; computed MET, gate failed
+  H5s  Mistral-7B-Instruct-v0.3     r_ans(KV) +0.780 [+0.761,+0.799] >= 0.35: MET; r_all(KV) +0.939 [+0.921,+0.954] >= 0.5: MET; r_other +0.243 [+0.221,+0.266] -> MET
+  H5s  the second hop, SENTENCE-AFTER (reported)          over 2 model(s) -> NOT EVALUABLE  [reported, not confirmatory]
+  H6   Qwen2.5-7B-Instruct          |top-20(a3, OPTIONS-AFTER) & top-20(a3, SENTENCE-AFTER)| = 13 >= 10 (null P = 9.2e-19) -> NOT EVALUABLE; computed MET, gate failed
+  H6   Mistral-7B-Instruct-v0.3     |top-20(a3, OPTIONS-AFTER) & top-20(a3, SENTENCE-AFTER)| = 14 >= 10 (null P = 9.9e-23) -> MET
+  H6   the same readers for list and sentence             over 2 model(s) -> NOT EVALUABLE
+-- exploratory
+   -- Mistral-7B-Instruct-v0.3 P1
+      a3      R  1:+0.00 2:+0.00 3:+0.08 5:+0.26 8:+0.59 12:+0.66 16:+0.83 20:+0.86 24:+0.86 32:+0.89 40:+0.90 48:+0.92 52:+0.94 64:+0.94 96:+0.97 128:+0.98
+      a3      KO 1:+0.20 2:+0.62 3:+0.83 5:+0.90 8:+0.97 12:+0.96 16:+0.96 20:+0.97 24:+0.96 32:+0.97 40:+0.96 48:+0.97 52:+0.97 64:+0.97 96:+0.99 128:+0.99
+      fplus   R  1:+0.03 2:+0.03 3:+0.04 5:+0.07 8:+0.11 12:+0.55 16:+0.59 20:+0.59 24:+0.59 32:+0.59 40:+0.59 48:+0.61 52:+0.61 64:+0.61 96:+0.61 128:+0.66
+      fplus   KO 1:+0.06 2:+0.07 3:+0.08 5:+0.23 8:+0.46 12:+0.99 16:+0.99 20:+1.00 24:+1.00 32:+1.00 40:+1.00 48:+1.00 52:+1.00 64:+1.00 96:+1.00 128:+1.00
+      dminus  R  1:-0.00 2:+0.04 3:+0.08 5:+0.44 8:+0.79 12:+0.89 16:+0.94 20:+0.97 24:+0.99 32:+1.02 40:+1.02 48:+1.02 52:+1.02 64:+1.02 96:+1.02 128:+1.02
+      dminus  KO 1:+0.44 2:+0.67 3:+0.83 5:+0.92 8:+0.97 12:+0.99 16:+1.00 20:+1.01 24:+1.01 32:+1.01 40:+1.01 48:+1.01 52:+1.01 64:+1.01 96:+1.01 128:+1.01
+      rand0   R  1:-0.00 2:-0.00 3:-0.00 5:-0.00 8:-0.00 12:-0.00 16:-0.00 20:-0.00 24:+0.01 32:+0.01 40:+0.01 48:+0.01 52:+0.01 64:+0.01 96:+0.01 128:+0.01
+      rand0   KO 1:-0.00 2:-0.00 3:-0.00 5:-0.00 8:-0.00 12:-0.00 16:-0.00 20:-0.00 24:+0.01 32:+0.01 40:+0.01 48:+0.01 52:+0.01 64:+0.00 96:+0.01 128:+0.01
+      rand1   R  1:+0.00 2:-0.00 3:-0.00 5:+0.00 8:-0.00 12:-0.00 16:-0.00 20:+0.01 24:+0.01 32:+0.01 40:+0.01 48:+0.01 52:+0.01 64:+0.01 96:+0.01 128:+0.00
+      rand1   KO 1:+0.00 2:-0.00 3:+0.00 5:-0.00 8:-0.00 12:-0.00 16:-0.00 20:+0.01 24:+0.01 32:+0.01 40:+0.01 48:+0.01 52:+0.01 64:+0.01 96:+0.02 128:+0.01
+      rand2   R  1:-0.00 2:-0.00 3:-0.00 5:-0.00 8:-0.00 12:-0.00 16:-0.00 20:+0.01 24:+0.01 32:+0.01 40:+0.01 48:+0.01 52:+0.01 64:+0.01 96:+0.01 128:+0.01
+      rand2   KO 1:+0.00 2:+0.00 3:+0.00 5:-0.00 8:-0.00 12:-0.00 16:-0.00 20:+0.01 24:+0.01 32:+0.01 40:+0.01 48:+0.01 52:+0.01 64:+0.01 96:+0.11 128:+0.11
+      layer profile (fraction of d_G): +0.00 -0.00 +0.00 -0.00 +0.00 +0.00 +0.01 +0.00 +0.00 +0.03 -0.00 +0.00 +0.05 +0.00 -0.00 -0.00 +0.00 -0.00 +0.00 +0.00 +0.00 +0.00 +0.00 +0.00 +0.00 +0.00 +0.00 +0.00 -0.00 +0.00 -0.00 +0.00
+      split-half a3 (R vs E) Spearman +0.956; top-10 a3 (R): (7, 18):0.91, (7, 19):0.82, (6, 2):0.70, (9, 26):0.60, (11, 20):0.57, (9, 28):0.49, (12, 9):0.45, (12, 11):0.45, (14, 26):0.43, (15, 23):0.40
+      ablation: ID_K(none) +15.700 [+15.265,+16.119], ID_V(none) +2.593 [+2.030,+3.239]
+        none                 rho_K +1.000 [+1.000,+1.000]  dV +0.000 [+0.000,+0.000]  mass>=0.9 0.95  base-argmax 1.00
+        top_kstar_mean       rho_K +0.059 [+0.040,+0.079]  dV +10.861 [+9.995,+11.677]  mass>=0.9 0.97  base-argmax 1.00
+        top_10_mean          rho_K +0.139 [+0.108,+0.172]  dV +12.326 [+11.523,+13.101]  mass>=0.9 0.90  base-argmax 1.00
+        top_20_mean          rho_K +0.104 [+0.079,+0.130]  dV +12.728 [+11.971,+13.460]  mass>=0.9 0.90  base-argmax 1.00
+        top_kstar_zero       rho_K +0.057 [+0.035,+0.081]  dV +9.030 [+8.354,+9.682]  mass>=0.9 1.00  base-argmax 0.95
+        rand0_kstar_mean     rho_K +1.002 [+0.999,+1.006]  dV -0.096 [-0.155,-0.037]  mass>=0.9 0.93  base-argmax 1.00
+        rand1_kstar_mean     rho_K +1.009 [+1.005,+1.012]  dV -0.292 [-0.410,-0.175]  mass>=0.9 0.95  base-argmax 1.00
+        rand2_kstar_mean     rho_K +1.006 [+0.999,+1.013]  dV -0.326 [-0.687,-0.061]  mass>=0.9 0.92  base-argmax 1.00
+        active_kstar_mean    rho_K +1.009 [+1.006,+1.012]  dV +0.049 [-0.027,+0.119]  mass>=0.9 0.98  base-argmax 1.00
+        next_kstar_mean      rho_K +0.996 [+0.987,+1.005]  dV +0.173 [-0.050,+0.383]  mass>=0.9 0.90  base-argmax 1.00
+      hop: r_ans_K +0.683, r_ans_V +0.023, r_ans_KV +0.859, r_all_KV +0.992, r_other_KV +0.165, r_exact +0.000; r_ans(KV) + r_other +1.024 vs r_all +0.992; |row0 - clean| 0.087
+        rows G   : r_other_K +0.138, r_other_V +0.534, r_all_K +0.925, r_all_V +0.534
+        rows rowS: r_ans_KV +0.557, r_all_KV +0.845, r_other_KV +0.273
+        rows rowB: r_ans_KV +0.391, r_all_KV +0.723, r_other_KV +0.354
+        rows sep : r_ans_KV +0.016, r_all_KV +0.119, r_other_KV +0.094
+      over C (top-16, P1 ranking): median T_dup +0.433, T_ctrl +0.065, previous-token P +0.004
+   -- Mistral-7B-Instruct-v0.3 POST
+      a3      R  1:+0.02 2:+0.04 3:+0.05 5:+0.13 8:+0.56 12:+0.72 16:+0.91 20:+0.95 24:+0.99 32:+0.99 40:+0.99 48:+0.98 52:+0.96 64:+0.98 96:+1.00 128:+0.99
+      a3      KO 1:+0.42 2:+0.62 3:+0.64 5:+0.78 8:+0.92 12:+0.95 16:+0.95 20:+0.96 24:+0.97 32:+0.98 40:+0.97 48:+0.97 52:+0.97 64:+0.98 96:+0.99 128:+0.99
+      fplus   R  1:+0.02 2:+0.05 3:+0.07 5:+0.11 8:+0.18 12:+0.23 16:+0.23 20:+0.23 24:+0.23 32:+0.25 40:+0.25 48:+0.25 52:+0.25 64:+0.26 96:+0.27 128:+0.27
+      fplus   KO 1:+0.05 2:+0.55 3:+0.57 5:+0.60 8:+0.79 12:+0.89 16:+0.89 20:+0.89 24:+0.90 32:+0.90 40:+0.90 48:+0.91 52:+0.91 64:+0.92 96:+0.92 128:+0.92
+      dminus  R  1:+0.02 2:+0.04 3:+0.19 5:+0.46 8:+0.85 12:+0.92 16:+0.93 20:+0.94 24:+0.94 32:+0.96 40:+0.96 48:+0.96 52:+0.96 64:+0.97 96:+0.99 128:+0.99
+      dminus  KO 1:+0.42 2:+0.62 3:+0.74 5:+0.92 8:+0.95 12:+0.98 16:+0.98 20:+0.98 24:+0.98 32:+0.98 40:+0.98 48:+0.98 52:+0.98 64:+0.98 96:+0.99 128:+0.99
+      rand0   R  1:+0.00 2:+0.00 3:-0.00 5:+0.00 8:-0.00 12:-0.00 16:+0.00 20:+0.00 24:+0.01 32:+0.01 40:+0.01 48:+0.01 52:+0.01 64:+0.01 96:+0.01 128:+0.01
+      rand0   KO 1:-0.00 2:-0.00 3:-0.00 5:-0.00 8:-0.01 12:-0.01 16:-0.00 20:-0.00 24:+0.01 32:+0.00 40:+0.01 48:+0.00 52:+0.01 64:+0.01 96:+0.01 128:+0.01
+      rand1   R  1:+0.00 2:-0.00 3:-0.00 5:-0.00 8:-0.00 12:-0.00 16:-0.00 20:+0.01 24:+0.01 32:+0.01 40:+0.01 48:+0.01 52:+0.01 64:+0.01 96:+0.02 128:+0.01
+      rand1   KO 1:-0.01 2:-0.00 3:-0.00 5:-0.01 8:-0.01 12:-0.00 16:-0.00 20:+0.00 24:+0.00 32:+0.01 40:+0.01 48:+0.01 52:+0.01 64:+0.01 96:+0.01 128:+0.01
+      rand2   R  1:+0.00 2:-0.00 3:-0.00 5:-0.00 8:-0.00 12:-0.00 16:-0.00 20:+0.00 24:+0.01 32:+0.00 40:+0.00 48:+0.00 52:+0.00 64:+0.00 96:+0.01 128:+0.00
+      rand2   KO 1:+0.00 2:-0.00 3:-0.00 5:-0.00 8:-0.00 12:-0.00 16:-0.00 20:-0.01 24:-0.01 32:-0.00 40:-0.00 48:+0.00 52:+0.00 64:+0.01 96:+0.06 128:+0.05
+      layer profile (fraction of d_G): +0.00 -0.01 +0.00 +0.00 +0.00 -0.00 +0.00 +0.05 +0.00 +0.04 +0.00 +0.00 +0.04 -0.00 -0.00 -0.01 +0.00 -0.00 +0.00 +0.00 -0.00 -0.00 +0.00 +0.00 +0.00 -0.00 -0.00 +0.00 +0.00 +0.00 -0.00 +0.00
+      split-half a3 (R vs E) Spearman +0.981; top-10 a3 (R): (7, 18):0.86, (7, 19):0.82, (11, 20):0.71, (12, 9):0.68, (14, 26):0.66, (15, 21):0.59, (6, 2):0.58, (9, 26):0.50, (9, 28):0.48, (15, 23):0.47
+      ablation: ID_K(none) +8.284 [+7.427,+9.110], ID_V(none) +12.053 [+11.348,+12.723]
+        none                 rho_K +1.000 [+1.000,+1.000]  dV +0.000 [+0.000,+0.000]  mass>=0.9 0.00  base-argmax 1.00
+        top_kstar_mean       rho_K +0.012 [-0.001,+0.025]  dV +2.640 [+1.932,+3.367]  mass>=0.9 0.00  base-argmax 1.00
+        top_10_mean          rho_K +0.233 [+0.184,+0.287]  dV +2.302 [+1.632,+2.994]  mass>=0.9 0.00  base-argmax 0.98
+        top_20_mean          rho_K +0.056 [+0.038,+0.074]  dV +2.648 [+2.006,+3.333]  mass>=0.9 0.00  base-argmax 1.00
+        top_kstar_zero       rho_K +0.006 [-0.005,+0.018]  dV +2.609 [+2.037,+3.232]  mass>=0.9 0.00  base-argmax 1.00
+        rand0_kstar_mean     rho_K +1.003 [+0.995,+1.011]  dV +0.048 [-0.023,+0.115]  mass>=0.9 0.00  base-argmax 1.00
+        rand1_kstar_mean     rho_K +1.289 [+1.242,+1.343]  dV -1.563 [-1.850,-1.289]  mass>=0.9 0.00  base-argmax 1.00
+        rand2_kstar_mean     rho_K +1.100 [+1.072,+1.131]  dV -0.336 [-0.488,-0.189]  mass>=0.9 0.00  base-argmax 1.00
+        active_kstar_mean    rho_K +0.949 [+0.928,+0.970]  dV +0.521 [+0.367,+0.685]  mass>=0.9 0.00  base-argmax 1.00
+        next_kstar_mean      rho_K +0.823 [+0.791,+0.854]  dV +0.682 [+0.499,+0.870]  mass>=0.9 0.00  base-argmax 1.00
+      hop: r_ans_K +0.732, r_ans_V +0.052, r_ans_KV +0.780, r_all_KV +0.939, r_other_KV +0.243, r_exact +0.000; r_ans(KV) + r_other +1.023 vs r_all +0.939; |row0 - clean| 0.077
+        rows G   : r_other_K +0.181, r_other_V +0.198, r_all_K +0.886, r_all_V +0.261
+        rows rowS: r_ans_KV +0.665, r_all_KV +0.895, r_other_KV +0.348
+        rows rowB: r_ans_KV +0.270, r_all_KV +0.589, r_other_KV +0.367
+        rows sep : r_ans_KV +0.023, r_all_KV +0.209, r_other_KV +0.193
+      over C (top-16, P1 ranking): median T_dup +0.478, T_ctrl +0.041, previous-token P +0.004
+      over the top-16 by this format's a3: median D +0.232, I +0.031, T_dup +0.488
+   -- Qwen2.5-7B-Instruct P1
+      a3      R  1:-0.00 2:-0.01 3:+0.01 5:+0.04 8:+0.16 12:+0.77 16:+0.79 20:+0.85 24:+0.94 32:+0.96 40:+0.97 48:+0.97 64:+0.97 96:+0.97 128:+0.97
+      a3      KO 1:+0.02 2:+0.03 3:+0.09 5:+0.27 8:+0.55 12:+0.89 16:+0.88 20:+0.91 24:+0.96 32:+0.98 40:+0.98 48:+0.98 64:+0.99 96:+0.98 128:+0.98
+      fplus   R  1:+0.00 2:+0.01 3:+0.01 5:+0.01 8:+0.02 12:+0.02 16:+0.02 20:+0.01 24:+0.03 32:+0.03 40:+0.03 48:+0.04 64:+0.04 96:+0.06 128:+0.06
+      fplus   KO 1:+0.02 2:+0.02 3:+0.02 5:+0.03 8:+0.03 12:+0.03 16:+0.03 20:+0.03 24:+0.03 32:+0.04 40:+0.03 48:+0.04 64:+0.04 96:+0.07 128:+0.07
+      dminus  R  1:+0.00 2:+0.01 3:+0.02 5:+0.06 8:+0.17 12:+0.32 16:+0.40 20:+0.42 24:+0.42 32:+0.43 40:+0.43 48:+0.43 64:+0.49 96:+0.53 128:+0.58
+      dminus  KO 1:+0.02 2:+0.06 3:+0.10 5:+0.27 8:+0.58 12:+0.79 16:+0.84 20:+0.85 24:+0.85 32:+0.86 40:+0.86 48:+0.86 64:+0.88 96:+0.90 128:+0.91
+      rand0   R  1:-0.00 2:+0.00 3:-0.00 5:+0.00 8:-0.01 12:-0.00 16:+0.00 20:-0.00 24:-0.00 32:-0.00 40:+0.00 48:-0.00 64:-0.01 96:-0.00 128:+0.00
+      rand0   KO 1:+0.00 2:+0.00 3:+0.00 5:+0.00 8:+0.00 12:+0.00 16:+0.00 20:-0.00 24:+0.00 32:+0.00 40:+0.01 48:+0.01 64:+0.01 96:+0.00 128:+0.01
+      rand1   R  1:-0.00 2:-0.00 3:-0.00 5:+0.00 8:+0.00 12:+0.00 16:+0.00 20:+0.00 24:-0.00 32:+0.00 40:+0.01 48:+0.00 64:+0.00 96:+0.01 128:+0.05
+      rand1   KO 1:+0.00 2:+0.00 3:+0.00 5:+0.00 8:+0.01 12:+0.01 16:+0.01 20:+0.01 24:+0.01 32:+0.01 40:+0.01 48:+0.01 64:+0.01 96:+0.04 128:+0.30
+      rand2   R  1:+0.00 2:+0.00 3:+0.00 5:-0.00 8:-0.00 12:+0.00 16:-0.00 20:-0.00 24:-0.00 32:+0.00 40:+0.01 48:+0.01 64:+0.00 96:+0.02 128:+0.03
+      rand2   KO 1:+0.00 2:-0.00 3:-0.00 5:-0.00 8:-0.00 12:+0.00 16:+0.00 20:+0.00 24:+0.00 32:+0.02 40:+0.02 48:+0.02 64:+0.03 96:+0.07 128:+0.12
+      layer profile (fraction of d_G): +0.00 +0.00 +0.01 +0.01 +0.00 +0.01 +0.00 +0.00 +0.02 +0.01 +0.00 +0.00 +0.01 +0.01 +0.02 +0.05 +0.00 +0.00 +0.01 -0.00 +0.00 +0.00 -0.00 +0.00 -0.00 -0.00 -0.00 +0.00
+      split-half a3 (R vs E) Spearman +0.973; top-10 a3 (R): (15, 20):0.98, (8, 22):0.89, (8, 24):0.79, (11, 24):0.69, (2, 4):0.61, (12, 24):0.60, (15, 18):0.59, (3, 8):0.55, (3, 11):0.53, (15, 15):0.46
+      ablation: ID_K(none) +19.841 [+19.357,+20.338], ID_V(none) +4.640 [+4.234,+5.044]
+        none                 rho_K +1.000 [+1.000,+1.000]  dV +0.000 [+0.000,+0.000]  mass>=0.9 1.00  base-argmax 0.97
+        top_kstar_mean       rho_K +0.238 [+0.205,+0.270]  dV +6.907 [+6.264,+7.561]  mass>=0.9 1.00  base-argmax 0.87
+        top_10_mean          rho_K +0.859 [+0.819,+0.896]  dV +1.978 [+1.380,+2.625]  mass>=0.9 1.00  base-argmax 0.98
+        top_20_mean          rho_K +0.654 [+0.606,+0.702]  dV +4.285 [+3.556,+5.026]  mass>=0.9 1.00  base-argmax 0.95
+        top_kstar_zero       rho_K +0.081 [+0.069,+0.093]  dV +11.315 [+10.695,+11.951]  mass>=0.9 1.00  base-argmax 1.00
+        rand0_kstar_mean     rho_K +1.002 [+0.991,+1.013]  dV +0.091 [-0.007,+0.188]  mass>=0.9 1.00  base-argmax 0.97
+        rand1_kstar_mean     rho_K +0.978 [+0.966,+0.991]  dV +0.851 [+0.690,+1.018]  mass>=0.9 1.00  base-argmax 1.00
+        rand2_kstar_mean     rho_K +0.953 [+0.943,+0.962]  dV +0.241 [+0.116,+0.369]  mass>=0.9 1.00  base-argmax 0.98
+        active_kstar_mean    rho_K +1.018 [+1.006,+1.030]  dV -0.177 [-0.333,-0.025]  mass>=0.9 1.00  base-argmax 0.97
+        next_kstar_mean      rho_K +1.019 [+1.009,+1.029]  dV -0.062 [-0.175,+0.052]  mass>=0.9 1.00  base-argmax 1.00
+      hop: r_ans_K +0.797, r_ans_V +0.080, r_ans_KV +0.899, r_all_KV +0.992, r_other_KV +0.118, r_exact +0.000; r_ans(KV) + r_other +1.017 vs r_all +0.992; |row0 - clean| 0.606
+        rows G   : r_other_K +0.074, r_other_V +0.107, r_all_K +0.829, r_all_V +0.204
+        rows rowS: r_ans_KV +0.605, r_all_KV +0.639, r_other_KV +0.124
+        rows rowB: r_ans_KV +0.414, r_all_KV +0.549, r_other_KV +0.112
+        rows sep : r_ans_KV +0.049, r_all_KV +0.104, r_other_KV +0.049
+      over C (top-20, P1 ranking): median T_dup +0.459, T_ctrl +0.027, previous-token P +0.017
+   -- Qwen2.5-7B-Instruct POST
+      a3      R  1:-0.02 2:-0.00 3:-0.03 5:-0.03 8:+0.40 12:+0.65 16:+1.04 20:+1.03 24:+1.06 32:+1.05 40:+1.03 48:+1.03 64:+0.99 96:+1.02 128:+1.00
+      a3      KO 1:+0.02 2:+0.02 3:+0.09 5:+0.10 8:+0.72 12:+0.88 16:+1.01 20:+1.01 24:+0.96 32:+0.98 40:+1.01 48:+1.01 64:+1.04 96:+1.00 128:+1.00
+      fplus   R  1:+0.05 2:+0.05 3:+0.07 5:+0.06 8:+0.07 12:+0.06 16:+0.05 20:+0.06 24:+0.06 32:+0.06 40:+0.06 48:+0.09 64:+0.10 96:+0.07 128:+0.09
+      fplus   KO 1:-0.01 2:-0.02 3:-0.00 5:-0.03 8:-0.02 12:-0.02 16:-0.00 20:-0.01 24:-0.01 32:-0.00 40:-0.00 48:+0.01 64:+0.04 96:+0.06 128:+0.08
+      dminus  R  1:-0.02 2:-0.00 3:+0.01 5:+0.01 8:-0.02 12:-0.02 16:-0.03 20:-0.02 24:-0.00 32:-0.01 40:+0.05 48:+0.06 64:+0.04 96:+0.10 128:+0.11
+      dminus  KO 1:+0.02 2:+0.06 3:+0.08 5:+0.07 8:+0.11 12:+0.14 16:+0.13 20:+0.14 24:+0.14 32:+0.15 40:+0.19 48:+0.18 64:+0.18 96:+0.41 128:+0.42
+      rand0   R  1:+0.00 2:-0.00 3:+0.02 5:+0.01 8:+0.00 12:+0.03 16:+0.01 20:+0.00 24:+0.00 32:+0.02 40:+0.02 48:-0.02 64:-0.03 96:-0.02 128:-0.00
+      rand0   KO 1:+0.01 2:-0.01 3:-0.02 5:-0.02 8:-0.00 12:-0.02 16:-0.01 20:-0.02 24:-0.01 32:-0.01 40:-0.02 48:-0.02 64:-0.02 96:-0.00 128:-0.03
+      rand1   R  1:+0.00 2:-0.01 3:+0.01 5:-0.01 8:+0.02 12:+0.02 16:+0.01 20:+0.03 24:+0.03 32:+0.03 40:+0.01 48:+0.00 64:+0.01 96:+0.02 128:+0.01
+      rand1   KO 1:-0.01 2:-0.00 3:-0.02 5:-0.02 8:-0.01 12:-0.02 16:-0.01 20:-0.01 24:-0.01 32:-0.00 40:-0.03 48:-0.02 64:-0.01 96:-0.03 128:+0.12
+      rand2   R  1:+0.02 2:+0.01 3:+0.01 5:+0.03 8:+0.02 12:-0.00 16:+0.03 20:+0.02 24:-0.01 32:+0.04 40:+0.03 48:+0.02 64:+0.02 96:+0.03 128:+0.06
+      rand2   KO 1:-0.00 2:-0.01 3:-0.01 5:-0.00 8:-0.02 12:-0.01 16:-0.01 20:-0.02 24:-0.02 32:-0.01 40:-0.02 48:+0.00 64:-0.01 96:-0.00 128:+0.03
+      layer profile (fraction of d_G): -0.00 +0.02 -0.04 -0.03 +0.03 +0.04 +0.01 +0.01 +0.00 +0.03 +0.02 +0.03 +0.02 +0.03 +0.02 +0.07 -0.01 +0.03 +0.01 +0.02 +0.01 +0.01 +0.02 +0.00 +0.00 -0.00 -0.00 +0.00
+      split-half a3 (R vs E) Spearman +0.985; top-10 a3 (R): (15, 20):0.97, (8, 22):0.90, (8, 24):0.74, (19, 20):0.63, (12, 24):0.62, (15, 18):0.62, (2, 4):0.61, (3, 11):0.59, (14, 13):0.51, (16, 1):0.49
+      ablation: ID_K(none) +4.642 [+4.202,+5.086], ID_V(none) +11.456 [+10.929,+11.972]
+        none                 rho_K +1.000 [+1.000,+1.000]  dV +0.000 [+0.000,+0.000]  mass>=0.9 0.00  base-argmax 1.00
+        top_kstar_mean       rho_K -0.080 [-0.123,-0.044]  dV +2.295 [+1.934,+2.664]  mass>=0.9 0.00  base-argmax 1.00
+        top_10_mean          rho_K +0.616 [+0.535,+0.698]  dV +1.436 [+1.152,+1.738]  mass>=0.9 0.00  base-argmax 1.00
+        top_20_mean          rho_K +0.126 [+0.067,+0.182]  dV +2.282 [+1.932,+2.651]  mass>=0.9 0.00  base-argmax 1.00
+        top_kstar_zero       rho_K -0.060 [-0.095,-0.030]  dV +2.756 [+2.396,+3.124]  mass>=0.9 0.00  base-argmax 1.00
+        rand0_kstar_mean     rho_K +0.969 [+0.951,+0.987]  dV +0.081 [-0.026,+0.192]  mass>=0.9 0.00  base-argmax 1.00
+        rand1_kstar_mean     rho_K +0.655 [+0.604,+0.702]  dV +0.820 [+0.659,+0.984]  mass>=0.9 0.00  base-argmax 1.00
+        rand2_kstar_mean     rho_K +0.975 [+0.957,+0.994]  dV +0.114 [+0.008,+0.217]  mass>=0.9 0.00  base-argmax 1.00
+        active_kstar_mean    rho_K +0.934 [+0.904,+0.964]  dV +0.012 [-0.104,+0.127]  mass>=0.9 0.00  base-argmax 1.00
+        next_kstar_mean      rho_K +1.140 [+1.104,+1.179]  dV -0.028 [-0.148,+0.090]  mass>=0.9 0.00  base-argmax 1.00
+      hop: r_ans_K +0.875, r_ans_V -0.046, r_ans_KV +0.788, r_all_KV +0.841, r_other_KV +0.049, r_exact +0.000; r_ans(KV) + r_other +0.837 vs r_all +0.841; |row0 - clean| 0.791
+        rows G   : r_other_K +0.047, r_other_V -0.108, r_all_K +0.900, r_all_V -0.131
+        rows rowS: r_ans_KV +0.708, r_all_KV +0.780, r_other_KV +0.102
+        rows rowB: r_ans_KV +0.255, r_all_KV +0.288, r_other_KV +0.044
+        rows sep : r_ans_KV -0.002, r_all_KV +0.060, r_other_KV +0.057
+      over C (top-20, P1 ranking): median T_dup +0.420, T_ctrl +0.021, previous-token P +0.017
+      over the top-20 by this format's a3: median D +0.332, I +0.014, T_dup +0.507
+
+######## PART (b) the exchange on Prakash et al.'s intervention: full report
+== Part (b) the exchange on Prakash et al.'s intervention (P-2026-10-05-H, Gates b0-b3, H7-H12): root results/gpu_stage6/prakash
+
+-- Qwen2.5-14B-Instruct: release 0579347e3c files story_templates.json e89df933, characters.json ef6a3063, bottles.json ad22ef58, drinks.json 055ae58e, dataset.py 915c1d3c, utils.py 91a0d58a; pool sha256 4451da1a1bcde9ce (OK), n_pool 320, n_bos 0; LETTERS-AFTER T=203, NO-MENTION T=180, OPTIONS-AFTER T=196, QNAMES T=186, QNAMES2 T=182
+   LM filter (NO-MENTION, both prompts): 315/320 pass (accuracy 0.984); population n = 150, the first 150 passing pairs in pool order: OK; overlap with the 81st-160th passing pairs (their validation split, under our filter): 70/80
+   l* = 28 (lstar.json 28), l*_ID = 0 (lstar.json 0): re-derived from the sweep files, equal
+   sweep BIND NO-MENTION IIA/Phi: 0:0.00/-2.1 1:0.00/-1.7 2:0.00/-1.4 3:0.00/-1.2 4:0.00/-1.1 5:0.00/-1.1 6:0.00/-1.1 7:0.00/-1.1 8:0.00/-1.1 9:0.00/-1.1 10:0.00/-1.1 11:0.00/-0.9 12:0.00/-0.8 13:0.00/-0.8 14:0.00/-0.6 15:0.00/-0.7 16:0.00/-0.5 17:0.00/-0.6 18:0.00/-0.6 19:0.00/-0.1 20:0.00/-0.0 21:0.00/+0.7 22:0.00/+1.4 23:0.00/+4.2 24:0.72/+21.3 25:0.69/+21.0 26:0.75/+22.2 27:0.89/+25.7 28:0.99/+31.6 29:1.00/+31.8 30:1.00/+32.0 31:1.00/+32.9 32:1.00/+31.1 33:1.00/+30.9 34:1.00/+31.2 35:0.97/+26.7 36:0.08/+13.9 37:0.01/+12.0 38:0.00/+9.7 39:0.01/+8.9 40:0.00/+7.9 41:0.00/+7.5 42:0.00/+5.2 43:0.00/+4.0 44:0.00/+3.4 45:0.00/+1.3 46:0.00/+0.1 47:0.00/+0.0
+   sweep ID   NO-MENTION IIA/Phi: 0:1.00/+46.0 1:1.00/+46.0 2:1.00/+46.0 3:1.00/+46.0 4:1.00/+46.0 5:1.00/+46.0 6:1.00/+46.0 7:1.00/+46.0 8:1.00/+46.0 9:1.00/+46.0 10:1.00/+46.0 11:1.00/+46.0 12:1.00/+46.0 13:1.00/+46.0 14:1.00/+46.0 15:1.00/+46.0 16:1.00/+46.0 17:1.00/+46.1 18:1.00/+46.0 19:1.00/+46.0 20:1.00/+46.0 21:1.00/+46.0 22:1.00/+46.0 23:1.00/+46.0 24:1.00/+45.9 25:1.00/+45.8 26:1.00/+45.8 27:1.00/+45.8 28:1.00/+45.8 29:1.00/+45.7 30:1.00/+45.6 31:1.00/+45.6 32:1.00/+45.3 33:1.00/+44.5 34:1.00/+44.0 35:1.00/+41.2 36:0.82/+32.9 37:0.66/+30.9 38:0.36/+28.5 39:0.18/+25.9 40:0.08/+21.1 41:0.07/+19.5 42:0.01/+13.7 43:0.00/+9.9 44:0.00/+8.6 45:0.00/+3.2 46:0.00/+0.4 47:0.00/+0.0
+   GATES
+   Gate b1 reproduction (NO-MENTION sweep): BIND IIA(l* = 28) = 0.993 (>= 0.7) -> MET; ID IIA_ID(l*_ID = 0) = 1.000 (>= 0.7) -> MET; IIA_ID(l*) = 1.000 (H11 Part 2 and Gate b3(b) need >= 0.7)
+   BIND @28 LETTERS-AFTER n=150 Gate b0 mean|m(r4)-m(r1)| 1.22e-01 mean|m(r0)-m(B)| 1.92e-01 (<= 0.3) -> MET;  Gate b2 Phi +0.225 [+0.170,+0.282] (>= 3) -> NOT MET;  rule holds;  kappa +0.658 [+0.559,+0.854] (dropped 0.2%)
+   BIND @28 NO-MENTION    n=150 Gate b0 mean|m(r4)-m(r1)| 1.31e-01 mean|m(r0)-m(B)| 1.69e-01 (<= 0.3) -> MET;  Gate b2 Phi +31.616 [+30.193,+32.985] (>= 3) -> MET;  rule holds;  kappa +0.618 [+0.595,+0.640] (dropped 0.0%)
+   BIND @28 OPTIONS-AFTER n=150 Gate b0 mean|m(r4)-m(r1)| 1.56e-01 mean|m(r0)-m(B)| 2.02e-01 (<= 0.3) -> MET;  Gate b2 Phi +6.523 [+5.905,+7.171] (>= 3) -> MET;  rule holds;  kappa +0.864 [+0.839,+0.889] (dropped 0.0%)
+   BIND @28 QNAMES        n=150 Gate b0 mean|m(r4)-m(r1)| 1.16e-01 mean|m(r0)-m(B)| 1.47e-01 (<= 0.3) -> MET;  Gate b2 Phi +5.814 [+5.187,+6.456] (>= 3) -> MET;  rule holds;  kappa +0.906 [+0.879,+0.931] (dropped 0.0%)
+   BIND @28 QNAMES2       n=150 Gate b0 mean|m(r4)-m(r1)| 1.19e-01 mean|m(r0)-m(B)| 1.60e-01 (<= 0.3) -> MET;  Gate b2 Phi +7.285 [+6.734,+7.861] (>= 3) -> MET;  rule holds;  kappa +1.014 [+0.992,+1.034] (dropped 0.0%)
+   ID   @ 0 LETTERS-AFTER n=150 Gate b0 mean|m(r4)-m(r1)| 1.70e-01 mean|m(r0)-m(B)| 1.76e-01 (<= 0.3) -> MET;  Gate b2 Phi +38.255 [+37.690,+38.788] (>= 3) -> MET;  rule holds;  kappa +0.969 [+0.960,+0.977] (dropped 0.0%)
+   ID   @ 0 NO-MENTION    n=150 Gate b0 mean|m(r4)-m(r1)| 1.39e-01 mean|m(r0)-m(B)| 1.45e-01 (<= 0.3) -> MET;  Gate b2 Phi +46.005 [+45.276,+46.725] (>= 3) -> MET;  rule holds;  kappa +0.131 [+0.119,+0.142] (dropped 0.0%)
+   ID   @ 0 OPTIONS-AFTER n=150 Gate b0 mean|m(r4)-m(r1)| 1.94e-01 mean|m(r0)-m(B)| 2.03e-01 (<= 0.3) -> MET;  Gate b2 Phi +54.550 [+53.652,+55.462] (>= 3) -> MET;  rule holds;  kappa +0.779 [+0.764,+0.793] (dropped 0.0%)
+   ID   @ 0 QNAMES        n=150 Gate b0 mean|m(r4)-m(r1)| 1.32e-01 mean|m(r0)-m(B)| 1.47e-01 (<= 0.3) -> MET;  Gate b2 Phi +39.606 [+38.747,+40.488] (>= 3) -> MET;  rule holds;  kappa +0.773 [+0.759,+0.786] (dropped 0.0%)
+   ID   @28 LETTERS-AFTER n=150 Gate b0 mean|m(r4)-m(r1)| 1.57e-01 mean|m(r0)-m(B)| 1.74e-01 (<= 0.3) -> MET;  Gate b2 Phi +0.034 [-0.012,+0.078] (>= 3) -> NOT MET;  rule fails;  kappa NOT EVALUABLE (psi_K -0.171, psi_V +3.024, interaction -1.854)
+   ID   @28 NO-MENTION    n=150 Gate b0 mean|m(r4)-m(r1)| 9.91e-02 mean|m(r0)-m(B)| 1.53e-01 (<= 0.3) -> MET;  Gate b2 Phi +45.797 [+45.069,+46.514] (>= 3) -> MET;  rule holds;  kappa +0.129 [+0.118,+0.140] (dropped 0.0%)
+   ID   @28 OPTIONS-AFTER n=150 Gate b0 mean|m(r4)-m(r1)| 1.57e-01 mean|m(r0)-m(B)| 1.79e-01 (<= 0.3) -> MET;  Gate b2 Phi +10.885 [+10.314,+11.513] (>= 3) -> MET;  rule holds;  kappa +0.006 [-0.003,+0.013] (dropped 0.0%)
+   ID   @28 QNAMES        n=150 Gate b0 mean|m(r4)-m(r1)| 1.08e-01 mean|m(r0)-m(B)| 1.41e-01 (<= 0.3) -> MET;  Gate b2 Phi +9.321 [+8.653,+9.995] (>= 3) -> MET;  rule holds;  kappa +0.007 [-0.004,+0.018] (dropped 0.0%)
+   Gate b3 (H10 as a dissociation): (a) ID_K(OPTIONS-AFTER, l*+1) -0.092 [-0.123,-0.063] > 0, CI excl. 0; s_ID -0.015 >= 0.5 -> NOT MET;  (b) kappa_ID at l* (OPTIONS-AFTER) kappa +0.006 [-0.003,+0.013] (dropped 0.0%), >= 0.5 and evaluable (IIA_ID(l*) >= 0.7) -> NOT MET;  Gate b3 -> NOT MET
+   (H7 secondary, against s_ID(f, 0): NO-MENTION kappa +0.618 s_ID +0.018 gap 0.600; QNAMES kappa +0.906 s_ID +0.724 gap 0.181; OPTIONS-AFTER kappa +0.864 s_ID +0.702 gap 0.163)
+
+   PREDICTIONS (Qwen2.5-14B-Instruct)
+   H7   for every evaluable f in {NO-MENTION, QNAMES, OPTIONS-AFTER}, with NO-MENTION and OPTIONS-AFTER evaluable: |kappa(f) - s_ID(f, l*+1)| <= 0.25, and Pearson r(kappa, s_ID(., l*+1)) >= 0.9 over the three
+        NO-MENTION kappa +0.618 s_ID +0.017 gap 0.601; QNAMES kappa +0.906 s_ID -0.028 gap 0.934; OPTIONS-AFTER kappa +0.864 s_ID -0.015 gap 0.879; r = -0.986 -> NOT MET
+   H8   under NO-MENTION psi_V >= 0.5 and psi_K <= 0.25, with the CI of psi_V - psi_K excluding 0
+        psi_V +0.435 psi_K +0.703 psi_V - psi_K -0.268 [-0.317,-0.219] -> NOT MET
+   H9   kappa(OPTIONS-AFTER) - kappa(NO-MENTION) >= 0.4 with the paired CI excluding 0; kappa(QNAMES) between the two if evaluable
+        kappa(OA) - kappa(NM) +0.247 [+0.211,+0.281] dropped 0.0%; kappa(QNAMES) +0.906 between: False -> NOT MET
+   H10  kappa(f) <= 0.25 for every evaluable f in {NO-MENTION, QNAMES, OPTIONS-AFTER}, with NO-MENTION and OPTIONS-AFTER evaluable (dissociation reading only if Gate b3 passes)
+        NO-MENTION kappa +0.618; QNAMES kappa +0.906; OPTIONS-AFTER kappa +0.864; Gate b3 not passed: not evaluable as a dissociation at this depth -> NOT MET
+   H11  Part 1: every evaluable f |kappa_ID(f) - s_ID(f, l*_ID+1)| <= 0.25 and kappa_ID(OPTIONS-AFTER) - kappa_ID(NO-MENTION) >= 0.4 with CI excluding 0; Part 2 (if IIA_ID(l*) >= 0.7): every evaluable f |kappa_ID at l*(f) - s_ID(f, l*+1)| <= 0.25; met if Part 1 holds and Part 2 holds or is not evaluable
+        Part 1 MET (NO-MENTION kappa +0.131 s_ID +0.017 gap 0.114; QNAMES kappa +0.773 s_ID +0.724 gap 0.048; OPTIONS-AFTER kappa +0.779 s_ID +0.702 gap 0.077; kappa_ID(OA) - kappa_ID(NM) +0.648 [+0.630,+0.666] dropped 0.0%); Part 2 MET (NO-MENTION kappa +0.129 s_ID +0.017 gap 0.113; QNAMES kappa +0.007 s_ID -0.028 gap 0.036; OPTIONS-AFTER kappa +0.006 s_ID -0.015 gap 0.020) -> MET
+   H12  if run: Gate b1 with l* in 30..40, and the 14B verdicts of H8, H11 Part 1 and whichever of {H7, H9} or H10 was met reproduced at the same thresholds (each 14B verdict that is MET or NOT MET recurs at 70B)
+        NOT RUN (optional; no Llama-3-70B results) -> NOT RUN
+
+-- Qwen2.5-14B-Instruct: EXPLORATORY
+   BIND @28 LETTERS-AFTER psi_K +1.652 psi_V +0.859 interaction -1.511 rho_K +0.141 rho_V -0.652 IIA 0.00 kappa_w +0.278 (|kappa_w - kappa| 0.380 > 0.1: punctuation rows); secondary population 150/150; q=0: psi_K +1.836 psi_V +1.805 (n=71); q=1: psi_K +1.173 psi_V -1.600 (n=79)
+   BIND @28 NO-MENTION    psi_K +0.703 psi_V +0.435 interaction -0.138 rho_K +0.565 rho_V +0.297 IIA 0.99 kappa_w +0.779 (|kappa_w - kappa| 0.161 > 0.1: punctuation rows); secondary population 150/150; q=0: psi_K +0.648 psi_V +0.464 (n=71); q=1: psi_K +0.772 psi_V +0.400 (n=79)
+   BIND @28 OPTIONS-AFTER psi_K +1.025 psi_V +0.161 interaction -0.186 rho_K +0.839 rho_V -0.025 IIA 0.00 kappa_w +0.875 (|kappa_w - kappa| 0.010); secondary population 150/150; q=0: psi_K +1.040 psi_V +0.036 (n=71); q=1: psi_K +1.001 psi_V +0.362 (n=79)
+   BIND @28 QNAMES        psi_K +1.020 psi_V +0.106 interaction -0.127 rho_K +0.894 rho_V -0.020 IIA 0.00 kappa_w +0.919 (|kappa_w - kappa| 0.013); secondary population 125/150; q=0: psi_K +1.022 psi_V +0.044 (n=71); q=1: psi_K +1.017 psi_V +0.224 (n=79)
+   BIND @28 QNAMES2       psi_K +1.016 psi_V -0.014 interaction -0.002 rho_K +1.014 rho_V -0.016 IIA 0.00 kappa_w +1.019 (|kappa_w - kappa| 0.005); secondary population 145/150; q=0: psi_K +1.029 psi_V -0.082 (n=71); q=1: psi_K +0.991 psi_V +0.121 (n=79)
+   ID   @ 0 LETTERS-AFTER psi_K +0.977 psi_V +0.031 interaction -0.008 rho_K +0.969 rho_V +0.023 IIA 1.00 kappa_w +0.957 (|kappa_w - kappa| 0.011); secondary population 150/150; q=0: psi_K +0.979 psi_V +0.025 (n=71); q=1: psi_K +0.974 psi_V +0.038 (n=79)
+   ID   @ 0 NO-MENTION    psi_K +0.131 psi_V +0.871 interaction -0.002 rho_K +0.129 rho_V +0.869 IIA 1.00 kappa_w +0.132 (|kappa_w - kappa| 0.001); secondary population 150/150; q=0: psi_K +0.129 psi_V +0.852 (n=71); q=1: psi_K +0.133 psi_V +0.888 (n=79)
+   ID   @ 0 OPTIONS-AFTER psi_K +0.789 psi_V +0.224 interaction -0.012 rho_K +0.776 rho_V +0.211 IIA 1.00 kappa_w +0.737 (|kappa_w - kappa| 0.042); secondary population 150/150; q=0: psi_K +0.793 psi_V +0.208 (n=71); q=1: psi_K +0.784 psi_V +0.238 (n=79)
+   ID   @ 0 QNAMES        psi_K +0.777 psi_V +0.229 interaction -0.006 rho_K +0.771 rho_V +0.223 IIA 0.90 kappa_w +0.749 (|kappa_w - kappa| 0.024); secondary population 125/150; q=0: psi_K +0.774 psi_V +0.226 (n=71); q=1: psi_K +0.780 psi_V +0.231 (n=79)
+   ID   @28 LETTERS-AFTER psi_K -0.171 psi_V +3.024 interaction -1.854 rho_K -2.024 rho_V +1.171 IIA 0.00 kappa_w -0.263 (|kappa_w - kappa| 0.203 > 0.1: punctuation rows); secondary population 150/150; q=0: psi_K +1.409 psi_V +2.545 (n=71); q=1: psi_K -2.000 psi_V +3.579 (n=79)
+   ID   @28 NO-MENTION    psi_K +0.129 psi_V +0.872 interaction -0.001 rho_K +0.128 rho_V +0.871 IIA 1.00 kappa_w +0.131 (|kappa_w - kappa| 0.002); secondary population 150/150; q=0: psi_K +0.128 psi_V +0.850 (n=71); q=1: psi_K +0.131 psi_V +0.892 (n=79)
+   ID   @28 OPTIONS-AFTER psi_K +0.005 psi_V +0.811 interaction +0.185 rho_K +0.189 rho_V +0.995 IIA 0.00 kappa_w +0.003 (|kappa_w - kappa| 0.003); secondary population 150/150; q=0: psi_K +0.002 psi_V +0.728 (n=71); q=1: psi_K +0.007 psi_V +0.900 (n=79)
+   ID   @28 QNAMES        psi_K +0.006 psi_V +0.827 interaction +0.166 rho_K +0.173 rho_V +0.994 IIA 0.00 kappa_w +0.009 (|kappa_w - kappa| 0.002); secondary population 125/150; q=0: psi_K +0.008 psi_V +0.771 (n=71); q=1: psi_K +0.004 psi_V +0.898 (n=79)
+   clamp LETTERS-AFTER l0= 0 n=150 ID_K +17.897 [+17.498,+18.284]  ID_V +0.296  ID_KV +19.100  s_ID +0.984 [+0.975,+0.992]  interaction/ID_KV +0.047
+   clamp LETTERS-AFTER l0= 1 n=150 ID_K +17.917 [+17.521,+18.306]  ID_V +0.292  ID_KV +19.108  s_ID +0.984 [+0.976,+0.992]  interaction/ID_KV +0.047
+   clamp LETTERS-AFTER l0= 3 n=150 ID_K +17.873 [+17.472,+18.262]  ID_V +0.289  ID_KV +19.099  s_ID +0.984 [+0.976,+0.992]  interaction/ID_KV +0.049
+   clamp LETTERS-AFTER l0=14 n=150 ID_K +9.708 [+8.953,+10.452]  ID_V +0.245  ID_KV +14.068  s_ID +0.975 [+0.962,+0.987]  interaction/ID_KV +0.293
+   clamp LETTERS-AFTER l0=29 n=150 ID_K +0.002 [-0.012,+0.016]  ID_V +0.019  ID_KV +0.016  s_ID +0.098 [-2.155,+1.750]  interaction/ID_KV -0.342
+   clamp NO-MENTION    l0= 0 n=150 ID_K +0.294 [+0.129,+0.459]  ID_V +16.401  ID_KV +22.611  s_ID +0.018 [+0.008,+0.027]  interaction/ID_KV +0.262
+   clamp NO-MENTION    l0= 1 n=150 ID_K +0.282 [+0.117,+0.447]  ID_V +16.398  ID_KV +22.630  s_ID +0.017 [+0.007,+0.026]  interaction/ID_KV +0.263
+   clamp NO-MENTION    l0= 3 n=150 ID_K +0.286 [+0.121,+0.449]  ID_V +16.412  ID_KV +22.610  s_ID +0.017 [+0.007,+0.027]  interaction/ID_KV +0.261
+   clamp NO-MENTION    l0= 6 n=150 ID_K +0.288 [+0.122,+0.453]  ID_V +16.415  ID_KV +22.617  s_ID +0.017 [+0.007,+0.027]  interaction/ID_KV +0.261
+   clamp NO-MENTION    l0=12 n=150 ID_K +0.294 [+0.129,+0.457]  ID_V +16.427  ID_KV +22.622  s_ID +0.018 [+0.008,+0.027]  interaction/ID_KV +0.261
+   clamp NO-MENTION    l0=14 n=150 ID_K +0.287 [+0.122,+0.451]  ID_V +16.435  ID_KV +22.599  s_ID +0.017 [+0.007,+0.027]  interaction/ID_KV +0.260
+   clamp NO-MENTION    l0=18 n=150 ID_K +0.284 [+0.119,+0.448]  ID_V +16.407  ID_KV +22.535  s_ID +0.017 [+0.007,+0.026]  interaction/ID_KV +0.259
+   clamp NO-MENTION    l0=24 n=150 ID_K +0.276 [+0.109,+0.442]  ID_V +16.400  ID_KV +22.429  s_ID +0.017 [+0.007,+0.026]  interaction/ID_KV +0.257
+   clamp NO-MENTION    l0=27 n=150 ID_K +0.281 [+0.114,+0.447]  ID_V +16.414  ID_KV +22.376  s_ID +0.017 [+0.007,+0.026]  interaction/ID_KV +0.254
+   clamp NO-MENTION    l0=29 n=150 ID_K +0.277 [+0.108,+0.443]  ID_V +16.481  ID_KV +22.365  s_ID +0.017 [+0.007,+0.026]  interaction/ID_KV +0.251
+   clamp NO-MENTION    l0=30 n=150 ID_K +0.288 [+0.122,+0.454]  ID_V +16.485  ID_KV +22.346  s_ID +0.017 [+0.007,+0.027]  interaction/ID_KV +0.249
+   clamp NO-MENTION    l0=33 n=150 ID_K +0.295 [+0.130,+0.460]  ID_V +16.359  ID_KV +22.191  s_ID +0.018 [+0.008,+0.027]  interaction/ID_KV +0.249
+   clamp NO-MENTION    l0=36 n=150 ID_K +0.322 [+0.159,+0.484]  ID_V +14.812  ID_KV +20.771  s_ID +0.021 [+0.011,+0.031]  interaction/ID_KV +0.271
+   clamp NO-MENTION    l0=42 n=150 ID_K +0.263 [+0.162,+0.365]  ID_V +7.009  ID_KV +11.513  s_ID +0.036 [+0.023,+0.049]  interaction/ID_KV +0.368
+   clamp OPTIONS-AFTER l0= 0 n=150 ID_K +21.683 [+21.017,+22.324]  ID_V +9.206  ID_KV +26.975  s_ID +0.702 [+0.689,+0.715]  interaction/ID_KV -0.145
+   clamp OPTIONS-AFTER l0= 1 n=150 ID_K +21.684 [+21.010,+22.327]  ID_V +9.199  ID_KV +26.970  s_ID +0.702 [+0.689,+0.716]  interaction/ID_KV -0.145
+   clamp OPTIONS-AFTER l0= 3 n=150 ID_K +21.692 [+21.023,+22.334]  ID_V +9.188  ID_KV +26.990  s_ID +0.702 [+0.689,+0.716]  interaction/ID_KV -0.144
+   clamp OPTIONS-AFTER l0= 6 n=150 ID_K +18.497 [+17.747,+19.235]  ID_V +8.400  ID_KV +26.690  s_ID +0.688 [+0.673,+0.702]  interaction/ID_KV -0.008
+   clamp OPTIONS-AFTER l0=12 n=150 ID_K +12.305 [+11.421,+13.158]  ID_V +7.099  ID_KV +22.694  s_ID +0.634 [+0.613,+0.653]  interaction/ID_KV +0.145
+   clamp OPTIONS-AFTER l0=14 n=150 ID_K +9.503 [+8.580,+10.408]  ID_V +6.696  ID_KV +22.200  s_ID +0.587 [+0.562,+0.610]  interaction/ID_KV +0.270
+   clamp OPTIONS-AFTER l0=18 n=150 ID_K +1.739 [+1.416,+2.099]  ID_V +6.254  ID_KV +15.161  s_ID +0.218 [+0.185,+0.250]  interaction/ID_KV +0.473
+   clamp OPTIONS-AFTER l0=24 n=150 ID_K +0.268 [+0.190,+0.354]  ID_V +6.311  ID_KV +9.047  s_ID +0.041 [+0.030,+0.052]  interaction/ID_KV +0.273
+   clamp OPTIONS-AFTER l0=27 n=150 ID_K -0.090 [-0.121,-0.060]  ID_V +6.360  ID_KV +8.636  s_ID -0.014 [-0.019,-0.010]  interaction/ID_KV +0.274
+   clamp OPTIONS-AFTER l0=29 n=150 ID_K -0.092 [-0.123,-0.063]  ID_V +6.382  ID_KV +8.587  s_ID -0.015 [-0.020,-0.010]  interaction/ID_KV +0.268
+   clamp OPTIONS-AFTER l0=30 n=150 ID_K -0.098 [-0.129,-0.069]  ID_V +6.277  ID_KV +8.750  s_ID -0.016 [-0.021,-0.011]  interaction/ID_KV +0.294
+   clamp OPTIONS-AFTER l0=33 n=150 ID_K -0.086 [-0.115,-0.059]  ID_V +6.009  ID_KV +8.256  s_ID -0.015 [-0.019,-0.010]  interaction/ID_KV +0.283
+   clamp OPTIONS-AFTER l0=36 n=150 ID_K -0.086 [-0.114,-0.059]  ID_V +4.810  ID_KV +6.799  s_ID -0.018 [-0.024,-0.013]  interaction/ID_KV +0.305
+   clamp OPTIONS-AFTER l0=42 n=150 ID_K -0.062 [-0.083,-0.043]  ID_V +0.958  ID_KV +1.803  s_ID -0.070 [-0.097,-0.046]  interaction/ID_KV +0.503
+   clamp QNAMES        l0= 0 n=150 ID_K +15.215 [+14.677,+15.740]  ID_V +5.786  ID_KV +19.482  s_ID +0.724 [+0.710,+0.739]  interaction/ID_KV -0.078
+   clamp QNAMES        l0= 1 n=150 ID_K +15.202 [+14.666,+15.727]  ID_V +5.790  ID_KV +19.480  s_ID +0.724 [+0.710,+0.739]  interaction/ID_KV -0.078
+   clamp QNAMES        l0= 3 n=150 ID_K +15.220 [+14.682,+15.746]  ID_V +5.754  ID_KV +19.474  s_ID +0.726 [+0.711,+0.740]  interaction/ID_KV -0.077
+   clamp QNAMES        l0=14 n=150 ID_K +4.646 [+4.047,+5.276]  ID_V +4.882  ID_KV +15.683  s_ID +0.488 [+0.452,+0.522]  interaction/ID_KV +0.393
+   clamp QNAMES        l0=29 n=150 ID_K -0.135 [-0.184,-0.091]  ID_V +4.915  ID_KV +7.174  s_ID -0.028 [-0.039,-0.019]  interaction/ID_KV +0.334
+   sweep BIND LETTERS-AFTER IIA/Phi: 18:0.00/+0.3 19:0.00/+1.2 20:0.00/+0.1 21:0.00/+0.8 22:0.00/+1.4 23:0.00/+2.8 24:0.00/+1.0 25:0.00/+0.6 26:0.00/+0.4 27:0.00/+0.3 28:0.00/+0.2 29:0.00/+0.2 30:0.00/+0.2 31:0.00/+0.2 32:0.00/+0.2 33:0.00/+0.2 34:0.00/+0.2 35:0.00/+0.1 36:0.00/+0.1 37:0.00/+0.1 38:0.00/+0.1 39:0.00/+0.1 40:0.00/+0.1
+   sweep BIND OPTIONS-AFTER IIA/Phi: 18:0.00/-0.2 19:0.00/+0.6 20:0.00/-0.1 21:0.00/+1.3 22:0.00/+1.7 23:0.00/+4.0 24:0.00/+4.4 25:0.00/+3.8 26:0.00/+4.0 27:0.00/+4.5 28:0.00/+6.5 29:0.00/+6.4 30:0.00/+6.2 31:0.00/+6.4 32:0.00/+6.2 33:0.00/+6.3 34:0.00/+6.3 35:0.00/+5.6 36:0.00/+2.2 37:0.00/+2.1 38:0.00/+1.7 39:0.00/+1.4 40:0.00/+1.2
+   sweep BIND QNAMES        IIA/Phi: 18:0.00/-0.3 19:0.00/+0.9 20:0.00/-0.2 21:0.00/+1.3 22:0.00/+2.0 23:0.01/+4.5 24:0.00/+4.1 25:0.00/+3.2 26:0.00/+3.4 27:0.00/+4.0 28:0.00/+5.8 29:0.00/+5.9 30:0.00/+5.9 31:0.00/+6.1 32:0.00/+5.9 33:0.00/+6.0 34:0.00/+6.1 35:0.00/+5.6 36:0.00/+2.5 37:0.00/+2.4 38:0.00/+2.1 39:0.00/+1.8 40:0.00/+1.7
+   sweep ID   LETTERS-AFTER IIA/Phi: 0:1.00/+38.3 1:1.00/+38.3 2:1.00/+38.3 3:1.00/+38.2 4:1.00/+38.2 5:1.00/+38.0 6:1.00/+38.0 7:1.00/+37.7 8:0.96/+34.2 9:0.97/+34.2 10:0.96/+33.2 11:0.96/+33.2 12:0.94/+32.5 13:0.91/+30.8 14:0.73/+25.7 15:0.67/+24.3 16:0.27/+14.1 17:0.25/+12.8 18:0.14/+8.9 19:0.09/+5.8 20:0.00/+0.9 21:0.00/+0.4 22:0.00/+0.5 23:0.00/+0.6 24:0.00/+0.2 25:0.00/+0.1 26:0.00/+0.0 27:0.00/+0.0 28:0.00/+0.0 29:0.00/+0.0 30:0.00/+0.0 31:0.00/+0.0 32:0.00/+0.0 33:0.00/+0.0 34:0.00/+0.0 35:0.00/-0.0 36:0.00/-0.0 37:0.00/-0.0 38:0.00/-0.0 39:0.00/-0.0 40:0.00/-0.0 41:0.00/-0.0 42:0.00/+0.0 43:0.00/-0.0 44:0.00/-0.0 45:0.00/+0.0 46:0.00/-0.0 47:0.00/+0.0
+   sweep ID   OPTIONS-AFTER IIA/Phi: 0:1.00/+54.5 1:1.00/+54.5 2:1.00/+54.5 3:1.00/+54.7 4:1.00/+54.7 5:1.00/+54.5 6:1.00/+54.5 7:1.00/+54.2 8:1.00/+51.2 9:1.00/+51.2 10:1.00/+50.8 11:1.00/+50.7 12:0.99/+50.4 13:0.99/+49.2 14:0.89/+44.2 15:0.87/+43.2 16:0.66/+33.8 17:0.55/+30.7 18:0.32/+24.1 19:0.17/+19.1 20:0.00/+11.8 21:0.00/+11.5 22:0.00/+11.6 23:0.00/+11.5 24:0.00/+11.6 25:0.00/+10.9 26:0.00/+11.0 27:0.00/+10.9 28:0.00/+10.9 29:0.00/+11.1 30:0.00/+10.5 31:0.00/+10.4 32:0.00/+10.4 33:0.00/+10.1 34:0.00/+9.8 35:0.00/+8.8 36:0.00/+4.2 37:0.00/+4.0 38:0.00/+3.2 39:0.00/+2.7 40:0.00/+2.3 41:0.00/+2.2 42:0.00/+1.6 43:0.00/+1.3 44:0.00/+1.2 45:0.00/+0.6 46:0.00/+0.1 47:0.00/+0.0
+   sweep ID   QNAMES        IIA/Phi: 0:0.90/+39.6 1:0.90/+39.6 2:0.91/+39.6 3:0.88/+39.8 4:0.89/+39.8 5:0.85/+39.7 6:0.85/+39.7 7:0.84/+39.7 8:0.75/+37.6 9:0.74/+37.6 10:0.66/+36.8 11:0.65/+36.8 12:0.57/+36.1 13:0.57/+35.0 14:0.37/+30.6 15:0.34/+29.9 16:0.15/+23.3 17:0.13/+22.0 18:0.11/+18.9 19:0.04/+15.2 20:0.00/+10.2 21:0.00/+9.9 22:0.00/+9.9 23:0.00/+9.8 24:0.00/+9.6 25:0.00/+9.3 26:0.00/+9.4 27:0.00/+9.4 28:0.00/+9.3 29:0.00/+9.5 30:0.00/+9.1 31:0.00/+9.1 32:0.00/+9.0 33:0.00/+8.8 34:0.00/+8.7 35:0.00/+8.0 36:0.00/+4.5 37:0.00/+4.4 38:0.00/+4.0 39:0.00/+3.5 40:0.00/+3.2 41:0.00/+2.9 42:0.00/+2.1 43:0.00/+1.7 44:0.00/+1.6 45:0.00/+0.6 46:0.00/+0.2 47:0.00/+0.0

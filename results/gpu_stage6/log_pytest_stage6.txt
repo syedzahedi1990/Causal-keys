@@ -1,0 +1,79 @@
+==== 2026-10-07T10:57:32Z python -m pytest tests/test_head_splice.py tests/test_prakash.py tests/test_clamp.py tests/test_stage6_score.py -v -rA -p no:cacheprovider
+=============== test session starts ===============
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /venv/main/bin/python
+rootdir: /workspace/Causal-keys
+plugins: anyio-4.15.1
+collecting ... collected 30 items
+
+tests/test_head_splice.py::test_headsplice_all_heads_is_full_clamp_and_empty_is_clean PASSED [  3%]
+tests/test_head_splice.py::test_headsplice_rows_G_and_group_slices_equal_rowsplice PASSED [  6%]
+tests/test_head_splice.py::test_headsplice_batched_grid_equals_single_runs PASSED [ 10%]
+tests/test_head_splice.py::test_self_ablation_is_clean PASSED [ 13%]
+tests/test_head_splice.py::test_hopsplice_all_rows_is_plain_clamp PASSED [ 16%]
+tests/test_head_splice.py::test_hopsplice_no_overwrite_and_answer_only_cache PASSED [ 20%]
+tests/test_head_splice.py::test_hop_batch_equals_single_rows PASSED [ 23%]
+tests/test_prakash.py::test_pool_hash_and_release PASSED [ 26%]
+tests/test_prakash.py::test_positions_lengths_qwen PASSED [ 30%]
+tests/test_prakash.py::test_positions_lengths_llama3 SKIPPED [ 33%]
+tests/test_prakash.py::test_preflight PASSED [ 36%]
+tests/test_prakash.py::test_exchange_exact[NO-MENTION] PASSED [ 40%]
+tests/test_prakash.py::test_exchange_exact[OPTIONS-AFTER] PASSED [ 43%]
+tests/test_prakash.py::test_resid_patch_rows PASSED [ 46%]
+tests/test_prakash.py::test_evaluability_rule PASSED [ 50%]
+tests/test_prakash.py::test_tie_rule PASSED [ 53%]
+tests/test_prakash.py::test_scorer_h_read PASSED [ 56%]
+tests/test_prakash.py::test_scorer_h_binding_and_rules PASSED [ 60%]
+tests/test_prakash.py::test_scorer_llama_and_missing PASSED [ 63%]
+tests/test_clamp.py::test_kv_sites PASSED   [ 66%]
+tests/test_clamp.py::test_gpt2_clamp_exact PASSED [ 70%]
+tests/test_clamp.py::test_qwen_clamp_matches_single_position_hooks PASSED [ 73%]
+tests/test_clamp.py::test_format_factorial_regression PASSED [ 76%]
+tests/test_clamp.py::test_row_restricted_regression PASSED [ 80%]
+tests/test_stage6_score.py::test_empty_root PASSED [ 83%]
+tests/test_stage6_score.py::test_part_b_synthetic PASSED [ 86%]
+tests/test_stage6_score.py::test_errors_and_mismatch PASSED [ 90%]
+tests/test_stage6_score.py::test_gate_a1_last_run PASSED [ 93%]
+tests/test_stage6_score.py::test_gate_a1_gates_part_a PASSED [ 96%]
+tests/test_stage6_score.py::test_provenance_mismatch PASSED [100%]
+
+===================== PASSES ======================
+_ test_headsplice_all_heads_is_full_clamp_and_empty_is_clean _
+-------------- Captured stderr setup --------------
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+--------------- Captured log setup ----------------
+WARNING  huggingface_hub.utils._http:_http.py:993 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+______________ test_resid_patch_rows ______________
+-------------- Captured stdout call ---------------
+  sweep ID: pairs 2/2 6:0.00
+============= short test summary info =============
+PASSED tests/test_head_splice.py::test_headsplice_all_heads_is_full_clamp_and_empty_is_clean
+PASSED tests/test_head_splice.py::test_headsplice_rows_G_and_group_slices_equal_rowsplice
+PASSED tests/test_head_splice.py::test_headsplice_batched_grid_equals_single_runs
+PASSED tests/test_head_splice.py::test_self_ablation_is_clean
+PASSED tests/test_head_splice.py::test_hopsplice_all_rows_is_plain_clamp
+PASSED tests/test_head_splice.py::test_hopsplice_no_overwrite_and_answer_only_cache
+PASSED tests/test_head_splice.py::test_hop_batch_equals_single_rows
+PASSED tests/test_prakash.py::test_pool_hash_and_release
+PASSED tests/test_prakash.py::test_positions_lengths_qwen
+PASSED tests/test_prakash.py::test_preflight
+PASSED tests/test_prakash.py::test_exchange_exact[NO-MENTION]
+PASSED tests/test_prakash.py::test_exchange_exact[OPTIONS-AFTER]
+PASSED tests/test_prakash.py::test_resid_patch_rows
+PASSED tests/test_prakash.py::test_evaluability_rule
+PASSED tests/test_prakash.py::test_tie_rule
+PASSED tests/test_prakash.py::test_scorer_h_read
+PASSED tests/test_prakash.py::test_scorer_h_binding_and_rules
+PASSED tests/test_prakash.py::test_scorer_llama_and_missing
+PASSED tests/test_clamp.py::test_kv_sites
+PASSED tests/test_clamp.py::test_gpt2_clamp_exact
+PASSED tests/test_clamp.py::test_qwen_clamp_matches_single_position_hooks
+PASSED tests/test_clamp.py::test_format_factorial_regression
+PASSED tests/test_clamp.py::test_row_restricted_regression
+PASSED tests/test_stage6_score.py::test_empty_root
+PASSED tests/test_stage6_score.py::test_part_b_synthetic
+PASSED tests/test_stage6_score.py::test_errors_and_mismatch
+PASSED tests/test_stage6_score.py::test_gate_a1_last_run
+PASSED tests/test_stage6_score.py::test_gate_a1_gates_part_a
+PASSED tests/test_stage6_score.py::test_provenance_mismatch
+SKIPPED [1] tests/test_prakash.py:85: unsloth/Meta-Llama-3.1-8B-Instruct tokenizer not cached
+==== 29 passed, 1 skipped in 211.39s (0:03:31) ====

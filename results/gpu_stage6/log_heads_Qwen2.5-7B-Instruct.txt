@@ -1,0 +1,8 @@
+==== 2026-10-07T11:01:41Z python experiments/stage6_heads.py --model Qwen/Qwen2.5-7B-Instruct --dtype bfloat16 --out results/gpu_stage6/heads --revision a09a35458c702b33eeacc393d103063234e8bc28
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+duplicate scores: 100 sequences (10s)
+[P1] phase 1: 60 ranking stories (2030s)
+[P1] phase 2: 60 evaluation stories (3297s)
+[POST] phase 1: 60 ranking stories (2162s)
+[POST] phase 2: 60 evaluation stories (3655s)
+wrote results/gpu_stage6/heads/Qwen2.5-7B-Instruct.json (6964s)

@@ -9,7 +9,8 @@ in-batch reference row (none / all_G / ID); the single passes (clean, full clamp
   R(k) = mean[m(top-k) - m(none)] / mean d_G, d_G = m(all_G) - m(none) (sufficiency batch of that head set);
   KO(k) = 1 - mean[m(all but top-k) - m(none_KO)] / mean[m(all_G,KO) - m(none_KO)] (knockout batch);
   rho_K(c) = mean ID_K(c) / mean ID_K(none); dV(c) = paired ID_V(c) - ID_V(none);
-  r_X = 1 - mean[m(row X) - m(ID)] / mean[m(K_S) - m(ID)] (second-hop batch rows, HOP_ROWS of the experiment).
+  r_X = 1 - mean[m(row X) - m(ID)] / mean[m(K_S) - m(ID)] (second-hop batch rows, HOP_ROWS of the experiment);
+  T_dup (H4 (ii)) and T_ctrl on the E stories' clean base runs, held out from the a3 ranking on R.
 Gate a2 (per model and format): mean |m(none) - m(clean pass)| and mean |m(all_T) - m(full clamp pass)| <= max(0.5,
   0.02 x mean d_full), all_T = the in-batch row where every head sees K_S in every row (the full key clamp; the all_G
   row equals the option-row splice, not the full clamp, and its gap is printed as a raw floor); every story's hop
@@ -238,15 +239,16 @@ def med_over(M, key, C):
     return est(lambda x: np.median(x, -1), X)
 
 
-def tdup_over(M, arm, C, key="tdup", n="n_dup"):
-    R = M.J["arms"][arm]["rank"]
+def tdup_over(M, arm, C, key="tdup", n="n_dup", part="eval"):
+    """median over the heads C of the task-side score on the E stories (held out from the a3 ranking), story bootstrap."""
+    R = M.J["arms"][arm][part]
     S = np.array([np.array(r[key])[[c[0] for c in C], [c[1] for c in C]] for r in R], float)
     N = np.array([r[n] for r in R], float)
     return est(lambda s, k: np.median(s / np.expand_dims(k, -1), -1), S, N)
 
 
-def tdup_grid(M, arm, key="tdup", n="n_dup"):
-    R = M.J["arms"][arm]["rank"]
+def tdup_grid(M, arm, key="tdup", n="n_dup", part="eval"):
+    R = M.J["arms"][arm][part]
     return np.sum([r[key] for r in R], 0) / max(1, sum(r[n] for r in R))
 
 

@@ -24,7 +24,7 @@ Output <out>/<model>.json (atomic write; rewritten after each arm):
   dup: {D, I, P: [nL][H] means, D_seq, I_seq: [n_seq][nL][H]};
   arms[arm]: rank: [per R story: core, p, G, T, mB, mF, a3, tdup, n_dup, tctrl, n_ctrl, act, dplus, dminus, none_grid,
     allG_loo]; rankings {a3, fplus, dminus: [[l, h], ...] all heads}; sets {rand: [perm...], active_kstar, next_kstar};
-    eval: [per E story: core, p, G, T, mB, mF, a3, curves {set: {suff: [m per KS_eff], none, allG, allT, ko: [...],
+    eval: [per E story: core, p, G, T, mB, mF, a3, tdup, n_dup, tctrl, n_ctrl, curves {set: {suff: [m per KS_eff], none, allG, allT, ko: [...],
     ko_none, ko_allG}}, layer {m, none, allG}, ablation {cond: {idK, idV, dK, dV, dKV, mass, argmax_cand, base_ok,
     m_id, m_cleanB}}, hop {m: [8], explo: {name: {rows, m}}}].
 TEST_MODE (--test or TEST_MODE=1): Qwen2.5-0.5B-Instruct FP32 on the CPU with n_rank = n_eval = 2, grid layers 4,8,12,
@@ -131,8 +131,8 @@ class Stage6:
         return {l: K[l][0, d["p"]].clone() for l in range(self.nL)}
 
     def base_runs(self, d, ks, phase1=False):
-        """Clean base run and full K_S clamp, both with attentions: m_B, m_full, a3 [nL, H]; in phase 1 also T_dup /
-        T_ctrl sums [nL, H] with their word counts, the o_proj inputs at G [nL, 6, H, hd] and their norms."""
+        """Clean base run and full K_S clamp, both with attentions: m_B, m_full, a3 [nL, H], T_dup / T_ctrl sums [nL, H]
+        with their word counts; in phase 1 also the o_proj inputs at G [nL, 6, H, hd] and their norms."""
         p, G, ids, nL = d["p"], d["G"], d["ids"], self.nL
         store, hk = {}, []
         if phase1:
@@ -151,23 +151,24 @@ class Stage6:
         rS, rB = d["rowS"], d["rowB"]
         a3 = 0.5 * ((Af[:, :, rS, p] - Ab[:, :, rS, p]) + (Ab[:, :, rB, p] - Af[:, :, rB, p]))
         out = dict(mB=float(self.m(lpb, d)[0]), mF=float(self.m(lpf, d)[0]), a3=a3.numpy())
+        core, cset = d["core"], set(self.cid)   # task-side duplicate scores, in both phases (H4 (ii) is scored on E)
+        dup_words = sorted({core["initial"], core["distractor_location"]} - {core["base"]})
+        ctrl_words = [w for w in LOCATIONS if w not in {core["initial"], core["distractor_location"], core["base"]}]
+        locs = [t for t in range(G[0]) if t != p and ids[t] in cset]
+        tdup, nd, tctrl, nc = torch.zeros(nL, self.H), 0, torch.zeros(nL, self.H), 0
+        for w in dup_words:
+            j = LOCATIONS.index(w)
+            occ = [t for t in range(G[0]) if t != p and ids[t] == self.cid[j]]
+            assert occ, (w, core)
+            tdup += Ab[:, :, G[j], occ].sum(-1)
+            nd += 1
+        for w in ctrl_words:
+            tctrl += Ab[:, :, G[LOCATIONS.index(w)], locs].sum(-1)
+            nc += 1
+        out |= dict(tdup=tdup.numpy(), n_dup=nd, tctrl=tctrl.numpy(), n_ctrl=nc)
         if phase1:
-            core, cset = d["core"], set(self.cid)
-            dup_words = sorted({core["initial"], core["distractor_location"]} - {core["base"]})
-            ctrl_words = [w for w in LOCATIONS if w not in {core["initial"], core["distractor_location"], core["base"]}]
-            locs = [t for t in range(G[0]) if t != p and ids[t] in cset]
-            tdup, nd, tctrl, nc = torch.zeros(nL, self.H), 0, torch.zeros(nL, self.H), 0
-            for w in dup_words:
-                j = LOCATIONS.index(w)
-                occ = [t for t in range(G[0]) if t != p and ids[t] == self.cid[j]]
-                assert occ, (w, core)
-                tdup += Ab[:, :, G[j], occ].sum(-1)
-                nd += 1
-            for w in ctrl_words:
-                tctrl += Ab[:, :, G[LOCATIONS.index(w)], locs].sum(-1)
-                nc += 1
             oin = torch.stack([store[l].view(6, self.H, self.hd) for l in range(nL)])
-            out |= dict(tdup=tdup.numpy(), n_dup=nd, tctrl=tctrl.numpy(), n_ctrl=nc, oin=oin, act=oin.norm(dim=-1).mean(1).numpy())
+            out |= dict(oin=oin, act=oin.norm(dim=-1).mean(1).numpy())
         return out
 
     def splice(self, d, ks, dense, extra_all=()):
@@ -348,6 +349,7 @@ def run_arm(S, a, cores_rank, cores_eval, layers, KS, kstar, log):
         b = S.base_runs(d, ks)
         cv, layer = S.curves(d, ks, sets, KS)
         R["eval"].append(dict(core=core, p=d["p"], G=d["G"], T=d["T"], mB=b["mB"], mF=b["mF"], a3=b["a3"].tolist(), curves=cv,
+                              tdup=b["tdup"].tolist(), n_dup=b["n_dup"], tctrl=b["tctrl"].tolist(), n_ctrl=b["n_ctrl"],
                               layer=layer, ablation=S.ablation(d, conds, MU), hop=S.second_hop(d, ks)))
     log(f"[{S.arm}] phase 2: {len(cores_eval)} evaluation stories ({time.time() - t0:.0f}s)")
     return R, list(conds)

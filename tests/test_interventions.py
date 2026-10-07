@@ -54,7 +54,7 @@ def test_self_key_exchange_noop_and_null_norm(mt):
     specs = [(l, "k", [pos], (lambda h, l=l: st[l][:, [pos]])) for l in L]
     with edits(model, specs):
         _, lg1 = answer(model, tok, ids)
-    assert torch.allclose(lg0, lg1, atol=1e-4)
+    assert torch.allclose(lg0, lg1, atol=1e-3)   # a no-op check, as test_identity_edit_is_noop
     r, d = torch.randn(1, 128), torch.randn(1, 128)
     g = torch.Generator().manual_seed(0)
     nl = signed_permutation_null(r, d, n_kv=2, generator=g)

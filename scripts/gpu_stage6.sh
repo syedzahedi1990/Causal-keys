@@ -23,7 +23,7 @@
 #   bash scripts/gpu_stage6.sh                      # PART=all
 #   MODEL=llama70 bash scripts/gpu_stage6.sh        # optional, 2 GPUs, HF_TOKEN set in the environment beforehand
 #   TEST_MODE=1 bash scripts/gpu_stage6.sh          # CPU plumbing test: pytest, both parts at Qwen2.5-0.5B (FP32) into a
-#                                                   # scratch OUT, then the scorer; about 32 min of pytest plus
+#                                                   # scratch OUT, then the scorer; about 8 min of pytest plus
 #                                                   # about 11 min of runs on a 4-core CPU
 # Optional: PART=heads|prakash|all (default all), OUT=<dir>, KEEP_CACHE=1, FORCE=1, TESTS=0, PY=<python>, MINGIB=<GiB>
 # (per-GPU memory floor, default 75), PRAKASH_REPO=<checkout of the release> (its HEAD must be the pinned commit);
@@ -33,13 +33,12 @@
 # kept unless FORCE=1; a file written by a FAILED step, or unreadable or incomplete, is moved aside to <file>.failed.<UTC>
 # and the step is run again, so a rerun with the same OUT resumes where it failed. Each model's Hub revision is resolved
 # once, pinned in $OUT/REVISIONS.txt (reused by a rerun), passed to every step as --revision and recorded in ENV.txt.
-# Pytest: the full suite, not only the stage-6 tests. Stage 6 runs on shared code (ckeys.clamp, ckeys.interventions,
-# ckeys.encoding, ckeys.story, format_factorial.run_item, row_restricted_keys.RowSplice) whose tests live in other files,
-# and the first stage-5 attempt showed that host-dependent numerics surface only on the box itself; the suite costs about
-# 20-30 min (about 1 USD), against a 6 h run that would be void on a broken instrument. The stage-6 tests (Gate a1:
-# tests/test_head_splice.py; tests/test_prakash.py; tests/test_clamp.py; tests/test_stage6_score.py) run first, verbose,
-# into log_pytest_stage6.txt, whose last run the scorer reads for Gate a1; then the rest of tests/, where 1-3 failed tests
-# (no collection error) are rerun once and the pipeline stops only if they fail again (both runs in log_pytest.txt).
+# Pytest: a fixed set, chosen by the code stage 6 runs, no reruns. First the stage-6 tests (Gate a1:
+# tests/test_head_splice.py; tests/test_prakash.py; tests/test_clamp.py, which also holds the format_factorial.run_item and
+# RowSplice regressions; tests/test_stage6_score.py), verbose, into log_pytest_stage6.txt, whose last run the scorer reads
+# for Gate a1; then the tests of the other shared modules stage 6 calls (ckeys.interventions, ckeys.encoding and
+# ckeys.story, row_restricted_keys: tests/test_interventions.py, test_encoding.py, test_row_restricted.py) into
+# log_pytest.txt. Any failure stops the script. The other test files cover stage 1-5 code only (run them locally).
 # Outside TEST_MODE it pins transformers 5.18.0, refuses a DRAFT P-2026-10-05-H, modified tracked files, or code
 # (ckeys experiments analysis scripts tests and the entry) that differs from the commit 'Finalise preregistration H',
 # then runs pytest and the preflights (release and pool hashes; prakash_swap.py --stage preflight, tokenizer only) before
@@ -173,20 +172,12 @@ fi
 
 # ---- unit tests (FP32 at Qwen2.5-0.5B on the CPU; stage 6 first, Gate a1 = tests/test_head_splice.py), before any model
 S6T="tests/test_head_splice.py tests/test_prakash.py tests/test_clamp.py tests/test_stage6_score.py"
+SHT="tests/test_interventions.py tests/test_encoding.py tests/test_row_restricted.py"   # the other shared modules stage 6 calls
 OKID="$(git rev-parse HEAD 2>/dev/null) $(hostname 2>/dev/null || uname -n)"
 if [ "${TESTS:-1}" = 1 ]; then
   rm -f "$OUT/PYTEST_OK.txt"
   run pytest_stage6 $PY -m pytest $S6T -v -rA -p no:cacheprovider || die "stage-6 unit tests (see $OUT/log_pytest_stage6.txt)"
-  if ! run pytest $PY -m pytest tests/ -q -p no:cacheprovider $(for t in $S6T; do printf -- '--ignore=%s ' "$t"; done); then
-    # one rerun of the failed tests (1-3, no collection ERROR) against one-off numeric flakes; both runs stay in the log
-    mapfile -t NODES < <(awk '/^==== .* -m pytest tests\//{n = 0; e = 0; delete F} /^FAILED tests\//{sub(/^FAILED /, ""); sub(/ - .*/, ""); F[++n] = $0}
-      /^ERROR /{e = 1} END{if (!e && n >= 1 && n <= 3) for (i = 1; i <= n; i++) print F[i]}' "$OUT/log_pytest.txt")
-    [ "${#NODES[@]}" -gt 0 ] || die "pytest (see $OUT/log_pytest.txt)"
-    echo "pytest: rerunning once ${NODES[*]}" | tee -a "$OUT/COMMIT.txt"
-    run pytest $PY -m pytest -v -rA -p no:cacheprovider "${NODES[@]}" || die "pytest, failed again on rerun (see $OUT/log_pytest.txt)"
-    mv "$OUT/FAILED.txt" "$OUT/FAILED.flake.$(date -u +%Y%m%dT%H%M%SZ).txt"
-    echo "pytest: ${NODES[*]} passed on rerun (first failure kept in log_pytest.txt and FAILED.flake.*.txt)" | tee -a "$OUT/COMMIT.txt"
-  fi
+  run pytest $PY -m pytest $SHT -v -rA -p no:cacheprovider || die "shared-module unit tests (see $OUT/log_pytest.txt)"
   echo "$OKID" > "$OUT/PYTEST_OK.txt"
 elif ! on TEST_MODE; then   # the entry requires the FP32 tests before any 7B model: skip them only after a pass of this HEAD here
   [ "$(cat "$OUT/PYTEST_OK.txt" 2>/dev/null)" = "$OKID" ] || die "TESTS=0 needs a passing pytest of this HEAD on this host in $OUT (PYTEST_OK.txt); run with TESTS=1"

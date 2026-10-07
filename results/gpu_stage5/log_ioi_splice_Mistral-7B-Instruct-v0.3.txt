@@ -1,0 +1,11 @@
+==== 2026-10-07T00:53:04Z python experiments/row_restricted_keys.py --task ioi --arms AFTER --model mistralai/Mistral-7B-Instruct-v0.3 --n 60 --seed 1 --dtype bfloat16 --out results/gpu_stage5/row_restricted --revision c170c708c41dac9275d15a8fff4eca08d52bab71
+Loading weights:   0%|          | 0/291 [00:00<?, ?it/s]Loading weights: 100%|██████████| 291/291 [00:00<00:00, 4287.01it/s]
+  AFTER done (26s)
+skipped_items 0
+AFTER: n=60  full K_S effect -3.67 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= -0.05 [-0.21,+0.13]  frac of full +0.01
+   rows=choices       (avg  11.0 tok)  d= -3.86 [-5.80,-1.89]  frac of full +1.05
+   rows=options       (avg   4.0 tok)  d= -3.92 [-5.85,-1.95]  frac of full +1.07
+   rows=options_sx    (avg   2.0 tok)  d= -3.08 [-3.96,-2.24]  frac of full +0.84
+   rows=sentence_tail (avg  13.3 tok)  d= +0.11 [-0.11,+0.32]  frac of full -0.03
+   rows=tail          (avg  15.0 tok)  d= +0.10 [-0.27,+0.46]  frac of full -0.03

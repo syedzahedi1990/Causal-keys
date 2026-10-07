@@ -1,0 +1,11 @@
+==== 2026-10-06T22:36:17Z python experiments/row_restricted_keys.py --task ioi --arms AFTER --model Qwen/Qwen2.5-7B-Instruct --n 60 --seed 1 --dtype bfloat16 --out results/gpu_stage5/row_restricted --revision a09a35458c702b33eeacc393d103063234e8bc28
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights: 100%|██████████| 339/339 [00:00<00:00, 4700.83it/s]
+  AFTER done (23s)
+skipped_items 0
+AFTER: n=60  full K_S effect +13.11 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= -0.13 [-0.30,+0.03]  frac of full -0.01
+   rows=choices       (avg   9.0 tok)  d=+13.71 [+11.64,+15.82]  frac of full +1.05
+   rows=options       (avg   4.0 tok)  d=+13.79 [+11.73,+15.90]  frac of full +1.05
+   rows=options_sx    (avg   2.0 tok)  d= +3.50 [+1.81,+5.28]  frac of full +0.27
+   rows=sentence_tail (avg  13.2 tok)  d= -0.09 [-0.26,+0.09]  frac of full -0.01
+   rows=tail          (avg  15.0 tok)  d= -1.98 [-2.35,-1.61]  frac of full -0.15

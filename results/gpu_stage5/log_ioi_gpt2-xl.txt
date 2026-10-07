@@ -1,0 +1,101 @@
+==== 2026-10-06T21:46:04Z python experiments/ioi_factorial.py --model gpt2-xl --n 200 --seed 1 --dtype float32 --out results/gpu_stage5/ioi --assert-exact auto --revision 15ea56dee5df4983c59b2538573817e1667135e2
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/580 [00:00<?, ?it/s]Loading weights:  72%|███████▏  | 417/580 [00:00<00:00, 4166.71it/s]Loading weights: 100%|██████████| 580/580 [00:00<00:00, 4074.86it/s]
+  PLAIN done n=200 chat=False floor_B=2.49e-06 floor_S=3.01e-06 (32s)
+  AFTER done n=200 chat=False floor_B=3.23e-06 floor_S=3.89e-06 (70s)
+  BEFORE done n=200 chat=False floor_B=2.82e-06 floor_S=3.83e-06 (107s)
+  QUESTION done n=200 chat=False floor_B=2.25e-06 floor_S=3.11e-06 (144s)
+  INLINE done n=200 chat=False floor_B=3.55e-06 floor_S=4.32e-06 (180s)
+  INLINE_BEFORE done n=200 chat=False floor_B=3.61e-06 floor_S=4.97e-06 (215s)
+{"args": {"model": "gpt2-xl", "n": 200, "seed": 1, "arms": "PLAIN,AFTER,BEFORE,QUESTION,INLINE,INLINE_BEFORE", "dtype": "float32", "bos": "auto", "chat": "auto", "assert_exact": "auto", "out": "results/gpu_stage5/ioi", "label": null, "device_map": null, "revision": "15ea56dee5df4983c59b2538573817e1667135e2", "test": false}, "git_commit": "51e105e177231656fc27232a58d9a4b914a98d68", "torch": "2.11.0+cu128", "transformers": "5.18.0", "python": "3.12.14", "device": "NVIDIA A100-SXM4-80GB", "wrapper": {"system_merged": false}, "l0_fracs": [0.0, 0.3], "label": null, "skipped_items": 0, "chat": false, "bos": null, "assert_exact": true, "exact_violations": 0, "exact_threshold": 0.001, "max_floor": 1.5079975128173828e-05, "attn_implementation": "sdpa", "test_mode": false, "n_items": 1200}
+PLAIN          [all ] n=200 two-way=0.99 four-way=0.99 LD=  +4.20 [ +3.99, +4.41] cand-mass=0.38 floor_B=2.49e-06 floor_S=3.01e-06
+   clean-B lp S  -9.07 B  -1.16 X  -8.91 Subj  -5.36   p 2..7 len 15-21
+   ID_K   -0.08 [ -0.13, -0.03]  ID_V   +8.82 [ +8.43, +9.22]  ID_KV   +7.89 [ +7.68, +8.11]  f_K   -0.01 [ -0.02, -0.00]  f_V   +1.12 [ +1.09, +1.15]  s_ID   -0.01 [ -0.02, -0.00]
+   l0= 0  dK   -1.00 [ -1.30, -0.71]  dV  +16.75 [+16.14,+17.37]  dKV  +15.73 [+15.31,+16.17]  key share   -0.06 [ -0.08, -0.05]  interaction   -0.01 [ -0.31, +0.30]
+   l0=14  dK   -1.02 [ -1.33, -0.74]  dV  +16.51 [+15.90,+17.14]  dKV  +15.41 [+14.99,+15.84]  key share   -0.07 [ -0.09, -0.05]  interaction   -0.08 [ -0.37, +0.23]
+PLAIN          [ABBA] n=100 two-way=1.00 four-way=1.00 LD=  +4.21 [ +3.96, +4.46] cand-mass=0.38 floor_B=2.50e-06 floor_S=2.91e-06
+   clean-B lp S  -9.16 B  -1.14 X  -8.88 Subj  -5.34   p 2..5 len 15-21
+   ID_K   -0.10 [ -0.17, -0.03]  ID_V   +8.67 [ +8.18, +9.16]  ID_KV   +7.86 [ +7.60, +8.13]  f_K   -0.01 [ -0.02, -0.00]  f_V   +1.10 [ +1.06, +1.14]  s_ID   -0.01 [ -0.02, -0.00]
+   l0= 0  dK   -1.13 [ -1.50, -0.78]  dV  +16.83 [+16.11,+17.56]  dKV  +15.92 [+15.45,+16.41]  key share   -0.07 [ -0.10, -0.05]  interaction   +0.23 [ -0.14, +0.60]
+   l0=14  dK   -1.15 [ -1.52, -0.80]  dV  +16.44 [+15.71,+17.17]  dKV  +15.45 [+14.97,+15.94]  key share   -0.08 [ -0.10, -0.05]  interaction   +0.17 [ -0.20, +0.55]
+PLAIN          [BABA] n=100 two-way=0.99 four-way=0.99 LD=  +4.19 [ +3.84, +4.54] cand-mass=0.38 floor_B=2.48e-06 floor_S=3.11e-06
+   clean-B lp S  -8.97 B  -1.19 X  -8.94 Subj  -5.38   p 4..7 len 15-21
+   ID_K   -0.06 [ -0.14, +0.02]  ID_V   +8.97 [ +8.37, +9.56]  ID_KV   +7.91 [ +7.59, +8.25]  f_K   -0.01 [ -0.02, +0.00]  f_V   +1.13 [ +1.09, +1.17]  s_ID   -0.01 [ -0.02, +0.00]
+   l0= 0  dK   -0.87 [ -1.34, -0.41]  dV  +16.67 [+15.66,+17.68]  dKV  +15.55 [+14.85,+16.23]  key share   -0.05 [ -0.08, -0.03]  interaction   -0.25 [ -0.72, +0.24]
+   l0=14  dK   -0.90 [ -1.37, -0.44]  dV  +16.58 [+15.57,+17.59]  dKV  +15.36 [+14.66,+16.04]  key share   -0.06 [ -0.09, -0.03]  interaction   -0.32 [ -0.78, +0.15]
+AFTER          [all ] n=200 two-way=0.52 four-way=0.26 LD=  +0.05 [ -0.09, +0.19] cand-mass=0.47 floor_B=3.23e-06 floor_S=3.89e-06
+   clean-B lp S  -2.42 B  -2.37 X  -2.58 Subj  -2.42   p 2..7 len 29-35
+   ID_K   -1.87 [ -1.95, -1.79]  ID_V   +0.72 [ +0.65, +0.79]  ID_KV   +0.06 [ +0.01, +0.11]  f_K  -30.82 [-159.47,-15.20]  f_V  +11.88 [ +6.09,+58.72]  s_ID   +1.63 [ +1.54, +1.73]
+   l0= 0  dK   -2.54 [ -2.69, -2.40]  dV   +2.61 [ +2.44, +2.78]  dKV   +0.09 [ -0.00, +0.19]  key share  -37.23 [-336.68,+320.13]  interaction   +0.03 [ -0.14, +0.20]
+   l0=14  dK   -1.06 [ -1.16, -0.95]  dV   +3.35 [ +3.19, +3.51]  dKV   +1.55 [ +1.45, +1.65]  key share   -0.46 [ -0.54, -0.39]  interaction   -0.74 [ -0.89, -0.58]
+AFTER          [ABBA] n=100 two-way=0.59 four-way=0.31 LD=  +0.29 [ +0.09, +0.48] cand-mass=0.47 floor_B=3.50e-06 floor_S=3.89e-06
+   clean-B lp S  -2.49 B  -2.25 X  -2.62 Subj  -2.53   p 2..5 len 29-35
+   ID_K   -1.52 [ -1.60, -1.44]  ID_V   +0.59 [ +0.50, +0.68]  ID_KV   +0.21 [ +0.15, +0.27]  f_K   -7.22 [-10.24, -5.54]  f_V   +2.81 [ +2.20, +3.82]  s_ID   +1.64 [ +1.49, +1.81]
+   l0= 0  dK   -1.96 [ -2.12, -1.81]  dV   +2.25 [ +2.04, +2.46]  dKV   +0.33 [ +0.22, +0.45]  key share   -6.72 [-38.18, -2.93]  interaction   +0.04 [ -0.18, +0.27]
+   l0=14  dK   -0.75 [ -0.88, -0.63]  dV   +3.26 [ +3.05, +3.46]  dKV   +1.93 [ +1.82, +2.05]  key share   -0.30 [ -0.38, -0.24]  interaction   -0.57 [ -0.77, -0.37]
+AFTER          [BABA] n=100 two-way=0.45 four-way=0.21 LD=  -0.18 [ -0.39, +0.02] cand-mass=0.47 floor_B=2.96e-06 floor_S=3.89e-06
+   clean-B lp S  -2.35 B  -2.49 X  -2.55 Subj  -2.30   p 4..7 len 29-35
+   ID_K   -2.23 [ -2.33, -2.12]  ID_V   +0.85 [ +0.75, +0.96]  ID_KV   -0.09 [ -0.17, -0.01]  f_K  +25.18 [+12.54,+120.71]  f_V   -9.65 [-48.98, -4.42]  s_ID   +1.62 [ +1.51, +1.76]
+   l0= 0  dK   -3.12 [ -3.30, -2.95]  dV   +2.97 [ +2.73, +3.20]  dKV   -0.14 [ -0.28, -0.01]  key share  +20.14 [-169.80,+206.39]  interaction   +0.01 [ -0.24, +0.28]
+   l0=14  dK   -1.36 [ -1.52, -1.21]  dV   +3.44 [ +3.20, +3.68]  dKV   +1.18 [ +1.05, +1.30]  key share   -0.65 [ -0.81, -0.53]  interaction   -0.91 [ -1.14, -0.66]
+BEFORE         [all ] n=200 two-way=0.52 four-way=0.32 LD=  +0.11 [ -0.03, +0.25] cand-mass=0.41 floor_B=2.82e-06 floor_S=3.83e-06
+   clean-B lp S  -2.69 B  -2.38 X  -2.83 Subj  -2.49   p 13..18 len 29-35
+   ID_K   -0.57 [ -0.62, -0.53]  ID_V   +0.41 [ +0.34, +0.48]  ID_KV   +0.31 [ +0.26, +0.37]  f_K   -1.84 [ -2.21, -1.56]  f_V   +1.30 [ +1.16, +1.47]  s_ID   +3.43 [ +2.47, +5.79]
+   l0= 0  dK   -0.72 [ -0.80, -0.64]  dV   +1.22 [ +1.08, +1.37]  dKV   +0.52 [ +0.43, +0.63]  key share   -1.41 [ -2.21, -1.00]  interaction   +0.02 [ -0.09, +0.13]
+   l0=14  dK   -0.72 [ -0.80, -0.64]  dV   +1.17 [ +1.02, +1.32]  dKV   +0.48 [ +0.38, +0.58]  key share   -1.58 [ -2.62, -1.09]  interaction   +0.02 [ -0.08, +0.14]
+BEFORE         [ABBA] n=100 two-way=0.63 four-way=0.36 LD=  +0.39 [ +0.20, +0.57] cand-mass=0.42 floor_B=2.67e-06 floor_S=3.93e-06
+   clean-B lp S  -2.70 B  -2.21 X  -2.80 Subj  -2.59   p 13..16 len 29-35
+   ID_K   -0.78 [ -0.84, -0.72]  ID_V   +0.58 [ +0.47, +0.70]  ID_KV   +0.47 [ +0.38, +0.55]  f_K   -1.67 [ -2.06, -1.40]  f_V   +1.24 [ +1.08, +1.41]  s_ID   +3.93 [ +2.50, +9.58]
+   l0= 0  dK   -0.97 [ -1.09, -0.86]  dV   +1.69 [ +1.48, +1.91]  dKV   +0.76 [ +0.61, +0.92]  key share   -1.35 [ -2.38, -0.91]  interaction   +0.04 [ -0.13, +0.22]
+   l0=14  dK   -0.97 [ -1.09, -0.86]  dV   +1.61 [ +1.39, +1.82]  dKV   +0.69 [ +0.54, +0.84]  key share   -1.53 [ -2.93, -0.99]  interaction   +0.06 [ -0.12, +0.24]
+BEFORE         [BABA] n=100 two-way=0.41 four-way=0.27 LD=  -0.16 [ -0.36, +0.04] cand-mass=0.39 floor_B=2.96e-06 floor_S=3.72e-06
+   clean-B lp S  -2.68 B  -2.55 X  -2.86 Subj  -2.39   p 15..18 len 29-35
+   ID_K   -0.37 [ -0.40, -0.34]  ID_V   +0.23 [ +0.17, +0.30]  ID_KV   +0.16 [ +0.10, +0.22]  f_K   -2.34 [ -3.70, -1.69]  f_V   +1.47 [ +1.14, +2.01]  s_ID   +2.71 [ +1.83, +5.43]
+   l0= 0  dK   -0.46 [ -0.55, -0.37]  dV   +0.75 [ +0.61, +0.90]  dKV   +0.29 [ +0.18, +0.40]  key share   -1.55 [ -4.02, -0.85]  interaction   -0.01 [ -0.15, +0.13]
+   l0=14  dK   -0.46 [ -0.55, -0.37]  dV   +0.73 [ +0.59, +0.87]  dKV   +0.26 [ +0.16, +0.37]  key share   -1.68 [ -4.80, -0.89]  interaction   -0.01 [ -0.15, +0.12]
+QUESTION       [all ] n=200 two-way=0.47 four-way=0.47 LD=  -0.25 [ -0.43, -0.07] cand-mass=0.07 floor_B=2.25e-06 floor_S=3.11e-06
+   clean-B lp S  -9.06 B  -3.80 X  -8.86 Subj  -3.56   p 2..7 len 27-33
+   ID_K   -0.01 [ -0.04, +0.03]  ID_V   +4.00 [ +3.80, +4.20]  ID_KV   +5.02 [ +4.88, +5.17]  f_K   -0.00 [ -0.01, +0.01]  f_V   +0.80 [ +0.77, +0.83]  s_ID   -0.00 [ -0.01, +0.01]
+   l0= 0  dK   +0.89 [ +0.73, +1.05]  dV   +9.07 [ +8.68, +9.45]  dKV  +10.13 [ +9.81,+10.43]  key share   +0.09 [ +0.07, +0.10]  interaction   +0.17 [ -0.09, +0.42]
+   l0=14  dK   +0.87 [ +0.71, +1.03]  dV   +8.92 [ +8.54, +9.29]  dKV   +9.96 [ +9.66,+10.26]  key share   +0.09 [ +0.07, +0.10]  interaction   +0.18 [ -0.08, +0.43]
+QUESTION       [ABBA] n=100 two-way=0.82 four-way=0.82 LD=  +0.67 [ +0.51, +0.84] cand-mass=0.07 floor_B=2.31e-06 floor_S=2.93e-06
+   clean-B lp S  -9.15 B  -3.28 X  -8.87 Subj  -3.96   p 2..5 len 27-33
+   ID_K   -0.02 [ -0.07, +0.02]  ID_V   +4.60 [ +4.32, +4.86]  ID_KV   +5.61 [ +5.45, +5.77]  f_K   -0.00 [ -0.01, +0.00]  f_V   +0.82 [ +0.78, +0.86]  s_ID   -0.00 [ -0.02, +0.00]
+   l0= 0  dK   +0.73 [ +0.48, +0.97]  dV  +10.36 [ +9.83,+10.88]  dKV  +11.38 [+11.00,+11.76]  key share   +0.07 [ +0.04, +0.09]  interaction   +0.30 [ -0.08, +0.66]
+   l0=14  dK   +0.71 [ +0.46, +0.94]  dV  +10.16 [ +9.64,+10.67]  dKV  +11.16 [+10.78,+11.54]  key share   +0.06 [ +0.04, +0.09]  interaction   +0.30 [ -0.07, +0.66]
+QUESTION       [BABA] n=100 two-way=0.11 four-way=0.11 LD=  -1.17 [ -1.36, -0.98] cand-mass=0.07 floor_B=2.18e-06 floor_S=3.29e-06
+   clean-B lp S  -8.97 B  -4.32 X  -8.86 Subj  -3.15   p 4..7 len 27-33
+   ID_K   +0.01 [ -0.05, +0.06]  ID_V   +3.40 [ +3.17, +3.64]  ID_KV   +4.44 [ +4.27, +4.61]  f_K   +0.00 [ -0.01, +0.01]  f_V   +0.77 [ +0.73, +0.81]  s_ID   +0.00 [ -0.01, +0.02]
+   l0= 0  dK   +1.05 [ +0.84, +1.27]  dV   +7.78 [ +7.35, +8.23]  dKV   +8.88 [ +8.53, +9.22]  key share   +0.12 [ +0.10, +0.14]  interaction   +0.04 [ -0.32, +0.39]
+   l0=14  dK   +1.03 [ +0.82, +1.24]  dV   +7.68 [ +7.26, +8.11]  dKV   +8.77 [ +8.43, +9.10]  key share   +0.12 [ +0.10, +0.14]  interaction   +0.06 [ -0.30, +0.40]
+INLINE         [all ] n=200 two-way=0.99 four-way=0.67 LD=  +3.19 [ +3.01, +3.37] cand-mass=0.55 floor_B=3.55e-06 floor_S=4.32e-06
+   clean-B lp S  -2.49 B  -1.44 X  -2.62 Subj  -4.63   p 2..7 len 23-29
+   ID_K   -3.29 [ -3.41, -3.17]  ID_V   +2.28 [ +2.12, +2.44]  ID_KV   +1.09 [ +0.94, +1.23]  f_K   -3.03 [ -3.53, -2.62]  f_V   +2.09 [ +1.91, +2.32]  s_ID   +3.25 [ +2.76, +3.98]
+   l0= 0  dK   -4.44 [ -4.64, -4.24]  dV   +6.62 [ +6.29, +6.95]  dKV   +2.15 [ +1.85, +2.46]  key share   -2.04 [ -2.54, -1.69]  interaction   -0.03 [ -0.26, +0.21]
+   l0=14  dK   -2.08 [ -2.26, -1.90]  dV   +7.64 [ +7.34, +7.96]  dKV   +4.16 [ +3.90, +4.43]  key share   -0.37 [ -0.42, -0.33]  interaction   -1.40 [ -1.62, -1.16]
+INLINE         [ABBA] n=100 two-way=1.00 four-way=0.67 LD=  +3.28 [ +3.04, +3.52] cand-mass=0.56 floor_B=3.51e-06 floor_S=4.13e-06
+   clean-B lp S  -2.57 B  -1.34 X  -2.77 Subj  -4.61   p 2..5 len 23-29
+   ID_K   -2.88 [ -3.03, -2.73]  ID_V   +2.13 [ +1.88, +2.37]  ID_KV   +1.19 [ +0.98, +1.41]  f_K   -2.42 [ -3.00, -1.99]  f_V   +1.79 [ +1.59, +2.03]  s_ID   +3.84 [ +2.77, +6.40]
+   l0= 0  dK   -3.86 [ -4.13, -3.61]  dV   +6.23 [ +5.79, +6.70]  dKV   +2.19 [ +1.80, +2.61]  key share   -1.63 [ -2.20, -1.27]  interaction   -0.18 [ -0.51, +0.17]
+   l0=14  dK   -1.86 [ -2.12, -1.61]  dV   +7.72 [ +7.32, +8.13]  dKV   +4.58 [ +4.27, +4.90]  key share   -0.32 [ -0.38, -0.27]  interaction   -1.27 [ -1.60, -0.93]
+INLINE         [BABA] n=100 two-way=0.99 four-way=0.66 LD=  +3.11 [ +2.83, +3.38] cand-mass=0.54 floor_B=3.59e-06 floor_S=4.50e-06
+   clean-B lp S  -2.42 B  -1.54 X  -2.48 Subj  -4.65   p 4..7 len 23-29
+   ID_K   -3.70 [ -3.85, -3.55]  ID_V   +2.43 [ +2.22, +2.63]  ID_KV   +0.98 [ +0.79, +1.18]  f_K   -3.76 [ -4.71, -3.10]  f_V   +2.47 [ +2.16, +2.90]  s_ID   +2.90 [ +2.50, +3.50]
+   l0= 0  dK   -5.02 [ -5.29, -4.76]  dV   +7.00 [ +6.54, +7.47]  dKV   +2.10 [ +1.67, +2.55]  key share   -2.54 [ -3.59, -1.93]  interaction   +0.12 [ -0.20, +0.46]
+   l0=14  dK   -2.30 [ -2.55, -2.06]  dV   +7.56 [ +7.10, +8.03]  dKV   +3.74 [ +3.34, +4.17]  key share   -0.44 [ -0.51, -0.37]  interaction   -1.52 [ -1.82, -1.19]
+INLINE_BEFORE  [all ] n=200 two-way=0.99 four-way=0.55 LD=  +3.43 [ +3.23, +3.64] cand-mass=0.54 floor_B=3.61e-06 floor_S=4.97e-06
+   clean-B lp S  -2.67 B  -1.72 X  -2.70 Subj  -5.15   p 11..16 len 24-30
+   ID_K   -1.09 [ -1.18, -1.01]  ID_V   +1.41 [ +1.19, +1.65]  ID_KV   +0.87 [ +0.70, +1.05]  f_K   -1.25 [ -1.57, -1.02]  f_V   +1.62 [ +1.44, +1.85]  s_ID   -3.42 [-11.51, -1.87]
+   l0= 0  dK   -1.64 [ -1.86, -1.43]  dV   +3.46 [ +2.99, +3.94]  dKV   +1.68 [ +1.32, +2.06]  key share   -0.91 [ -1.34, -0.65]  interaction   -0.13 [ -0.43, +0.17]
+   l0=14  dK   -1.65 [ -1.87, -1.44]  dV   +3.14 [ +2.66, +3.63]  dKV   +1.36 [ +1.00, +1.74]  key share   -1.11 [ -1.82, -0.76]  interaction   -0.12 [ -0.43, +0.18]
+INLINE_BEFORE  [ABBA] n=100 two-way=1.00 four-way=0.51 LD=  +3.50 [ +3.26, +3.74] cand-mass=0.52 floor_B=3.05e-06 floor_S=4.84e-06
+   clean-B lp S  -2.48 B  -1.77 X  -2.66 Subj  -5.27   p 11..14 len 24-30
+   ID_K   -1.38 [ -1.51, -1.26]  ID_V   +1.27 [ +0.95, +1.60]  ID_KV   +0.51 [ +0.30, +0.73]  f_K   -2.70 [ -4.56, -1.89]  f_V   +2.49 [ +2.00, +3.48]  s_ID  +12.96 [-102.50,+113.49]
+   l0= 0  dK   -2.07 [ -2.36, -1.80]  dV   +3.35 [ +2.73, +3.99]  dKV   +0.96 [ +0.51, +1.41]  key share   -1.61 [ -3.70, -0.97]  interaction   -0.32 [ -0.73, +0.09]
+   l0=14  dK   -2.08 [ -2.37, -1.80]  dV   +2.90 [ +2.26, +3.56]  dKV   +0.53 [ +0.09, +0.98]  key share   -2.52 [-12.97, -1.15]  interaction   -0.29 [ -0.73, +0.15]
+INLINE_BEFORE  [BABA] n=100 two-way=0.99 four-way=0.59 LD=  +3.37 [ +3.02, +3.71] cand-mass=0.55 floor_B=4.16e-06 floor_S=5.10e-06
+   clean-B lp S  -2.87 B  -1.67 X  -2.74 Subj  -5.04   p 13..16 len 24-30
+   ID_K   -0.80 [ -0.89, -0.72]  ID_V   +1.55 [ +1.22, +1.87]  ID_KV   +1.23 [ +0.98, +1.49]  f_K   -0.65 [ -0.81, -0.54]  f_V   +1.26 [ +1.10, +1.43]  s_ID   -1.08 [ -1.91, -0.74]
+   l0= 0  dK   -1.22 [ -1.52, -0.93]  dV   +3.56 [ +2.86, +4.25]  dKV   +2.40 [ +1.85, +2.95]  key share   -0.52 [ -0.86, -0.33]  interaction   +0.06 [ -0.38, +0.51]
+   l0=14  dK   -1.22 [ -1.52, -0.94]  dV   +3.37 [ +2.67, +4.06]  dKV   +2.19 [ +1.64, +2.73]  key share   -0.57 [ -0.98, -0.36]  interaction   +0.04 [ -0.39, +0.48]
+wrote results/gpu_stage5/ioi/gpt2-xl_s1.json

@@ -1,0 +1,225 @@
+{"args": {"model": "mistralai/Mistral-7B-Instruct-v0.3", "n": 150, "arms": "NONE,S2,S3,S3out,S3half,S4,S4out,S6,L2,L3,L3out,L4,L4out,L6", "views": "direct", "dtype": "bfloat16", "seed": 1, "out": "results/gpu_stage5/factorial", "device_map": null, "revision": "c170c708c41dac9275d15a8fff4eca08d52bab71", "arm_modules": "ckeys.subsets"}, "git_commit": "51e105e177231656fc27232a58d9a4b914a98d68", "torch": "2.11.0+cu128", "transformers": "5.18.0", "python": "3.12.14", "device": "NVIDIA A100-SXM4-80GB", "wrapper": {"system_merged": false}, "l0_fracs": [0.0, 0.0625, 0.3], "skipped_items": 0, "attn_implementation": "sdpa"}
+NONE    direct      [all] n=150 cand-mass=0.03 span=+31.80 batch-noise-floor=0.059
+   l0= 0  dK   +2.61 [ +2.31, +2.91]  dV  +29.07 [+28.52,+29.61]  dKV  +31.80 [+31.29,+32.28]
+          key share   +0.08 [ +0.07, +0.09]  interaction   +0.13 [ -0.20, +0.45]  interaction/dKV   +0.00 [ -0.01, +0.01]
+   l0= 2  dK   +2.61 [ +2.31, +2.91]  dV  +29.08 [+28.53,+29.62]  dKV  +31.81 [+31.29,+32.29]
+          key share   +0.08 [ +0.07, +0.09]  interaction   +0.13 [ -0.21, +0.45]  interaction/dKV   +0.00 [ -0.01, +0.01]
+   l0=10  dK   +2.60 [ +2.30, +2.90]  dV  +29.05 [+28.50,+29.59]  dKV  +31.77 [+31.25,+32.24]
+          key share   +0.08 [ +0.07, +0.09]  interaction   +0.12 [ -0.20, +0.45]  interaction/dKV   +0.00 [ -0.01, +0.01]
+   identity(K)   +0.46 [ +0.38, +0.54]   identity(V)  +13.54 [+13.19,+13.88]   dlogp(B) under K_S +0.88, K_X +0.79
+NONE    direct      [competent] n=150 cand-mass=0.03 span=+31.80 batch-noise-floor=0.059
+   l0= 0  dK   +2.61 [ +2.31, +2.91]  dV  +29.07 [+28.52,+29.61]  dKV  +31.80 [+31.29,+32.28]
+          key share   +0.08 [ +0.07, +0.09]  interaction   +0.13 [ -0.20, +0.45]  interaction/dKV   +0.00 [ -0.01, +0.01]
+   l0= 2  dK   +2.61 [ +2.31, +2.91]  dV  +29.08 [+28.53,+29.62]  dKV  +31.81 [+31.29,+32.29]
+          key share   +0.08 [ +0.07, +0.09]  interaction   +0.13 [ -0.21, +0.45]  interaction/dKV   +0.00 [ -0.01, +0.01]
+   l0=10  dK   +2.60 [ +2.30, +2.90]  dV  +29.05 [+28.50,+29.59]  dKV  +31.77 [+31.25,+32.24]
+          key share   +0.08 [ +0.07, +0.09]  interaction   +0.12 [ -0.20, +0.45]  interaction/dKV   +0.00 [ -0.01, +0.01]
+   identity(K)   +0.46 [ +0.38, +0.54]   identity(V)  +13.54 [+13.19,+13.88]   dlogp(B) under K_S +0.88, K_X +0.79
+S2      direct      [all] n=150 cand-mass=0.02 span=+30.91 batch-noise-floor=0.071
+   l0= 0  dK   +9.90 [ +9.15,+10.65]  dV  +29.84 [+29.19,+30.45]  dKV  +30.92 [+30.31,+31.48]
+          key share   +0.25 [ +0.24, +0.26]  interaction   -8.82 [ -9.62, -8.02]  interaction/dKV   -0.29 [ -0.31, -0.26]
+   l0= 2  dK   +9.96 [ +9.18,+10.75]  dV  +29.90 [+29.26,+30.50]  dKV  +30.97 [+30.37,+31.54]
+          key share   +0.25 [ +0.24, +0.26]  interaction   -8.89 [ -9.71, -8.06]  interaction/dKV   -0.29 [ -0.31, -0.26]
+   l0=10  dK   +4.34 [ +4.00, +4.68]  dV  +29.91 [+29.26,+30.51]  dKV  +30.91 [+30.30,+31.47]
+          key share   +0.13 [ +0.12, +0.14]  interaction   -3.33 [ -3.68, -2.99]  interaction/dKV   -0.11 [ -0.12, -0.10]
+   identity(K)   +3.83 [ +3.50, +4.17]   identity(V)  +13.25 [+12.89,+13.61]   dlogp(B) under K_S +0.32, K_X -0.10
+S2      direct      [competent] n=150 cand-mass=0.02 span=+30.91 batch-noise-floor=0.071
+   l0= 0  dK   +9.90 [ +9.15,+10.65]  dV  +29.84 [+29.19,+30.45]  dKV  +30.92 [+30.31,+31.48]
+          key share   +0.25 [ +0.24, +0.26]  interaction   -8.82 [ -9.62, -8.02]  interaction/dKV   -0.29 [ -0.31, -0.26]
+   l0= 2  dK   +9.96 [ +9.18,+10.75]  dV  +29.90 [+29.26,+30.50]  dKV  +30.97 [+30.37,+31.54]
+          key share   +0.25 [ +0.24, +0.26]  interaction   -8.89 [ -9.71, -8.06]  interaction/dKV   -0.29 [ -0.31, -0.26]
+   l0=10  dK   +4.34 [ +4.00, +4.68]  dV  +29.91 [+29.26,+30.51]  dKV  +30.91 [+30.30,+31.47]
+          key share   +0.13 [ +0.12, +0.14]  interaction   -3.33 [ -3.68, -2.99]  interaction/dKV   -0.11 [ -0.12, -0.10]
+   identity(K)   +3.83 [ +3.50, +4.17]   identity(V)  +13.25 [+12.89,+13.61]   dlogp(B) under K_S +0.32, K_X -0.10
+S3      direct      [all] n=150 cand-mass=0.02 span=+30.44 batch-noise-floor=0.072
+   l0= 0  dK   +8.34 [ +7.52, +9.15]  dV  +21.93 [+20.98,+22.88]  dKV  +30.47 [+29.90,+31.01]
+          key share   +0.28 [ +0.26, +0.29]  interaction   +0.20 [ -1.05, +1.50]  interaction/dKV   +0.01 [ -0.03, +0.05]
+   l0= 2  dK   +7.97 [ +7.10, +8.84]  dV  +22.62 [+21.77,+23.47]  dKV  +30.76 [+30.19,+31.30]
+          key share   +0.26 [ +0.24, +0.28]  interaction   +0.16 [ -1.07, +1.42]  interaction/dKV   +0.01 [ -0.03, +0.05]
+   l0=10  dK   +1.81 [ +1.42, +2.22]  dV  +23.38 [+22.58,+24.18]  dKV  +26.32 [+25.28,+27.32]
+          key share   +0.07 [ +0.06, +0.09]  interaction   +1.13 [ +0.35, +1.92]  interaction/dKV   +0.04 [ +0.01, +0.07]
+   identity(K)   +5.25 [ +4.85, +5.65]   identity(V)  +11.68 [+11.32,+12.04]   dlogp(B) under K_S +0.62, K_X +0.45
+S3      direct      [competent] n=150 cand-mass=0.02 span=+30.44 batch-noise-floor=0.072
+   l0= 0  dK   +8.34 [ +7.52, +9.15]  dV  +21.93 [+20.98,+22.88]  dKV  +30.47 [+29.90,+31.01]
+          key share   +0.28 [ +0.26, +0.29]  interaction   +0.20 [ -1.05, +1.50]  interaction/dKV   +0.01 [ -0.03, +0.05]
+   l0= 2  dK   +7.97 [ +7.10, +8.84]  dV  +22.62 [+21.77,+23.47]  dKV  +30.76 [+30.19,+31.30]
+          key share   +0.26 [ +0.24, +0.28]  interaction   +0.16 [ -1.07, +1.42]  interaction/dKV   +0.01 [ -0.03, +0.05]
+   l0=10  dK   +1.81 [ +1.42, +2.22]  dV  +23.38 [+22.58,+24.18]  dKV  +26.32 [+25.28,+27.32]
+          key share   +0.07 [ +0.06, +0.09]  interaction   +1.13 [ +0.35, +1.92]  interaction/dKV   +0.04 [ +0.01, +0.07]
+   identity(K)   +5.25 [ +4.85, +5.65]   identity(V)  +11.68 [+11.32,+12.04]   dlogp(B) under K_S +0.62, K_X +0.45
+S3out   direct      [all] n=150 cand-mass=0.03 span=+30.23 batch-noise-floor=0.068
+   l0= 0  dK   +0.97 [ +0.82, +1.13]  dV  +21.63 [+20.82,+22.41]  dKV  +30.26 [+29.46,+30.98]
+          key share   +0.04 [ +0.04, +0.05]  interaction   +7.66 [ +6.90, +8.40]  interaction/dKV   +0.25 [ +0.23, +0.28]
+   l0= 2  dK   +0.93 [ +0.78, +1.08]  dV  +22.26 [+21.54,+22.97]  dKV  +30.24 [+29.45,+30.97]
+          key share   +0.04 [ +0.03, +0.05]  interaction   +7.05 [ +6.32, +7.77]  interaction/dKV   +0.23 [ +0.21, +0.26]
+   l0=10  dK   +0.60 [ +0.50, +0.70]  dV  +22.83 [+22.06,+23.59]  dKV  +28.02 [+27.17,+28.85]
+          key share   +0.03 [ +0.02, +0.03]  interaction   +4.59 [ +3.90, +5.28]  interaction/dKV   +0.16 [ +0.14, +0.19]
+   identity(K)   +0.30 [ +0.26, +0.35]   identity(V)  +12.10 [+11.77,+12.44]   dlogp(B) under K_S +0.26, K_X +0.18
+S3out   direct      [competent] n=150 cand-mass=0.03 span=+30.23 batch-noise-floor=0.068
+   l0= 0  dK   +0.97 [ +0.82, +1.13]  dV  +21.63 [+20.82,+22.41]  dKV  +30.26 [+29.46,+30.98]
+          key share   +0.04 [ +0.04, +0.05]  interaction   +7.66 [ +6.90, +8.40]  interaction/dKV   +0.25 [ +0.23, +0.28]
+   l0= 2  dK   +0.93 [ +0.78, +1.08]  dV  +22.26 [+21.54,+22.97]  dKV  +30.24 [+29.45,+30.97]
+          key share   +0.04 [ +0.03, +0.05]  interaction   +7.05 [ +6.32, +7.77]  interaction/dKV   +0.23 [ +0.21, +0.26]
+   l0=10  dK   +0.60 [ +0.50, +0.70]  dV  +22.83 [+22.06,+23.59]  dKV  +28.02 [+27.17,+28.85]
+          key share   +0.03 [ +0.02, +0.03]  interaction   +4.59 [ +3.90, +5.28]  interaction/dKV   +0.16 [ +0.14, +0.19]
+   identity(K)   +0.30 [ +0.26, +0.35]   identity(V)  +12.10 [+11.77,+12.44]   dlogp(B) under K_S +0.26, K_X +0.18
+S3half  direct      [all] n=150 cand-mass=0.03 span=+30.19 batch-noise-floor=0.076
+   l0= 0  dK   +7.62 [ +6.91, +8.35]  dV  +22.67 [+21.79,+23.52]  dKV  +30.22 [+29.59,+30.83]
+          key share   +0.25 [ +0.23, +0.27]  interaction   -0.06 [ -1.16, +1.07]  interaction/dKV   -0.00 [ -0.04, +0.04]
+   l0= 2  dK   +7.33 [ +6.58, +8.09]  dV  +23.31 [+22.50,+24.08]  dKV  +30.42 [+29.78,+31.03]
+          key share   +0.24 [ +0.22, +0.26]  interaction   -0.22 [ -1.25, +0.85]  interaction/dKV   -0.01 [ -0.04, +0.03]
+   l0=10  dK   +1.98 [ +1.62, +2.35]  dV  +24.00 [+23.21,+24.78]  dKV  +26.86 [+25.91,+27.76]
+          key share   +0.08 [ +0.06, +0.09]  interaction   +0.87 [ +0.21, +1.55]  interaction/dKV   +0.03 [ +0.01, +0.06]
+   identity(K)   +2.36 [ +2.06, +2.64]   identity(V)  +11.62 [+11.25,+11.98]   dlogp(B) under K_S +0.69, K_X +0.26
+S3half  direct      [competent] n=150 cand-mass=0.03 span=+30.19 batch-noise-floor=0.076
+   l0= 0  dK   +7.62 [ +6.91, +8.35]  dV  +22.67 [+21.79,+23.52]  dKV  +30.22 [+29.59,+30.83]
+          key share   +0.25 [ +0.23, +0.27]  interaction   -0.06 [ -1.16, +1.07]  interaction/dKV   -0.00 [ -0.04, +0.04]
+   l0= 2  dK   +7.33 [ +6.58, +8.09]  dV  +23.31 [+22.50,+24.08]  dKV  +30.42 [+29.78,+31.03]
+          key share   +0.24 [ +0.22, +0.26]  interaction   -0.22 [ -1.25, +0.85]  interaction/dKV   -0.01 [ -0.04, +0.03]
+   l0=10  dK   +1.98 [ +1.62, +2.35]  dV  +24.00 [+23.21,+24.78]  dKV  +26.86 [+25.91,+27.76]
+          key share   +0.08 [ +0.06, +0.09]  interaction   +0.87 [ +0.21, +1.55]  interaction/dKV   +0.03 [ +0.01, +0.06]
+   identity(K)   +2.36 [ +2.06, +2.64]   identity(V)  +11.62 [+11.25,+11.98]   dlogp(B) under K_S +0.69, K_X +0.26
+S4      direct      [all] n=150 cand-mass=0.02 span=+30.82 batch-noise-floor=0.068
+   l0= 0  dK   +9.29 [ +8.42,+10.16]  dV  +21.73 [+20.77,+22.68]  dKV  +30.84 [+30.23,+31.41]
+          key share   +0.30 [ +0.28, +0.32]  interaction   -0.18 [ -1.50, +1.20]  interaction/dKV   -0.01 [ -0.05, +0.04]
+   l0= 2  dK   +8.94 [ +8.00, +9.87]  dV  +22.19 [+21.31,+23.06]  dKV  +30.86 [+30.21,+31.47]
+          key share   +0.29 [ +0.27, +0.31]  interaction   -0.26 [ -1.58, +1.11]  interaction/dKV   -0.01 [ -0.05, +0.04]
+   l0=10  dK   +1.79 [ +1.41, +2.20]  dV  +23.02 [+22.19,+23.84]  dKV  +26.18 [+25.12,+27.20]
+          key share   +0.07 [ +0.06, +0.09]  interaction   +1.37 [ +0.57, +2.18]  interaction/dKV   +0.05 [ +0.02, +0.08]
+   identity(K)   +6.06 [ +5.60, +6.52]   identity(V)  +11.88 [+11.51,+12.26]   dlogp(B) under K_S +0.43, K_X +0.27
+S4      direct      [competent] n=150 cand-mass=0.02 span=+30.82 batch-noise-floor=0.068
+   l0= 0  dK   +9.29 [ +8.42,+10.16]  dV  +21.73 [+20.77,+22.68]  dKV  +30.84 [+30.23,+31.41]
+          key share   +0.30 [ +0.28, +0.32]  interaction   -0.18 [ -1.50, +1.20]  interaction/dKV   -0.01 [ -0.05, +0.04]
+   l0= 2  dK   +8.94 [ +8.00, +9.87]  dV  +22.19 [+21.31,+23.06]  dKV  +30.86 [+30.21,+31.47]
+          key share   +0.29 [ +0.27, +0.31]  interaction   -0.26 [ -1.58, +1.11]  interaction/dKV   -0.01 [ -0.05, +0.04]
+   l0=10  dK   +1.79 [ +1.41, +2.20]  dV  +23.02 [+22.19,+23.84]  dKV  +26.18 [+25.12,+27.20]
+          key share   +0.07 [ +0.06, +0.09]  interaction   +1.37 [ +0.57, +2.18]  interaction/dKV   +0.05 [ +0.02, +0.08]
+   identity(K)   +6.06 [ +5.60, +6.52]   identity(V)  +11.88 [+11.51,+12.26]   dlogp(B) under K_S +0.43, K_X +0.27
+S4out   direct      [all] n=150 cand-mass=0.03 span=+30.73 batch-noise-floor=0.076
+   l0= 0  dK  +10.35 [ +9.61,+11.10]  dV  +29.44 [+28.68,+30.14]  dKV  +30.74 [+30.02,+31.40]
+          key share   +0.26 [ +0.25, +0.27]  interaction   -9.04 [ -9.87, -8.23]  interaction/dKV   -0.29 [ -0.32, -0.27]
+   l0= 2  dK  +10.55 [ +9.77,+11.32]  dV  +29.42 [+28.67,+30.13]  dKV  +30.79 [+30.06,+31.44]
+          key share   +0.26 [ +0.25, +0.28]  interaction   -9.18 [-10.02, -8.33]  interaction/dKV   -0.30 [ -0.33, -0.27]
+   l0=10  dK   +5.65 [ +5.16, +6.15]  dV  +29.41 [+28.66,+30.12]  dKV  +30.59 [+29.87,+31.27]
+          key share   +0.16 [ +0.15, +0.17]  interaction   -4.47 [ -4.99, -3.98]  interaction/dKV   -0.15 [ -0.16, -0.13]
+   identity(K)   +5.82 [ +5.35, +6.29]   identity(V)  +13.43 [+13.02,+13.81]   dlogp(B) under K_S +0.09, K_X -0.08
+S4out   direct      [competent] n=149 cand-mass=0.03 span=+30.85 batch-noise-floor=0.075
+   l0= 0  dK  +10.37 [ +9.61,+11.13]  dV  +29.55 [+28.85,+30.24]  dKV  +30.86 [+30.20,+31.50]
+          key share   +0.26 [ +0.25, +0.27]  interaction   -9.07 [ -9.90, -8.24]  interaction/dKV   -0.29 [ -0.32, -0.27]
+   l0= 2  dK  +10.57 [ +9.79,+11.35]  dV  +29.53 [+28.83,+30.22]  dKV  +30.90 [+30.24,+31.54]
+          key share   +0.26 [ +0.25, +0.28]  interaction   -9.20 [-10.06, -8.35]  interaction/dKV   -0.30 [ -0.33, -0.27]
+   l0=10  dK   +5.66 [ +5.17, +6.17]  dV  +29.53 [+28.83,+30.21]  dKV  +30.71 [+30.04,+31.36]
+          key share   +0.16 [ +0.15, +0.17]  interaction   -4.47 [ -4.99, -3.97]  interaction/dKV   -0.15 [ -0.16, -0.13]
+   identity(K)   +5.80 [ +5.32, +6.27]   identity(V)  +13.45 [+13.04,+13.84]   dlogp(B) under K_S +0.13, K_X -0.02
+S6      direct      [all] n=150 cand-mass=0.03 span=+31.74 batch-noise-floor=0.067
+   l0= 0  dK  +11.67 [+10.64,+12.70]  dV  +19.99 [+18.77,+21.18]  dKV  +31.77 [+31.14,+32.36]
+          key share   +0.37 [ +0.35, +0.39]  interaction   +0.11 [ -1.52, +1.78]  interaction/dKV   +0.00 [ -0.05, +0.06]
+   l0= 2  dK  +11.03 [ +9.92,+12.11]  dV  +20.51 [+19.36,+21.64]  dKV  +31.68 [+31.00,+32.31]
+          key share   +0.35 [ +0.33, +0.37]  interaction   +0.14 [ -1.51, +1.86]  interaction/dKV   +0.00 [ -0.05, +0.06]
+   l0=10  dK   +1.41 [ +1.08, +1.79]  dV  +21.62 [+20.55,+22.66]  dKV  +24.86 [+23.55,+26.12]
+          key share   +0.06 [ +0.05, +0.08]  interaction   +1.83 [ +0.97, +2.68]  interaction/dKV   +0.07 [ +0.04, +0.11]
+   identity(K)   +7.70 [ +7.19, +8.22]   identity(V)  +11.43 [+11.00,+11.86]   dlogp(B) under K_S -0.51, K_X -0.77
+S6      direct      [competent] n=150 cand-mass=0.03 span=+31.74 batch-noise-floor=0.067
+   l0= 0  dK  +11.67 [+10.64,+12.70]  dV  +19.99 [+18.77,+21.18]  dKV  +31.77 [+31.14,+32.36]
+          key share   +0.37 [ +0.35, +0.39]  interaction   +0.11 [ -1.52, +1.78]  interaction/dKV   +0.00 [ -0.05, +0.06]
+   l0= 2  dK  +11.03 [ +9.92,+12.11]  dV  +20.51 [+19.36,+21.64]  dKV  +31.68 [+31.00,+32.31]
+          key share   +0.35 [ +0.33, +0.37]  interaction   +0.14 [ -1.51, +1.86]  interaction/dKV   +0.00 [ -0.05, +0.06]
+   l0=10  dK   +1.41 [ +1.08, +1.79]  dV  +21.62 [+20.55,+22.66]  dKV  +24.86 [+23.55,+26.12]
+          key share   +0.06 [ +0.05, +0.08]  interaction   +1.83 [ +0.97, +2.68]  interaction/dKV   +0.07 [ +0.04, +0.11]
+   identity(K)   +7.70 [ +7.19, +8.22]   identity(V)  +11.43 [+11.00,+11.86]   dlogp(B) under K_S -0.51, K_X -0.77
+L2      direct      [all] n=150 cand-mass=0.64 span=+34.63 batch-noise-floor=0.073
+   l0= 0  dK  +31.30 [+30.40,+32.14]  dV  +33.12 [+32.29,+33.89]  dKV  +34.63 [+33.77,+35.41]
+          key share   +0.49 [ +0.48, +0.49]  interaction  -29.79 [-30.66,-28.88]  interaction/dKV   -0.86 [ -0.87, -0.85]
+   l0= 2  dK  +31.19 [+30.24,+32.08]  dV  +32.94 [+32.13,+33.70]  dKV  +34.76 [+33.91,+35.53]
+          key share   +0.49 [ +0.48, +0.49]  interaction  -29.37 [-30.27,-28.41]  interaction/dKV   -0.85 [ -0.86, -0.83]
+   l0=10  dK   +6.84 [ +5.91, +7.80]  dV  +32.83 [+32.02,+33.59]  dKV  +34.21 [+33.40,+34.94]
+          key share   +0.17 [ +0.15, +0.19]  interaction   -5.47 [ -6.42, -4.54]  interaction/dKV   -0.16 [ -0.19, -0.13]
+   identity(K)  +15.31 [+14.93,+15.68]   identity(V)  +16.05 [+15.63,+16.46]   dlogp(B) under K_S -14.50, K_X -14.84
+L2      direct      [competent] n=150 cand-mass=0.64 span=+34.63 batch-noise-floor=0.073
+   l0= 0  dK  +31.30 [+30.40,+32.14]  dV  +33.12 [+32.29,+33.89]  dKV  +34.63 [+33.77,+35.41]
+          key share   +0.49 [ +0.48, +0.49]  interaction  -29.79 [-30.66,-28.88]  interaction/dKV   -0.86 [ -0.87, -0.85]
+   l0= 2  dK  +31.19 [+30.24,+32.08]  dV  +32.94 [+32.13,+33.70]  dKV  +34.76 [+33.91,+35.53]
+          key share   +0.49 [ +0.48, +0.49]  interaction  -29.37 [-30.27,-28.41]  interaction/dKV   -0.85 [ -0.86, -0.83]
+   l0=10  dK   +6.84 [ +5.91, +7.80]  dV  +32.83 [+32.02,+33.59]  dKV  +34.21 [+33.40,+34.94]
+          key share   +0.17 [ +0.15, +0.19]  interaction   -5.47 [ -6.42, -4.54]  interaction/dKV   -0.16 [ -0.19, -0.13]
+   identity(K)  +15.31 [+14.93,+15.68]   identity(V)  +16.05 [+15.63,+16.46]   dlogp(B) under K_S -14.50, K_X -14.84
+L3      direct      [all] n=150 cand-mass=0.85 span=+33.65 batch-noise-floor=0.078
+   l0= 0  dK  +28.96 [+27.60,+30.20]  dV   +4.07 [ +3.35, +4.91]  dKV  +33.66 [+32.83,+34.44]
+          key share   +0.88 [ +0.85, +0.90]  interaction   +0.63 [ -0.65, +1.88]  interaction/dKV   +0.02 [ -0.02, +0.06]
+   l0= 2  dK  +26.14 [+24.37,+27.85]  dV   +3.61 [ +3.38, +3.86]  dKV  +33.11 [+31.89,+34.23]
+          key share   +0.88 [ +0.87, +0.89]  interaction   +3.36 [ +2.07, +4.74]  interaction/dKV   +0.10 [ +0.06, +0.14]
+   l0=10  dK   +0.56 [ +0.24, +0.99]  dV   +3.75 [ +3.50, +4.02]  dKV   +5.42 [ +4.58, +6.38]
+          key share   +0.13 [ +0.06, +0.21]  interaction   +1.10 [ +0.39, +1.93]  interaction/dKV   +0.20 [ +0.08, +0.31]
+   identity(K)  +15.79 [+15.36,+16.20]   identity(V)   +3.10 [ +2.69, +3.54]   dlogp(B) under K_S -12.76, K_X -13.74
+L3      direct      [competent] n=150 cand-mass=0.85 span=+33.65 batch-noise-floor=0.078
+   l0= 0  dK  +28.96 [+27.60,+30.20]  dV   +4.07 [ +3.35, +4.91]  dKV  +33.66 [+32.83,+34.44]
+          key share   +0.88 [ +0.85, +0.90]  interaction   +0.63 [ -0.65, +1.88]  interaction/dKV   +0.02 [ -0.02, +0.06]
+   l0= 2  dK  +26.14 [+24.37,+27.85]  dV   +3.61 [ +3.38, +3.86]  dKV  +33.11 [+31.89,+34.23]
+          key share   +0.88 [ +0.87, +0.89]  interaction   +3.36 [ +2.07, +4.74]  interaction/dKV   +0.10 [ +0.06, +0.14]
+   l0=10  dK   +0.56 [ +0.24, +0.99]  dV   +3.75 [ +3.50, +4.02]  dKV   +5.42 [ +4.58, +6.38]
+          key share   +0.13 [ +0.06, +0.21]  interaction   +1.10 [ +0.39, +1.93]  interaction/dKV   +0.20 [ +0.08, +0.31]
+   identity(K)  +15.79 [+15.36,+16.20]   identity(V)   +3.10 [ +2.69, +3.54]   dlogp(B) under K_S -12.76, K_X -13.74
+L3out   direct      [all] n=150 cand-mass=0.93 span=+30.64 batch-noise-floor=0.061
+   l0= 0  dK   +1.86 [ +1.38, +2.39]  dV   +3.02 [ +2.73, +3.35]  dKV  +30.62 [+29.41,+31.78]
+          key share   +0.38 [ +0.32, +0.44]  interaction  +25.74 [+24.41,+27.05]  interaction/dKV   +0.84 [ +0.82, +0.86]
+   l0= 2  dK   +1.27 [ +0.93, +1.66]  dV   +3.46 [ +3.20, +3.75]  dKV  +27.88 [+26.07,+29.58]
+          key share   +0.27 [ +0.21, +0.32]  interaction  +23.14 [+21.38,+24.83]  interaction/dKV   +0.83 [ +0.81, +0.85]
+   l0=10  dK   +0.20 [ +0.13, +0.26]  dV   +3.56 [ +3.27, +3.89]  dKV   +4.70 [ +4.27, +5.17]
+          key share   +0.05 [ +0.04, +0.07]  interaction   +0.94 [ +0.60, +1.29]  interaction/dKV   +0.20 [ +0.14, +0.26]
+   identity(K)   +0.22 [ +0.15, +0.28]   identity(V)   +2.26 [ +2.08, +2.46]   dlogp(B) under K_S -0.60, K_X -0.62
+L3out   direct      [competent] n=133 cand-mass=0.93 span=+31.94 batch-noise-floor=0.062
+   l0= 0  dK   +1.37 [ +1.03, +1.75]  dV   +2.89 [ +2.64, +3.18]  dKV  +31.92 [+30.82,+32.97]
+          key share   +0.32 [ +0.27, +0.37]  interaction  +27.66 [+26.58,+28.72]  interaction/dKV   +0.87 [ +0.85, +0.88]
+   l0= 2  dK   +1.09 [ +0.80, +1.41]  dV   +3.38 [ +3.11, +3.65]  dKV  +29.10 [+27.26,+30.82]
+          key share   +0.24 [ +0.19, +0.29]  interaction  +24.64 [+22.87,+26.26]  interaction/dKV   +0.85 [ +0.83, +0.86]
+   l0=10  dK   +0.17 [ +0.12, +0.23]  dV   +3.42 [ +3.13, +3.73]  dKV   +4.46 [ +4.06, +4.87]
+          key share   +0.05 [ +0.03, +0.06]  interaction   +0.87 [ +0.54, +1.22]  interaction/dKV   +0.19 [ +0.13, +0.26]
+   identity(K)   +0.20 [ +0.13, +0.27]   identity(V)   +2.20 [ +2.01, +2.40]   dlogp(B) under K_S -0.30, K_X -0.37
+L4      direct      [all] n=150 cand-mass=0.85 span=+32.99 batch-noise-floor=0.075
+   l0= 0  dK  +28.55 [+27.31,+29.72]  dV   +4.27 [ +3.48, +5.20]  dKV  +33.01 [+32.10,+33.86]
+          key share   +0.87 [ +0.85, +0.89]  interaction   +0.19 [ -1.06, +1.36]  interaction/dKV   +0.01 [ -0.03, +0.04]
+   l0= 2  dK  +25.58 [+23.88,+27.23]  dV   +3.68 [ +3.35, +4.06]  dKV  +32.76 [+31.63,+33.81]
+          key share   +0.87 [ +0.86, +0.89]  interaction   +3.51 [ +2.21, +4.87]  interaction/dKV   +0.11 [ +0.07, +0.15]
+   l0=10  dK   +1.29 [ +0.82, +1.83]  dV   +3.68 [ +3.37, +4.06]  dKV   +7.16 [ +6.09, +8.36]
+          key share   +0.26 [ +0.18, +0.34]  interaction   +2.19 [ +1.37, +3.16]  interaction/dKV   +0.31 [ +0.21, +0.39]
+   identity(K)  +15.52 [+15.11,+15.92]   identity(V)   +3.29 [ +2.86, +3.77]   dlogp(B) under K_S -12.55, K_X -13.17
+L4      direct      [competent] n=150 cand-mass=0.85 span=+32.99 batch-noise-floor=0.075
+   l0= 0  dK  +28.55 [+27.31,+29.72]  dV   +4.27 [ +3.48, +5.20]  dKV  +33.01 [+32.10,+33.86]
+          key share   +0.87 [ +0.85, +0.89]  interaction   +0.19 [ -1.06, +1.36]  interaction/dKV   +0.01 [ -0.03, +0.04]
+   l0= 2  dK  +25.58 [+23.88,+27.23]  dV   +3.68 [ +3.35, +4.06]  dKV  +32.76 [+31.63,+33.81]
+          key share   +0.87 [ +0.86, +0.89]  interaction   +3.51 [ +2.21, +4.87]  interaction/dKV   +0.11 [ +0.07, +0.15]
+   l0=10  dK   +1.29 [ +0.82, +1.83]  dV   +3.68 [ +3.37, +4.06]  dKV   +7.16 [ +6.09, +8.36]
+          key share   +0.26 [ +0.18, +0.34]  interaction   +2.19 [ +1.37, +3.16]  interaction/dKV   +0.31 [ +0.21, +0.39]
+   identity(K)  +15.52 [+15.11,+15.92]   identity(V)   +3.29 [ +2.86, +3.77]   dlogp(B) under K_S -12.55, K_X -13.17
+L4out   direct      [all] n=150 cand-mass=0.84 span=+29.73 batch-noise-floor=0.139
+   l0= 0  dK  +26.73 [+25.52,+27.91]  dV  +27.90 [+26.67,+29.10]  dKV  +29.75 [+28.53,+30.92]
+          key share   +0.49 [ +0.49, +0.49]  interaction  -24.89 [-26.13,-23.60]  interaction/dKV   -0.84 [ -0.86, -0.81]
+   l0= 2  dK  +26.51 [+25.26,+27.70]  dV  +27.50 [+26.31,+28.67]  dKV  +29.91 [+28.70,+31.05]
+          key share   +0.49 [ +0.49, +0.50]  interaction  -24.10 [-25.37,-22.78]  interaction/dKV   -0.81 [ -0.83, -0.78]
+   l0=10  dK  +11.79 [+10.60,+13.02]  dV  +27.37 [+26.17,+28.54]  dKV  +29.09 [+27.89,+30.24]
+          key share   +0.30 [ +0.28, +0.32]  interaction  -10.07 [-11.33, -8.83]  interaction/dKV   -0.35 [ -0.39, -0.30]
+   identity(K)  +15.38 [+15.01,+15.74]   identity(V)  +13.51 [+12.90,+14.13]   dlogp(B) under K_S -14.13, K_X -14.45
+L4out   direct      [competent] n=129 cand-mass=0.85 span=+31.07 batch-noise-floor=0.124
+   l0= 0  dK  +28.17 [+27.07,+29.22]  dV  +29.63 [+28.52,+30.70]  dKV  +31.08 [+29.98,+32.14]
+          key share   +0.49 [ +0.48, +0.49]  interaction  -26.72 [-27.84,-25.54]  interaction/dKV   -0.86 [ -0.88, -0.84]
+   l0= 2  dK  +27.89 [+26.75,+29.01]  dV  +29.30 [+28.24,+30.30]  dKV  +31.25 [+30.16,+32.29]
+          key share   +0.49 [ +0.48, +0.49]  interaction  -25.95 [-27.10,-24.75]  interaction/dKV   -0.83 [ -0.85, -0.81]
+   l0=10  dK  +11.93 [+10.63,+13.28]  dV  +29.20 [+28.13,+30.20]  dKV  +30.56 [+29.48,+31.58]
+          key share   +0.29 [ +0.27, +0.31]  interaction  -10.56 [-11.95, -9.23]  interaction/dKV   -0.35 [ -0.39, -0.30]
+   identity(K)  +15.45 [+15.05,+15.83]   identity(V)  +14.12 [+13.51,+14.71]   dlogp(B) under K_S -14.92, K_X -15.17
+L6      direct      [all] n=150 cand-mass=0.86 span=+32.57 batch-noise-floor=0.084
+   l0= 0  dK  +28.39 [+27.22,+29.49]  dV   +4.39 [ +3.67, +5.19]  dKV  +32.59 [+31.64,+33.47]
+          key share   +0.87 [ +0.85, +0.89]  interaction   -0.19 [ -1.27, +0.85]  interaction/dKV   -0.01 [ -0.04, +0.03]
+   l0= 2  dK  +25.77 [+24.23,+27.24]  dV   +4.04 [ +3.58, +4.59]  dKV  +32.64 [+31.57,+33.62]
+          key share   +0.86 [ +0.85, +0.88]  interaction   +2.82 [ +1.58, +4.12]  interaction/dKV   +0.09 [ +0.05, +0.13]
+   l0=10  dK   +1.68 [ +1.14, +2.32]  dV   +3.93 [ +3.55, +4.35]  dKV   +8.18 [ +7.17, +9.28]
+          key share   +0.30 [ +0.23, +0.37]  interaction   +2.58 [ +1.86, +3.38]  interaction/dKV   +0.32 [ +0.24, +0.38]
+   identity(K)  +15.66 [+15.30,+16.02]   identity(V)   +3.45 [ +3.05, +3.87]   dlogp(B) under K_S -12.39, K_X -12.95
+L6      direct      [competent] n=150 cand-mass=0.86 span=+32.57 batch-noise-floor=0.084
+   l0= 0  dK  +28.39 [+27.22,+29.49]  dV   +4.39 [ +3.67, +5.19]  dKV  +32.59 [+31.64,+33.47]
+          key share   +0.87 [ +0.85, +0.89]  interaction   -0.19 [ -1.27, +0.85]  interaction/dKV   -0.01 [ -0.04, +0.03]
+   l0= 2  dK  +25.77 [+24.23,+27.24]  dV   +4.04 [ +3.58, +4.59]  dKV  +32.64 [+31.57,+33.62]
+          key share   +0.86 [ +0.85, +0.88]  interaction   +2.82 [ +1.58, +4.12]  interaction/dKV   +0.09 [ +0.05, +0.13]
+   l0=10  dK   +1.68 [ +1.14, +2.32]  dV   +3.93 [ +3.55, +4.35]  dKV   +8.18 [ +7.17, +9.28]
+          key share   +0.30 [ +0.23, +0.37]  interaction   +2.58 [ +1.86, +3.38]  interaction/dKV   +0.32 [ +0.24, +0.38]
+   identity(K)  +15.66 [+15.30,+16.02]   identity(V)   +3.45 [ +3.05, +3.87]   dlogp(B) under K_S -12.39, K_X -12.95

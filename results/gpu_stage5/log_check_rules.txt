@@ -1,0 +1,2 @@
+==== 2026-10-06T21:44:43Z python -c from ckeys.subsets import check_rules; print(check_rules())
+subset rules ok on 2000 cores

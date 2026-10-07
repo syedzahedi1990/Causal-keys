@@ -1,0 +1,9 @@
+==== 2026-10-06T22:36:51Z python experiments/remention_attention.py --model Qwen/Qwen2.5-14B-Instruct --n 150 --dtype bfloat16 --out results/gpu_stage5/attention --revision cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Fetching 8 files:   0%|          | 0/8 [00:00<?, ?it/s]Fetching 8 files:  12%|█▎        | 1/8 [00:13<01:31, 13.00s/it]Fetching 8 files:  25%|██▌       | 2/8 [00:26<01:20, 13.47s/it]Fetching 8 files:  38%|███▊      | 3/8 [00:27<00:37,  7.52s/it]Fetching 8 files:  50%|█████     | 4/8 [00:27<00:19,  4.77s/it]Fetching 8 files:  62%|██████▎   | 5/8 [00:28<00:10,  3.39s/it]Fetching 8 files:  88%|████████▊ | 7/8 [00:29<00:01,  1.74s/it]Fetching 8 files: 100%|██████████| 8/8 [00:29<00:00,  1.37s/it]Fetching 8 files: 100%|██████████| 8/8 [00:29<00:00,  3.67s/it]
+Loading weights:   0%|          | 0/579 [00:00<?, ?it/s]Loading weights:  80%|███████▉  | 463/579 [00:00<00:00, 4628.44it/s]Loading weights: 100%|██████████| 579/579 [00:00<00:00, 4647.04it/s]
+  POST: first core 1.2s, T=109, p=55, r=[68, 71, 74, 77, 80, 83], ans=108
+  POST done (67s)
+  P1: first core 67.6s, T=103, p=55, r=[76, 78, 80, 82, 84, 86], ans=102
+  P1 done (129s)
+wrote results/gpu_stage5/attention/Qwen2.5-14B-Instruct.json (300 items, casing_check ok)

@@ -1,0 +1,14 @@
+==== 2026-10-07T00:46:34Z python experiments/form_attention.py --model mistralai/Mistral-7B-Instruct-v0.3 --n 60 --dtype bfloat16 --out results/gpu_stage5/form_attention --revision c170c708c41dac9275d15a8fff4eca08d52bab71
+Loading weights:   0%|          | 0/291 [00:00<?, ?it/s]Loading weights: 100%|██████████| 291/291 [00:00<00:00, 5659.86it/s]
+  POST done (23s)
+  POST_THE done (37s)
+  POST_MODIF done (50s)
+  POST_TITLE done (65s)
+  POST_UPPER done (78s)
+  POST_PLURAL done (92s)
+  POST_SYN done (106s)
+  POST_FRMIX done (122s)
+  POST_DEMIX done (142s)
+  POST_FR done (156s)
+  POST_DE done (170s)
+wrote results/gpu_stage5/form_attention/Mistral-7B-Instruct-v0.3.json (660 items, 0 skipped)

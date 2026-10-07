@@ -1,0 +1,14 @@
+==== 2026-10-07T01:19:56Z python experiments/form_attention.py --model allenai/OLMo-2-1124-7B-Instruct --n 60 --dtype bfloat16 --out results/gpu_stage5/form_attention --revision 470b1fba1ae01581f270116362ee4aa1b97f4c84
+Loading weights:   0%|          | 0/355 [00:00<?, ?it/s]Loading weights: 100%|██████████| 355/355 [00:00<00:00, 4152.24it/s]
+  POST done (23s)
+  POST_THE done (38s)
+  POST_MODIF done (53s)
+  POST_TITLE done (68s)
+  POST_UPPER done (83s)
+  POST_PLURAL done (98s)
+  POST_SYN done (113s)
+  POST_FRMIX done (129s)
+  POST_DEMIX done (144s)
+  POST_FR done (161s)
+  POST_DE done (177s)
+wrote results/gpu_stage5/form_attention/OLMo-2-1124-7B-Instruct.json (660 items, 0 skipped)

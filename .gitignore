@@ -5,3 +5,4 @@ __pycache__/
 results/cache/
 .venv-s4/
 gpu_stage4_results.tgz
+results/gpu_stage5/attention/*.npz

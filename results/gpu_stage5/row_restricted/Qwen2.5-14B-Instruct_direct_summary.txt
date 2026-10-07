@@ -1,0 +1,56 @@
+S2: n=60  full K_S effect +24.59 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= -1.36 [-1.54,-1.18]  frac of full -0.06
+   rows=story_tail    (avg   8.0 tok)  d= +0.06 [+0.01,+0.12]  frac of full +0.00
+   rows=question      (avg  10.0 tok)  d= +0.01 [-0.04,+0.06]  frac of full +0.00
+   rows=mention       (avg   9.0 tok)  d= +9.25 [+7.86,+10.70]  frac of full +0.38
+   rows=mention_words (avg   2.0 tok)  d= +9.22 [+7.84,+10.65]  frac of full +0.38
+   rows=rest_after_p  (avg  14.0 tok)  d=+12.17 [+11.19,+13.16]  frac of full +0.49
+S3: n=60  full K_S effect +17.37 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= -0.59 [-0.74,-0.44]  frac of full -0.03
+   rows=story_tail    (avg   8.0 tok)  d= +0.00 [-0.05,+0.06]  frac of full +0.00
+   rows=question      (avg  10.0 tok)  d= -0.01 [-0.07,+0.04]  frac of full -0.00
+   rows=mention       (avg  12.0 tok)  d=+12.12 [+10.18,+14.16]  frac of full +0.70
+   rows=mention_words (avg   3.0 tok)  d=+12.42 [+10.43,+14.52]  frac of full +0.72
+   rows=rest_after_p  (avg  14.0 tok)  d= +1.96 [+1.70,+2.22]  frac of full +0.11
+L2: n=60  full K_S effect +64.31 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= -0.98 [-1.21,-0.75]  frac of full -0.02
+   rows=story_tail    (avg   8.0 tok)  d= -0.04 [-0.11,+0.03]  frac of full -0.00
+   rows=question      (avg  10.0 tok)  d= -0.07 [-0.16,+0.03]  frac of full -0.00
+   rows=mention       (avg   5.0 tok)  d=+60.38 [+57.72,+63.03]  frac of full +0.94
+   rows=mention_words (avg   2.0 tok)  d=+60.40 [+57.73,+63.02]  frac of full +0.94
+   rows=rest_after_p  (avg  15.0 tok)  d=+11.08 [+10.11,+12.02]  frac of full +0.17
+L3: n=60  full K_S effect +69.81 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= -0.20 [-0.30,-0.10]  frac of full -0.00
+   rows=story_tail    (avg   8.0 tok)  d= -0.03 [-0.09,+0.03]  frac of full -0.00
+   rows=question      (avg  10.0 tok)  d= -0.05 [-0.11,+0.01]  frac of full -0.00
+   rows=mention       (avg   7.0 tok)  d=+66.65 [+63.71,+69.58]  frac of full +0.95
+   rows=mention_words (avg   3.0 tok)  d=+66.67 [+63.74,+69.60]  frac of full +0.95
+   rows=rest_after_p  (avg  15.0 tok)  d= +0.26 [+0.19,+0.34]  frac of full +0.00
+S3out: n=60  full K_S effect +2.76 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= -0.61 [-0.73,-0.49]  frac of full -0.22
+   rows=story_tail    (avg   8.0 tok)  d= -0.02 [-0.07,+0.03]  frac of full -0.01
+   rows=question      (avg  10.0 tok)  d= -0.04 [-0.08,+0.01]  frac of full -0.01
+   rows=mention       (avg  12.0 tok)  d= +0.31 [+0.16,+0.46]  frac of full +0.11
+   rows=mention_words (avg   3.0 tok)  d= +0.30 [+0.16,+0.44]  frac of full +0.11
+   rows=rest_after_p  (avg  14.0 tok)  d= +2.04 [+1.79,+2.29]  frac of full +0.74
+L3out: n=60  full K_S effect +5.50 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= -0.16 [-0.25,-0.06]  frac of full -0.03
+   rows=story_tail    (avg   8.0 tok)  d= +0.03 [-0.04,+0.09]  frac of full +0.00
+   rows=question      (avg  10.0 tok)  d= +0.09 [+0.03,+0.15]  frac of full +0.02
+   rows=mention       (avg   7.0 tok)  d= +2.16 [+1.53,+2.82]  frac of full +0.39
+   rows=mention_words (avg   3.0 tok)  d= +2.16 [+1.53,+2.84]  frac of full +0.39
+   rows=rest_after_p  (avg  15.0 tok)  d= +0.50 [+0.39,+0.60]  frac of full +0.09
+S6: n=60  full K_S effect +21.78 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= -0.74 [-0.91,-0.57]  frac of full -0.03
+   rows=story_tail    (avg   8.0 tok)  d= -0.00 [-0.05,+0.05]  frac of full -0.00
+   rows=question      (avg  10.0 tok)  d= +0.02 [-0.02,+0.06]  frac of full +0.00
+   rows=mention       (avg  21.0 tok)  d=+15.55 [+13.27,+17.88]  frac of full +0.71
+   rows=mention_words (avg   6.0 tok)  d=+15.67 [+13.34,+18.02]  frac of full +0.72
+   rows=rest_after_p  (avg  14.0 tok)  d= +1.89 [+1.65,+2.15]  frac of full +0.09
+L6: n=60  full K_S effect +68.22 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= -0.21 [-0.33,-0.10]  frac of full -0.00
+   rows=story_tail    (avg   8.0 tok)  d= +0.02 [-0.04,+0.08]  frac of full +0.00
+   rows=question      (avg  10.0 tok)  d= -0.06 [-0.12,-0.00]  frac of full -0.00
+   rows=mention       (avg  13.0 tok)  d=+63.32 [+60.24,+66.50]  frac of full +0.93
+   rows=mention_words (avg   6.0 tok)  d=+63.31 [+60.24,+66.50]  frac of full +0.93
+   rows=rest_after_p  (avg  15.0 tok)  d= +0.41 [+0.33,+0.49]  frac of full +0.01

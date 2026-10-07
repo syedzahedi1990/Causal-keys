@@ -1,0 +1,42 @@
+==== 2026-10-06T21:44:46Z python analysis/ioi_entry_facts.py --seed 1 --out results/gpu_stage5/ENTRY_FACTS.preflight.txt
+ckeys/ioi.py make_cores(200, random.Random(1)): 15 templates, reduced pools
+core 0: {'template': 12, 'pattern': 'ABBA', 'place': 'museum', 'object': 'ticket', 'io_b': 'Scott', 'io_s': 'Matt', 'io_x': 'Lars', 'subj': 'Steven', 'order': [3, 1, 0, 2]}
+  B: Then, Scott and Steven had a long argument. Afterwards Steven said to
+  S: Then, Matt and Steven had a long argument. Afterwards Steven said to
+  X: Then, Lars and Steven had a long argument. Afterwards Steven said to
+  listing: Choices: Steven, Matt, Scott, Lars
+  INLINE: Then, Scott and Steven had a long argument ( Steven, Matt, Scott, Lars). Afterwards Steven said to
+  INLINE_BEFORE: ( Steven, Matt, Scott, Lars) Then, Scott and Steven had a long argument. Afterwards Steven said to
+  AFTER (chat user turn): 'Complete the sentence with the right name.\n\nSentence: Then, Scott and Steven had a long argument. Afterwards Steven said to\nChoices: Steven, Matt, Scott, Lars\nAnswer with one name.\nAnswer:'
+  AFTER (raw): 'Then, Scott and Steven had a long argument. Afterwards Steven said to\nChoices: Steven, Matt, Scott, Lars\nAnswer:'
+IO_B list slot counts (slot 0..3): 0:58 1:46 2:51 3:45
+pattern counts: {'ABBA': 100, 'BABA': 100}
+template histogram (index: count): 0:16 1:16 2:16 3:8 4:8 5:13 6:13 7:9 8:19 9:7 10:16 11:12 12:14 13:19 14:14
+tokenizer gpt2 (gpt2; chat False; BOS '<|endoftext|>')
+  PLAIN          chat=False skipped=0 p 2..7 len 15-21 IO-count {1: 200} S-count {2: 200} -> ok
+  AFTER          chat=False skipped=0 p 2..7 len 29-35 IO-count {2: 200} S-count {3: 200} -> ok
+  BEFORE         chat=False skipped=0 p 13..18 len 29-35 IO-count {2: 200} S-count {3: 200} -> ok
+  QUESTION       chat=False skipped=0 p 2..7 len 27-33 IO-count {1: 200} S-count {2: 200} -> ok
+  INLINE         chat=False skipped=0 p 2..7 len 23-29 IO-count {2: 200} S-count {3: 200} -> ok
+  INLINE_BEFORE  chat=False skipped=0 p 11..16 len 24-30 IO-count {2: 200} S-count {3: 200} -> ok
+tokenizer Qwen2.5 (Qwen/Qwen2.5-7B-Instruct; chat True; BOS None)
+  PLAIN          chat=False skipped=0 p 1..6 len 14-20 IO-count {1: 200} S-count {2: 200} -> ok
+  AFTER          chat=True  skipped=0 p 25..30 len 63-69 IO-count {2: 200} S-count {3: 200} -> ok
+  BEFORE         chat=True  skipped=0 p 35..40 len 63-69 IO-count {2: 200} S-count {3: 200} -> ok
+  QUESTION       chat=True  skipped=0 p 25..30 len 61-67 IO-count {1: 200} S-count {2: 200} -> ok
+  INLINE         chat=False skipped=0 p 1..6 len 22-28 IO-count {2: 200} S-count {3: 200} -> ok
+  INLINE_BEFORE  chat=False skipped=0 p 10..15 len 23-29 IO-count {2: 200} S-count {3: 200} -> ok
+tokenizer Qwen2.5 raw (Qwen/Qwen2.5-7B-Instruct; chat False; BOS None)
+  PLAIN          chat=False skipped=0 p 1..6 len 14-20 IO-count {1: 200} S-count {2: 200} -> ok
+  AFTER          chat=False skipped=0 p 1..6 len 27-33 IO-count {2: 200} S-count {3: 200} -> ok
+  BEFORE         chat=False skipped=0 p 11..16 len 27-33 IO-count {2: 200} S-count {3: 200} -> ok
+  QUESTION       chat=False skipped=0 p 1..6 len 25-31 IO-count {1: 200} S-count {2: 200} -> ok
+  INLINE         chat=False skipped=0 p 1..6 len 22-28 IO-count {2: 200} S-count {3: 200} -> ok
+  INLINE_BEFORE  chat=False skipped=0 p 10..15 len 23-29 IO-count {2: 200} S-count {3: 200} -> ok
+tokenizer Mistral-v0.3 (mistralai/Mistral-7B-Instruct-v0.3; chat True; BOS '<s>')
+  PLAIN          chat=False skipped=0 p 2..7 len 15-21 IO-count {1: 200} S-count {2: 200} -> ok
+  AFTER          chat=True  skipped=0 p 24..29 len 64-70 IO-count {2: 200} S-count {3: 200} -> ok
+  BEFORE         chat=True  skipped=0 p 36..41 len 64-70 IO-count {2: 200} S-count {3: 200} -> ok
+  QUESTION       chat=True  skipped=0 p 24..29 len 62-68 IO-count {1: 200} S-count {2: 200} -> ok
+  INLINE         chat=False skipped=0 p 2..7 len 23-29 IO-count {2: 200} S-count {3: 200} -> ok
+  INLINE_BEFORE  chat=False skipped=0 p 11..16 len 24-30 IO-count {2: 200} S-count {3: 200} -> ok

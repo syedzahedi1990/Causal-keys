@@ -1,0 +1,9 @@
+==== 2026-10-06T23:46:17Z python experiments/form_competence.py --model Qwen/Qwen2.5-14B-Instruct --dtype bfloat16 --out results/gpu_stage5/competence --revision cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8
+Loading weights:   0%|          | 0/579 [00:00<?, ?it/s]Loading weights:  79%|███████▉  | 459/579 [00:00<00:00, 4579.74it/s]Loading weights: 100%|██████████| 579/579 [00:00<00:00, 4574.04it/s]
+TITLE   6/6 competent  Box->box  Basket->basket  Shelf->shelf  Drawer->drawer  Cabinet->cabinet  Closet->closet
+UPPER   6/6 competent  BOX->box  BASKET->basket  SHELF->shelf  DRAWER->drawer  CABINET->cabinet  CLOSET->closet
+PLURAL  6/6 competent  boxes->box  baskets->basket  shelves->shelf  drawers->drawer  cabinets->cabinet  closets->closet
+SYN     6/6 competent  crate->box  hamper->basket  ledge->shelf  compartment->drawer  cupboard->cabinet  wardrobe->closet
+FR      6/6 competent  boîte->box  panier->basket  étagère->shelf  tiroir->drawer  armoire->cabinet  placard->closet
+DE      5/6 competent  Kiste->box  Korb->basket  Regal->shelf  Schublade->drawer  Schrank->cabinet  Kammer->cabinet!
+wrote results/gpu_stage5/competence/Qwen2.5-14B-Instruct.json

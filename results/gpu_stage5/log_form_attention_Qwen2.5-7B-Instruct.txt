@@ -1,0 +1,14 @@
+==== 2026-10-06T22:30:36Z python experiments/form_attention.py --model Qwen/Qwen2.5-7B-Instruct --n 60 --dtype bfloat16 --out results/gpu_stage5/form_attention --revision a09a35458c702b33eeacc393d103063234e8bc28
+Loading weights:   0%|          | 0/339 [00:00<?, ?it/s]Loading weights: 100%|██████████| 339/339 [00:00<00:00, 5551.51it/s]
+  POST done (20s)
+  POST_THE done (32s)
+  POST_MODIF done (44s)
+  POST_TITLE done (57s)
+  POST_UPPER done (69s)
+  POST_PLURAL done (82s)
+  POST_SYN done (94s)
+  POST_FRMIX done (106s)
+  POST_DEMIX done (118s)
+  POST_FR done (130s)
+  POST_DE done (142s)
+wrote results/gpu_stage5/form_attention/Qwen2.5-7B-Instruct.json (660 items, 0 skipped)

@@ -1,0 +1,7 @@
+AFTER: n=60  full K_S effect +13.11 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= -0.13 [-0.30,+0.03]  frac of full -0.01
+   rows=choices       (avg   9.0 tok)  d=+13.71 [+11.64,+15.82]  frac of full +1.05
+   rows=options       (avg   4.0 tok)  d=+13.79 [+11.73,+15.90]  frac of full +1.05
+   rows=options_sx    (avg   2.0 tok)  d= +3.50 [+1.81,+5.28]  frac of full +0.27
+   rows=sentence_tail (avg  13.2 tok)  d= -0.09 [-0.26,+0.09]  frac of full -0.01
+   rows=tail          (avg  15.0 tok)  d= -1.98 [-2.35,-1.61]  frac of full -0.15

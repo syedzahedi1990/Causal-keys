@@ -1,0 +1,67 @@
+==== 2026-10-07T00:43:05Z python experiments/row_restricted_keys.py --model mistralai/Mistral-7B-Instruct-v0.3 --n 60 --dtype bfloat16 --arms S2,S3,L2,L3,S3out,L3out,S6,L6 --arm-modules ckeys.subsets --out results/gpu_stage5/row_restricted --revision c170c708c41dac9275d15a8fff4eca08d52bab71
+Loading weights:   0%|          | 0/291 [00:00<?, ?it/s]Loading weights: 100%|██████████| 291/291 [00:00<00:00, 7629.39it/s]
+  S2 done (24s)
+  S3 done (47s)
+  L2 done (70s)
+  L3 done (93s)
+  S3out done (117s)
+  L3out done (140s)
+  S6 done (163s)
+  L6 done (186s)
+skipped_items 0
+S2: n=60  full K_S effect +9.51 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= -0.24 [-0.32,-0.17]  frac of full -0.03
+   rows=story_tail    (avg   8.0 tok)  d= -0.01 [-0.03,+0.02]  frac of full -0.00
+   rows=question      (avg  10.0 tok)  d= +0.01 [-0.01,+0.04]  frac of full +0.00
+   rows=mention       (avg   9.0 tok)  d= +3.65 [+2.99,+4.31]  frac of full +0.38
+   rows=mention_words (avg   2.0 tok)  d= +3.68 [+3.01,+4.37]  frac of full +0.39
+   rows=rest_after_p  (avg  16.0 tok)  d= +3.65 [+3.14,+4.17]  frac of full +0.38
+S3: n=60  full K_S effect +8.14 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= -0.04 [-0.11,+0.04]  frac of full -0.00
+   rows=story_tail    (avg   8.0 tok)  d= -0.01 [-0.03,+0.02]  frac of full -0.00
+   rows=question      (avg  10.0 tok)  d= +0.03 [+0.00,+0.05]  frac of full +0.00
+   rows=mention       (avg  12.0 tok)  d= +5.60 [+4.55,+6.69]  frac of full +0.69
+   rows=mention_words (avg   3.0 tok)  d= +5.84 [+4.74,+6.98]  frac of full +0.72
+   rows=rest_after_p  (avg  16.0 tok)  d= +0.81 [+0.64,+0.98]  frac of full +0.10
+L2: n=60  full K_S effect +30.49 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= +0.13 [-0.06,+0.36]  frac of full +0.00
+   rows=story_tail    (avg   8.0 tok)  d= -0.01 [-0.05,+0.03]  frac of full -0.00
+   rows=question      (avg  10.0 tok)  d= +0.02 [-0.02,+0.06]  frac of full +0.00
+   rows=mention       (avg   7.0 tok)  d=+28.18 [+26.57,+29.66]  frac of full +0.92
+   rows=mention_words (avg   2.0 tok)  d=+28.13 [+26.52,+29.61]  frac of full +0.92
+   rows=rest_after_p  (avg  17.0 tok)  d= +2.44 [+2.00,+2.92]  frac of full +0.08
+L3: n=60  full K_S effect +28.45 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= -0.08 [-0.16,-0.00]  frac of full -0.00
+   rows=story_tail    (avg   8.0 tok)  d= -0.01 [-0.03,+0.02]  frac of full -0.00
+   rows=question      (avg  10.0 tok)  d= -0.01 [-0.03,+0.02]  frac of full -0.00
+   rows=mention       (avg   9.0 tok)  d=+27.19 [+25.37,+28.81]  frac of full +0.96
+   rows=mention_words (avg   3.0 tok)  d=+27.17 [+25.36,+28.77]  frac of full +0.95
+   rows=rest_after_p  (avg  17.0 tok)  d= +0.36 [+0.27,+0.44]  frac of full +0.01
+S3out: n=60  full K_S effect +1.13 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= +0.03 [-0.02,+0.08]  frac of full +0.02
+   rows=story_tail    (avg   8.0 tok)  d= +0.02 [-0.00,+0.03]  frac of full +0.01
+   rows=question      (avg  10.0 tok)  d= +0.02 [+0.00,+0.05]  frac of full +0.02
+   rows=mention       (avg  12.0 tok)  d= +0.13 [+0.06,+0.21]  frac of full +0.12
+   rows=mention_words (avg   3.0 tok)  d= +0.13 [+0.06,+0.20]  frac of full +0.11
+   rows=rest_after_p  (avg  16.0 tok)  d= +0.77 [+0.62,+0.92]  frac of full +0.68
+L3out: n=60  full K_S effect +1.79 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= +0.01 [-0.02,+0.04]  frac of full +0.00
+   rows=story_tail    (avg   8.0 tok)  d= +0.01 [-0.01,+0.03]  frac of full +0.00
+   rows=question      (avg  10.0 tok)  d= -0.00 [-0.02,+0.02]  frac of full -0.00
+   rows=mention       (avg   9.0 tok)  d= +0.78 [+0.36,+1.32]  frac of full +0.43
+   rows=mention_words (avg   3.0 tok)  d= +0.74 [+0.33,+1.27]  frac of full +0.41
+   rows=rest_after_p  (avg  17.0 tok)  d= +0.32 [+0.26,+0.38]  frac of full +0.18
+S6: n=60  full K_S effect +12.38 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= +0.02 [-0.04,+0.08]  frac of full +0.00
+   rows=story_tail    (avg   8.0 tok)  d= -0.00 [-0.02,+0.02]  frac of full -0.00
+   rows=question      (avg  10.0 tok)  d= +0.01 [-0.01,+0.03]  frac of full +0.00
+   rows=mention       (avg  21.0 tok)  d= +9.02 [+7.61,+10.41]  frac of full +0.73
+   rows=mention_words (avg   6.0 tok)  d= +9.02 [+7.58,+10.46]  frac of full +0.73
+   rows=rest_after_p  (avg  16.0 tok)  d= +0.56 [+0.43,+0.70]  frac of full +0.05
+L6: n=60  full K_S effect +27.76 nats;  none-check +0.000
+   rows=self          (avg   1.0 tok)  d= +0.04 [-0.03,+0.12]  frac of full +0.00
+   rows=story_tail    (avg   8.0 tok)  d= -0.01 [-0.03,+0.01]  frac of full -0.00
+   rows=question      (avg  10.0 tok)  d= +0.00 [-0.03,+0.03]  frac of full +0.00
+   rows=mention       (avg  15.0 tok)  d=+26.55 [+25.05,+28.02]  frac of full +0.96
+   rows=mention_words (avg   6.0 tok)  d=+26.43 [+24.93,+27.89]  frac of full +0.95
+   rows=rest_after_p  (avg  17.0 tok)  d= +0.25 [+0.20,+0.31]  frac of full +0.01

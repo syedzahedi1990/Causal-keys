@@ -1,0 +1,9 @@
+gpt2 607a30d783dfa663caf39e06633721c8d4cfcd7e
+gpt2-xl 15ea56dee5df4983c59b2538573817e1667135e2
+Qwen/Qwen2.5-1.5B-Instruct 989aa7980e4cf806f80c7fef2b1adb7bc71aa306
+Qwen/Qwen2.5-3B-Instruct aa8e72537993ba99e69dfaafa59ed015b17504d1
+Qwen/Qwen2.5-7B-Instruct a09a35458c702b33eeacc393d103063234e8bc28
+Qwen/Qwen2.5-14B-Instruct cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8
+mistralai/Mistral-7B-Instruct-v0.3 c170c708c41dac9275d15a8fff4eca08d52bab71
+allenai/OLMo-2-1124-7B-Instruct 470b1fba1ae01581f270116362ee4aa1b97f4c84
+Qwen/Qwen2.5-7B d149729398750b98c0af14eb82c78cfe92750796

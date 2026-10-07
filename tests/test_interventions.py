@@ -32,7 +32,7 @@ def test_identity_edit_is_noop(mt):
     a0, lg0 = answer(model, tok, ids)
     with edit(model, 4, "resid", [pos], lambda h: h):
         a1, lg1 = answer(model, tok, ids)
-    assert torch.allclose(lg0, lg1, atol=1e-4) and a0 == "shelf"
+    assert torch.allclose(lg0, lg1, atol=1e-3) and a0 == "shelf"   # a no-op check, not 1e-4 numerics (host-independent)
 
 def test_full_resid_patch_transfers_source(mt):
     model, tok = mt

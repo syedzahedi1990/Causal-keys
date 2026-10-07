@@ -18,8 +18,9 @@ Gate a3 (per model): mean d_full >= 10 under OPTIONS-AFTER and > 0 under SENTENC
   under OPTIONS-AFTER (d_G of the a3 sufficiency batch).
 A model's OPTIONS-AFTER predictions are NOT EVALUABLE when its Gate a3 or its OPTIONS-AFTER Gate a2 fails (the computed
 verdict is still printed); the SENTENCE-AFTER lines and H6 also need the SENTENCE-AFTER Gate a2. A prediction over both
-models is MET when it is met in every required model, NOT EVALUABLE when no model is evaluable, else NOT MET; the
-required models are the preregistered two when either file is present, else every model found (TEST_MODE).
+models is MET when it is met in both, NOT MET when it is not met in at least one evaluable model, else NOT EVALUABLE (a
+missing model or one that fails its gates is not evaluable); the same rule combines the parts of H2 and H3 within a model.
+The required models are the preregistered two when either file is present, else every model found (TEST_MODE).
 """
 import argparse
 import json
@@ -72,8 +73,9 @@ def V(ok):
 
 
 def comb(subs):
+    """MET when every part is met, NOT MET when an evaluable part is not met, else NOT EVALUABLE (also with no part)."""
     subs = list(subs)
-    return None if all(s is None for s in subs) else all(s is not None and bool(s) for s in subs)
+    return False if any(s is not None and not s for s in subs) else None if not subs or any(s is None for s in subs) else True
 
 
 def ratio(a, b):

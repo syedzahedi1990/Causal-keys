@@ -184,8 +184,9 @@ def test_tie_rule():
 
 
 def write_synth(root, model="Qwen2.5-14B-Instruct", n=40, nL=48, ls=28, li=4, iia=0.95,
-                kap=None, sid=None, kap_id=None):
-    """A synthetic part-(b) directory: H_read pattern by default (kappa follows s_ID; H7, H8, H9, H11 met, H10 not)."""
+                kap=None, sid=None, kap_id=None, id_at_ls=True):
+    """A synthetic part-(b) directory: H_read pattern by default (kappa follows s_ID; H7, H8, H9, H11 met, H10 not);
+    id_at_ls: the ID edit also reproduces at l* (H11 Part 2 and Gate b3(b) evaluable)."""
     kap = kap or {NM: (0.03, 0.92), QN: (0.4, 0.55), OA: (0.85, 0.12), LA: (0.9, 0.08), "QNAMES2": (0.2, 0.7)}
     kap_id = kap_id or {NM: (0.08, 0.9), QN: (0.45, 0.5), OA: (0.88, 0.1), LA: (0.9, 0.1)}
     sid = sid or {NM: 0.06, QN: 0.45, OA: 0.9, LA: 0.95}
@@ -198,8 +199,9 @@ def write_synth(root, model="Qwen2.5-14B-Instruct", n=40, nL=48, ls=28, li=4, ii
     W("filter.json", {"pairs": [{"i": i, "ok": i % 7 != 3} for i in range(320)], "n_pass": 274, "accuracy": 274 / 320})
     pop = [i for i in range(320) if i % 7 != 3][:n]
     for arm, l0 in (("BIND", ls), ("ID", li)):
-        rows = {str(l): [{"i": i, "m_patch": 5.0 if l0 <= l <= l0 + 4 else 0.1, "m_self": 0.0,
-                          "ok": (l0 <= l <= l0 + 4) and k < iia * n} for k, i in enumerate(pop)] for l in range(nL)}
+        hit = lambda l: l0 <= l <= l0 + 4 or (arm == "ID" and id_at_ls and l == ls)  # noqa: E731
+        rows = {str(l): [{"i": i, "m_patch": 5.0 if hit(l) else 0.1, "m_self": 0.0,
+                          "ok": hit(l) and k < iia * n} for k, i in enumerate(pop)] for l in range(nL)}
         W(f"sweep_{arm}_{NM}.json", {"arm": arm, "format": NM, "layers": list(range(nL)), "population": pop, "rows": rows})
     W("lstar.json", {"lstar": ls, "lstar_ID": li, "population": pop})
     cells = []
@@ -241,7 +243,10 @@ def test_scorer_h_read(tmp_path):
     v = {h: ok for h, (ok, _) in r["verdicts"].items()}
     assert v == {"H7": True, "H8": True, "H9": True, "H10": False, "H11": True, "H12": None}, text
     assert r["gates"]["Qwen2.5-14B-Instruct"]["b3"] is True and "NOT RUN" in text
-    assert "interaction-carried" not in text and "overlap with the 81st-160th" in text
+    assert "interaction-carried" not in text and "overlap with the 81st-160th" in text and "flat-high" not in text
+    write_synth(tmp_path / "x", id_at_ls=False)   # the ID edit does not reproduce at l*: Gate b3(b) fails, H11 Part 2 not evaluable
+    r, text = _score(tmp_path / "x")
+    assert r["gates"]["Qwen2.5-14B-Instruct"]["b3"] is False and r["verdicts"]["H11"][0] is True and "Part 2 NOT EVALUABLE" in text
 
 
 def test_scorer_h_binding_and_rules(tmp_path):
@@ -251,6 +256,19 @@ def test_scorer_h_binding_and_rules(tmp_path):
     v = {h: ok for h, (ok, _) in r["verdicts"].items()}
     assert v["H10"] is True and v["H7"] is False and v["H9"] is False and v["H11"] is None, text   # kappa_ID(OA) not evaluable
     assert r["gates"]["Qwen2.5-14B-Instruct"]["b3"] is False and "not evaluable as a dissociation at this depth" in text
+    oa_out = {NM: (0.03, 0.92), QN: (0.05, 0.9), OA: (0.1, 0.2)}   # OPTIONS-AFTER fails the rule: H7, H9 and H10 all not evaluable
+    write_synth(tmp_path / "h", kap=oa_out)
+    r, text = _score(tmp_path / "h")
+    v = {h: ok for h, (ok, _) in r["verdicts"].items()}
+    assert v["H10"] is None and v["H7"] is None and v["H9"] is None and "must be evaluable" in r["verdicts"]["H10"][1], text
+    write_synth(tmp_path / "q", kap={NM: (0.03, 0.92), QN: (0.1, 0.2), OA: (0.1, 0.85)})   # QNAMES alone fails: H10 on NM and OA
+    r = _score(tmp_path / "q")[0]
+    assert r["verdicts"]["H10"][0] is True and "QNAMES not evaluable" in r["verdicts"]["H10"][1]
+    write_synth(tmp_path / "fo", kap={NM: (0.1, 0.2), QN: (0.85, 0.1), OA: (0.9, 0.08)})   # flat-high needs H10 evaluable
+    r = _score(tmp_path / "fo")[0]
+    assert r["verdicts"]["H10"][0] is None and "flat-high" not in r["verdicts"]["H10"][1]
+    write_synth(tmp_path / "fh", kap={NM: (0.9, 0.05), QN: (0.85, 0.1), OA: (0.9, 0.08)})
+    assert "flat-high" in _score(tmp_path / "fh")[0]["verdicts"]["H10"][1]
     write_synth(tmp_path / "b", iia=0.5)        # Gate b1 fails: the arm's predictions are not evaluable
     r, text = _score(tmp_path / "b")
     assert r["verdicts"]["H7"][0] is None and r["verdicts"]["H11"][0] is None and "Gate b1" in text
@@ -266,6 +284,19 @@ def test_scorer_llama_and_missing(tmp_path):
     write_synth(tmp_path, model="Meta-Llama-3-70B-Instruct", nL=80, ls=34, li=6)
     r, _ = _score(tmp_path)
     assert r["verdicts"]["H12"][0] is True
+    nm_fail = {NM: (0.1, 0.2), QN: (0.4, 0.55), OA: (0.85, 0.12)}   # H8 not met and H7/H9/H10 not evaluable at both sizes
+    write_synth(tmp_path / "n", kap=nm_fail, kap_id={NM: (0.1, 0.2), QN: (0.1, 0.2), OA: (0.1, 0.2)})
+    write_synth(tmp_path / "n", model="Meta-Llama-3-70B-Instruct", nL=80, ls=34, li=6, kap=nm_fail, kap_id={NM: (0.1, 0.2), QN: (0.1, 0.2), OA: (0.1, 0.2)})
+    r, text = _score(tmp_path / "n")
+    v = {h: ok for h, (ok, _) in r["verdicts"].items()}
+    assert v["H8"] is False and v["H11"] is None and v["H12"] is True and "H11 Part 1 NOT EVALUABLE at 14B (left out)" in text, text
+    write_synth(tmp_path / "m", kap_id={NM: (0.1, 0.2), QN: (0.1, 0.2), OA: (0.1, 0.2)}, kap={NM: (0.1, 0.2), QN: (0.1, 0.2), OA: (0.1, 0.2)})
+    write_synth(tmp_path / "m", model="Meta-Llama-3-70B-Instruct", nL=80, ls=34, li=6)
+    r, text = _score(tmp_path / "m")   # H8 NOT MET at 14B (psi_V < 0.5) but MET at 70B: not reproduced
+    assert r["verdicts"]["H12"][0] is False and "H8 NOT MET, MET: no" in text, text
+    write_synth(tmp_path / "o", model="Meta-Llama-3-70B-Instruct", nL=80, ls=34, li=6)   # no 14B results
+    r, text = _score(tmp_path / "o")
+    assert r["verdicts"]["H12"][0] is None and "no Qwen2.5-14B results" in text
     (tmp_path / "e").mkdir()
     r, text = _score(tmp_path / "e")
     assert all(ok is None for ok, _ in r["verdicts"].values()) and "MISSING" in text

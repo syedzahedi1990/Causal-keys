@@ -50,6 +50,7 @@ from ckeys.encoding import LISTING, ROOM, candidate_ids, raw_prompt
 from ckeys.headsplice import HeadSplice, HopSplice, cells_dense, head_masks, mean_table
 from ckeys.interventions import blocks, capture, edits
 from ckeys.story import LOCATIONS, make_cores, record
+from experiments.ioi_factorial import device_name
 from experiments.row_restricted_keys import encode_with_offsets, rows_in
 
 KS_DEFAULT = "1,2,3,5,8,12,16,20,24,32,40,48,64,96,128"
@@ -274,10 +275,10 @@ class Stage6:
 
 
 def token_pool(tok, model_type):
-    """Random-sequence ids: the base vocabulary without special/added/control ids (Mistral: ids >= 1000, past the
-    [control_N] and byte blocks)."""
+    """Random-sequence ids: the base vocabulary without special/added/control ids (Mistral v0.3: ids >= 1027, past the
+    [control_N] block, 10-770, and the byte block <0x00>-<0xFF>, 771-1026)."""
     bad = set(tok.all_special_ids) | set(getattr(tok, "added_tokens_decoder", {}) or {})
-    lo = 1000 if model_type == "mistral" else 0
+    lo = 1027 if model_type == "mistral" else 0
     return np.array([i for i in range(lo, tok.vocab_size) if i not in bad])
 
 
@@ -403,7 +404,7 @@ def main(argv=None):
     dup, dprov = duplicate_scores(model, tok, a.n_seq, a.half)
     log(f"duplicate scores: {a.n_seq} sequences ({time.time() - t0:.0f}s)")
     prov = ff.provenance(a) | {"model": a.model, "revision": a.revision, "dtype": str(next(model.parameters()).dtype),
-                               "attn_implementation": model.config._attn_implementation, "device": str(dev), "test_mode": test,
+                               "attn_implementation": model.config._attn_implementation, "device": device_name(dev), "test_mode": test,
                                "n_layers": nL, "n_heads": n_heads, "heads_per_layer": H, "n_kv_heads": model.config.num_key_value_heads,
                                "head_dim": hs.hd, "kstar": kstar, "KS_eff": KS_eff, "n_rand": a.n_rand, "grid_layers": layers,
                                "loo": not a.no_loo, "hop_rows": list(HOP_ROWS), "dup": dprov, "timings": {}}

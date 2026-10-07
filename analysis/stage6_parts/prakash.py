@@ -11,7 +11,14 @@ bootstrap resamples with one fixed index set per n, every ratio of means recompu
 kappa evaluability: psi_K + psi_V >= 0.5 and psi_K, psi_V >= -0.1 on the point estimates; a resample failing the rule is
 dropped from kappa's CI (and from a paired contrast's), and a dropped fraction > 5 % fails the CI. A cell that is not
 evaluable reports psi_K, psi_V and the interaction, labelled interaction-carried when the interaction >= 0.5.
-A cell is usable for H7, H9-H11 when Gate b0 and Gate b2 pass in it, Gate b1 passes for its arm and the rule holds.
+A cell is usable (f evaluable) for H7, H9-H11 and Gate b3 when Gate b0 and Gate b2 pass in it, the rule holds and its
+arm's edit reproduces at the cell's depth: IIA(l*) >= 0.7 for BIND, IIA_ID(l*_ID) >= 0.7 for ID at l*_ID (Gate b1), and
+IIA_ID(l*) >= 0.7 for ID at l* (the H11 Part 2 condition; Gate b3(b) fails without it). H7 and H11 also need s_ID(f, l0)
+defined (mean ID_K + mean ID_V > 0); H10 is stated on kappa alone (no s_ID condition) and, like H7 and H9, needs
+NO-MENTION and OPTIONS-AFTER usable (otherwise NOT EVALUABLE). H7's r needs all three formats; otherwise it counts as not
+met. "flat-high" labels kappa >= 0.75 in every usable format once H10 is evaluable (reported, no verdict). H12
+compares each named 14B verdict that is MET or NOT MET with the same prediction at 70B; a 14B NOT EVALUABLE is left out,
+and H12 is NOT EVALUABLE when none remains.
 l* and l*_ID are re-derived from the NO-MENTION sweep files (earliest layer with IIA >= max - 0.01) and asserted equal
 to lstar.json. Verdicts: MET / NOT MET / NOT EVALUABLE (None); H12 is NOT RUN without a Llama-3-70B directory.
 """
@@ -30,19 +37,21 @@ PRIMARY, OPTIONAL = "Qwen2.5-14B-Instruct", "Meta-Llama-3-70B-Instruct"
 NM, QN, OA, LA, Q2 = "NO-MENTION", "QNAMES", "OPTIONS-AFTER", "LETTERS-AFTER", "QNAMES2"
 LAW = (NM, QN, OA)
 SEED, B = 20261005, 10000
-B0_TOL, B0_TOL_TEST, B1, B2, BOUND, CROSS, FLAT, R_MIN = 0.3, 1e-3, 0.7, 3.0, 0.25, 0.4, 0.25, 0.9
+B0_TOL, B0_TOL_TEST, B1, B2, BOUND, CROSS, FLAT, FLAT_HIGH, R_MIN = 0.3, 1e-3, 0.7, 3.0, 0.25, 0.4, 0.25, 0.75, 0.9
+H10_NEED = (NM, OA)   # as H7/H9: the discriminating format (OPTIONS-AFTER) and NO-MENTION must be usable (spec G-P4)
 _idx = {}
 WORDING = {
     "H7": "for every evaluable f in {NO-MENTION, QNAMES, OPTIONS-AFTER}, with NO-MENTION and OPTIONS-AFTER evaluable: "
           "|kappa(f) - s_ID(f, l*+1)| <= 0.25, and Pearson r(kappa, s_ID(., l*+1)) >= 0.9 over the three",
     "H8": "under NO-MENTION psi_V >= 0.5 and psi_K <= 0.25, with the CI of psi_V - psi_K excluding 0",
     "H9": "kappa(OPTIONS-AFTER) - kappa(NO-MENTION) >= 0.4 with the paired CI excluding 0; kappa(QNAMES) between the two if evaluable",
-    "H10": "kappa(f) <= 0.25 for every evaluable f (dissociation reading only if Gate b3 passes)",
+    "H10": "kappa(f) <= 0.25 for every evaluable f in {NO-MENTION, QNAMES, OPTIONS-AFTER}, with NO-MENTION and OPTIONS-AFTER "
+           "evaluable (dissociation reading only if Gate b3 passes)",
     "H11": "Part 1: every evaluable f |kappa_ID(f) - s_ID(f, l*_ID+1)| <= 0.25 and kappa_ID(OPTIONS-AFTER) - kappa_ID(NO-MENTION) >= 0.4 "
            "with CI excluding 0; Part 2 (if IIA_ID(l*) >= 0.7): every evaluable f |kappa_ID at l*(f) - s_ID(f, l*+1)| <= 0.25; "
            "met if Part 1 holds and Part 2 holds or is not evaluable",
     "H12": "if run: Gate b1 with l* in 30..40, and the 14B verdicts of H8, H11 Part 1 and whichever of {H7, H9} or H10 was met "
-           "reproduced at the same thresholds"}
+           "reproduced at the same thresholds (each 14B verdict that is MET or NOT MET recurs at 70B)"}
 
 
 def IDX(n):
@@ -209,16 +218,22 @@ class Model:
         c = self.C.get((f, l0))
         return np.nan if c is None else c.s
 
+    def b1_at(self, arm, depth):
+        """The arm's edit reproduces at this depth: Gate b1 (BIND at l*, ID at l*_ID), or IIA_ID(l*) >= 0.7 for ID at l*."""
+        if arm == "BIND" or depth == self.li:
+            return self.b1[arm]
+        return bool(self.sweeps["ID", NM][0].get(depth, -1) >= B1)
+
     def cell_ok(self, arm, depth, f):
         e = self.ex(arm, depth, f)
-        return e is not None and e.usable(self.b1[arm])
+        return e is not None and e.usable(self.b1_at(arm, depth))
 
 
 # --------------------------------------------------------------------------- gates and predictions
 def gates(M, out):
     out(f"   Gate b1 reproduction (NO-MENTION sweep): BIND IIA(l* = {M.ls}) = {M.iia_b:.3f} (>= 0.7) -> {V(M.b1['BIND'])}; "
         f"ID IIA_ID(l*_ID = {M.li}) = {M.iia_i:.3f} (>= 0.7) -> {V(M.b1['ID'])}; IIA_ID(l*) = "
-        + ("not swept" if M.iia_i_at_ls is None else f"{M.iia_i_at_ls:.3f}") + " (H11 Part 2 evaluable if >= 0.7)")
+        + ("not swept" if M.iia_i_at_ls is None else f"{M.iia_i_at_ls:.3f}") + " (H11 Part 2 and Gate b3(b) need >= 0.7)")
     tol = B0_TOL_TEST if M.test else B0_TOL
     for (arm, dep, f), e in sorted(M.E.items()):
         out(f"   {arm:4s} @{dep:2d} {f:13s} n={e.n:3d} Gate b0 mean|m(r4)-m(r1)| {e.b0a:.2e} mean|m(r0)-m(B)| {e.b0b:.2e} (<= {tol:g}) -> {V(e.b0)};  "
@@ -226,10 +241,11 @@ def gates(M, out):
     c = M.C.get((OA, M.ls + 1))
     e = M.ex("ID", M.ls, OA)
     a_ok = None if c is None else bool(c.idk[0] > 0 and excl0(c.idk[1], c.idk[2]) and np.isfinite(c.s) and c.s >= 0.5)
-    b_ok = None if e is None else bool(e.usable(M.b1["ID"]) and e.kappa >= 0.5)
+    b_ok = None if e is None else bool(M.cell_ok("ID", M.ls, OA) and e.kappa >= 0.5)
     b3 = None if a_ok is None or b_ok is None else bool(a_ok and b_ok)
     out(f"   Gate b3 (H10 as a dissociation): (a) ID_K(OPTIONS-AFTER, l*+1) " + ("MISSING" if c is None else f"{fci(c.idk)} > 0, CI excl. 0; s_ID {f3(c.s)} >= 0.5")
-        + f" -> {V(a_ok)};  (b) kappa_ID at l* (OPTIONS-AFTER) " + ("MISSING" if e is None else f"{e.state()}, >= 0.5 and evaluable") + f" -> {V(b_ok)};  Gate b3 -> {V(b3)}")
+        + f" -> {V(a_ok)};  (b) kappa_ID at l* (OPTIONS-AFTER) " + ("MISSING" if e is None else f"{e.state()}, >= 0.5 and evaluable (IIA_ID(l*) >= 0.7)")
+        + f" -> {V(b_ok)};  Gate b3 -> {V(b3)}")
     return b3
 
 
@@ -283,12 +299,15 @@ def predictions(M, b3, out):
         R["H9"] = (bool(dpt >= CROSS and excl0(lo, hi) and dr <= 0.05 and between),
                    f"kappa(OA) - kappa(NM) {f3(dpt)} [{f3(lo)},{f3(hi)}] dropped {dr:.1%}" + (" (CI FAILED)" if dr > 0.05 else "")
                    + (f"; kappa(QNAMES) {f3(q.kappa)} between: {between}" if M.cell_ok("BIND", ls, QN) else "; QNAMES not evaluable"))
-    # H10
-    if not need:
-        R["H10"] = (None, "NO-MENTION and OPTIONS-AFTER must both be evaluable (not scorable)")
+    # H10 (kappa alone: usability from the gates and the rule, no s_ID condition)
+    ev10 = [f for f in LAW if M.cell_ok("BIND", ls, f)]
+    k10 = {f: M.ex("BIND", ls, f).kappa for f in ev10}
+    if not ev10 or not all(f in ev10 for f in H10_NEED):
+        R["H10"] = (None, "no format evaluable" if not ev10 else f"{', '.join(H10_NEED)} must be evaluable")
     else:
-        ok = all(res[f][2] <= FLAT for f in ev)
-        R["H10"] = (bool(ok), "; ".join(f"{f} kappa {f3(res[f][2])}" for f in ev)
+        R["H10"] = (bool(all(k <= FLAT for k in k10.values())), "; ".join(f"{f} kappa {f3(k)}" for f, k in k10.items())
+                    + "".join(f"; {f} not evaluable" for f in LAW if f not in ev10)
+                    + ("; flat-high (kappa >= 0.75 in every evaluable format: address read by the answer position)" if all(k >= FLAT_HIGH for k in k10.values()) else "")
                     + ("" if b3 else "; Gate b3 " + ("not passed" if b3 is False else "not evaluable") + ": not evaluable as a dissociation at this depth"))
     # H11
     r1, ev1, need1 = law(M, "ID", li, li + 1)
@@ -300,7 +319,7 @@ def predictions(M, b3, out):
         t1 = f"{law_text(r1)}; kappa_ID(OA) - kappa_ID(NM) {f3(dpt)} [{f3(lo)},{f3(hi)}] dropped {dr:.1%}"
     else:
         t1 = "not evaluable (" + ("Gate b1 ID failed" if not M.b1["ID"] else "NO-MENTION or OPTIONS-AFTER not evaluable") + f"): {law_text(r1)}"
-    p2e = M.iia_i_at_ls is not None and M.iia_i_at_ls >= B1
+    p2e = M.b1_at("ID", ls)
     r2, ev2, _ = law(M, "ID", ls, ls + 1)
     p2 = bool(all(r2[f][1] <= BOUND for f in ev2)) if p2e and ev2 else None
     R["H11"] = (None if p1 is None else bool(p1 and p2 is not False),
@@ -360,15 +379,22 @@ def score(root, out=print, test=False):
         ok, txt = P.get(h, (None, "no results"))
         verd[h] = (ok, txt)
         out(f"   {h:4s} {WORDING[h]}\n        {txt} -> {V(ok)}")
-    if OPTIONAL in res:
-        L, R14 = res[OPTIONAL], P
-        met = [h for h in ("H7", "H9", "H10") if R14.get(h, (None,))[0] is True]
-        rep = {h: (L["R"][h][0] is True) if h in met else (L["R"][h][0] == R14.get(h, (None,))[0]) for h in ["H8", "H11 Part 1"] + met}
-        ok = bool(L["b1"]["BIND"] and 30 <= L["lstar"] <= 40 and all(rep.values()))
-        verd["H12"] = (ok, f"70B Gate b1 {V(L['b1']['BIND'])}, l* = {L['lstar']} (30..40); reproduced: " + ", ".join(f"{h} {'yes' if v else 'no'}" for h, v in rep.items()))
+    run70 = OPTIONAL in dirs and not (dirs[OPTIONAL] / "SKIPPED.txt").exists()
+    if OPTIONAL in res and prim in res:
+        L = res[OPTIONAL]
+        named = ["H8", "H11 Part 1"] + [h for h in ("H7", "H9", "H10") if P[h][0] is True]
+        ev14 = [h for h in named if P[h][0] is not None]
+        rep = {h: L["R"][h][0] is P[h][0] for h in ev14}
+        g70 = bool(L["b1"]["BIND"] and 30 <= L["lstar"] <= 40)
+        verd["H12"] = (None if not ev14 else bool(g70 and all(rep.values())),
+                       f"70B Gate b1 {V(L['b1']['BIND'])}, l* = {L['lstar']} (30..40): {'OK' if g70 else 'FAILED'}; "
+                       + "".join(f"{h} NOT EVALUABLE at 14B (left out); " for h in named if h not in ev14)
+                       + ("reproduced (14B verdict, 70B verdict): " + ", ".join(f"{h} {V(P[h][0])}, {V(L['R'][h][0])}: {'yes' if v else 'no'}" for h, v in rep.items())
+                          if ev14 else "no named 14B verdict is MET or NOT MET"))
     else:
-        verd["H12"] = (None, "NOT RUN (optional; no Llama-3-70B results)" if OPTIONAL not in dirs or (dirs[OPTIONAL] / "SKIPPED.txt").exists() else "70B results incomplete")
-    out(f"   H12  {WORDING['H12']}\n        {verd['H12'][1]} -> {V(verd['H12'][0])}")
+        verd["H12"] = (None, "NOT RUN (optional; no Llama-3-70B results)" if not run70 else
+                       "70B results incomplete" if OPTIONAL not in res else "no Qwen2.5-14B results to reproduce")
+    out(f"   H12  {WORDING['H12']}\n        {verd['H12'][1]} -> {'NOT RUN' if not run70 else V(verd['H12'][0])}")
     for m, M in models.items():
         out(f"\n-- {m}: EXPLORATORY")
         exploratory(M, out)

@@ -321,19 +321,24 @@ def main(argv=None):
     rel = ct.load(a.prakash_repo)
     pairs = ct.pool(rel)   # asserts the pool hash
     tok = AutoTokenizer.from_pretrained(a.model, revision=a.revision)
-    pf = preflight(tok, rel, pairs, sorted(set(formats) | set(ct.FORMATS)))
+    pf = preflight(tok, rel, pairs, sorted(set(formats) | set(ct.FORMATS) | set(ct.EXTRA_FORMATS)))   # independent of --formats
     print(f"preflight OK: pool {pf['pool_sha256'][:16]}, {pf['n_words_single_token']} single-token words, n_bos {pf['n_bos']}, "
           + ", ".join(f"{f} T={v['length']} P={v['positions']}" for f, v in pf["formats"].items()), flush=True)
-    dump(out / "preflight.json", provenance(a), pf)
+    if "preflight" in stages or not (out / "preflight.json").exists():
+        dump(out / "preflight.json", provenance(a), pf)
+    else:   # a later stage re-derives the preflight and checks it against the stored one, which keeps the preflight's provenance
+        drop = lambda d: {k: v for k, v in d.items() if k not in ("provenance", "seconds")}  # noqa: E731
+        assert drop(json.loads(json.dumps(pf))) == drop(json.load(open(out / "preflight.json"))), \
+            f"the preflight re-derived here differs from {out / 'preflight.json'}"
     if stages == ["preflight"]:
         return
     t0 = time.time()
     kw = {"dtype": getattr(torch, a.dtype), "revision": a.revision, "attn_implementation": a.attn}
-    if a.device_map:
-        kw["device_map"] = a.device_map
+    if a.device_map or (torch.cuda.is_available() and not a.test):   # straight to the GPU (the FP32 14B re-check is 59 GB)
+        kw["device_map"] = a.device_map or {"": 0}
     model = AutoModelForCausalLM.from_pretrained(a.model, **kw).eval()
-    if not a.device_map:
-        model = model.to("cuda" if torch.cuda.is_available() and not a.test else "cpu")
+    if "device_map" not in kw:
+        model = model.to("cpu")
     nL = len(blocks(model))
     prov = provenance(a, model)
     print(f"loaded {a.model} ({nL} layers, {prov['dtype']}, {prov['device']}) in {time.time() - t0:.0f}s", flush=True)

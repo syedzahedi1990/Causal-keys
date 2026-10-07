@@ -369,6 +369,197 @@ Alternative: an inhibitory read at 7B (G19b fails with G19a met; reported as "in
 
 ---
 
+## Outcome of P-2026-10-05-G (GPU stage 5; scored by analysis/stage5_score.py at the finalising commit 51e105e, which the run used)
+
+**Run.**
+- **Hardware and software:** one A100-SXM4-80GB, Python 3.12.14, torch 2.11.0+cu128, transformers 5.18.0, numpy 2.5.3. The run used a clean checkout of 51e105e (`COMMIT.txt`) with `PARTS=a,b,c,d,e`, `EXTRA=0` and `TEST_MODE=0`, started 2026-10-06T21:25Z.
+- **Precision and attention:** BF16 throughout, except GPT-2 small and GPT-2 XL, which ran in FP32 with exactness asserted (0 violations). Part (a) and the form probe used eager attention; every other part used sdpa.
+- **Provenance and population:**
+  - One Hub revision per model, nine models (`REVISIONS.txt`), and every results file carries commit 51e105e.
+  - Every file has the preregistered n (150, 60 or 200 per arm) with the same cores in every arm and across the parts that share a model, and `skipped_items` is 0 wherever it is recorded.
+  - The scorer prints "provenance OK; population OK".
+- **What failed:** one step failed: the exploratory GPT-2 small name-mover/duplicate-head attention probe (`experiments/ioi_attention.py`). It hit a device mismatch: an index tensor stayed on the CPU while the weights were on cuda:0 (`log_ioi_attention_gpt2.txt`, `FAILED.txt`). No gate or prediction uses this probe. It was re-run afterwards on CPU (see Deviations).
+- **Scope of the run:** `EXTRA=0` means the exploratory Qwen3-8B cells (part (c) factorial and splice) were not run. No prediction uses them.
+- **Re-score:** re-scoring the archive off the box with the committed scorer at 51e105e reproduces `STAGE5_SCORE.txt` byte for byte when run from a checkout root with the default relative `--root`. With an absolute `--root`, only the printed root path differs, in two header lines.
+- **Independent checks:** five independent recomputations from the raw files, none of which imports the scorer, reproduce every gate value, point estimate and verdict (details under Deviations).
+- **Summary line:** 12 MET, 10 NOT MET, 0 NOT EVALUABLE of 22.
+
+Numbers below are from `STAGE5_SCORE.txt` unless marked *(recomputed)*, which means recomputed from the raw files and not printed in the score file; "our arithmetic" marks a difference or ratio of printed score-file values. Model order in triples is Qwen2.5-7B / Qwen2.5-14B / Mistral-7B, and in quadruples Qwen2.5-7B / 14B / Mistral-7B / OLMo-2-7B (all Instruct), unless stated.
+
+### Gates
+
+- **Gate 0 (reproduction of stage 3b; parts c, d): passed 4/4.**
+  - ID_K for SENTENCE-AFTER / NO-MENTION / LIST-AFTER: 5.52 / 1.04 / 20.60 (Qwen2.5-7B), 12.08 / 1.05 / 35.81 (14B), 7.87 / 0.55 / 15.55 (Mistral-7B), 2.01 / 0.38 / 8.65 (OLMo-2-7B). Every value equals the reference at the printed precision.
+  - Per core, these cells are bitwise identical to the stage-3b raw files *(recomputed: largest per-core difference 0.0 over 150 cores × 3 arms × 4 models)*.
+- **Gate a (part a): all four models gated in.**
+  - Lowercase ID_K(OPTIONS-AFTER) is +19.39 / +38.95 / +2.63 / +10.37 (Qwen2.5-7B / 14B / 1.5B / 3B), every CI excluding 0.
+  - ID_K(SENTENCE-AFTER) is +4.50 [+4.18, +4.82] at 7B and +12.05 [+11.44, +12.67] at 14B. At 1.5B it is −0.53 [−0.64, −0.41] and at 3B −0.02 [−0.40, +0.37], both inside [−1, +1].
+  - In the cells where the emitted casing is capitalised, the capitalised ID_K is +4.73 (7B SENTENCE-AFTER), +13.48 (14B) and +0.04 [−0.35, +0.44] (3B).
+  - E(OPTIONS-AFTER) is 0.887 / 0.866 / 0.750 / 0.832, and F/E(OPTIONS-AFTER) is 1.00 / 0.99 / 1.04 / 1.03.
+- **Gate b (part b, M8 in every arm): met 3/3.**
+  - Under M8, mean ID_K = mean ID_V = 0.000 in all 12 arm × model cells, and the within-batch duplicate-row floor is 0.000.
+  - acc_B and on_B under M8 are 0.00 at Qwen2.5-7B, 0.00–0.15 at 14B and 0.04–0.19 at Mistral-7B.
+- **Gates d1–d3 (part d).**
+  - d1 failed only in the secondary list arms AFTER_FR and AFTER_DE, at Qwen2.5-7B and Mistral-7B; for example, Qwen2.5-7B AFTER_DE has clean B accuracy 0.727. Those secondary cells are not evaluable; every primary sentence cell passed.
+  - d2 passed in every model and form family: DE 5/6 in all four models, SYN 5/6 at Mistral-7B, FR 5/6 at OLMo-2-7B, all others 6/6.
+  - d3 passed 4/4.
+- **Gate e (part e, per model × arm).**
+  - Qwen2.5-7B-Instruct passed in all six arms.
+  - Mistral-7B failed AFTER (two-way 0.59, four-way 0.42), BEFORE (four-way 0.27) and INLINE_BEFORE (four-way 0.32). Mistral-7B is therefore not evaluable in G19–G21, which counts as not met.
+  - GPT-2 small passed PLAIN, INLINE and INLINE_BEFORE and failed AFTER, BEFORE and QUESTION, the same pattern as in the disclosed pilot.
+  - Exploratory models: Qwen2.5-7B base failed QUESTION, Qwen2.5-14B-Instruct failed INLINE_BEFORE, and GPT-2 XL failed AFTER, BEFORE and QUESTION.
+
+### Predictions
+
+**Part (a), re-mention attention (SENTENCE-AFTER unless stated).**
+
+| Prediction | Observed | Verdict |
+|---|---|---|
+| G1 anchors: E ≥ 0.20 (lower > 0.10), F/E ≥ 0.5 at 7B and 14B | E 0.869 [0.852, 0.885], F/E 1.00 (7B); E 0.915 [0.908, 0.921], F/E 0.98 (14B) | **met** (2/2) |
+| G2 dissociation at 1.5B/3B: H_diss | E 0.789 [0.778, 0.802], F/E 1.03 (1.5B); E 0.879 [0.866, 0.892], F/E 0.99 (3B). Not embedding-level: H* layers 8, 12, 6 and 17, 22, 19. Jaccard(H*SENTENCE-AFTER, H*OPTIONS-AFTER) 1.00 / 0.50. d_K beside ID_K: +0.31 [+0.09, +0.54] (1.5B) and +2.89 [+2.16, +3.64] (3B) | **met** (H_diss, 2/2) |
+| G3 magnitude under H_diss: R_A ≥ 0.5 and E(m) ≥ 0.5 × min anchor E | R_A 1.05 [1.04, 1.07] / 1.06 [1.03, 1.08]; E(m)/min anchor E 0.91 [0.88, 0.94] / 1.01 [1.00, 1.03] (1.5B / 3B) | **met** (2/2) |
+| G4 hop 2: (a) G ≥ 0.10 (lower > 0.05) at the anchors; (b) Q ≤ 0.5 (upper < 1.0) at 1.5B/3B | (a) G 0.255 [0.222, 0.288] (7B), 0.329 [0.304, 0.353] (14B); (b) Q 0.34 [0.29, 0.39] (G 0.086), 0.44 [0.37, 0.52] (G 0.113) | **met** ((a) 2/2, (b) 2/2) |
+
+G2 replicates, in sibling models, the H_diss pattern of the disclosed Qwen2.5-0.5B CPU pilots. G4 is an attention measure; it does not intervene on hop 2.
+
+**Part (b), attention knockout (Qwen2.5-7B / 14B / Mistral-7B).**
+
+| Prediction | Observed | Verdict |
+|---|---|---|
+| G5 r_K(M1) ≤ 0.20 (upper ≤ 0.25) in LIST-AFTER and OPTIONS-AFTER, 3/3; ≤ 0.40 in SENTENCE-AFTER, ≥ 2/3 | LIST-AFTER +0.001 / −0.026 / −0.007; OPTIONS-AFTER +0.003 / −0.028 / −0.009 (every upper bound ≤ 0.007); SENTENCE-AFTER −0.105 / −0.036 / +0.001 | **met** (list 3/3, sentence 3/3) |
+| G6 matched control column (LIST-AFTER, M2) | r_K(M2) 1.094 / 0.997 / 0.990; \|ΔID_V\| 0.785 / 0.795 / 0.255 against limits 2.494 / 2.867 / 2.046; paired ID_K M1 − M2 −22.54 / −36.56 / −15.50, all CIs below 0 | **met** (3/3) |
+| G7 H_redundant: (a) copy takes over, ≥ 2/3 models in both formats; (b) answer preserved, 3/3 | (a) 3/3: q_V^M1 0.390 / 0.440 / 0.448 (LIST-AFTER) and 0.377 / 0.427 / 0.422 (OPTIONS-AFTER) against q_V^M0(NO-MENTION) 0.391 / 0.335 / 0.433; paired ID_V M1 − M0 +5.95 / +23.09 / +9.22 and +5.02 / +24.23 / +7.19, all CIs above 0. (b) 1/3: acc_B / acc_S / on_B / on_S under M1 are 0.37 / 0.40 / 0.37 / 0.40 and 0.30 / 0.31 / 0.31 / 0.31 (Qwen2.5-7B), 1.00 / 0.99 / 1.00 / 0.99 and 0.99 / 0.99 / 0.99 / 0.99 (14B), 0.86 / 0.83 / 0.86 / 0.83 and 0.73 / 0.74 / 0.73 / 0.74 (Mistral-7B); loc_mass ratio ≥ 0.956 everywhere; span ratio ≥ 0.5 in 3/3 | **not met**. H_replaced **not met** (ID_V/q_V pattern 0/3, behaviour pattern 1/3). Preregistered outcome: **partial takeover** |
+| G8 routes at the answer position: (a) NO-MENTION M3; (b) LIST-AFTER M3; (c) M4 against M1 | (a) ID_V^M3/ID_V^M0 0.134 / 0.370 / 0.417, paired −14.40 / −12.05 / −7.95; (b) r_K(M3) 1.043 / 1.027 / 1.010 with acc_B = on_B = 1.00; (c) ID_V^M4/ID_V^M1 0.134 / 0.465 / 0.570 (LIST-AFTER) and 0.111 / 0.411 / 0.517 (OPTIONS-AFTER), all paired CIs below 0 | **met** ((a) 3/3, (b) 3/3, (c) 3/3 in each format) |
+
+**Part (c), membership, dose and reader rows (Qwen2.5-7B / 14B / Mistral-7B; seed 0, seed-1 replication beside).**
+
+| Prediction | Observed | Verdict |
+|---|---|---|
+| G9 membership, per family | Sentence family: S3 − NO-MENTION +2.44 / +8.47 / +4.70; S3/S6 0.63 / 0.79 / 0.67; S3 − S3out +2.76 / +8.77 / +4.91; S3out − NO-MENTION −0.32 [−0.36, −0.27] / −0.30 [−0.38, −0.22] / −0.21 [−0.26, −0.17]. List family: L3 − NO-MENTION +20.66 / +34.78 / +15.11; L3/L6 1.05 / 1.00 / 1.01; L3 − L3out +21.01 / +34.91 / +15.35; L3out − NO-MENTION −0.35 / −0.13 / −0.25 | **met** (sentence 3/3, list 3/3; seed 1 replicated 3/3 in each family) |
+| G10 proportionality refuted (lower bound of r_2 > 1/3 and of r_3 > 1/2), per family | Sentence family: r_2 0.28 [0.23, 0.32] / 0.58 [0.55, 0.61] / 0.46 [0.43, 0.50]; r_3 0.63 / 0.79 / 0.67; ladder r_4 0.83 / 0.90 / 0.78. List family: r_2 0.96 / 0.98 / 0.98, r_3 1.05 / 1.00 / 1.01 | **not met**: sentence 2/3 (fails at Qwen2.5-7B, also at seed 1: r_2 0.32 [0.28, 0.37]); list **met** 3/3 (seed 1 3/3) |
+| G11 the copy returns when the readers leave the list: ID_V(L3out) − ID_V(L3) > 0 and R_V ≥ 0.5 | +1.43 [+1.14, +1.72] / +0.52 [+0.28, +0.76] / −0.83 [−1.24, −0.46]; R_V 0.11 / 0.03 / −0.08; evaluability gaps 12.53 / 16.16 / 10.35 nats | **not met** (0/3; seed 1 0/3, R_V 0.10 / 0.03 / −0.08) |
+| G12 reader rows: f_words ≥ 0.5 (lower > 0.25) in S2, S3, L2, L3 | S2 0.40 [0.32, 0.46] / 0.38 [0.33, 0.42] / 0.39 [0.33, 0.45]; S3 0.68 / 0.72 / 0.72; L2 0.91 / 0.94 / 0.92; L3 0.94 / 0.95 / 0.95; all 12 cells valid (d(none) 0.000, d(all) ≥ 8.14 nats) | **not met** (9/12; S2 fails in all three models) |
+
+**Part (d), non-identical re-mentions (Qwen2.5-7B / 14B / Mistral-7B / OLMo-2-7B; met if ≥ 3 evaluable models meet).**
+
+| Prediction | Observed | Verdict |
+|---|---|---|
+| G13 wrappers: r_K(THE), r_K(MODIF) ≥ 0.75 (lower > 0.5), scored separately | THE 1.09 / 0.99 / 1.06 / 0.96; MODIF 0.32 / 0.64 / 0.64 / 0.55 | **not met** (THE **met** 4/4; MODIF **not met** 0/4) |
+| G14 an exact repeat reads most: r_K(v) ≤ 0.75 (upper < 1.0), six sub-verdicts | TITLE 0.94 / 1.09 / 1.07 / 0.87 and UPPER 1.08 / 1.14 / 1.01 / 0.83 (0/4 each); PLURAL 0.33 / 0.37 / 0.49 / 0.11, SYN −0.03 / 0.00 / 0.06 / −0.13, FRMIX 0.15 / 0.10 / 0.07 / 0.09, DEMIX −0.01 / 0.02 / 0.02 / 0.00 (4/4 each) | **not met** (4/6 sub-verdicts met; TITLE and UPPER not met) |
+| G15 token-level on the paper's measure: r_K ≤ 1/3 (upper < 0.5) and rho_s ≤ 0.5 (upper < 0.75) for SYN, FRMIX, DEMIX | r_K as in G14; rho_s: SYN 0.19 / 0.14 / 0.16 / 0.09, FRMIX 0.33 / 0.29 / 0.17 / 0.30, DEMIX 0.19 / 0.20 / 0.11 / 0.22 | **met** (each sub-verdict 4/4) |
+| G16 token pattern on r_K^any and on a_v within a model, ≥ 3 models, per variant | SYN 1/4: r^any token in 4/4 (0.09 / 0.09 / 0.26 / −0.13); a_v 0.41 / 0.41 / 0.53 / 0.21, graded except OLMo-2-7B (token). FRMIX 0/4: concept pattern on both measures at Qwen2.5-7B (r^any 0.95, a_v 0.86) and 14B (1.06, 0.90), graded at Mistral-7B (0.56, 0.55) and OLMo-2-7B (0.44, 0.39). DEMIX 2/4 (collision-excluded): concept pattern on r^any and graded on a_v at Qwen2.5-7B (0.69, 0.66) and 14B (1.32, 0.65); token pattern on both at Mistral-7B (0.31, 0.33) and OLMo-2-7B (−0.13, 0.09) | **not met** (SYN, FRMIX, DEMIX each not met). Decision table: none of the three preregistered outcomes holds for any variant (graded) |
+| G17 value compensation: paired ID_V(v) − ID_V(SENTENCE-AFTER) > 0 in ≥ 2 of the evaluable cells (Qwen2.5-7B, Mistral-7B, OLMo-2-7B) | FRMIX +2.58 / +1.37 / +0.31 [+0.08, +0.53]; DEMIX +2.02 / +1.13 / +0.39 [+0.12, +0.65]. Qwen2.5-14B is excluded by the entry's gap rule: it is not among the models with a stage-3b gap ID_V(NO-MENTION) − ID_V(SENTENCE-AFTER) > 2 nats (in the stage-5 factorial the gap is 19.12 − 18.46 = +0.66, our arithmetic on the score-file arm table). Its paired differences, printed as not evaluable, are −2.53 and −3.08 | **met** (FRMIX 3/3, DEMIX 3/3) |
+
+THE is met, so G14–G17 are not confounded with the frame.
+
+**Part (e), IOI (seed-1 cores, n = 200).**
+
+| Prediction | Observed | Verdict |
+|---|---|---|
+| G18 f_K(PLAIN) ∈ [−0.10, +0.10], CI within [−0.20, +0.20], 3/3 | GPT-2 small −0.02 [−0.02, −0.01], Qwen2.5-7B-Instruct +0.02 [+0.01, +0.03], Mistral-7B +0.00 [−0.00, +0.01]; ID_KV 8.61 / 10.33 / 7.94 | **met** (3/3) |
+| G19 a later list opens a key read: (a) existence, (b) positive sign, 2/2 | Qwen2.5-7B-Instruct: ID_K(AFTER) +7.05 [+6.26, +7.81], contrast against QUESTION +6.44 [+5.65, +7.21], positive. Mistral-7B: not evaluable (AFTER failed Gate e) | **not met** ((a) 1/2, (b) 1/2) |
+| G20 the lookup replaces the copy, 2/2 | Qwen2.5-7B-Instruct: f_V(AFTER) 0.45 [0.41, 0.48] ≤ 0.50 (passes); f_V(QUESTION) 0.69 [0.67, 0.70] < 0.75 (fails); paired f_V(QUESTION) − f_V(AFTER) +0.24 [+0.20, +0.28] (passes); s_ID(AFTER) 0.57 (passes). Mistral-7B not evaluable | **not met** (0/2) |
+| G21 controls: (a) BEFORE, (b) QUESTION, (c) GPT-2 small INLINE_BEFORE | (a) Qwen2.5-7B-Instruct ID_K(BEFORE) −2.02 [−2.18, −1.86], \|mean\| > 0.5 (the AFTER − BEFORE contrast +9.07 [+8.27, +9.85] passes); Mistral-7B not evaluable: 0/2. (b) Qwen2.5-7B-Instruct \|f_K(QUESTION)\| 0.02, \|ID_K(QUESTION)\|/\|ID_K(AFTER)\| 0.09 [0.06, 0.11]: met; Mistral-7B not evaluable: 1/2. (c) ID_K(INLINE_BEFORE) −0.25 [−0.29, −0.21]: met | **not met** ((a) not met, (b) not met, (c) met) |
+| G22 GPT-2 small in-sentence re-mention: (a) key read, (b) inhibitory | ID_K(INLINE) −2.35 [−2.47, −2.23]; signed contrast against PLAIN +2.20 [+2.09, +2.32] and against INLINE_BEFORE +2.10 [+1.99, +2.22] | **met** ((a), (b)) |
+
+Following the entry, the GPT-2 small parts are replications of the disclosed CPU pilot on fresh cores and are not counted as confirmatory evidence. These are the GPT-2 line of G18, G21c and G22. The pilot gave ID_K(INLINE) −2.34 [−2.46, −2.23]. The confirmatory IOI evidence is the 7B-pair part of G18 (met) and G19–G21a/b (not met).
+
+**Status of the preregistered alternatives.**
+- **(a) H_track:** not declared. G2 is met under H_diss, and G4b is met (Q 0.34 / 0.44), so the entry's fallback ("if G4b fails with H_diss met, … OV content") does not apply.
+- **(b) H_replaced:** not met (see G7). Neither H_redundant nor H_replaced holds; the preregistered outcome is partial takeover.
+- **(c) Graded list-likeness (OUT ≈ IN ≈ ½ × k6, r_k ≈ k/6, readers not in the named rows):** not supported overall. OUT lies below NO-MENTION in both families (S3out − NO-MENTION −0.32 / −0.30 / −0.21, L3out − NO-MENTION −0.35 / −0.13 / −0.25), not near ½ × k6, and the list ladder is complete at k = 2 (r_2 0.96–0.98). Two features match it in part: in sentences at Qwen2.5-7B, r_2 0.28 [0.23, 0.32] is close to 2/6; and in S2 the rows after the question carry 0.46 / 0.49 / 0.38 of the splice effect d.
+- **(d) Concept-level lookup:** not established by the decision table, which needs the concept pattern on a_v in ≥ 3 models. It holds in two models, and for one variant only (FRMIX at Qwen2.5-7B and 14B; see G16).
+- **(e) Inhibitory key read at 7B, or additive mixture:** neither holds at Qwen2.5-7B-Instruct. G19b is met there (positive sign), and f_V(AFTER) is 0.45 [0.41, 0.48] < 0.5. Mistral-7B is not evaluable.
+
+### Deviations and disclosures
+
+- **GPT-2 attention probe re-run on CPU (exploratory, no prediction).** The failed probe was re-run with the same arguments: gpt2 at revision 607a30d, n = 200, seed-1 IOI cores, FP32, eager attention, code of 51e105e, skipped_items 0. Output: `results/gpu_stage5_cpu_probe/`.
+  - The software differs from the box: torch 2.14.1+cpu and Python 3.11.15, against torch 2.11.0+cu128 and Python 3.12.14. transformers is 5.18.0 in both.
+  - Its summary lines agree with its stored attention matrices *(recomputed)*.
+- **GPT-2 replication status.** On fresh cores, every GPT-2 small result of the disclosed pilot recurs:
+  - Gate e passes in PLAIN, INLINE and INLINE_BEFORE only.
+  - G18 (GPT-2 line), G21c, G22a and G22b are met.
+  - ID_K(INLINE) is within 0.01 nats of the pilot.
+- **Headline lines combine sub-verdicts (scorer rule at 51e105e, documented in the `stage5_score.py` docstring).** A prediction with sub-verdicts is printed MET only when every sub-verdict is met. The entry scores G9 and G10 per family and G13 and G14 as separate sub-verdicts, so this record states them:
+  - G10: list family met 3/3, sentence family not met 2/3.
+  - G13: THE met, MODIF not met.
+  - G14: PLURAL, SYN, FRMIX and DEMIX met; TITLE and UPPER not met.
+
+  The count of 12 MET / 10 NOT MET uses the combined lines. No verdict is changed.
+- **G16 label (scorer wording, not the entry's).** For a variant matching none of the three preregistered outcomes, the scorer prints "graded (per-model profile reported verbatim, phrased as near-token-level)".
+  - The entry says only "otherwise graded", and "near-token-level" appears nowhere in it.
+  - The phrase does not describe FRMIX, where Qwen2.5-7B and 14B show the concept pattern on both measures, or DEMIX at the Qwen models. This record reports the per-model profiles and does not adopt the phrase.
+  - The scorer also has a fourth branch ("reported as is", for a token pattern on a_v with a concept pattern on r^any) that the entry does not list. It did not fire.
+- **Part (a), points the entry leaves open (no verdict effect).**
+  - "Emitted casing" is taken to be the casing with the larger clean-B candidate mass. It matters only at Qwen2.5-1.5B under SENTENCE-AFTER (lowercase 0.65, capitalised 0.33), where both casings pass the gate.
+  - F, F_b and the K_X mirror are computed on the evaluation half at H*, while the key effects are bootstrapped over all 150 cores.
+  - The Gate a key effects come from the eager single-sequence run. At Qwen2.5-7B they are lower than the sdpa values on the same cores, by about 1.0 nat under SENTENCE-AFTER and 1.8 under OPTIONS-AFTER, with non-overlapping CIs: SENTENCE-AFTER +4.50 against +5.52 (stage-5 part (c) factorial and stage 1), OPTIONS-AFTER +19.39 against +21.16 (stage 1, printed beside it; the stage-5 part (b) knockout M0 gives +21.17). The other three models agree with the stage-1 sdpa values within 0.2 nats. The gate is not near its bound (4.50 > 3.0).
+- **Part (b), points the entry leaves open (no verdict effect).**
+  - The H_replaced behaviour clause is applied per model in both list formats.
+  - The q_V thresholds are applied to point estimates.
+  - The G6 \|ΔID_V\| criterion uses cell means, which equal the paired means because every arm has the same cores.
+  - Either reading of each point gives the same verdicts.
+- **Part (e), the 7B pair rests on one evaluable model.** Mistral-7B's AFTER, BEFORE and INLINE_BEFORE cells failed Gate e. Its not-evaluable cells count as not met in the 2/2 lines, so the NOT MET verdicts of G19, G20 and G21a/b reflect Qwen2.5-7B-Instruct alone (G19a/b and G21b met there; G20 and G21a not met there) together with Mistral-7B's gate failure.
+- **Gate 0 checks determinism, not sampling agreement.** On the same stack and GPU type, the reproduction cells are bitwise identical to stage 3b *(recomputed)*.
+- **Independent verification.** Five recomputations from the raw files, without the scorer, gave the following *(recomputed)*:
+  - Every gate and verdict and every printed point estimate agree.
+  - In part (b), the scorer's own bootstrap index set reproduces all 63 cell lines byte for byte.
+  - With independent seeds, CI bounds move by at most about 0.05 nats (0.048 in part (b); 0.039 over 600 cell statistics in part (d)) and by up to 0.01 in ratios (for example the 3B Q upper bound, 0.52 against 0.51). No verdict lies within that distance of its bound.
+  - The exceptions are ratio CIs with denominators near zero, such as f_K and f_V for Mistral-7B INLINE_BEFORE and GPT-2 XL AFTER. These enter no verdict.
+  - The scorer files are unchanged between 51e105e and the results commit.
+
+### Unpredicted observations (reported, not reinterpreted)
+
+**Part (a).**
+- **Accuracy at the small models.** Under SENTENCE-AFTER, clean accuracy is low *(recomputed, argmax over the 12 candidate ids)*: B 0.76 / S 0.79 at 1.5B and 0.82 / 0.82 at 3B. Almost every wrong answer is the initial location.
+- **3B on competent cores.** Restricted to cores answered correctly in both B and S, 3B SENTENCE-AFTER ID_K (capitalised) is +0.71 [+0.29, +1.14] *(recomputed; not preregistered)*. At 1.5B it stays at −0.51 [−0.65, −0.37].
+- **Non-specific key effect at 3B.** Under SENTENCE-AFTER, 3B has a non-specific key effect without identity: d_K +2.89 (lowercase), +3.03 (capitalised). Its co-variation with F_b is weakly positive: Pearson +0.25 [+0.07, +0.41].
+- **Hop 2 under the key clamp.** At 1.5B the hop-2 attention does not follow the clamped key: d(ans→r_s) +0.015, d(ans→r_b) +0.028. At 3B it partly follows (+0.127 / −0.105), and at 7B and 14B it follows (+0.343 / −0.243 and +0.321 / −0.213).
+- **What the answer row attends to.** Under SENTENCE-AFTER at 7B and 14B, the answer row at the hop-2 heads attends mostly to the writing token itself (0.534, 0.468), not to the re-mentions. Under OPTIONS-AFTER its top-5 columns are all re-mention words.
+- **Head-set overlap.** H*(SENTENCE-AFTER) and H*(OPTIONS-AFTER) are identical at 7B and 1.5B (Jaccard 1.00) but overlap little at 14B (0.20). At 14B each format's heads still work on the other format (cross-format E 0.768, 0.734).
+
+**Part (b).**
+- **Which answer replaces B under M1.** At Qwen2.5-7B, the self-clamp row's restricted argmax is the initial location in 0.63 (LIST-AFTER) and 0.69 (OPTIONS-AFTER) of cores; at Mistral-7B it is 0.14 and 0.24, and at 14B 0.00 *(recomputed, descriptive)*.
+  - Under SENTENCE-AFTER with M1, the answer stays B in 1.00 / 1.00 / 0.99 of cores.
+  - The loc_mass criterion of G7b cannot see the initial-location answers, because they are still location words.
+- **M3 and M7 under SENTENCE-AFTER (exploratory).** Cutting only the answer position's attention to the writing token raises the key read: r_K(M3) 1.66 / 1.80 / 1.39. M7 (tail rows) gives 1.18 / 1.94 / 1.46.
+- **Row specificity (exploratory).** Cutting only the rows of the three clamped candidates (M5) removes the key read as completely as M1: r_K −0.008 / −0.025 / −0.007 under LIST-AFTER. Cutting the other three candidate rows (M6) leaves it intact: 0.961 / 1.003 / 1.003.
+- **Copy takeover under SENTENCE-AFTER (exploratory).** q_V(M1) is 0.423 / 0.443 / 0.460, against q_V(NO-MENTION) 0.391 / 0.335 / 0.433.
+- **Initial-location column at Qwen2.5-7B.** Cutting this column (M2) slightly strengthens the key read: r_K 1.094, and 1.137 on the 40 cores with two such columns.
+
+**Part (c).**
+- **F3out falls below NO-MENTION.** Naming B with two other candidates instead of S and X pushes ID_K below NO-MENTION, although the written word B is re-mentioned: S3out − NO-MENTION −0.32 / −0.30 / −0.21, L3out − NO-MENTION −0.35 / −0.13 / −0.25, mostly with CIs excluding 0.
+- **Sentence ladder.** In sentences every added candidate raises ID_K. At Qwen2.5-7B the paired steps are S3 − S2 +1.96 (adds B), S4 − S3 +1.11 (adds one non-matching candidate) and S6 − S4 +0.93 (adds two), each CI excluding 0. In lists the read is complete at k = 2.
+- **Value identity when B is not named.** In lists that do not name the written word B, the key read is at full strength while the value identity stays near or above NO-MENTION.
+  - ID_V(L2) is 18.63 / 29.48 / 16.24 and ID_V(L4out) 14.90 / 30.76 / 13.68, against NO-MENTION 16.60 / 19.12 / 13.65 and L3 4.06 / 2.97 / 3.29.
+  - Paired L4out − L4 is +10.19 / +26.57 / +10.06 *(recomputed)*.
+  - The same holds at seed 1, for example 14B L4out 30.88 against NO-MENTION 18.84.
+- **Readers in S2.** In S2 the rows after the question carry 0.46 / 0.49 / 0.38 of the splice effect d (the total key-swap effect, d_K, not ID_K), against 0.10–0.13 in S3. In S2 most of d_K is not identity-specific: ID_K/d_K is 0.14 / 0.29 / 0.38, against 0.44 / 0.56 / 0.61 in S3 (our arithmetic on the score-file arm tables, 150 cores).
+- **Readout mass in the sentence family.** Under NO-MENTION and every sentence arm, the clean-B probability mass on the six lowercase candidates is 0.00–0.03 at the three primary models, so the sentence-family contrasts are scored on tokens the model is not about to emit (as in stage 3b). In lists the mass is 0.21–1.00.
+- **Unnamed B is still chosen.** At Qwen2.5-7B the model chooses B in 1.00 of L2 cores, although B is not listed, and in 0.71 of L4out cores (Mistral-7B 0.81).
+
+**Part (d).**
+- **Case variants.** A capitalised or all-caps re-mention reads the key nearly as fully as the exact repeat, although it has different token ids: r_K 0.83–1.14. The CI lies below 1 for OLMo-2-7B TITLE and UPPER (0.87, 0.83) and Qwen2.5-7B TITLE (0.94); the other five of the eight cells are at or above 1.
+- **Attention without the read.** A multi-token wrapper (MODIF) attends to the writing token about as much as the exact repeat (span-summed a_v 1.22 / 1.24 / 1.08 / 0.94). The plural attends at 0.87–0.89 of the exact repeat (1.40 at Mistral-7B). Both read the key only partly (r_K 0.32–0.64 and 0.11–0.49). The values above 1 come from summing attention over multi-token spans. With the last token only, MODIF is 0.95 / 0.95 / 0.84 / 0.79 (span 2.33–2.50 tokens) and PLURAL 0.87 / 0.88 / 0.62 / 0.89 (1.83 tokens at Mistral-7B, one token elsewhere) *(recomputed)*.
+- **Translations at Qwen.** Scored in the variant's own form, the French-mixed re-mention at the Qwen models reads the key fully: r_K^form 0.99 / 1.28 (r_K^any 0.95 / 1.06). The raw rise of log p(S) under the K_S clamp does not separate the variants (it is as large for SYN, which has almost no read: r_K^any 0.09 / 0.09), so only these identity contrasts are reported.
+- **Size of the G17 compensation.** The value compensation of G17 is no larger than that produced by the structure-matched floor sentence: ID_V(POST_OTHER) − ID_V(SENTENCE-AFTER) is +2.71 / +2.51 / +0.54 at Qwen2.5-7B / Mistral-7B / OLMo-2-7B *(recomputed)*, against FRMIX +2.58 / +1.37 / +0.31.
+- **Span-summed attention.** The a_v of the multi-token forms depends on summing attention over the span. With the last token only, FRMIX a_v is 0.55 / 0.60 / 0.45 / 0.29 *(recomputed)*.
+
+**Part (e).**
+- **BEFORE gives a negative key read.** It is negative in every gated-in BEFORE cell: −2.02 (Qwen2.5-7B-Instruct), −3.83 (14B), −0.95 (Qwen2.5-7B base). The cells that failed Gate e are negative too: Mistral-7B −0.96, GPT-2 small −0.05, GPT-2 XL −0.57.
+- **The sign of the AFTER read varies by model.**
+  - Positive at Qwen2.5-7B-Instruct (+7.05) and 14B-Instruct (+10.24; the G19 criteria and G21b are met there, exploratory). The 14B model fails G20 on f_V(QUESTION) = 0.68, as the 7B model does.
+  - Absent at Qwen2.5-7B base: −0.03 [−0.15, +0.08]. This is a weak null: the total K+V effect there is only +1.72 nats (ID_KV), against +11.96 at the instruct model.
+  - Negative in the gate-failed cells: Mistral-7B −1.98 [−2.38, −1.58], GPT-2 small −1.77, GPT-2 XL −1.87.
+- **INLINE is inhibitory in every model.** An in-sentence re-mention gives a negative key read in all six models, with Gate e passed in every INLINE cell: −2.33 to −3.29 nats.
+- **Row splice (AFTER, n = 60, exploratory).** The listed names carry the whole key effect: options rows 1.05 at Qwen2.5-7B-Instruct and 1.07 at Mistral-7B. The rows of the two clamped names alone carry 0.27 at Qwen2.5-7B-Instruct and 0.84 at Mistral-7B, whose AFTER cell failed Gate e.
+- **GPT-2 small probe (CPU re-run, exploratory).**
+  - Name movers 9.9 and 9.6 attend from END to the IO mention with 0.767 and 0.674 in PLAIN, and 0.514 and 0.443 in INLINE.
+  - In INLINE, duplicate heads 3.0 and 0.1 attend from the listed copy of the IO name to the IO mention (0.656, 0.496).
+  - Under the K_S clamp this attention moves to the listed swapped name's row (0.662, 0.496), and the IO row falls to 0.004 and 0.001.
+
+---
+
 ## P-2026-10-05-H: GPU stage 6, the reader heads and the second hop; the exchange on Prakash et al.'s intervention and the out-of-sample law (paper v3)
 
 **Final.** Fixed in the commit titled "Finalise preregistration H", together with the scoring script `analysis/stage6_score.py` (with `analysis/stage6_parts/`), the stage-6 code and `scripts/gpu_stage6.sh`, before any stage-6 GPU run and before any stage-5 output was inspected (nothing here depends on them); the GPU script refuses a draft entry, a modified tree or code that differs from that commit, and runs the FP32 unit tests before loading any model. The draft was committed at 6e253bb; the changes since are clarifications and decisions made while the scorer was built and reviewed (listed in that commit). No model output beyond the disclosed pilots below and the plumbing runs of `TEST_MODE` (Qwen2.5-0.5B, FP32, two stories or pairs, every gate failing or not evaluable) was seen.

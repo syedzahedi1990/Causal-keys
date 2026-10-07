@@ -17,7 +17,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-EXCLUDE = ("paper/BRIEF.md", "docs/PAPER2_PROPOSAL.md", "docs/GPU_RUNBOOK.md", "paper/sections/old/", "notebooks/")
+EXCLUDE = ("paper/BRIEF.md", "docs/PAPER2_PROPOSAL.md", "docs/GPU_RUNBOOK.md", "docs/V3_STAGE5_IMPLICATIONS.md", "paper/sections/old/", "notebooks/")
 TRACKED_HISTORY = ["docs/PREREGISTRATION.md", "analysis/stage1_prereg.py", "analysis/stage2_score.py",
                    "analysis/stage3_score.py", "analysis/stage3b_score.py", "analysis/stage4_score.py",
                    "analysis/stage5_score.py", "analysis/stage5_parts", "analysis/stage6_score.py", "analysis/stage6_parts"]

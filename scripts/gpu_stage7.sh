@@ -34,7 +34,7 @@
 # TESTS=0 needs OUT/PYTEST_OK.txt from a passing pytest of the same HEAD on the same host. keep/FORCE as in
 # scripts/gpu_stage6.sh: a step whose results file exists, is readable JSON and complete is kept unless FORCE=1 or
 # FORCE_STEPS names it; a file written by a FAILED step, or unreadable or incomplete, is moved aside to
-# <file>.failed.<UTC> and the step is run again, so a rerun with the same OUT resumes where it failed (at step
+# <file>.failed.<UTC> (a deadline stub from an earlier session to <file>.skipped.<UTC>) and the step is run again, so a rerun with the same OUT resumes where it failed (at step
 # granularity: a link step that failed in a late format is rerun for all five formats).
 # Pytest: a fixed set, before any model, no reruns: the stage-7 tests (Gate I-G0: tests/test_stage7_link.py; the HeadSplice,
 # knockout and release tests stage 7 builds on; tests/test_stage7_score.py) into log_pytest_stage7.txt, whose last run the
@@ -82,7 +82,7 @@ run() {
   tail -n 2 "$OUT/log_$name.txt"
   return $rc
 }
-aside() { local old="$1.failed.$(date -u +%Y%m%dT%H%M%SZ)"; mv "$1" "$old"; echo "moved aside $old: $2" | tee -a "$OUT/COMMIT.txt"; }
+aside() { local old="$1.${3:-failed}.$(date -u +%Y%m%dT%H%M%SZ)"; mv "$1" "$old"; echo "moved aside $old: $2" | tee -a "$OUT/COMMIT.txt"; }  # aside <file> <why> [suffix]
 complete() {  # the results file is readable JSON and holds everything its step writes
   $PY - "$1" "$NFAM" > /dev/null 2>&1 <<'EOF'
 import json, sys
@@ -105,12 +105,17 @@ elif "/frames/" in f:
     assert j["results"] and (not nfam or len(j["results"]) == nfam)
 EOF
 }
+stub() {  # the results file is a stub its step wrote, as a whole, after the deadline (provenance.skipped)
+  $PY -c "import json, sys; sys.exit(0 if json.load(open(sys.argv[1]))['provenance'].get('skipped') else 1)" "$1" > /dev/null 2>&1
+}
 STEPS=0
 keep() {  # keep <results file> <name> <command...>: as in scripts/gpu_stage6.sh
   local f=$1 name=$2 rc=0 stamp; shift
   STEPS=$((STEPS + 1))
   if [ -e "$f" ]; then
-    if ! complete "$f"; then aside "$f" "not readable JSON or incomplete (a step interrupted while writing); $name is run again"
+    if ! complete "$f"; then
+      if stub "$f"; then aside "$f" "a deadline stub from an earlier session; $name is run again" skipped
+      else aside "$f" "not readable JSON or incomplete (a step interrupted while writing); $name is run again"; fi
     elif ! forced "$name"; then
       echo "==================== $name kept: $f exists (FORCE=1 or FORCE_STEPS=$name to redo)"
       [ "$name" = link ] && $PY -c "import json, sys; n = len(json.load(open(sys.argv[1]))['provenance'].get('explo_skipped') or []); n and print(f'  link kept with {n} exploratory parts skipped at an earlier deadline (FORCE_STEPS=link redoes link)')" "$f"

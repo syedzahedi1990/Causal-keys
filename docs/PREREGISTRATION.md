@@ -834,3 +834,220 @@ Evaluable formats: BIND@28 and ID@0 are evaluable under NO-MENTION, QNAMES and O
 - **The H7 correlation.** r = −0.986 is computed over s_ID(·, 29) values that span 0.045 around zero (+0.017, −0.028, −0.015).
 - **s_ID(LETTERS-AFTER, 29) is undetermined.** It is +0.098 with CI [−2.155, +1.750], because its denominator ID_K + ID_V is 0.021 nats (our arithmetic).
 - **Per-pair Gate b0 noise.** Single pairs reach 1.5 nats (BIND NO-MENTION, |m(r0) − m(B)|), although every cell mean is ≤ 0.203 *(recomputed)*.
+
+---
+
+## P-2026-10-08-I: GPU stage 7, blocking the reader heads while applying the released remap at Mistral-Small-24B (paper v3)
+
+**DRAFT, not yet final.** To be fixed in the commit titled "Finalise preregistration I", with `analysis/stage7_score.py` (and `analysis/stage7_parts/`), the stage-7 code (`ckeys/readerblind.py`, `experiments/stage7_link.py`) and `scripts/gpu_stage7.sh`, before any stage-7 GPU run; the GPU script refuses a draft entry, a modified tree or code that differs from that commit, and runs the FP32 unit tests (Gate I-G0) before it loads any model. Results go into the revision of paper v3; `paper/versions/paper2_v3.pdf` is not changed. **Seen before this draft:** every committed 24B number quoted below (stages 2, 3b and 4), the 7B head results of stage 6, and a Monte-Carlo power check run on the committed stage-3b per-core rows (see Power). No head-level output of any model at 24B has been seen. The only runs of the stage-7 code before finalisation will be `TEST_MODE` plumbing runs (Qwen2.5-0.5B, FP32, random bases, two stories), in which every gate fails or is not evaluable; any other pilot is listed here before the entry is finalised.
+
+**Context.** An external review of paper v3 notes that its two halves are linked only by inference. The reader heads (preregistration H, part (a): about 5 % of heads, ranked by a3, read the writing token's key at the re-mentioned option words; H1–H5 met) were shown at Qwen2.5-7B and Mistral-7B. The intervention result (the released learned remap M of our predecessor, Anonymous (2026), is carried by the writing token's key or value depending on the readout format; E4 and the refit F) was shown at Mistral-Small-24B and Qwen2.5-72B. The paper says "That the readers are the same at 24B and 72B is an inference" (`results_intervention.tex`). This stage tests the link directly at Mistral-Small-24B. Step 1 finds the reader heads there. Step 2 applies M and its PCA control P exactly as in stage 3b and blocks those heads at the option words. **Prediction (H_link):** with the readers blocked, the remap's exchanged key no longer reaches the answer; under the formats with later mentions M's key share falls toward its NO-MENTION value, the value channel carries more of M's effect in nats, and M's behavioural effect is roughly kept; random head sets of the same size change nothing. Qwen2.5-72B is not run (two GPUs, 145 GB of weights); there the link stays an inference.
+
+**Reference numbers (Mistral-Small-24B, stage 3b, `results/gpu_stage3b/STAGE3B_SCORE.txt`, n = 96 cores × 3 seeds).** φ, ψ_K and ψ_V are from the score file; κ = ψ_K/(ψ_K + ψ_V) and the nat-scale means are *(recomputed)* with the frames scorer's per-core rows (10,000-resample core bootstrap). D = mean m(M) − m(P), K = mean m(P + K_M) − m(P), V = mean m(P + V_M) − m(P), all in nats; the non-additive share is 1 − ψ_K − ψ_V.
+
+| Format (code arm) | φ | ψ_K | ψ_V | κ | D | K | V | non-additive |
+|---|---|---|---|---|---|---|---|---|
+| OPTIONS-AFTER (P1) | 0.705 [0.677, 0.732] | 0.528 [0.489, 0.565] | 0.229 [0.216, 0.243] | 0.697 [0.680, 0.713] | 13.70 | 7.24 | 3.14 | 0.242 |
+| LETTERS-AFTER (LETTER) | 0.749 [0.712, 0.784] | 0.777 [0.735, 0.817] | 0.018 [0.013, 0.023] | 0.977 [0.970, 0.984] | 12.87 | 10.00 | 0.23 | 0.205 |
+| SENTENCE-AFTER (POST) | 0.719 [0.691, 0.746] | 0.196 [0.160, 0.231] | 0.523 [0.503, 0.543] | 0.272 [0.233, 0.310] | 12.17 | 2.38 | 6.36 | 0.282 |
+| NO-MENTION (NONE) | 0.708 [0.681, 0.733] | 0.069 [0.058, 0.080] | 0.803 [0.777, 0.827] | 0.079 [0.067, 0.091] | 14.34 | 0.99 | 11.51 | 0.128 |
+| LIST-BEFORE (BEFORE) | 0.738 [0.712, 0.763] | −0.001 [−0.012, 0.010] | 0.971 [0.959, 0.984] | −0.001 [−0.013, 0.010] | 12.13 | −0.02 | 11.78 | 0.030 |
+
+Stage 4's same-stack anchor (released bases, transformers 5.9.0) reproduced every φ, ψ_K and ψ_V to 0.001. In the stage-2 natural factorial at 24B (n = 150), the natural key clamp d_K = m(K_S) − m(ID) is 17.10 / 17.04 / 3.07 nats from 0-based layer 0 / 2 / 12 under OPTIONS-AFTER, 18.70 / 18.54 / 2.92 under LETTERS-AFTER, 8.15 / 8.43 / 0.86 under SENTENCE-AFTER and 2.00 at every onset under NO-MENTION *(recomputed)*. Most of the 24B key read therefore lies in layers 2–11; a NO-MENTION-sized part (about 2 nats) sits in layers ≥ 12 and needs no later mention. The remap shows the same: its key-only effect is 0.99 nats under NO-MENTION against 7.24 / 10.00 under OPTIONS-AFTER / LETTERS-AFTER, so if that route persists with later mentions, about 0.14 / 0.10 of M's key-only effect is read outside the option rows (our arithmetic).
+
+**Runs:** `scripts/gpu_stage7.sh` on one A100-80GB with transformers 5.18.0. The model is Mistral-Small-24B-Instruct-2501 at revision 9527884be6e5616bdd54de542f9ae13384489724 (that of stages 2–4), in BF16, with use_cache=False. The ranking passes use eager attention; every evaluation pass uses sdpa, as in stage 3b. The tokenizer check of `experiments/paper1_frames.py` (fix_mistral_regex installed; ids identical with and without it) runs on every ranking and evaluation prompt. Our predecessor's reviewer repository is checked before any model is loaded: the release manifest with `refit_remap.tolerant_verify`, which also pins the sha256 of `RELEASE.json` itself (2dea297d…, `refit_remap.PINNED`, as recorded in `results/gpu_stage4/preflight/INTEGRITY.json`); the nine Mistral `original_1000` bases against the sha256 recorded in the provenance of `results/gpu_stage4/frames/mistral.json`; and `native_story_120.json` against the sha256 listed in that manifest (22af9f5b…, hard-coded in the stage-7 code, which a unit test checks against the manifest). The steps, each kept or redone as in stage 6:
+1. preflight (tokenizer only);
+2. rank (step 1, phase 1, eager);
+3. family: `experiments/paper1_frames.py --model mistral`, unchanged, all five formats (the reproduction of stage 3b);
+4. gate (step 1, phase 2, sdpa);
+5. link (step 2, sdpa);
+6. remap ranking (exploratory, eager, last).
+
+**Scoring:** `analysis/stage7_score.py` writes `STAGE7_SCORE.txt`. Outputs of `TEST_MODE` carry the tag TEST_ and go to a scratch directory outside the repository. **Statistics:** means over the 96 cores, seeds averaged within core, as in stages 2–4. Intervals are 95 % percentiles of 10,000 core-bootstrap resamples from one fixed index set (seed 20261008). The formats share the cores and are resampled jointly. Every ratio of means, κ, closure and t is recomputed within each resample. Verdicts (MET, NOT MET, NOT EVALUABLE) use the point estimates and the bounds named. Evaluability is decided only by the code gate and by gates on unblocked rows (I-G0 to I-G3); a quantity that becomes undefined because of the blocking itself counts against the prediction (NOT MET, with the reason printed), never as NOT EVALUABLE.
+
+### Definitions
+
+**Material.** E is the 96 cores of our predecessor's `native_story_120.json` with B, S and T distinct (stages 2–4). M is the released `original_1000` m3 basis and P the pca basis, seeds 101–103, each M paired with the P of its own seed. M and P patch the output of 0-based layer 3 (1-based block 4, `FIT_LAYER0`) over the event span. The writing token p is the critical location word; its key or value is exchanged from 0-based layer 5 (1-based block 6, `FIRST_EXCHANGE0`). Prompts use the "Answer:" prefill. m = log p(T) − log p(S) at the answer position over the full vocabulary; under LETTERS-AFTER the letters of T and S are used. φ, ψ_K, ψ_V, ρ_K and ρ_V are as in stage 3b (`analysis/stage3b_score.py`).
+
+The ranking set R is make_cores(60, Random(0)), the ranking stories of stage 6. It is disjoint from E: 0 of the 60 share the eight story fields, or object, initial and distractor locations, B and S, with any E core *(checked)*. 36 of the 96 E cores have the distractor location equal to B or S, which make_cores excludes; the head gate (I-G2) checks that the ranking transfers.
+
+**Option rows G_f.** These are the six rows of the location words in the re-mention span after p, in canonical order:
+- OPTIONS-AFTER: the "Choices:" list;
+- LETTERS-AFTER: the location words of the lettered list (the letter rows are exploratory);
+- SENTENCE-AFTER: the room sentence.
+
+Under NO-MENTION, G is empty and every blocking is the identity. Under LIST-BEFORE, the list rows precede p, so the blinding and the knockout there are a structural check (I-G1 (d)).
+
+**What the remap changes before layer 5.** M patches the output of layer 3, so from layer 4 on the M and P runs differ at p and at the other event-span tokens; in native core 0 eight patched tokens follow p *(checked)*. The exchange rows move only p's key or value from layer 5, so no head below layer 5 ever sees M's *exchanged* key. Heads below layer 5 are not blind to the remap, though: in the M row, the layer-4 heads at G see M's own key and value at p, and every head from layer 4 on can read the patched span tokens after p. These reads are part of D and of the non-additive share (0.242 / 0.205 under OPTIONS-AFTER / LETTERS-AFTER, against 0.128 under NO-MENTION), not of K or V. Operation A+ below covers layer 4; mean-ablation of a head set covers every column those heads read.
+
+**Step 1, the readers at 24B.** The natural clamp sets K_S at p from layer 5 on (the exchange onset). a3(l, h) is defined as in H and computed on R_f per format, with eager attention.
+- Heads in layers 0–4 have a3 = 0 by construction and are not eligible, which leaves 35 × 32 = 1120 eligible heads. At 7B, 7 of the top 40 and 2 of the top 52 heads lay in layers 0–4 *(recomputed)*, so a layer-0 ranking could fill H* with heads the exchange cannot reach.
+- H*_f is the top-k* heads by mean a3 over R_f, with k* = ceil(0.05 × 1280) = 64. This is H's 5 % of all heads (5.7 % of the eligible).
+- Random sets: the first 64 heads of three fixed permutations of the eligible heads (numpy default_rng(2)), the same three in every format. The active-at-G control is H's: the 64 eligible heads with the largest mean o_proj-input norm at G_f over R_f, outside the top 128 by a3.
+- On E (sdpa), d_full, d_G, R(k) and KO(k) are computed as in H, with K_S from layer 5, over k ∈ {8, 16, 32, 64, 128}. The all_G and all_T rows cover every head of layers 5–39. The natural clamp from layer 5 is also run under NO-MENTION on E, giving d_full(NONE), so the mention-specific ratio d_G / [d_full − d_full(NONE)] can be printed beside d_G / d_full.
+- One set is ranked per format, because the re-mention rows differ by format. The overlap of the sets and the cross-applied OPTIONS-AFTER set are exploratory.
+
+**Step 2, operation (i): exchange blinding B_x(S)** (I1–I3). HeadSplice (`ckeys/headsplice.py`, unchanged) on the P_s-patched run. Every head in every row sees M_s's key at p in layers ≥ 5, except the heads of S in the rows G, which see P_s's own key K_P. The key at p seen outside the splice is pinned to the host's captured key from layer 5 on, so these heads see exactly K_P, not a key that has evolved under p's own read of K_M. The exchanged key therefore cannot reach the answer through S at the option words.
+- B_x(∅) is the frames' key-only exchange P + K_M. B_x(all@G): only the rows outside G see K_M.
+- With a(S) = m(B_x(S)) − m(P):
+  - g_K = 1 − mean a(all@G) / mean a(∅), the share of M's key-only effect read at G; the mention-specific g̃_K = [mean a(∅) − mean a(all@G)] / [mean a(∅) − K(NONE)], with K(NONE) the in-run NO-MENTION key-only effect, is printed beside it;
+  - KO_x(S) = [mean a(∅) − mean a(S)] / [mean a(∅) − mean a(all@G)], the share of the G-row part that passes through S (H's KO for the remap);
+  - r_K(S) = mean a(S) / mean a(∅) and ψ_K^x(S) = mean a(S) / D are printed.
+- B_x leaves M and P unchanged, so behaviour is unchanged by construction.
+
+**Step 2, operation (ii): reader ablation A(S)** (I4–I7). In every row of the family batch (per seed P, M, P + K_M, P + V_M, M + K_P and M + V_P; then the natural B, S and T), the output of each head of S in the rows G (its o_proj-input slice) is replaced by its mean over R at the same option word, taken from the natural B runs in the frames encoding. This is H3's operation (HeadSplice "ablate"), applied in the remap's rows; at 7B it kept the base answer in 0.87 and 1.00 of stories. It removes everything those heads read at G: p's key and value, the patched span tokens after p, and every other column. A+(S) is A(S ∪ L4), with L4 the 32 heads of layer 4 at G. Positions ≤ p compute identically under A and A+, so the exchanged K/V tables are unaffected.
+
+**Step 2, operation (iii): reader knockout N(S)** (reported contrast, no verdict). In every row of the same family batch, the heads of S cannot attend from the rows G to p: their attention weight on column p in the rows G is set to exactly 0 and the row renormalised, which is the stage-5 knockout restricted to those heads. Every other head, row and edge is unchanged. Its prior is G7: the all-heads knockout M1 lost the base answer at Qwen2.5-7B (acc_B 0.37 / 0.30 under LIST-AFTER / OPTIONS-AFTER; the answer moved to the initial location in 0.63 / 0.69 of cores) and kept it at Qwen2.5-14B; the paper does not reconcile this with H3. N's lines are therefore reported two-sided.
+
+**Step-2 statistics** (for O ∈ {A, A+, N}, set S, format f; the ∅ condition is the unblocked batch):
+- D^O(S) = mean[m(M^O) − m(P^O)], K^O(S) = mean[m(P^O + K_M) − m(P^O)], V^O(S) = mean[m(P^O + V_M) − m(P^O)], all in nats, with K^∅, V^∅ and D^∅ from the ∅ batch.
+- Transfer kept: t(S) = D^O(S) / D^∅. φ^O on the blocked natural rows is secondary.
+- Shares on the unblocked scale: ψ̃_K(S) = K^O(S) / D^∅ and ψ̃_V(S) = V^O(S) / D^∅. Shares on the blocked scale: ψ_K^O = K^O / D^O and ψ_V^O = V^O / D^O, printed beside them, with the non-additive share 1 − ψ_K^O − ψ_V^O.
+- Key share κ^O(S) = K^O / (K^O + V^O), subject to the κ rule. Closure c_κ(f) = [κ^∅(f) − κ^O(f)] / [κ^∅(f) − κ^∅(NONE)].
+- Key closure on the unblocked scale: c̃_K(f) = [ψ_K^∅(f) − ψ̃_K(f)] / [ψ_K^∅(f) − ψ_K^∅(NONE)].
+- Value gain: Δ_V(S) = V^O(S) − V^∅, paired by core, in nats. Floor: F_V(f) = 0.25 × [V^∅(NONE) − V^∅(f)], in-run (2.09 nats under OPTIONS-AFTER and 2.82 under LETTERS-AFTER at the stage-3b values). The ratio Δ_V / (K^∅ − K^O), the share of the lost key effect that reappears in the values, is printed.
+- Argmax rates over the six candidates (or letters), for the M, P and natural B rows under ∅, A(H*), A+(H*) and N(H*): M's T-rate, P's S-rate, B's B-rate, and in each row the rate on the initial location, so that a fall in t caused by answers moving to the initial location is visible.
+- κ rule (H's, adapted): κ is defined when ψ_K + ψ_V ≥ 0.3 and both are ≥ −0.1 on the scale of its own condition, and that condition's D ≥ 3 nats. Within the bootstrap the rule is applied to every κ that enters a statistic (κ^∅(f), κ^∅(NONE) and κ^O(f)); resamples that fail are dropped, and a CI with more than 5 % dropped resamples does not meet a bound.
+
+### Gates
+
+**I-G0, exactness** (FP32, CPU, Qwen2.5-0.5B, random bases; `tests/test_stage7_link.py`, 1e-4 nats in the logits). Every test must pass and none may be skipped. The checks:
+1. B_x(∅), A(∅) and N(∅) equal the unblocked rows.
+2. HeadSplice with every head in every row from layer 5, given M's key on the P run, equals the P + K_M row of `paper1_frames.run_family`; with every head in the rows G only, it equals RowSplice(G) with K_M; B_x(all@G) equals P + K_M with RowSplice(G) giving the rows G the K_P table from layer 5 (the key pin).
+3. A(S) with each head's own o_proj input as its "mean" equals the unablated row; A+ masks exactly the 32 heads of layer 4 and S at G.
+4. N(all heads) with the patch and exchange hooks active equals the stage-5 4D knockout mask on G × {p}; a null knockout (second pass, no edge removed) equals the unblocked run.
+5. A mixed batch equals its rows run singly, for B_x, A and N.
+6. The stage-7 natural passes and patches equal `run_core`'s.
+7. Every position ≤ p is identical under every B_x, A and N.
+8. The pinned stories file hash equals the manifest entry; the base hashes equal the stage-4 provenance.
+
+I-G0 failing makes I1–I7 NOT EVALUABLE.
+
+**I-G1, reproduction and floors:**
+- (a) The family run reproduces the stage-3b table above: |Δφ|, |Δψ_K| and |Δψ_V| ≤ 0.03 in each of the five formats (E3's tolerance; the change is from transformers 5.9.0 on 2 GPUs to 5.18.0 on 1).
+- (b) The in-run ∅ rows of the link batches reproduce the family's ψ_K and ψ_V within 0.03 and its D within 3 %; the x_all row of B_x reproduces the family's ψ_K within 0.03.
+- (c) Knockout floor (gates the N lines only): the null knockout gives |κ^null − κ^∅|, |ψ̃_V^null − ψ_V^∅| and |t(null) − 1| ≤ 0.02.
+- (d) Structural check on the box: under LIST-BEFORE, every B_x and N row blocked at the list rows with H*_OPTIONS-AFTER is within 0.1 nats of its unblocked row in every core (H's tolerance for its on-box exactness row); the maximum difference is printed. Failing (d) makes I1–I7 NOT EVALUABLE: the blocking code then acts on rows it cannot reach.
+
+**I-G2, the readers at 24B** (per format, on E; point estimates):
+- (a) mean d_full ≥ 3 nats with CI excluding 0 (SENTENCE-AFTER: > 0).
+- (b) d_G / d_full ≥ 0.7 (OPTIONS-AFTER, LETTERS-AFTER; at 7B 0.926 / 0.982), and ≥ 0.5 under SENTENCE-AFTER (at 7B 0.57 / 0.73). The threshold is 0.7, not H's 0.8, because a NO-MENTION-sized key read (about 2 nats, stage 2) sits outside the option rows at 24B; d_G / [d_full − d_full(NONE)] is printed.
+- (c) R(k*) ≥ 0.7 and KO(k*) ≥ 0.8, with the means over the three random sets R_rand(k*) ≤ 0.25 and KO_rand(k*) ≤ 0.25 (at 7B: R 0.967 / 0.942, KO 0.977 / 0.971, random sets ≤ 0.011).
+- (d) BF16 floor of the HeadSplice rows, H's Gate a2: mean |m(none) − m(clean pass)| and mean |m(all_T) − m(full clamp pass)| ≤ max(0.5 nats, 0.02 × mean d_full).
+
+Its outcome is also printed as "H1/H2 pattern at 24B: replicated / not replicated", without a verdict count.
+
+**I-G3, the remap acts** (per format, ∅ condition): (first clause) D^∅ ≥ 3 nats; (second clause, for KO_x only) mean a(∅) − mean a(all@G) ≥ 1 nat.
+
+**I-G4, reading I5 and I6 as a value takeover** (OPTIONS-AFTER; not a verdict gate, used like H's Gate b3): under A+(H*), t ≥ 0.6 and Δ_V > 0 with CI excluding 0. If I5 and I6 are met but I-G4 fails, the kept behaviour is attributed to unblocked layer-4 or span reads, not to the value copy.
+
+**Evaluability.**
+- I-G0 or I-G1 (d) failing makes I1–I7 NOT EVALUABLE in every format.
+- I1 in format f needs I-G1 (a, b) and the first clause of I-G3 in f. It does not need I-G2, because g_K does not use H*.
+- I2 and I3 need, in addition, I-G2 (a–d) and the second clause of I-G3 in f.
+- I4–I7 need I-G1 (a, b), I-G2 (a–d) and the first clause of I-G3 in f. I4 and I5 use NO-MENTION as well, so they also need NO-MENTION to pass I-G1 (a, b) and the first clause of I-G3, and I4 under OPTIONS-AFTER needs κ^∅(NONE) and κ^∅(OPTIONS-AFTER) defined by the κ rule; otherwise they are NOT EVALUABLE.
+- In an evaluable format, a κ^O that is undefined after blocking, or a CI with more than 5 % of resamples dropped, means the criterion is NOT MET; the scorer prints the reason (for example "κ undefined after blocking: behaviour lost" or "interaction-carried").
+- A prediction over the two confirmatory formats is MET if it is met in both, NOT MET if it is not met in at least one evaluable format, and NOT EVALUABLE otherwise. I5 and I6 are scored under OPTIONS-AFTER alone. The same rule combines the sets of I3 and I7.
+
+### Predictions
+
+The confirmatory formats are OPTIONS-AFTER and LETTERS-AFTER. SENTENCE-AFTER is reported against the same thresholds (I1: ≥ 0.5) without a verdict, because its power is low (see Power).
+- **I1, the remap's key is read at the option words** (D3 for the remap). g_K ≥ 0.7 with lower bound ≥ 0.6. g̃_K is printed beside it.
+- **I2, through the natural readers** (H2 for the remap). KO_x(H*_f) ≥ 0.8 with lower bound ≥ 0.7. r_K(H*) and ψ_K^x(H*) are printed beside it, against ψ_K(NO-MENTION).
+- **I3, specificity of the route.** KO_x ≤ 0.25 for each of the three random sets and for the active-at-G set.
+- **I4, the key share falls toward NO-MENTION under A(H*).** OPTIONS-AFTER: c_κ ≥ 0.5 with lower bound ≥ 0.3 (κ^{A(H*)} ≤ 0.39 at the stage-3b values). LETTERS-AFTER: c̃_K ≥ 0.5 with lower bound ≥ 0.3; κ^{A(H*)} and c_κ are printed there two-sided, because κ is defined under LETTERS-AFTER only if the values take over (ψ_V^∅ = 0.018). I4 is a consistency check, not independent evidence: under OPTIONS-AFTER, c_κ ≥ 0.5 follows from a removed key fraction g_K × KO_x ≥ 0.73 even with the value effect fixed in nats, and c̃_K is close to g_K × KO_x × ψ_K^∅ / (ψ_K^∅ − ψ_K^∅(NONE)) whenever the ablation removes what the blinding removes. It confirms that the ablation removes M's key read as the blinding does, so that I5 and I6 are measured under an operation that blocks the readers.
+- **I5, the value channel carries more of the remap** (OPTIONS-AFTER; the form of H3 (d)). Δ_V(H*) > 0 with CI excluding 0, and Δ_V(H*) ≥ F_V (about 2.1 nats). ψ̃_V, ψ_V^{A(H*)} and Δ_V / (K^∅ − K^A) are printed.
+- **I6, the behaviour is kept** (OPTIONS-AFTER). t(H*) ≥ 0.75 with lower bound ≥ 0.6 under A(H*). The argmax rates, including the initial-location rate, are printed beside it. Basis: H3, the same operation, kept the base answer in 0.87 and 1.00 of stories at 7B.
+
+  The LETTERS-AFTER lines of I5 and I6 are reported two-sided, without a verdict: a lettered answer may need the readers to map the copied location to its letter, and nothing measured so far predicts which way it goes.
+- **I7, random sets change nothing.** For each random set and the active-at-G set under A, in both formats: |κ^S − κ^∅| ≤ 0.10, |ψ̃_V(S) − ψ_V^∅| ≤ 0.10 and |t(S) − 1| ≤ 0.10.
+
+**Reported contrast, the reader knockout N(H*)** (two-sided, no verdict; needs I-G1 (c)): c_κ, c̃_K, Δ_V, t, κ^N and the argmax rates, beside the same lines under A. If t^N falls while t^A holds, the stage-5 / H3 difference recurs at the head level for the remap.
+
+**Expected values** (the author's, not thresholds):
+
+| Quantity | OPTIONS-AFTER | LETTERS-AFTER |
+|---|---|---|
+| g_K | ≈ 0.85 | ≈ 0.9 |
+| KO_x(H*) | 0.9–0.95 | 0.9–0.95 |
+| c̃_K | ≈ 0.9 | ≈ 0.9 |
+| κ^{A(H*)} | 0.15–0.30 | (not stated) |
+| Δ_V(H*) | +3 to +6 nats | (not stated) |
+| t(H*) under A | 0.8–1.0 | (not stated) |
+
+### Alternatives and what each would mean for the paper
+
+| Outcome | Reading | Consequence for the paper |
+|---|---|---|
+| I1–I7 met, I-G4 passed | H_link with redundant writing | The inference sentence is replaced, for 24B only: ablating the 5 % reader heads at the option words removes M's key-only effect, moves its key share toward NO-MENTION, adds to what M's values carry and keeps the behaviour; random sets do not. 72B remains an inference. |
+| I1–I7 met, I-G4 failed | The readers are the conduit, but the behaviour is kept by unblocked early or span reads | The head-level link is stated; "the values take over" is not. |
+| I1–I4 and I7 met; I5 met, I6 not met | Partial takeover (G7's term) | The value channel carries more of M's effect without its readers, but not enough to keep the behaviour. |
+| I1–I4 and I7 met; I5 and I6 not met | The readers are the conduit, and the copy does not take over | "Written redundantly into both channels" is qualified at the head level for OPTIONS-AFTER: the format-level crossover stands, but without its readers the remap is largely lost. |
+| I4 not met under OPTIONS-AFTER because κ^{A(H*)} is undefined | Neither channel alone carries the remap once its readers are ablated, or its behaviour is lost | Counted as NOT MET; ψ̃_K, ψ̃_V and the non-additive share are reported. |
+| I1 met, I2 not met (I-G2 passed) | H_other: M's key is read at the option words, but not mainly by the natural readers | The "same readers" inference fails at 24B. The exploratory remap ranking says which heads read M's key and how far they overlap with H*. |
+| I1 not met | H_not_rows: M's key effect is read outside the re-mention rows (e.g. by the answer position directly) | The reader-head account does not explain the remap's key share at 24B. |
+| I2 met, I4 not met | Backup readers: blinding H* stops the exchanged key, but ablating H* does not remove the read | Reported as compensation by other heads; the exploratory all-heads-at-G knockout is the check. |
+| I3 or I7 not met | Non-specific: any 64 heads disturb the read | No head-level link is claimed. |
+| I-G2 fails in a format | The 24B readers there are not a sparse 5 % set at the option rows (H1/H2 do not replicate at 24B) | I2–I7 are untestable as preregistered in that format; I1 stands; the curves are reported, and the paper says so. |
+| I-G1 (a) fails in a format | The remap does not reproduce on this stack (transformers 5.18.0, one GPU) | That format is not evaluable; the stage-3b and stage-4 numbers stand as published, and stage 7 is reported as a failed reproduction there. |
+| I-G0 or I-G1 (d) fails | The blocking code is not exact, in FP32 or on the box | Nothing is evaluable; the run is reported as such. |
+
+### Power
+
+The power check (`stage7/power2.py`, kept with the stage-7 build notes) uses the stage-3b 24B frames per-core rows (n = 96): 300 simulated replicates per cell, 1,000 bootstrap resamples each, and the decision rules above. In the worst-case noise model each blocked per-core quantity gets independent normal noise with the full per-core SD of its unblocked counterpart, i.e. no positive within-core correlation; in the 7B-like model the residual SD is 5 % of the mean numerator (at 7B, the KO numerator's per-story SD was 1.4–1.5 nats against a denominator of 26–33 nats). The table gives the probability that each prediction is met when the true value is as stated.
+
+| Prediction | True value | OPTIONS-AFTER (worst / 7B-like) | LETTERS-AFTER (worst / 7B-like) |
+|---|---|---|---|
+| I1 (g_K) | 0.75 | 0.87 / 1.00 | 0.90 / 1.00 |
+| I1 (g_K) | 0.85 | 1.00 / 1.00 | 1.00 / 1.00 |
+| I2 (KO_x; true g_K 0.85) | 0.85 | 0.64 / 1.00 | 0.73 / 1.00 |
+| I2 | 0.90 | 0.86 / 1.00 | 0.96 / 1.00 |
+| I2 | 0.95 | 0.97 / 1.00 | 0.99 / 1.00 |
+| I6 alone (t) | 0.80 | 0.98 | 0.98 |
+| I6 alone (t) | 0.85 | 1.00 | 1.00 |
+
+For I4–I6 the simulation removes a fraction f = 0.85 × 0.95 = 0.81 of M's key-only effect under A(H*) and lets a fraction c of the removed key effect reappear in the value-only effect (c = 0: no takeover, value effect fixed in nats). Worst-case noise; mean point estimates in parentheses:
+
+| Scenario | True t | P(κ defined) | P(I4 met) | P(I5 met) | P(I6 met) |
+|---|---|---|---|---|---|
+| OPTIONS-AFTER, c = 0 | 0.57 | 1.00 | 0.95 (c_κ 0.64) | 0.00 (Δ_V 0.00) | 0.00 |
+| OPTIONS-AFTER, c = 0.5 | 0.79 | 1.00 | 1.00 (c_κ 0.83) | 1.00 (Δ_V +2.92) | 0.94 |
+| OPTIONS-AFTER, c = 1 | 1.00 | 1.00 | 1.00 (c_κ 0.91) | 1.00 (Δ_V +5.84) | 1.00 |
+| LETTERS-AFTER, c = 0 | 0.37 | 0.96 | 1.00 (c̃_K 0.89; c_κ 0.10) | (two-sided) | (two-sided) |
+| LETTERS-AFTER, c = 0.5 | 0.69 | 1.00 | 1.00 (c̃_K 0.89; c_κ 0.74) | (two-sided) | (two-sided) |
+| LETTERS-AFTER, c = 1 | 1.00 | 1.00 | 1.00 (c̃_K 0.89; c_κ 0.88) | (two-sided) | (two-sided) |
+
+So I4 is met with or without a takeover, as stated under I4, and is a consistency check. I5 and I6 separate the scenarios: neither is met without a takeover, and both are met at half or full takeover (I6 at 0.94 for c = 0.5). Under LETTERS-AFTER, c_κ would fail without a takeover, and κ approaches the rule's limit as f rises; this is why c̃_K is scored there. The I7 margins of 0.10 are more than 5 SE of κ, ψ̃_V and t. SENTENCE-AFTER (K 2.38 nats) gives P(I1 met) 0.69 at a true g_K of 0.85 and P(I2 met) 0.28 at a true KO_x of 0.9 under the worst case, which is why it is reported and not scored.
+
+### Compute
+
+| Part | Row-forwards |
+|---|---|
+| Rank (eager; 3 formats × 60 stories, + 180 for the layer-0 ranking, + 100 duplicate-score sequences) | about 720 passes |
+| Family (5 × 120 × 24) | 14,400 |
+| Gate on E (3 × 96 × 42, + 288 for the NO-MENTION clamp) | 12,384 |
+| Link: natural and capture passes (5 × 96 × 9) | 4,320 |
+| Link: B_x (96 × (54 + 57 + 54), + 864 LIST-BEFORE) | 16,704 |
+| Link: A and N batches (96 × 21 × (12 + 13 + 12)), NO-MENTION ∅ (2,016), LIST-BEFORE ∅ and N (4,032) | 80,640 |
+| Remap ranking (eager, exploratory) | about 7,800 passes |
+
+That is about 128,000 sdpa row-forwards. Stage 3b ran these frames at about 0.026–0.03 s per row; with about 10 % for the second attention passes they take about 1.0–1.2 h, plus about 0.15 h of eager passes and about 0.8 h of setup (pip and pytest about 15 min, the 47 GB download about 6–10 min, five model loads about 8 min, preflight, scoring and archive about 5 min). That is about 2–2.5 GPU-hours on one A100-80GB, with a 4 h cap; at about $2 per A100-80GB hour (the runbook's rate) about $4–6, at most $10. The box needs ≥ 64 GB host RAM and ≥ 100 GB disk. `TEST_MODE` (Qwen2.5-0.5B, FP32, CPU, random bases from `--bases-override 896`, n = 2 cores, R = 2 stories, k* fraction 0.012, so k* = 5 of 336 heads, grid 1, 2, 4, 5, 8; three random sets; L4 = the 14 heads of layer 4) takes about 10 min of pytest plus about 15 min of runs on a 4-core CPU.
+
+**Exploratory:**
+- **SENTENCE-AFTER:** all lines.
+- **Removal through the readers:** M with H* at G seeing P's key, ρ_K^x(H*), against ρ_K = 0.762 / 0.986.
+- **Sufficiency:** R_x(H*) = [m(H*@G only) − m(P)] / [m(all@G only) − m(P)].
+- **Curves:** KO_x(k) over k ∈ {8, 16, 32, 128}.
+- **Remap ranking:** a3 for the remap on E, eager, per format: a3^rem(l, h) = ½[(A^{P+K_M} − A^P)[rowT → p] + (A^P − A^{P+K_M})[rowS → p]], averaged over seeds and cores, eligible heads only. Its top-64 overlap with H* (Jaccard and the hypergeometric P, as in H4) and KO_x of that set (in-sample on E, with its own in-batch P, x_all and x_notG rows).
+- **Knockout of every head at G:** the stage-5 M1 for the remap (N(allG)).
+- **Layer 4 alone:** A(L4).
+- **The knockout of a random set:** N(rand0).
+- **Head sets:**
+  - the OPTIONS-AFTER set applied under LETTERS-AFTER (A);
+  - the overlap of the sets across formats;
+  - a3 from layer 0 (H's ranking) and its overlap with H*;
+  - the layer profile of H*.
+- **Duplicate and induction scores of H* at 24B:** H4 at 24B, on 100 random sequences.
+- **Letter rows under LETTERS-AFTER.**
+- **Breakdowns:** per seed; per core for the 36 E cores whose distractor location is B or S, against the rest.
+- **Not run:** the f_star bases under the blocking, and Qwen2.5-72B.

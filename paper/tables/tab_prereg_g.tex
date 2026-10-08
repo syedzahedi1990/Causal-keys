@@ -1,0 +1,32 @@
+\begin{tabular}{p{0.04\textwidth}p{0.36\textwidth}p{0.42\textwidth}p{0.08\textwidth}}
+\toprule
+ & Prediction & Observed & Verdict \\
+\midrule
+G1 & Anchors attend: $E \geq 0.20$ (lower $> 0.10$) and $F/E \geq 0.5$ under \fmtPost{} at Qwen2.5-7B and 14B & $E$ 0.869 [0.852, 0.885], $F/E$ 1.00 (7B); $E$ 0.915 [0.908, 0.921], $F/E$ 0.98 (14B) & \textbf{met} \\
+G2 & Dissociation at 1.5B and 3B ($H_{\mathrm{diss}}$): the same attention while $\mathrm{ID}_K(\text{\fmtPost{}})$ stays within $\pm 1$ nat & $E$ 0.789 [0.778, 0.802], $F/E$ 1.03, $\mathrm{ID}_K$ $-$0.53 (1.5B); $E$ 0.879 [0.866, 0.892], $F/E$ 0.99, $\mathrm{ID}_K$ $-$0.02 (3B) & \textbf{met} \\
+G3 & Magnitude under $H_{\mathrm{diss}}$: $R_A \geq 0.5$ and $E(m) \geq 0.5\times$ the smaller anchor $E$ & $R_A$ 1.05 / 1.06; $E(m)$/anchor 0.91 / 1.01 (1.5B / 3B) & \textbf{met} \\
+G4 & Hop 2 (attention): (a) $G \geq 0.10$ (lower $> 0.05$) at the anchors; (b) $Q \leq 0.5$ (upper $< 1$) at 1.5B and 3B & (a) $G$ 0.255 / 0.329; (b) $Q$ 0.34 [0.29, 0.39] / 0.44 [0.37, 0.52] & \textbf{met} \\
+\midrule
+G5 & Cutting the candidate rows' attention to the writing token (M1): $r_K \leq 0.20$ (upper $\leq 0.25$) in the lists, $\leq 0.40$ in \fmtPost{} & \fmtListA{} 0.001 / $-$0.026 / $-$0.007; \fmtOpt{} 0.003 / $-$0.028 / $-$0.009; \fmtPost{} $-$0.105 / $-$0.036 / 0.001 & \textbf{met} \\
+G6 & Matched control column (M2, \fmtListA{}): $r_K$ within $[0.8, 1.2]$, small $|\Delta\mathrm{ID}_V|$, $\mathrm{ID}_K$(M1)$-$(M2) $< 0$ & $r_K$(M2) 1.094 / 0.997 / 0.990 & \textbf{met} \\
+G7 & $H_{\mathrm{redundant}}$: (a) the copy takes over under M1 in $\geq 2/3$ models in both list formats; (b) the answer is kept (acc$_B$, on$_B \geq 0.90$) in 3/3 & (a) 3/3: $q_V$(M1) 0.390 / 0.440 / 0.448 (\fmtListA{}) against 0.391 / 0.335 / 0.433 under \fmtNone{}; (b) 1/3: acc$_B$ 0.37 / 1.00 / 0.86 (\fmtListA{}), 0.30 / 0.99 / 0.73 (\fmtOpt{}); partial takeover & \textbf{not met} \\
+G8 & Routes at the answer: (a) cutting answer$\to$writing token (M3) under \fmtNone{} leaves $\leq 0.6$ of $\mathrm{ID}_V$; (b) $r_K$(M3) $\geq 0.8$ under \fmtListA{}; (c) M4 against M1 & (a) 0.134 / 0.370 / 0.417; (b) 1.043 / 1.027 / 1.010; (c) 0.134 / 0.465 / 0.570 & \textbf{met} \\
+\midrule
+G9 & Membership: naming the swapped candidates (S3, L3) reads the key; naming B with two others (S3out, L3out) does not & S3$-$\fmtNone{} $+$2.44 / $+$8.47 / $+$4.70; L3$-$\fmtNone{} $+$20.66 / $+$34.78 / $+$15.11; S3out$-$\fmtNone{} $-$0.32 / $-$0.30 / $-$0.21 & \textbf{met} \\
+G10 & Proportionality refuted, per family: lower bound of $r_2 > 1/3$ and of $r_3 > 1/2$ & sentences $r_2$ 0.28 [0.23, 0.32] / 0.58 / 0.46; lists $r_2$ 0.96 / 0.98 / 0.98; lists met; sentences 2/3 & \textbf{not met} \\
+G11 & The copy returns when S and X leave the list: $\mathrm{ID}_V$(L3out)$-\mathrm{ID}_V$(L3) $> 0$ and $R_V \geq 0.5$ & $R_V$ 0.11 / 0.03 / $-$0.08; 0/3 & \textbf{not met} \\
+G12 & Reader rows (splice): $f_{\mathrm{words}} \geq 0.5$ (lower $> 0.25$) in S2, S3, L2, L3 & S2 0.40 / 0.38 / 0.39; S3 0.68 / 0.72 / 0.72; L2 0.91 / 0.94 / 0.92; L3 0.94 / 0.95 / 0.95; 9/12 & \textbf{not met} \\
+\midrule
+G13 & Wrappers keep the read: $r_K \geq 0.75$ (lower $> 0.5$) for THE and MODIF, $\geq 3$ of 4 models & THE 0.96--1.09; MODIF 0.32--0.64; THE met; MODIF not met & \textbf{not met} \\
+G14 & An exact repeat reads most: $r_K \leq 0.75$ (upper $< 1$) for each of six variants & TITLE, UPPER 0.83--1.14 (0/4 each); PLURAL 0.11--0.49; SYN, FRMIX, DEMIX $\leq$ 0.15 (4/4 each); 4/6 sub-verdicts & \textbf{not met} \\
+G15 & Token-level on the English measure: $r_K \leq 1/3$ and $\rho_s \leq 0.5$ for SYN, FRMIX, DEMIX & $r_K$ $-$0.13 to 0.15; $\rho_s$ 0.09--0.33 & \textbf{met} \\
+G16 & Token pattern on $r_K^{\mathrm{any}}$ and $a_v$ in $\geq 3$ models, per variant & SYN Q7B t/g, Q14B t/g, M7B t/g, O7B t/t; FRMIX Q7B c/c, Q14B c/c, M7B g/g, O7B g/g; DEMIX Q7B c/g, Q14B c/g, M7B t/t, O7B t/t (t token, c concept, g graded; $r^{\mathrm{any}}$/$a_v$); graded & \textbf{not met} \\
+G17 & Value compensation: paired $\mathrm{ID}_V(v) - \mathrm{ID}_V(\text{\fmtPost{}}) > 0$ where the read is lost & FRMIX $+$2.58 / $+$1.37 / $+$0.31; DEMIX $+$2.02 / $+$1.13 / $+$0.39 (Qwen2.5-7B / Mistral-7B / OLMo-2-7B) & \textbf{met} \\
+\midrule
+G18 & No key read in plain IOI: $f_K$(PLAIN) within $\pm 0.10$ (CI within $\pm 0.20$), 3/3 & $-$0.02 / $+$0.02 / $+$0.00 (GPT-2 small / Qwen2.5-7B / Mistral-7B) & \textbf{met} \\
+G19 & A later list opens a key read on IOI: (a) existence, (b) positive sign, 2/2 & Qwen2.5-7B $\mathrm{ID}_K$(AFTER) $+$7.05 [6.26, 7.81]; Mistral-7B not evaluable (Gate e); 1/2 & \textbf{not met} \\
+G20 & The lookup replaces the copy on IOI: $f_V$(AFTER) $\leq 0.5$, $f_V$(QUESTION) $\geq 0.75$ & Qwen2.5-7B $f_V$ 0.45 (AFTER), 0.69 (QUESTION); Mistral-7B not evaluable; 0/2 & \textbf{not met} \\
+G21 & Controls: (a) BEFORE $|\mathrm{ID}_K| \leq 0.5$; (b) QUESTION; (c) GPT-2 small INLINE\_BEFORE $|\mathrm{ID}_K| \leq 0.5$ & (a) $-$2.02 (Qwen2.5-7B); (b) met at Qwen2.5-7B, Mistral-7B not evaluable; (c) $-$0.25; (c) met & \textbf{not met} \\
+G22 & GPT-2 small in-sentence re-mention: (a) a key read, (b) inhibitory (replication of a disclosed pilot) & $\mathrm{ID}_K$(INLINE) $-$2.35 [$-$2.47, $-$2.23] & \textbf{met} \\
+\bottomrule
+\end{tabular}

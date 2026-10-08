@@ -1,0 +1,28 @@
+\begin{tabular}{@{}llcc@{}}
+\toprule
+ & Quantity (\fmtOpt{}) & Qwen2.5-7B & Mistral-7B \\
+\midrule
+ & heads $k^*$ (of all heads) & 40 (784) & 52 (1024) \\
+\midrule
+H1 & $R(k^*)$, top-$k^*$ by $a_3$ see $K_S$ & \begin{tabular}[t]{@{}c@{}}0.967\\[-1pt]{\scriptsize[0.952, 0.982]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}0.942\\[-1pt]{\scriptsize[0.919, 0.961]}\end{tabular} \\
+ & $k_{80}$ by $a_3$ / by $f^+$ / by $d^-$ & 20 / none / none & 16 / none / 12 \\
+\midrule
+H2 & $\mathrm{KO}(k^*)$, top-$k^*$ blinded & \begin{tabular}[t]{@{}c@{}}0.977\\[-1pt]{\scriptsize[0.966, 0.987]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}0.971\\[-1pt]{\scriptsize[0.954, 0.984]}\end{tabular} \\
+ & random sets: $R$ / $\mathrm{KO}$ (mean of 3) & 0.004 / 0.011 & 0.007 / 0.010 \\
+\midrule
+H3 & $\rho_K$ under mean-ablation of the top-$k^*$ & \begin{tabular}[t]{@{}c@{}}0.238\\[-1pt]{\scriptsize[0.205, 0.270]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}0.059\\[-1pt]{\scriptsize[0.040, 0.079]}\end{tabular} \\
+ & $\rho_K$, control sets (min--max) & 0.953--1.018 & 1.002--1.009 \\
+ & rise of $\mathrm{ID}_V$ (nats) & \begin{tabular}[t]{@{}c@{}}$+$6.907\\[-1pt]{\scriptsize[6.264, 7.561]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}$+$10.861\\[-1pt]{\scriptsize[9.995, 11.677]}\end{tabular} \\
+ & answer kept (base argmax) & 0.87 & 1.00 \\
+\midrule
+H4 & $|C|$ (heads carrying 80\,\%) & 20 & 16 \\
+ & median duplicate score $D$ over $C$ & \begin{tabular}[t]{@{}c@{}}0.370\\[-1pt]{\scriptsize[0.361, 0.378]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}0.232\\[-1pt]{\scriptsize[0.227, 0.238]}\end{tabular} \\
+ & median induction score $I$ over $C$ & 0.011 & 0.022 \\
+ & median in-task $T_{\mathrm{dup}}$ over $C$ & 0.459 & 0.433 \\
+ & top-10 by $a_3$ $\cap$ top-10 by $D$ & 6 & 5 \\
+\midrule
+H5 & $r_{\mathrm{ans}}$: only the answer row restored & \begin{tabular}[t]{@{}c@{}}0.899\\[-1pt]{\scriptsize[0.886, 0.913]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}0.859\\[-1pt]{\scriptsize[0.845, 0.872]}\end{tabular} \\
+ & $r_{\mathrm{other}}$ / $r_{\mathrm{all}}$ & 0.118 / 0.992 & 0.165 / 0.992 \\
+ & $r_{\mathrm{ans}}(K)$ / $r_{\mathrm{ans}}(V)$ (secondary, not scored) & 0.797 / 0.080 & 0.683 / 0.023 \\
+\bottomrule
+\end{tabular}

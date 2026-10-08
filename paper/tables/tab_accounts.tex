@@ -1,0 +1,13 @@
+\begin{tabular}{@{}p{0.54\columnwidth}cccc@{}}
+\toprule
+Observation (evidence) & DT & LB & FF & LM \\
+\midrule
+Hop~1: a sparse set of heads, whose core is duplicate-token heads, attends from the re-mentions to the writing token, key-matched, at every scale, also at 1.5B and 3B where $\mathrm{ID}_K \approx 0$ (G1--G3, H1--H4) & $\checkmark$/$\times$ & -- & -- & $\checkmark$ \\
+The same words placed before the writing token give no key read (E1) & $\checkmark$ & $\times$ & -- & $\checkmark$ \\
+The answer reads the option words, not the writing token (H5, G8b) & -- & $\times$ & -- & $\checkmark$ \\
+Without a later mention the identity is copied through the answer's edge to the writing token (G8a, E4) & -- & $\checkmark$ & -- & $\checkmark$ \\
+Removing the readers raises the value copy (G7a, H3) & -- & (ph) & -- & $\checkmark$ \\
+A remap refit without later mentions shows the same crossover (F1--F4) & -- & -- & $\times$ & $\checkmark$ \\
+Prakash et al.'s binding swap is key-dominant in every evaluable format ($\kappa$ 0.618, $\psi_V$ 0.435 without a later mention); later mentions shift $\kappa$ by $+$0.247 (H7--H10) & -- & (ph) & -- & $\times$ \\
+\bottomrule
+\end{tabular}

@@ -138,3 +138,36 @@ The script:
 To re-score an archive off the box: `PYTHONPATH=. python analysis/stage6_score.py --root results/gpu_stage6`.
 
 **CPU plumbing test.** `TEST_MODE=1 bash scripts/gpu_stage6.sh` runs pytest, then both parts at Qwen2.5-0.5B-Instruct in FP32 on the CPU into a scratch directory (heads: n_rank = n_eval = 2 on a reduced grid; prakash: n = 2 pairs, no LM filter), then the scorer with the tag `TEST_`. It takes about 8 min of pytest plus about 11 min of runs on a 4-core box. Its verdict lines are plumbing checks, not results.
+
+## Stage 7: blocking the reader heads while applying the released remap at Mistral-Small-24B (preregistered P-2026-10-08-I; paper v3)
+
+**What to rent.** 1× 80GB GPU (1× A100 80GB ≈ $1.5–2/h on Vast, or 1× H100), PyTorch template, host RAM ≥ 64 GB, disk ≥ 100 GB (the 47 GB Mistral-Small-24B weights are downloaded once and removed from the HF cache at the end unless they were cached before the run). Runtime is about 2–2.5 h: about 0.8 h of setup (pip and pytest about 20–25 min, the download about 6–10 min, five model loads about 8 min, preflight, scoring and archive about 5 min), about 1.0–1.2 h of sdpa passes (about 128,000 row-forwards: the family run, the head gate and the link batches) and about 0.15 h of eager passes (the ranking and the exploratory remap ranking). That is about $4–6, at most about $10. No Hugging Face token is needed.
+
+Run it in the instance's **Jupyter → Terminal**:
+```bash
+git clone -b claude/paper2-research https://github.com/syedzahedi1990/Causal-keys.git && cd Causal-keys
+I=$(git log --format=%H -1 --grep='^Finalise preregistration I') && [ -n "$I" ] && git checkout "$I"
+bash scripts/gpu_stage7.sh
+```
+The second line checks out the commit that finalises preregistration P-2026-10-08-I, its scorer `analysis/stage7_score.py` and the stage-7 code. The script refuses to start if any of these holds:
+- the entry is still marked DRAFT;
+- tracked files have local changes;
+- the code at HEAD (`ckeys experiments analysis scripts tests` and the entry) differs from that commit.
+
+The script:
+- pins transformers 5.18.0 and records the environment (`ENV.txt`, `PIP_FREEZE.txt`) and the commit (`COMMIT.txt`). It stops if no GPU with ≥ 75 GiB is visible (`MINGIB=<GiB>` lowers the floor).
+- fetches our predecessor's released reviewer repository, Anonymous (2026), into `~/paper1` as stage 4 does (or uses `P1R=<path>`, which must exist: a missing `P1R` stops the script instead of fetching a copy elsewhere), and checks it before any test or model: the release manifest with `refit_remap.tolerant_verify` (which pins `RELEASE.json` itself), the nine Mistral bases against the stage-4 provenance and the stories file against the manifest (`RELEASE.txt`, `log_release.txt`).
+- runs a fixed set of FP32 unit tests on the CPU before loading any model, with no reruns: the stage-7 tests (`log_pytest_stage7.txt`; `tests/test_stage7_link.py` is Gate I-G0, and the scorer reads the last run in that log), then the shared modules (`log_pytest.txt`), about 20 min on a 4-core CPU (14 min and 6.5 min in our TEST_MODE run). Any failure stops the script.
+- runs the tokenizer-only preflight (`preflight.json`), downloads the model at the pinned revision (`REVISIONS.txt`), then the steps `rank` (eager), `family` (`experiments/paper1_frames.py`, the stage-3b reproduction), `gate`, `link` (sdpa) and the exploratory `remaprank` (eager), in that order. A step whose results file exists and is complete is kept unless `FORCE=1`; a file written by a failed step is moved aside to `<file>.failed.<UTC time>` and the step is run again. After `DEADLINE_H` hours (default 3.5; a positive number) the link step skips the exploratory parts (the curve batch and the exploratory conditions) of each format it starts after that time, for every core of that format, and `remaprank` writes a stub instead of running (each skip is recorded in the provenance and listed by the scorer), so the run stays within the 4 h cap. No confirmatory batch is skipped. A link step that fails is rerun for all five formats on the next invocation (about 1 GPU-hour), since steps resume at step granularity.
+- scores with `analysis/stage7_score.py` into `results/gpu_stage7/STAGE7_SCORE.txt`: provenance, population checks, Gates I-G0 to I-G4, one verdict line per prediction I1–I7, the reported lines (SENTENCE-AFTER, the LETTERS-AFTER I5/I6 lines, the knockout contrast N(H*)), a summary, then the exploratory report.
+- writes `gpu_stage7_results.tgz`: results, logs and score, no model weights (tens of MB; `heads/mu.pt`, the means used by the ablation, is included so that its hash can be checked).
+
+**What to upload.** Put `gpu_stage7_results.tgz` in the Google Drive folder `causal-keys-results` and tell Claude. Then destroy the instance (destroy, do not just stop it).
+
+**Reading the result.** A step failed if the script prints a line starting with `FAILED <step>` (the same lines are in `FAILED.txt`); the other steps still run, the archive is still written, and the script exits with status 1. Upload the archive anyway. A failure of the exploratory `remaprank` goes to `FAILED_EXPLORATORY.txt` and does not make the run fail. `NOT EVALUABLE`, `NOT MET` or a failed gate in the score are results, not step failures. A `provenance MISMATCH` or `population MISMATCH`, or link results without a passing Gate I-G0, make the score step fail with exit 2 (the score file is still written).
+
+**Reruns.** To redo a failed step on the same box, run the script again with the same `OUT` and `TESTS=0` (accepted only when `OUT/PYTEST_OK.txt` records a passing pytest of the same commit on the same host). To fill exploratory parts skipped at the deadline, run it again the same way: a `remaprank` stub is redone automatically while the new session's own deadline has not passed, and `FORCE_STEPS=link` redoes the link step alone (about 1 GPU-hour; the other steps are kept). `FORCE_STEPS` takes a comma-separated list of steps (`preflight,rank,family,gate,link,remaprank`); `FORCE=1` redoes all of them. On a new box, clone and check out the same commit and unpack the earlier archive first (`tar xzf gpu_stage7_results.tgz`). Outside `TEST_MODE`, set `KEEP_CACHE=1` for any invocation on a machine other than the rented box.
+
+To re-score an archive off the box: `PYTHONPATH=. python analysis/stage7_score.py --root results/gpu_stage7` (no copy of the predecessor's release is needed; the stage-3b reference is the committed `results/gpu_stage3b/paper1_frames_v/mistral.json`).
+
+**CPU plumbing test.** `TEST_MODE=1 P1R=<local copy of the release> bash scripts/gpu_stage7.sh` runs pytest, then every step at Qwen2.5-0.5B-Instruct in FP32 on the CPU with random bases (two ranking stories, two evaluation cores) into a scratch directory, then the scorer with the tag `TEST_` (I-G1 (a) has no reference there and is NOT EVALUABLE, so every verdict is NOT EVALUABLE). It takes about 20 min of pytest plus about 15 min of runs on a 4-core box (peak host RAM about 10 GB). Its verdict lines are plumbing checks, not results.

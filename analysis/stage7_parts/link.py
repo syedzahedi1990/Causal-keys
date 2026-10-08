@@ -93,6 +93,10 @@ def cond_stats(L, arm, cond):
         nonadd_O=est(lambda D0, K0, V0, D, K, V, *_: 1 - (K + V) / D, *xs),
         kappa0=est(k0, *xs), kappaO=est(kO, *xs), kappaN=est(kN, *xs),
         c_kappa=est(lambda *x: (k0(*x) - kO(*x)) / (k0(*x) - kN(*x)), *xs),
+        # resamples dropped because an unblocked kappa (kappa^0(f) or kappa^0(NONE)) fails the kappa rule (an evaluability
+        # matter), and those where kappa^O fails while both unblocked kappas are defined (they count against the prediction)
+        drop_unblocked=est(lambda *x: k0(*x) + kN(*x), *xs)[3],
+        drop_blocked=est(lambda *x: np.where(np.isnan(k0(*x) + kN(*x)), 0.0, kO(*x)), *xs)[3],
         c_K=est(lambda D0, K0, V0, D, K, V, DN, KN, VN: (K0 / D0 - K / D0) / (K0 / D0 - KN / DN), *xs),
         dV=est(lambda D0, K0, V0, D, K, V, *_: V - V0, *xs),
         FV=0.25 * (fN["V"].mean() - f0["V"].mean()),
@@ -156,7 +160,7 @@ def gate_g1b(L, frames, arm):
         px = L.a(arm, "x_all").mean() / L.Dx(arm).mean()
         okx = abs(px - F["psiK"]) <= 0.03
         ok = ok and okx
-        txt += f"; B_x x_all psi_K {px:+.3f} vs {F['psiK']:+.3f} (within 0.03): {V(okx)}"
+        txt += f"; B_x x_all psi_K {px:+.3f} vs {F['psiK']:+.3f} (within 0.03{'' if okx else ': NOT MET'})"
     return ok, txt, F
 
 
@@ -164,11 +168,14 @@ def gate_g1c(L, arm):
     if not (L.has(arm, "N:null") and L.has(arm, "0")):
         return None, "no null knockout"
     S = cond_stats(L, arm, "N:null")
-    dk = S["kappaO"][0] - S["kappa0"][0]
+    k0, kn = S["kappa0"][0], S["kappaO"][0]
+    both = nan(k0) and nan(kn)                    # kappa undefined in both: the kappa part of the floor is moot
+    dk = 0.0 if both else kn - k0
     dv = S["dpsiV"][0]
     dt = S["t"][0] - 1
     ok = not nan(dk) and abs(dk) <= 0.02 and abs(dv) <= 0.02 and abs(dt) <= 0.02
-    return ok, f"|kappa_null - kappa| {abs(dk):.4f}, |psi~_V null - psi_V| {abs(dv):.4f}, |t - 1| {abs(dt):.4f} (each <= 0.02)"
+    return ok, (f"|kappa_null - kappa| {'undefined in both' if both else f'{abs(dk):.4f}'}, |psi~_V null - psi_V| {abs(dv):.4f}, "
+                f"|t - 1| {abs(dt):.4f} (each <= 0.02)")
 
 
 def gate_g1d(L):
@@ -211,7 +218,7 @@ def i1(L, arm, KN=None):
     gt = est(lambda a, n, k: (a - n) / (a - k), aa, an, KN) if KN is not None else (float("nan"),) * 4
     if arm == "POST":
         ok = g[0] >= 0.5
-        return ok, f"g_K {f3(g)} >= 0.5 (reported): {V(ok)}; g~_K {f3(gt)}", g
+        return ok, f"g_K {f3(g)} (>= 0.5, reported); g~_K {f3(gt)}", g
     ok = g[0] >= 0.7 and lower_ok(g, 0.6)
     return ok, f"g_K {f3(g)} (>= 0.7, lower >= 0.6); g~_K {f3(gt)}", g
 
@@ -241,10 +248,13 @@ def i3(L, arm):
 def i4(L, arm):
     S = cond_stats(L, arm, "A:H")
     if arm == "P1":
-        t = S["c_kappa"]
-        why = why_undefined(S["kappaO"]) or why_undefined(t, "c_kappa")
+        # only resamples where kappa^O fails while both unblocked kappas are defined count toward the 5 % (the unblocked
+        # drops decide evaluability in the scorer's ev()); the interval is over the resamples where all three are defined
+        t = (*S["c_kappa"][:3], S["drop_blocked"])
+        why = why_undefined((*S["kappaO"][:3], S["drop_blocked"])) or why_undefined(t, "c_kappa")
         ok = (not why) and t[0] >= 0.5 and lower_ok(t, 0.3)
-        txt = f"c_kappa {f3(t)} (>= 0.5, lower >= 0.3); kappa^A {f3(S['kappaO'])} vs {S['kappa0'][0]:+.3f} (NO-MENTION {S['kappaN'][0]:+.3f})"
+        txt = (f"c_kappa {f3(S['c_kappa'])} (>= 0.5, lower >= 0.3; resamples dropped by kappa^A alone {100 * S['drop_blocked']:.1f} %, "
+               f"by an unblocked kappa {100 * S['drop_unblocked']:.1f} %); kappa^A {f3(S['kappaO'])} vs {S['kappa0'][0]:+.3f} (NO-MENTION {S['kappaN'][0]:+.3f})")
         return ok, txt + (f"; NOT MET: {why}" if why else "") + "  [consistency check: follows from I1 x I2 without a takeover]", S
     t = S["c_K"]
     ok = t[0] >= 0.5 and lower_ok(t, 0.3)

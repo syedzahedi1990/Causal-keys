@@ -17,8 +17,9 @@ scored), SUMMARY, then the EXPLORATORY report.
 Evaluability (the entry's): I-G0 or I-G1 (d) failing -> I1-I7 NOT EVALUABLE; I1 in f needs I-G1 (a, b) and I-G3 (1) in
 f; I2, I3 also I-G2 (a-d) and I-G3 (2); I4-I7 need I-G1 (a, b), I-G2 and I-G3 (1) in f; I4 and I5 also NO-MENTION's
 I-G1 (a, b) and I-G3 (1), and I4 under OPTIONS-AFTER kappa(OPTIONS-AFTER) and kappa(NO-MENTION) defined by the kappa
-rule. In an evaluable format an undefined kappa after blocking, or more than 5 % of resamples dropped, is NOT MET with
-the reason printed. A prediction over OPTIONS-AFTER and LETTERS-AFTER is MET if met in both, NOT MET if not met in an
+rule at the point and, jointly, in >= 95 % of the resamples. In an evaluable format an undefined kappa after blocking,
+or more than 5 % of resamples dropped by the blocked kappa, is NOT MET with the reason printed. SENTENCE-AFTER lines say
+whether the threshold is met and whether that format passes its gates, without a verdict word. A prediction over OPTIONS-AFTER and LETTERS-AFTER is MET if met in both, NOT MET if not met in an
 evaluable format, else NOT EVALUABLE; I5 and I6 are scored under OPTIONS-AFTER alone.
 --tag TEST_<model> (TEST_MODE): sizes are not checked, I-G1 (a) has no reference (NOT EVALUABLE) and the verdict lines
 are plumbing checks, not results.
@@ -42,14 +43,14 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent))
 from stage7_parts import heads as hd  # noqa: E402
 from stage7_parts import link as lk  # noqa: E402
-from stage7_parts.common import NAMES, V, comb, est, f3  # noqa: E402
+from stage7_parts.common import MAXDROP, NAMES, V, comb, est, f3  # noqa: E402
 
 from ckeys.story import make_cores  # noqa: E402
 
 REV = "9527884be6e5616bdd54de542f9ae13384489724"
 RELEASE_SHA = "2dea297d508e51f07b927e9eb0571f40e99d25d996ccd7ad3342cb46942d0416"
 N_E, N_R, N_FRAMES = 96, 60, 600
-IG0_TESTS = 16   # the test functions of tests/test_stage7_link.py
+IG0_TESTS = 17   # the test functions of tests/test_stage7_link.py
 TITLE = {"I1": "the remap's key is read at the option words", "I2": "through the natural readers",
          "I3": "specificity of the route (random and active sets)", "I4": "the key share falls toward NO-MENTION under A(H*)",
          "I5": "the value channel carries more of the remap", "I6": "the behaviour is kept", "I7": "random sets change nothing"}
@@ -206,8 +207,8 @@ def gate_i0(root, out):
     return ok
 
 
-def score(root, tag, ref, out, test):
-    """Gates, evaluability, verdicts and reported lines. Returns the result dict."""
+def load(root, tag):
+    """The results files (None where absent), the link and head views, the family run."""
     F = {lab: (load_json(root / lab) if (root / lab).exists() else None)
          for lab in ("preflight.json", "heads/rank.json", "heads/gate.json", "heads/remaprank.json", f"link/{tag}.json")}
     F["frames"] = load_json(root / "frames" / f"{tag}.json") if (root / "frames" / f"{tag}.json").exists() else None
@@ -232,7 +233,7 @@ def main(argv=None):
     out(f"Stage 7 scoring, preregistration P-2026-10-08-I; root {root}; tag {a.tag}; reference {ref_f}")
     if test:
         out("TEST MODE: sizes are not checked and the verdict lines below are plumbing checks, not results")
-    F, L, Hh, frames = score(root, a.tag, ref_f, out, test)
+    F, L, Hh, frames = load(root, a.tag)
     ref = load_json(ref_f) if ref_f and ref_f.exists() else None
     ref = ref if ref and "results" in ref else None
     out("")
@@ -318,7 +319,8 @@ def run_gates_and_verdicts(root, L, Hh, frames, ref, out, report, test, res):
             need += [("NO-MENTION I-G1a", g1a.get("NONE")), ("NO-MENTION I-G1b", g1b.get("NONE")), ("NO-MENTION I-G3 (1)", g3.get("NONE", (None, None))[0])]
         if pred == "I4" and arm == "P1" and L is not None and L.has("P1", "0") and L.has("NONE", "0"):
             S = lk.cond_stats(L, "P1", "0")
-            need += [("kappa(OPTIONS-AFTER) defined", not np.isnan(S["kappa0"][0])), ("kappa(NO-MENTION) defined", not np.isnan(S["kappaN"][0]))]
+            need += [("kappa(OPTIONS-AFTER) defined", not np.isnan(S["kappa0"][0])), ("kappa(NO-MENTION) defined", not np.isnan(S["kappaN"][0])),
+                     (f"unblocked kappas defined in >= 95 % of resamples ({100 * S['drop_unblocked']:.1f} % dropped)", S["drop_unblocked"] <= MAXDROP)]
         miss = [n for n, ok in need if not ok]
         return not miss, ", ".join(miss)
 
@@ -353,7 +355,9 @@ def run_gates_and_verdicts(root, L, Hh, frames, ref, out, report, test, res):
         for p in ("I1", "I2", "I3", "I4", "I5", "I6", "I7"):
             try:
                 ok, txt, *_ = fns[p]("POST")
-                out(f"  {p} SENTENCE-AFTER: {txt} -> {V(ok)} (reported)")
+                ok_ev, why = ev(p, "POST")
+                word = "not computable" if ok is None else "meets the threshold" if ok else "does not meet the threshold"
+                out(f"  {p} SENTENCE-AFTER: {txt} -> {word} (no verdict) [gates: " + ("passed" if ok_ev else f"not passed: {why}") + "]")
             except Exception as e:  # noqa: BLE001
                 out(f"  {p} SENTENCE-AFTER: not computable: {type(e).__name__}: {e}")
         for p in ("I5", "I6"):
@@ -370,9 +374,7 @@ def run_gates_and_verdicts(root, L, Hh, frames, ref, out, report, test, res):
             out(f"  N(H*) {NAMES[arm]}: {lk.stats_txt(S)}{note}")
             out(f"        argmax rates {lk.rates_txt(L, arm)}")
             if L.has(arm, "A:H"):
-                SA, tN = lk.cond_stats(L, arm, "A:H"), S["t"][0]
-                out(f"        t under A {SA['t'][0]:+.3f} vs under N {tN:+.3f}" + ("; t falls under N while it holds under A: the stage-5 / H3 difference recurs at the head level"
-                                                                                  if SA["t"][0] >= 0.75 and tN < 0.6 else ""))
+                out(f"        t under A {f3(lk.cond_stats(L, arm, 'A:H')['t'])} vs under N {f3(S['t'])}")
         for arm in hd.ARMS:
             if L.has(arm, "A:H"):
                 out(f"  A(H*) {NAMES[arm]}: {lk.stats_txt(lk.cond_stats(L, arm, 'A:H'))}")
@@ -383,41 +385,64 @@ def run_gates_and_verdicts(root, L, Hh, frames, ref, out, report, test, res):
 
 # --------------------------------------------------------------------------- exploratory
 def exploratory(F, L, Hh, out):
+    """Each block (the head report, each format's step-2 lines, the remap ranking, the skipped list) in its own try, so a
+    missing or partial exploratory record loses only its own lines; a batch is reported only when every core holds it."""
+    def guard(label, fn):
+        try:
+            fn()
+        except Exception:  # noqa: BLE001
+            out(f"  exploratory report failed ({label}):\n" + traceback.format_exc())
+
     if Hh is not None:
         out("-- head sets and the gate curves (step 1)")
-        Hh.report(out)
+        guard("head sets", lambda: Hh.report(out))
     if L is None:
         out("  no link results")
         return
+    sk = L.P.get("explo_skipped") or []
+    out("-- exploratory parts skipped at the deadline: " + (f"{len(sk)}: {', '.join(sk)}" if sk else "none"))
     out("-- exploratory conditions (step 2)")
     for arm in hd.ARMS:
-        if not L.R(arm):
-            continue
-        out(f"   {NAMES[arm]}:")
-        for c in ("N:allG", "A:L4", "N:rand0", "A:H_P1"):
-            if L.has(arm, c):
-                out(f"      {c:8s} {lk.stats_txt(lk.cond_stats(L, arm, c))}")
-        if L.R(arm) and "x/rem_H_101" in L.R(arm)[0]["runs"]:
-            rho = est(lambda m, r, p: (m - r) / (m - p), L.sm(arm, "x", "M"), L.sm(arm, "x", "rem_H"), L.sm(arm, "x", "P"))
-            rx = est(lambda s, g: s / g, L.a(arm, "s_H"), L.a(arm, "s_G"))
-            out(f"      removal through the readers rho_K^x(H*) {f3(rho)} (frames rho_K 0.762 / 0.986); sufficiency R_x(H*) {f3(rx)}")
-        R0 = L.R(arm)[0]["runs"]
-        ks = sorted(int(k.split("_")[1][1:]) for k in R0 if k.startswith("curve/x_k") and k.endswith("_101"))
-        if ks:
-            out("      KO_x(k) " + " ".join(f"{k}:{lk.ko_x(L, arm, f'x_k{k}', 'curve')[0]:+.2f}" for k in ks))
-        if "curve/x_HP1_101" in R0:
-            out(f"      KO_x(H*_OPTIONS-AFTER) under LETTERS-AFTER {f3(lk.ko_x(L, arm, 'x_HP1', 'curve'))}")
-        for s in lk.SEEDS:
-            aa = np.array([lk.m_of(r["runs"][f"x/x_all_{s}"], r) - lk.m_of(r["runs"][f"x/P_{s}"], r) for r in L.R(arm)])
-            an = np.array([lk.m_of(r["runs"][f"x/x_notG_{s}"], r) - lk.m_of(r["runs"][f"x/P_{s}"], r) for r in L.R(arm)])
-            aH = np.array([lk.m_of(r["runs"][f"x/x_H_{s}"], r) - lk.m_of(r["runs"][f"x/P_{s}"], r) for r in L.R(arm)])
-            out(f"      seed {s}: g_K {1 - an.mean() / aa.mean():+.3f}, KO_x(H*) {(aa.mean() - aH.mean()) / (aa.mean() - an.mean()):+.3f}")
-        dist = np.array([r["core"]["distractor_location"] in (r["core"]["base"], r["core"]["source"]) for r in L.R(arm)])
-        aa, an, aH = L.a(arm, "x_all"), L.a(arm, "x_notG"), L.a(arm, "x_H")
-        for lab, sel in (("distractor at B or S", dist), ("the rest", ~dist)):
-            if sel.any():
-                out(f"      {lab} (n={int(sel.sum())}): g_K {1 - an[sel].mean() / aa[sel].mean():+.3f}, "
-                    f"KO_x(H*) {(aa[sel].mean() - aH[sel].mean()) / (aa[sel].mean() - an[sel].mean()):+.3f}")
+        if L.R(arm):
+            out(f"   {NAMES[arm]}:")
+            guard(NAMES[arm], lambda arm=arm: explo_arm(L, arm, out))
+    guard("remap ranking", lambda: explo_remaprank(F, Hh, out))
+
+
+def explo_arm(L, arm, out):
+    every = lambda key: all(key in r["runs"] for r in L.R(arm))  # noqa: E731
+    for c in ("N:allG", "A:L4", "N:rand0", "A:H_P1"):
+        if L.has(arm, c):
+            out(f"      {c:8s} {lk.stats_txt(lk.cond_stats(L, arm, c))}")
+        elif any(k.startswith(f"{c}/") for r in L.R(arm) for k in r["runs"]):
+            out(f"      {c:8s} present in only some cores: not reported")
+    if every("x/rem_H_101"):
+        rho = est(lambda m, r, p: (m - r) / (m - p), L.sm(arm, "x", "M"), L.sm(arm, "x", "rem_H"), L.sm(arm, "x", "P"))
+        rx = est(lambda s, g: s / g, L.a(arm, "s_H"), L.a(arm, "s_G"))
+        ref = {"P1": " (frames rho_K 0.762)", "LETTER": " (frames rho_K 0.986)"}.get(arm, "")
+        out(f"      removal through the readers rho_K^x(H*) {f3(rho)}{ref}; sufficiency R_x(H*) {f3(rx)}")
+    ks = sorted({int(k.split("_")[1][1:]) for r in L.R(arm) for k in r["runs"] if k.startswith("curve/x_k") and k.endswith("_101")})
+    curve = every("curve/P_101") and every("curve/x_all_101")
+    if ks and curve and all(every(f"curve/x_k{k}_{s}") for k in ks for s in lk.SEEDS):
+        out("      KO_x(k) " + " ".join(f"{k}:{lk.ko_x(L, arm, f'x_k{k}', 'curve')[0]:+.2f}" for k in ks))
+    elif ks:
+        out("      KO_x(k): the curve batch is present in only some cores: not reported")
+    if curve and all(every(f"curve/x_HP1_{s}") for s in lk.SEEDS):
+        out(f"      KO_x(H*_OPTIONS-AFTER) under LETTERS-AFTER {f3(lk.ko_x(L, arm, 'x_HP1', 'curve'))}")
+    for s in lk.SEEDS:
+        aa = np.array([lk.m_of(r["runs"][f"x/x_all_{s}"], r) - lk.m_of(r["runs"][f"x/P_{s}"], r) for r in L.R(arm)])
+        an = np.array([lk.m_of(r["runs"][f"x/x_notG_{s}"], r) - lk.m_of(r["runs"][f"x/P_{s}"], r) for r in L.R(arm)])
+        aH = np.array([lk.m_of(r["runs"][f"x/x_H_{s}"], r) - lk.m_of(r["runs"][f"x/P_{s}"], r) for r in L.R(arm)])
+        out(f"      seed {s}: g_K {1 - an.mean() / aa.mean():+.3f}, KO_x(H*) {(aa.mean() - aH.mean()) / (aa.mean() - an.mean()):+.3f}")
+    dist = np.array([r["core"]["distractor_location"] in (r["core"]["base"], r["core"]["source"]) for r in L.R(arm)])
+    aa, an, aH = L.a(arm, "x_all"), L.a(arm, "x_notG"), L.a(arm, "x_H")
+    for lab, sel in (("distractor at B or S", dist), ("the rest", ~dist)):
+        if sel.any():
+            out(f"      {lab} (n={int(sel.sum())}): g_K {1 - an[sel].mean() / aa[sel].mean():+.3f}, "
+                f"KO_x(H*) {(aa[sel].mean() - aH[sel].mean()) / (aa[sel].mean() - an[sel].mean()):+.3f}")
+
+
+def explo_remaprank(F, Hh, out):
     RR = F.get("heads/remaprank.json")
     if RR and RR.get("arms") and Hh is not None:
         from scipy.stats import hypergeom
@@ -435,9 +460,8 @@ def exploratory(F, L, Hh, out):
             out(f"   {NAMES[arm]}: |H_rem & H*| = {ov} of {len(Hs)}, Jaccard {jac:.3f}, hypergeometric P {p:.1e}; KO_x(H_rem) {f3(k)} (in-sample)")
     elif RR is not None:
         out("-- remap ranking: " + str((RR.get("provenance") or {}).get("skipped", "no results")))
-    sk = L.P.get("explo_skipped") or []
-    if sk:
-        out(f"-- exploratory conditions skipped at the deadline: {len(sk)} (first {sk[:5]})")
+    else:
+        out("-- remap ranking: no results file")
 
 
 if __name__ == "__main__":

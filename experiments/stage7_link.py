@@ -48,8 +48,11 @@ f"{cond}/B|S|T" (cond in nat, cap, x, curve, before, 0, A:<set>, A+:<set>, N:<se
 TEST_MODE (--test or TEST_MODE=1): Qwen2.5-0.5B-Instruct FP32 on the CPU, random bases (width 896, generator seed 0, as
 paper1_frames --bases-override), n_rank = n_eval = 2, KS = (1, 2, 4, 5, 8), k* fraction 0.012 (k* = 5 of 336 heads),
 5 duplicate sequences; L4 = the 14 heads of layer 4. Outputs carry test_mode and the tag TEST_Qwen2.5-0.5B-Instruct.
-A deadline (env STAGE7_DEADLINE, epoch seconds, set by the pipeline) skips the exploratory conditions and remaprank once
-passed; what was skipped is recorded in the provenance.
+A deadline (env STAGE7_DEADLINE, epoch seconds, set by the pipeline) is checked by link at the start of each format: once
+it has passed, that format's exploratory parts (the curve batch and the exploratory family conditions) are skipped for
+every core, so each exploratory batch is complete or absent, and each skipped part is recorded in
+provenance.explo_skipped as "<arm>/<part>"; remaprank checks it once at its start and, once passed, writes a stub
+recording the skip.
 """
 from __future__ import annotations
 
@@ -500,6 +503,9 @@ def stage_preflight(a):
     for arm in ARMS_ALL:
         for core in E:
             skipped["E"] += prep(tok, core, arm, True) is None
+    # rank cannot use a skipped ranking story, and a skipped evaluation core fails the population check: stop here,
+    # before any model is downloaded or loaded
+    assert skipped == {"R": 0, "E": 0}, f"stories whose B/S(/T) encodings differ in length: {skipped}"
     key = lambda c: tuple(c[f] for f in STORY_FIELDS)  # noqa: E731
     overlap = len({key(c) for c in R} & {key(c) for c in E})
     assert overlap == 0, f"{overlap} ranking stories equal an evaluation core"
@@ -661,6 +667,10 @@ def stage_link(a):
             act = cells(S["arms"][arm]["active"])
             el = set(L.elig)
             comp = lambda C: sorted(el - set(C))  # noqa: E731
+        # the deadline is checked once per format: its exploratory parts run for every core or for none
+        explo_on = not deadline_passed()
+        if not explo_on and arm in ARMS_LINK:
+            P["explo_skipped"] += [f"{arm}/{n}" for n in ["curve", "A:L4", "N:rand0", "N:allG"] + (["A:H_P1"] if arm == "LETTER" else [])]
         for ci, core in enumerate(E):
             d = prep(tok, core, arm, True)
             if d is None:
@@ -695,16 +705,13 @@ def stage_link(a):
                 res |= {f"before/{n}_{s}": {"cand": c[i].tolist(), "argmax": int(g[i])} for i, (n, s, *_) in enumerate(rows)}
             for name, cond in conds:
                 res |= {f"{name}/{k}": v for k, v in L.family(d, Pt, X, cond).items()}
-            if arm in ARMS_LINK and not deadline_passed():
+            if arm in ARMS_LINK and explo_on:
                 cur = [(n, s, "P", C, o) for s in SEEDS for n, C, o in
                        [("P", [], False), ("x_all", L.elig, True)] + [(f"x_k{k}", comp(Hs[:k]), True) for k in KS if k != kstar]
                        + ([("x_HP1", comp(H1), True)] if arm == "LETTER" else [])]
                 c, g, _ = L.bx(d, Pt, X, cur)
                 res |= {f"curve/{n}_{s}": {"cand": c[i].tolist(), "argmax": int(g[i])} for i, (n, s, *_) in enumerate(cur)}
-            for name, cond in explo:
-                if deadline_passed():
-                    P["explo_skipped"].append(f"{arm}/{ci}/{name}")
-                    continue
+            for name, cond in (explo if explo_on else []):
                 res |= {f"{name}/{k}": v for k, v in L.family(d, Pt, X, cond).items()}
             rows_out.append(rec)
         out["arms"][arm] = rows_out

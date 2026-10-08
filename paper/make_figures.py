@@ -24,6 +24,7 @@ FIG = ROOT / "paper" / "figures"
 FIG.mkdir(parents=True, exist_ok=True)
 BLUE, ORANGE, AQUA = "#2a78d6", "#eb6834", "#1baf7a"
 INK, INK2, GRID = "#0b0b0b", "#52514e", "#e4e3df"
+PURPLE, BROWN, LGREY = "#7d3fa8", "#a8661f", "#b9b7b2"
 plt.rcParams.update({"font.size": 8, "axes.edgecolor": INK2, "axes.labelcolor": INK, "xtick.color": INK2,
                      "ytick.color": INK2, "axes.spines.top": False, "axes.spines.right": False,
                      "font.family": "DejaVu Sans", "pdf.fonttype": 42})
@@ -54,11 +55,18 @@ def mac(name, value, fmt="{:.2f}"):
     macros[name] = fmt.format(value) if not isinstance(value, str) else value
 
 
+def tnum(s):
+    """formatted number -> LaTeX: a math minus for negatives; a value that rounds to zero is printed unsigned."""
+    if s.lstrip("+-").strip("0.") == "":
+        return s.lstrip("+-")
+    return f"$-${s[1:]}" if s.startswith("-") else s
+
+
 def cell(t, f="{:+.1f}", fci=None):
     """Estimate on one line, its 95% interval below in scriptsize."""
     fci = fci or f
-    return (f"\\begin{{tabular}}[t]{{@{{}}c@{{}}}}{f.format(t[0])}\\\\[-1pt]"
-            f"{{\\scriptsize[{fci.format(t[1])}, {fci.format(t[2])}]}}\\end{{tabular}}")
+    return (f"\\begin{{tabular}}[t]{{@{{}}c@{{}}}}{tnum(f.format(t[0]))}\\\\[-1pt]"
+            f"{{\\scriptsize[{tnum(fci.format(t[1]))}, {tnum(fci.format(t[2]))}]}}\\end{{tabular}}")
 
 
 def ratio_ci(a, b, B=10000, seed=0):
@@ -297,7 +305,7 @@ def draw_frames(pk=None):
         ax.set_title(f"({'ab'[list(frames).index(label)]}) {label}", fontsize=7.5, color=INK)
         ax.set_ylim(-0.1, 1.15)
         ax.grid(axis="y", color=GRID, lw=0.6)
-    axes[0].set_ylabel("fraction of the remap's effect")
+    axes[0].set_ylabel("fraction ($\\varphi$: of natural shift;\n$\\psi$: of M$-$P)", fontsize=6.5, labelpad=1)
     plt.setp(axes[1].get_yticklabels(), visible=False)
     h, l = axes[0].get_legend_handles_labels()
     fig.legend(h, l, frameon=False, fontsize=6.5, loc="upper left", bbox_to_anchor=(0.06, 1.0), ncol=3)
@@ -308,20 +316,20 @@ def draw_frames(pk=None):
     for (label, a), (nx, cy_) in cross.items():
         mist = label.startswith("Mistral")
         ax.errorbar(nx[0], cy_[0], xerr=[[nx[0] - nx[1]], [nx[2] - nx[0]]], yerr=[[cy_[0] - cy_[1]], [cy_[2] - cy_[0]]],
-                    fmt="o" if mist else "s", ms=3.4, color=INK2, mfc="white" if mist else INK, mec=INK, mew=0.7,
+                    fmt="o" if mist else "s", ms=5.2 if mist else 3.4, color=INK2, mfc="white" if mist else INK, mec=INK, mew=0.7,
                     elinewidth=0.6, zorder=3, label=(label.split("-")[-1] + " released") if a == "LETTER" else None)
         if label.startswith("Qwen"):
             ax.annotate(ABBR[a], (nx[0], cy_[0]), textcoords="offset points",
                         xytext={"LETTER": (-16, -10), "P1": (5, -5), "POST": (5, -6), "NONE": (6, 0), "BEFORE": (5, -7)}[a],
                         fontsize=5.6, color=INK2)
     for fam, mk, nm in (("none/", "^", "24B refit, no mention"), ("p1/", "v", "24B refit, options")):
-        ax.scatter([sid4[a] for a in FRAME_ARMS], [refshare[fam][a] for a in FRAME_ARMS], marker=mk, s=13,
+        ax.scatter([sid4[a] for a in FRAME_ARMS], [refshare[fam][a] for a in FRAME_ARMS], marker=mk, s=9,
                    facecolor="#9a9893" if fam == "none/" else "white", edgecolor=INK, linewidth=0.6, zorder=4, label=nm)
     ax.set_xlim(-0.15, 1.05); ax.set_ylim(-0.15, 1.05)
     ax.set_xticks([0, 0.5, 1]); ax.set_yticks([0, 0.5, 1])
     ax.set_xlabel("natural read: identity key share", fontsize=6.5)
-    ax.set_ylabel("remap: $\\psi_K/(\\psi_K+\\psi_V)$", fontsize=6.5, labelpad=2)
-    ax.set_title("(c) remap vs. natural read", fontsize=7.5, color=INK)
+    ax.set_ylabel("edit's key share $\\psi_K/(\\psi_K+\\psi_V)$ or $\\kappa$", fontsize=6.5, labelpad=2)
+    ax.set_title("(c) edit vs. natural read", fontsize=7.5, color=INK)
     ax.grid(color=GRID, lw=0.6)
     for lab, mk, col, pts in (pk or []):
         for (sx, ky, f) in pts:
@@ -330,14 +338,14 @@ def draw_frames(pk=None):
                         label=lab if f == "NO-MENTION" else None)
         xs_, ys_ = [p[0][0] for p in pts], [p[1][0] for p in pts]
         ax.annotate("H7" if mk == "D" else "H11", (max(xs_), max(ys_)), textcoords="offset points", xytext=(4, -2) if mk == "D" else (-14, 5),
-                    fontsize=5.6, color=col, weight="bold")
+                    fontsize=6, color=col, weight="bold")
     if not pk:
         ax.legend(frameon=False, fontsize=5.2, loc="upper left", handletextpad=0.1, borderaxespad=0.2, labelspacing=0.25)
     else:
         h_, l_ = ax.get_legend_handles_labels()
-        fig.legend(h_, l_, frameon=False, fontsize=4.7, loc="upper left", bbox_to_anchor=(0.705, 1.01), ncol=2, handletextpad=0.1,
+        fig.legend(h_, l_, frameon=False, fontsize=6, loc="upper left", bbox_to_anchor=(0.66, 1.02), ncol=2, handletextpad=0.1,
                    columnspacing=0.6, labelspacing=0.2, borderaxespad=0.1)
-    fig.subplots_adjust(left=0.075, right=0.99, bottom=0.2, top=0.8)
+    fig.subplots_adjust(left=0.085, right=0.99, bottom=0.2, top=0.8)
     fig.savefig(FIG / "fig_frames.pdf")
     plt.close(fig)
 
@@ -1557,7 +1565,7 @@ PH = "(ph)"
 # ---- tab_accounts.tex: accounts vs observations (main text, single column, seven rows; c.7)
 acc_rows = [
     (r"Hop~1: a sparse set of heads, whose core is duplicate-token heads, attends from the re-mentions to the writing token, key-matched, at every scale, also at 1.5B and 3B where $\mathrm{ID}_K \approx 0$ (G1--G3, H1--H4)",
-     CK + "/" + XX, NA, NA, CK),
+     CK + "/" + XX, NA, NA, CK + "/" + PH),
     (r"The same words placed before the writing token give no key read (E1)", CK, XX, NA, CK),
     (r"The answer reads the option words, not the writing token (H5, G8b)", NA, XX, NA, CK),
     (r"Without a later mention the identity is copied through the answer's edge to the writing token (G8a, E4)", NA, CK, NA, CK),
@@ -1585,7 +1593,7 @@ rows = [
      f"{min(hm['H3']['rc'], key=fl).lstrip('+')}--{max(hm['H3']['rc'], key=fl).lstrip('+')}"),
     ("", r"rise of $\mathrm{ID}_V$ (nats)", tcell(hq["H3"]["dv"], True), tcell(hm["H3"]["dv"], True)),
     ("", r"answer kept (base argmax)", tx(hq["H3"]["base"]), tx(hm["H3"]["base"])),
-    ("H4", r"$|C|$ (heads carrying 80\,\%)", hq["H4"]["kc"], hm["H4"]["kc"]),
+    ("H4", r"$|C|$ (top heads by $a_3$ carrying 80\,\%)", hq["H4"]["kc"], hm["H4"]["kc"]),
     ("", r"median duplicate score $D$ over $C$", tcell(hq["H4"]["D"]), tcell(hm["H4"]["D"])),
     ("", r"median induction score $I$ over $C$", tx(hq["H4"]["I"][0]), tx(hm["H4"]["I"][0])),
     ("", r"median in-task $T_{\mathrm{dup}}$ over $C$", tx(hq["H4"]["T"][0]), tx(hm["H4"]["T"][0])),
@@ -1885,7 +1893,7 @@ wtab("tab_ioi.tex", lines)
 
 # ---------------------------------------------------------------- v3 figures
 GREY = "#9a9893"
-RCOL = {"a3": BLUE, "fplus": ORANGE, "dminus": AQUA}
+RCOL = {"a3": INK, "fplus": PURPLE, "dminus": BROWN}
 RLAB = {"a3": "$a_3$ (attention change)", "fplus": "$f^+$ (single-head gain)", "dminus": "$d^-$ (single-head loss)"}
 HC = {}
 for m in HM:
@@ -1921,7 +1929,7 @@ def readers_figure():
         ax.text(1.08, 3.45, title, ha="right", va="bottom", fontsize=5.8, color=INK2)
         if r_ == 0:
             ax.set_title("(a) rows that read the key", fontsize=7, color=INK, loc="left", x=-0.35)
-            ax.legend(frameon=False, fontsize=4.8, loc="lower right", handlelength=0.8, borderaxespad=0.1, labelspacing=0.15, bbox_to_anchor=(1.02, 0.12))
+            ax.legend(frameon=False, fontsize=6, loc="center right", handlelength=0.8, borderaxespad=0.1, labelspacing=0.15, bbox_to_anchor=(1.04, 0.47))
         else:
             ax.set_xlabel("fraction of the key effect", fontsize=5.8, labelpad=1)
     # (b) heads: R(k) and KO(k)
@@ -1957,7 +1965,7 @@ def readers_figure():
             h_, l_ = ax.get_legend_handles_labels()
             h_ += [matplotlib.lines.Line2D([], [], color=INK2, lw=0.9), matplotlib.lines.Line2D([], [], color=INK2, lw=0.9, ls="--")]
             l_ = [{"random sets": "random"}.get(x, x.split(" (")[0]) for x in l_] + ["$R(k)$", "KO$(k)$"]
-            ax.legend(h_[::-1], l_[::-1], frameon=False, fontsize=5.0, loc="upper left", ncol=3, handlelength=1.3, borderaxespad=0.1,
+            ax.legend(h_[::-1], l_[::-1], frameon=False, fontsize=6, loc="upper left", ncol=3, handlelength=1.3, borderaxespad=0.1,
                       labelspacing=0.15, columnspacing=0.5, bbox_to_anchor=(0.0, 1.0))
         else:
             ax.set_yticklabels([])
@@ -1966,7 +1974,7 @@ def readers_figure():
     w = 0.16
     for c_, m in enumerate(HM):
         H5_ = h6[m]["H5"]
-        for j, (key, col, lab) in enumerate((("ans", BLUE, r"$r_{\mathrm{ans}}$: answer row only"), ("other", ORANGE, r"$r_{\mathrm{other}}$: all other rows"),
+        for j, (key, col, lab) in enumerate((("ans", INK, r"$r_{\mathrm{ans}}$: answer row"), ("other", LGREY, r"$r_{\mathrm{other}}$: other rows"),
                                               ("all", INK2, r"$r_{\mathrm{all}}$: every row"))):
             t_ = H5_[key]
             x_ = c_ + (j - 2) * w
@@ -1974,8 +1982,8 @@ def readers_figure():
                    yerr=[[fl(t_[0]) - fl(t_[1])], [fl(t_[2]) - fl(t_[0])]], error_kw=dict(lw=0.6, ecolor=INK))
         for j, (key, lab) in enumerate((("K", r"$r_{\mathrm{ans}}(K)$"), ("V", r"$r_{\mathrm{ans}}(V)$"))):
             x_ = c_ + (j + 1) * w
-            ax.bar(x_, fl(H5_[key]), w * 0.92, color="white", edgecolor=BLUE, hatch="////" if key == "K" else "..", lw=0.6, zorder=3,
-                   label=(lab + " (secondary, not scored)" if key == "K" else lab) if c_ == 0 else None)
+            ax.bar(x_, fl(H5_[key]), w * 0.92, color="white", edgecolor=INK, hatch="////" if key == "K" else "..", lw=0.6, zorder=3,
+                   label=(lab + " (unscored)" if key == "K" else lab) if c_ == 0 else None)
     ax.axhline(0, color=INK2, lw=0.6)
     ax.set_xticks(range(len(HM)))
     ax.set_xticklabels([SHORT[m] for m in HM], fontsize=6)
@@ -1985,7 +1993,7 @@ def readers_figure():
     ax.grid(axis="y", color=GRID, lw=0.6)
     ax.set_ylabel("fraction of the key-clamp effect removed", fontsize=5.8, labelpad=1)
     ax.set_title("(c) the answer's read", fontsize=7, color=INK, loc="left")
-    ax.legend(frameon=False, fontsize=4.5, loc="upper left", ncol=1, handlelength=1.1, borderaxespad=0.1, labelspacing=0.15)
+    ax.legend(frameon=False, fontsize=6, loc="upper left", ncol=1, handlelength=1.1, borderaxespad=0.1, labelspacing=0.15)
     fig.savefig(FIG / "fig_readers.pdf")
     plt.close(fig)
 
@@ -2065,8 +2073,8 @@ sweeps_figure()
 
 # fig_frames panel (c) with Prakash et al.'s cells (H7: BIND@28 vs s_ID(f, 29); H11: ID@0 vs s_ID(f, 1))
 PKPTS = []
-for a_, l0, lab, mk, col in (("Bind", 29, "14B BIND@28 (H7, failed)", "D", ORANGE),
-                             ("IdZero", 1, "14B ID@0 (H11)", "P", BLUE)):
+for a_, l0, lab, mk, col in (("Bind", 29, "BIND@28, 14B (H7)", "D", PURPLE),
+                             ("IdZero", 1, "ID@0, 14B (H11)", "P", PURPLE)):
     pts = []
     for f in ("NO-MENTION", "QNAMES", "OPTIONS-AFTER"):
         k_ = tuple(map(fl, PK[a_, PKF[f]]["kappa"]))

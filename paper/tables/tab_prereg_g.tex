@@ -3,7 +3,7 @@
  & Prediction & Observed & Verdict \\
 \midrule
 G1 & Anchors attend: $E \geq 0.20$ (lower $> 0.10$) and $F/E \geq 0.5$ under \fmtPost{} at Qwen2.5-7B and 14B & $E$ 0.869 [0.852, 0.885], $F/E$ 1.00 (7B); $E$ 0.915 [0.908, 0.921], $F/E$ 0.98 (14B) & \textbf{met} \\
-G2 & Dissociation at 1.5B and 3B ($H_{\mathrm{diss}}$): the same attention while $\mathrm{ID}_K(\text{\fmtPost{}})$ stays within $\pm 1$ nat & $E$ 0.789 [0.778, 0.802], $F/E$ 1.03, $\mathrm{ID}_K$ $-$0.53 (1.5B); $E$ 0.879 [0.866, 0.892], $F/E$ 0.99, $\mathrm{ID}_K$ $-$0.02 (3B) & \textbf{met} \\
+G2 & Dissociation at 1.5B and 3B ($H_{\mathrm{diss}}$): the same attention while $\mathrm{ID}_K(\text{\fmtPost{}})$ stays within $\pm 1$ nat & $E$ 0.789 [0.778, 0.802], $F/E$ 1.03, $\mathrm{ID}_K$ (lowercase ids) $-$0.53 (1.5B); $E$ 0.879 [0.866, 0.892], $F/E$ 0.99, $\mathrm{ID}_K$ (lowercase ids) $-$0.02 (3B; 0.04 in the emitted casing) & \textbf{met} \\
 G3 & Magnitude under $H_{\mathrm{diss}}$: $R_A \geq 0.5$ and $E(m) \geq 0.5\times$ the smaller anchor $E$ & $R_A$ 1.05 / 1.06; $E(m)$/anchor 0.91 / 1.01 (1.5B / 3B) & \textbf{met} \\
 G4 & Hop 2 (attention): (a) $G \geq 0.10$ (lower $> 0.05$) at the anchors; (b) $Q \leq 0.5$ (upper $< 1$) at 1.5B and 3B & (a) $G$ 0.255 / 0.329; (b) $Q$ 0.34 [0.29, 0.39] / 0.44 [0.37, 0.52] & \textbf{met} \\
 \midrule

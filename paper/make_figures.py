@@ -1704,8 +1704,8 @@ gr = []
 gr.append(("G1", r"Anchors attend: $E \geq 0.20$ (lower $> 0.10$) and $F/E \geq 0.5$ under \fmtPost{} at Qwen2.5-7B and 14B",
            f"$E$ {tci(G5[Q7, 'POST']['E'])}, $F/E$ {tx(G5[Q7, 'POST']['FE'][0])} (7B); $E$ {tci(G5[Q14, 'POST']['E'])}, $F/E$ {tx(G5[Q14, 'POST']['FE'][0])} (14B)", VG5["G1"][1]))
 gr.append(("G2", r"Dissociation at 1.5B and 3B ($H_{\mathrm{diss}}$): the same attention while $\mathrm{ID}_K(\text{\fmtPost{}})$ stays within $\pm 1$ nat",
-           f"$E$ {tci(G5[Q15, 'POST']['E'])}, $F/E$ {tx(G5[Q15, 'POST']['FE'][0])}, $\\mathrm{{ID}}_K$ {tx(M_('GtwoIDKLowQwenOnefive'))} (1.5B); "
-           f"$E$ {tci(G5[Q3, 'POST']['E'])}, $F/E$ {tx(G5[Q3, 'POST']['FE'][0])}, $\\mathrm{{ID}}_K$ {tx(M_('GtwoIDKLowQwenThree'))} (3B)", VG5["G2"][1]))
+           f"$E$ {tci(G5[Q15, 'POST']['E'])}, $F/E$ {tx(G5[Q15, 'POST']['FE'][0])}, $\\mathrm{{ID}}_K$ (lowercase ids) {tx(M_('GtwoIDKLowQwenOnefive'))} (1.5B); "
+           f"$E$ {tci(G5[Q3, 'POST']['E'])}, $F/E$ {tx(G5[Q3, 'POST']['FE'][0])}, $\\mathrm{{ID}}_K$ (lowercase ids) {tx(M_('GtwoIDKLowQwenThree'))} (3B; {tx(M_('GtwoIDKCapQwenThree'))} in the emitted casing)", VG5["G2"][1]))
 gr.append(("G3", r"Magnitude under $H_{\mathrm{diss}}$: $R_A \geq 0.5$ and $E(m) \geq 0.5\times$ the smaller anchor $E$",
            f"$R_A$ {tx(M_('GthreeRAQwenOnefive'))} / {tx(M_('GthreeRAQwenThree'))}; $E(m)$/anchor {tx(M_('GthreeEratioQwenOnefive'))} / {tx(M_('GthreeEratioQwenThree'))} (1.5B / 3B)", VG5["G3"][1]))
 gr.append(("G4", r"Hop 2 (attention): (a) $G \geq 0.10$ (lower $> 0.05$) at the anchors; (b) $Q \leq 0.5$ (upper $< 1$) at 1.5B and 3B",

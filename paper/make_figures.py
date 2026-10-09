@@ -2266,7 +2266,10 @@ def _gv(p):
     return "MET" if all(l.rstrip().endswith("-> MET") for l in ls) else "NOT MET"
 
 
-GV = {g: _gv("  " + g + " ") for g in ("I-G0", "I-G2", "I-G3")}
+GV = {g: _gv("  " + g + " ") for g in ("I-G0", "I-G2")}
+_g3 = [S7[j] for j in find(S7, "  I-G3 ", many=True)]   # its lines end ': MET' per clause, without '->'
+assert len(_g3) == 4 and all(l.rstrip().endswith(": MET") or l.rstrip().endswith(": NOT MET") for l in _g3), _g3
+GV["I-G3"] = "NOT MET" if any("NOT MET" in l for l in _g3) else "MET"
 GV["I-G1"] = "MET" if all(_gv(f"  I-G1{x} ") == "MET" for x in "abcd") else "NOT MET"
 _g4 = S7[find(S7, "  I-G4 ")].rstrip()
 assert _g4.endswith("takeover: no (not a verdict gate)") or _g4.endswith("takeover: yes (not a verdict gate)"), _g4

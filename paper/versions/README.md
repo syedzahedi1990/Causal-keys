@@ -46,4 +46,5 @@
   and on the readers, Related Work sentences on the binding swap and the joint clamp, the F3 interval in Sec. 4.1 (in
   Table 5), and the intro's pointer to the accounts table (now in Sec. 4.3). The release script also anonymises
   first-person references to the earlier work, the repository name, scratch paths and paper-numbered identifiers,
-  and excludes itself.
+  and excludes itself. Re-frozen 2026-10-09: Table 8 printed Gate I-G3 as "not met" (a parsing error in
+  `paper/make_figures.py`; the score file has it met); fixed, nothing else changed.

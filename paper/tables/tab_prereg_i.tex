@@ -5,7 +5,7 @@
 I-G0 & FP32 exactness of the blinding, ablation and knockout code (unit tests), before any model & 17 passed, 0 failed, 0 skipped & \textbf{met} \\
 I-G1 & Reproduction of stage 3b ($|\Delta\varphi|$, $|\Delta\psi_K|$, $|\Delta\psi_V| \leq 0.03$, five formats); in-run rows; knockout floor; no effect at rows before the writing token & largest difference 0.000; in-run $D$ within 0.2\,\%; structural check 0 nats & \textbf{met} \\
 I-G2 & The readers at 24B: $\bar d_{\mathrm{full}} \geq 3$; $d_G/d_{\mathrm{full}} \geq 0.7$; $R(64) \geq 0.7$, $\mathrm{KO}(64) \geq 0.8$; random sets $\leq 0.25$; BF16 floor & $\bar d_{\mathrm{full}}$ 17.020 / 18.186; $d_G/d_{\mathrm{full}}$ 0.853 / 0.987; $R$ 0.832 / 0.822; KO 0.971 / 0.991; random $R$ 0.001 / 0.001, KO 0.011 / 0.013 & \textbf{met} \\
-I-G3 & The remap acts: $D \geq 3$ nats; direct read at $G$ $\geq 1$ nat & $D$ 13.67 / 12.87 & \textbf{not met} \\
+I-G3 & The remap acts: $D \geq 3$ nats; direct read at $G$ $\geq 1$ nat & $D$ 13.67 / 12.87 & \textbf{met} \\
 I-G4 & For reading I5/I6 as a value takeover (not a verdict gate): under A$^+$, $t \geq 0.6$ and $\Delta_V > 0$ (CI excluding 0) & $t$ 0.556 [0.534, 0.578]; $\Delta_V$ $+$2.496 [2.250, 2.737] & \textbf{not met} \\
 \midrule
 I1 & The remap's key is read at the option words: $g_K \geq 0.7$, lower bound $\geq 0.6$ & 0.976 [0.963, 0.990] / 0.999 [0.997, 1.000] & \textbf{met} \\

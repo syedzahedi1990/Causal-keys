@@ -1,0 +1,19 @@
+\begin{tabular}{p{0.05\textwidth}p{0.36\textwidth}p{0.41\textwidth}p{0.08\textwidth}}
+\toprule
+ & Gate or prediction & Observed (\fmtOpt{} / \fmtLetter{}) & Verdict \\
+\midrule
+I-G0 & FP32 exactness of the blinding, ablation and knockout code (unit tests), before any model & 17 passed, 0 failed, 0 skipped & \textbf{met} \\
+I-G1 & Reproduction of stage 3b ($|\Delta\varphi|$, $|\Delta\psi_K|$, $|\Delta\psi_V| \leq 0.03$, five formats); in-run rows; knockout floor; no effect at rows before the writing token & largest difference 0.000; in-run $D$ within 0.2\,\%; structural check 0 nats & \textbf{met} \\
+I-G2 & The readers at 24B: $\bar d_{\mathrm{full}} \geq 3$; $d_G/d_{\mathrm{full}} \geq 0.7$; $R(64) \geq 0.7$, $\mathrm{KO}(64) \geq 0.8$; random sets $\leq 0.25$; BF16 floor & $\bar d_{\mathrm{full}}$ 17.020 / 18.186; $d_G/d_{\mathrm{full}}$ 0.853 / 0.987; $R$ 0.832 / 0.822; KO 0.971 / 0.991; random $R$ 0.001 / 0.001, KO 0.011 / 0.013 & \textbf{met} \\
+I-G3 & The remap acts: $D \geq 3$ nats; direct read at $G$ $\geq 1$ nat & $D$ 13.67 / 12.87 & \textbf{not met} \\
+I-G4 & For reading I5/I6 as a value takeover (not a verdict gate): under A$^+$, $t \geq 0.6$ and $\Delta_V > 0$ (CI excluding 0) & $t$ 0.556 [0.534, 0.578]; $\Delta_V$ $+$2.496 [2.250, 2.737] & \textbf{not met} \\
+\midrule
+I1 & The remap's key is read at the option words: $g_K \geq 0.7$, lower bound $\geq 0.6$ & 0.976 [0.963, 0.990] / 0.999 [0.997, 1.000] & \textbf{met} \\
+I2 & Through the natural readers: $\mathrm{KO}_x(H^*) \geq 0.8$, lower bound $\geq 0.7$ & 0.994 [0.989, 0.999] / 0.993 [0.990, 0.995] & \textbf{met} \\
+I3 & Specificity: $\mathrm{KO}_x \leq 0.25$ for three random sets and the active set & at most 0.082 & \textbf{met} \\
+I4 & Under A($H^*$) the key share falls toward \fmtNone{}: $c_\kappa$ (\fmtOpt{}), $\tilde c_K$ (\fmtLetter{}) $\geq 0.5$, lower bound $\geq 0.3$ & 0.946 [0.905, 0.991] ($\kappa$ 0.698 $\to$ 0.113; \fmtNone{} 0.080) / 0.845 [0.818, 0.871] & \textbf{met} \\
+I5 & The value channel carries more (\fmtOpt{}): $\Delta_V > 0$ (CI excluding 0) and $\geq F_V$ & $+$2.388 [2.141, 2.631] nats, $F_V$ = 2.10; 0.366 of the lost key effect & \textbf{met} \\
+I6 & The behaviour is kept (\fmtOpt{}): $t \geq 0.75$, lower bound $\geq 0.6$ & 0.565 [0.542, 0.589]; M's target is the argmax in 0.80 of (core, fit) items (0.82 unblocked) & \textbf{not met} \\
+I7 & Random and active sets change nothing: $|\Delta\kappa|$, $|\Delta\tilde\psi_V|$, $|t-1| \leq 0.10$ & at most 0.019 & \textbf{met} \\
+\bottomrule
+\end{tabular}

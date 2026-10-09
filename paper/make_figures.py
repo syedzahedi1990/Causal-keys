@@ -1569,10 +1569,12 @@ acc_rows = [
     (r"The same words placed before the writing token give no key read (E1)", CK, XX, NA, CK),
     (r"The answer reads the option words, not the writing token (H5, G8b)", NA, XX, NA, CK),
     (r"Without a later mention the identity is copied through the answer's edge to the writing token (G8a, E4)", NA, CK, NA, CK),
-    (r"Removing the readers raises the value copy (G7a, H3)", NA, PH, NA, CK),
+    (r"Removing the readers raises the value copy (G7a, H3, I5)", NA, PH, NA, CK),
     (r"A remap refit without later mentions shows the same crossover (F1--F4)", NA, NA, XX, CK),
     (rf"Prakash et al.'s binding swap is key-dominant in every evaluable format ($\kappa$ {tx(PK['Bind', 'None']['kappa'][0])}, $\psi_V$ {tx(PK['Bind', 'None']['pv'])} without a later mention); later mentions shift $\kappa$ by {tx(macros['HnineDiff'], True)} (H7--H10)",
      NA, PH, NA, XX),
+    (r"At 24B the remap's key read runs through the natural reader heads; ablating them removes most of its key-only effect (I1--I4)", NA, NA, NA, CK),
+    (r"Without its readers, the remap keeps its effect on the margin (I6)", NA, NA, NA, XX),
 ]
 lines = [r"\begin{tabular}{@{}p{0.54\columnwidth}cccc@{}}", r"\toprule", r"Observation (evidence) & DT & LB & FF & LM \\", r"\midrule"]
 for r in acc_rows:
@@ -1797,7 +1799,7 @@ hr.append(("b2", r"Effect size $\Phi \geq 3$ nats per cell", f"met in 11 of 13 c
 hr.append(("b3", r"For H10 as a dissociation: identity key-read route at $\ell^*+1$ ($s_{\mathrm{ID}} \geq 0.5$) and $\kappa_{\mathrm{ID}}(\ell^*) \geq 0.5$ under \fmtOpt{}",
            f"$s_{{\\mathrm{{ID}}}}$ {tx(M_('PkGatebThreeSid'))}; $\\kappa_{{\\mathrm{{ID}}}}$ {tx(M_('PkGatebThreeKappa'))}", "NOT MET"))
 hr.append(("H7", r"The law on the binding swap: $|\kappa(f) - s_{\mathrm{ID}}(f, 29)| \leq 0.25$ for each evaluable $f$ and $r \geq 0.9$",
-           f"gaps {M_('HsevenGapNone')} / {M_('HsevenGapQnames')} / {M_('HsevenGapOpt')}; $r = {M_('HsevenR')}$", VH["H7"]))
+           f"gaps {M_('HsevenGapNone')} / {M_('HsevenGapQnames')} / {M_('HsevenGapOpt')}; $r = {M_('HsevenR')}$; secondary, against $s_{{\\mathrm{{ID}}}}(f, 0)$: gaps {M_('HsevenGapZeroNone')} / {M_('HsevenGapZeroQnames')} / {M_('HsevenGapZeroOpt')}", VH["H7"]))
 hr.append(("H8", r"Under \fmtNone{}: $\psi_V \geq 0.5$, $\psi_K \leq 0.25$",
            f"$\\psi_V$ {tx(M_('HeightPsiV'))}, $\\psi_K$ {tx(M_('HeightPsiK'))}; $\\psi_V-\\psi_K$ {tci((M_('HeightDiff'), M_('HeightDiffLo'), M_('HeightDiffHi')))}", VH["H8"]))
 hr.append(("H9", r"Crossover: $\kappa(\text{\fmtOpt{}}) - \kappa(\text{\fmtNone{}}) \geq 0.4$; \textsc{qnames} between",
@@ -2082,6 +2084,275 @@ for a_, l0, lab, mk, col in (("Bind", 29, "BIND@28, 14B (H7)", "D", PURPLE),
         pts.append((s_, k_, f))
     PKPTS.append((lab, mk, col, pts))
 draw_frames(pk=PKPTS)
+
+# ================================================================ stage 7 (preregistration I): the reader heads at Mistral-Small-24B
+# Parsed from STAGE7_SCORE.txt as stages 5 and 6 are (smac: printed string, verified against its line); arithmetic on
+# printed values is registered with amac. Formats: Opt = OPTIONS-AFTER (P1), Letter = LETTERS-AFTER, Post = SENTENCE-AFTER.
+G7I = "stage 7 (preregistration I): reader heads blocked under the released remap at Mistral-Small-24B"
+S7F = ROOT / "results/gpu_stage7/STAGE7_SCORE.txt"
+S7 = S7F.read_text().splitlines()
+SCORE["S7"] = S7
+SNAME["S7"] = "results/gpu_stage7/STAGE7_SCORE.txt"
+F7 = {"Opt": "OPTIONS-AFTER", "Letter": "LETTERS-AFTER", "Post": "SENTENCE-AFTER"}
+V7 = sec(S7, "VERDICTS (I1-I7")
+R7 = sec(S7, "REPORTED (not scored")
+X7 = sec(S7, "######## EXPLORATORY")
+i7 = {}   # parsed printed strings for the tables
+for ft, f in F7.items():
+    i = find(S7, "  I-G2 ", f)
+    d = grab(S7, i, r"d_full " + CIR)
+    smac3(f"IgtwoDfull{ft}", "S7", i, d, f"I-G2 (a) mean d_full (natural clamp from layer 5), {f}", G7I)
+    r_ = grab(S7, i, r"d_G/d_full " + CIR)
+    smac3(f"IgtwoRatio{ft}", "S7", i, r_, f"I-G2 (b) d_G/d_full, {f}", G7I)
+    ms = grab(S7, i, r"mention-specific d_G/\(d_full - d_full\(NONE\)\) " + CIR)
+    smac(f"IgtwoRatioMs{ft}", "S7", i, ms[0], f"I-G2 (b) mention-specific d_G/(d_full - d_full(NONE)), printed, {f}", G7I)
+    R_ = grab(S7, i, r"R\(64\) " + CIR)
+    smac3(f"IgtwoR{ft}", "S7", i, R_, f"I-G2 (c) R(64): share of the natural key read at G recovered by H* alone, {f}", G7I)
+    K_ = grab(S7, i, r"KO\(64\) " + CIR)
+    smac3(f"IgtwoKO{ft}", "S7", i, K_, f"I-G2 (c) KO(64): share of the natural key read at G removed by blocking H*, {f}", G7I)
+    rr = grab(S7, i, r"R_rand " + CIR)
+    smac(f"IgtwoRrand{ft}", "S7", i, rr[0], f"I-G2 (c) R(64) of random sets (mean of three), {f}", G7I)
+    kr = grab(S7, i, r"KO_rand " + CIR)
+    smac(f"IgtwoKOrand{ft}", "S7", i, kr[0], f"I-G2 (c) KO(64) of random sets (mean of three), {f}", G7I)
+    i7[ft, "G2"] = dict(d=d, ratio=r_, R=R_, KO=K_, Rr=rr, KOr=kr, v=S7[i].rsplit("-> ", 1)[1].strip())
+    i = find(S7, "  I-G3 ", f)
+    i7[ft, "D"] = grab(S7, i, r"\(1\) D " + NUM)[0]
+    smac(f"IgthreeD{ft}", "S7", i, i7[ft, "D"], f"I-G3 (1) D: M - P effect in nats, unblocked, {f}", G7I)
+i = find(S7, "  I-G3 ", "NO-MENTION")
+smac("IgthreeDNone", "S7", i, grab(S7, i, r"\(1\) D " + NUM)[0], "I-G3 (1) D, NO-MENTION", G7I)
+i = find(S7, "  I-G0 ")
+i7["G0"] = grab(S7, i, r"(\d+) passed, (\d+) failed, (\d+) skipped")
+smac("IgzeroPassed", "S7", i, i7["G0"][0], "I-G0: tests of tests/test_stage7_link.py passed (FP32, before any model)", G7I)
+i = find(S7, "   OPTIONS-AFTER: H* = top-", start=X7)
+smac("Ikstar", "S7", i, grab(S7, i, r"top-(\d+) by a3")[0], "k* = ceil(0.05 x 1280 heads) at Mistral-Small-24B", G7I)
+i7["G1a"] = [find(S7, "  I-G1a ", f) for f in ("OPTIONS-AFTER", "LETTERS-AFTER", "SENTENCE-AFTER", "NO-MENTION", "LIST-BEFORE")]
+_d1 = [abs(float(x)) for j in i7["G1a"] for x in re.findall(r"diff ([+-]\d+\.\d+)", S7[j])]
+assert len(_d1) == 15, _d1
+i7["G1a_max"] = max(_d1)
+amac("IgoneaMaxDiff", i7["G1a_max"], "I-G1 (a) largest |difference| of phi, psi_K, psi_V from stage 3b over the five formats", SNAME["S7"], G7I, "{:.3f}")
+i = find(S7, "  I-G4 ")
+t4, dv4 = grab(S7, i, r"t " + CIR), grab(S7, i, r"dV " + CIR)
+smac3("IgfourT", "S7", i, t4, "I-G4: t under A+(H*) (H* and layer 4 at G ablated), OPTIONS-AFTER", G7I)
+smac3("IgfourDV", "S7", i, dv4, "I-G4: Delta_V under A+(H*), OPTIONS-AFTER", G7I)
+i7["G4"] = (t4, dv4)
+# verdicts
+VI = {}
+for p in range(1, 8):
+    i = find(S7, f"  I{p}  ", start=V7, end=R7)
+    VI[f"I{p}"] = S7[i].rsplit("-> ", 1)[1].strip()
+for ft in ("Opt", "Letter"):
+    f = F7[ft]
+    i = find(S7, f"{f}: g_K", start=V7, end=R7)
+    i7[ft, "I1"] = grab(S7, i, r"g_K " + CIR)
+    smac3(f"IoneG{ft}", "S7", i, i7[ft, "I1"], f"I1 g_K: share of the remap's key-only effect read directly at the option rows, {f}", G7I)
+    i = find(S7, f"{f}: KO_x(H*)", start=V7, end=R7)
+    i7[ft, "I2"] = grab(S7, i, r"KO_x\(H\*\) " + CIR)
+    smac3(f"ItwoKO{ft}", "S7", i, i7[ft, "I2"], f"I2 KO_x(H*): share of that read that passes through H*, {f}", G7I)
+    i7[ft, "I2r"] = grab(S7, i, r"r_K\(H\*\) " + NUM)[0]
+    smac(f"ItwoRK{ft}", "S7", i, i7[ft, "I2r"], f"I2 r_K(H*): key-only effect left with H* blinded, as a share of the unblinded, {f}", G7I)
+    i = find(S7, f"{f}: KO_x rand0", start=V7, end=R7)
+    i7[ft, "I3"] = [float(x) for x in re.findall(r"(?:rand\d|active) " + NUM, S7[i])]
+    assert len(i7[ft, "I3"]) == 4, S7[i]
+    i = find(S7, f"{f}: rand0: |d kappa|", start=V7, end=R7)
+    i7[ft, "I7"] = [float(x) for x in re.findall(r"\| " + NUM, S7[i])]
+    assert len(i7[ft, "I7"]) == 12, S7[i]
+amac("IthreeMax", max(max(i7[ft, "I3"]) for ft in ("Opt", "Letter")), "I3: largest KO_x of the three random sets and the active set, both confirmatory formats", SNAME["S7"], G7I, "{:.3f}")
+amac("IsevenMax", max(max(i7[ft, "I7"]) for ft in ("Opt", "Letter")), "I7: largest |d kappa|, |d psi~_V| or |t - 1| under A of the random and active sets, both formats", SNAME["S7"], G7I, "{:.3f}")
+i = find(S7, "OPTIONS-AFTER: c_kappa", start=V7, end=R7)
+i7["I4"] = grab(S7, i, r"c_kappa " + CIR)
+smac3("IfourC", "S7", i, i7["I4"], "I4 c_kappa under A(H*): closure of the key share toward NO-MENTION, OPTIONS-AFTER", G7I)
+i7["I4kA"] = grab(S7, i, r"kappa\^A " + CIR)
+smac3("IfourKappaA", "S7", i, i7["I4kA"], "I4 kappa (key share) of the remap under A(H*), OPTIONS-AFTER", G7I)
+smac("IfourKappaU", "S7", i, grab(S7, i, r"vs " + NUM)[0], "I4 kappa of the remap unblocked, OPTIONS-AFTER (in-run)", G7I)
+smac("IfourKappaNone", "S7", i, grab(S7, i, r"NO-MENTION " + NUM)[0], "I4 kappa of the remap under NO-MENTION (in-run)", G7I)
+i = find(S7, "LETTERS-AFTER: c~_K", start=V7, end=R7)
+i7["I4L"] = grab(S7, i, r"c~_K " + CIR)
+smac3("IfourCtLetter", "S7", i, i7["I4L"], "I4 c~_K under A(H*) (key closure on the unblocked scale), LETTERS-AFTER", G7I)
+smac("IfourKappaALetter", "S7", i, grab(S7, i, r"kappa\^A " + CIR)[0], "I4 kappa under A(H*), LETTERS-AFTER (two-sided)", G7I)
+i = find(S7, "OPTIONS-AFTER: dV", start=V7, end=R7)
+i7["I5"] = grab(S7, i, r"dV " + CIR)
+smac3("IfiveDV", "S7", i, i7["I5"], "I5 Delta_V under A(H*): value-only effect gained, nats, OPTIONS-AFTER", G7I)
+smac("IfiveFloor", "S7", i, grab(S7, i, r"F_V " + NUM)[0], "I5 floor F_V = 0.25 (V(NONE) - V(OPTIONS-AFTER)), nats", G7I)
+smac("IfiveRatio", "S7", i, grab(S7, i, r"dV / \(K - K\^A\) " + NUM)[0], "I5 Delta_V / lost key effect, OPTIONS-AFTER", G7I)
+i = find(S7, "OPTIONS-AFTER: t ", start=V7, end=R7)
+i7["I6"] = grab(S7, i, r"t " + CIR)
+smac3("IsixT", "S7", i, i7["I6"], "I6 t = D under A(H*) / D unblocked, OPTIONS-AFTER", G7I)
+rates = re.findall(r"M->T (\d\.\d\d)", S7[i])
+smac("IsixMT", "S7", i, rates[0], "I6 argmax rate of M's target T, unblocked, OPTIONS-AFTER", G7I)
+smac("IsixMTA", "S7", i, rates[1], "I6 argmax rate of M's target T under A(H*), OPTIONS-AFTER", G7I)
+# reported lines
+for ft, key, pat, nm_, desc in (("Post", "I1 SENTENCE-AFTER", r"g_K " + CIR, "IoneGPost", "I1 g_K, SENTENCE-AFTER (reported)"),
+                                ("Post", "I2 SENTENCE-AFTER", r"KO_x\(H\*\) " + CIR, "ItwoKOPost", "I2 KO_x(H*), SENTENCE-AFTER (reported)"),
+                                ("Post", "I6 SENTENCE-AFTER", r"t " + CIR, "IsixTPost", "I6 t under A(H*), SENTENCE-AFTER (reported)"),
+                                ("Letter", "I6 LETTERS-AFTER", r"t " + CIR, "IsixTLetter", "I6 t under A(H*), LETTERS-AFTER (two-sided)"),
+                                ("Letter", "I5 LETTERS-AFTER", r"dV " + CIR, "IfiveDVLetter", "I5 Delta_V under A(H*), LETTERS-AFTER (two-sided)")):
+    i = find(S7, "  " + key, start=R7, end=X7)
+    i7[nm_] = grab(S7, i, pat)
+    smac3(nm_, "S7", i, i7[nm_], desc, G7I)
+for ft, f in F7.items():
+    i = find(S7, f"  N(H*) {f}: t", start=R7, end=X7)
+    i7["N", ft] = grab(S7, i, r"t " + CIR)
+    smac3(f"InT{ft}", "S7", i, i7["N", ft], f"N(H*) (knockout of H*'s edges from G to p, reported): t, {f}", G7I)
+    i = find(S7, f"  A(H*) {f}: t", start=R7, end=X7)
+    nats = grab(S7, i, r"nats D " + NUM + " K " + NUM + " V " + NUM + r" \(unblocked " + NUM + " / " + NUM + " / " + NUM + r"\)")
+    i7["nats", ft] = nats
+    for k_, s_ in zip(("DA", "KA", "VA", "DU", "KU", "VU"), nats):
+        smac(f"Inats{k_}{ft}", "S7", i, s_, f"nats under A(H*) ({k_[0]}, {'ablated' if k_[1] == 'A' else 'unblocked'}), {f}", G7I)
+# exploratory: the remap ranking and the cross-format overlap of H*
+for ft, f in F7.items():
+    i = find(S7, f"   {f}: |H_rem & H*| = ", start=X7)
+    smac(f"IremOverlap{ft}", "S7", i, grab(S7, i, r"= (\d+) of 64")[0], f"exploratory: |H_rem & H*| (heads ranked on the remap itself vs H*), {f}", G7I)
+i = find(S7, "overlap of H* across formats: OPTIONS-AFTER & LETTERS-AFTER", start=X7)
+smac("IxOverlapOptLetter", "S7", i, grab(S7, i, r"= (\d+) of 64")[0], "exploratory: |H*(OPTIONS-AFTER) & H*(LETTERS-AFTER)|", G7I)
+i = find(S7, "overlap of H* across formats: OPTIONS-AFTER & SENTENCE-AFTER", start=X7)
+smac("IxOverlapOptPost", "S7", i, grab(S7, i, r"= (\d+) of 64")[0], "exploratory: |H*(OPTIONS-AFTER) & H*(SENTENCE-AFTER)|", G7I)
+i = find(S7, "SUMMARY:")
+i7["sum"] = grab(S7, i, r"(\d+) MET, (\d+) NOT MET, (\d+) NOT EVALUABLE of (\d+)")
+smac("IcountMet", "S7", i, i7["sum"][0], "stage 7: predictions MET (of 7)", G7I)
+smac("IcountNotMet", "S7", i, i7["sum"][1], "stage 7: predictions NOT MET (of 7)", G7I)
+smac("IcountNotEval", "S7", i, i7["sum"][2], "stage 7: predictions NOT EVALUABLE (of 7)", G7I)
+assert int(macros["GcountMet"]) + int(macros["GcountNotMet"]) == 22 and int(macros["HcountMet"]) + int(macros["HcountNotMet"]) + int(macros["HcountNotEval"]) + int(macros["HcountNotRun"]) == 12
+amac("GHIcountPred", 22 + 12 + int(i7["sum"][3]), "predictions of G, H and I (22 + 12 + 7)", SNAME["S7"], G7I, "{:d}")
+amac("GHIcountFailed", int(macros["GcountNotMet"]) + int(macros["HcountNotMet"]) + int(i7["sum"][1]),
+     "failed predictions of G, H and I (NOT MET; H6 not evaluable and H12 not run are not counted)", SNAME["S7"], G7I, "{:d}")
+i7["G1b"] = [float(x) for x in re.findall(r"D [\d.]+ vs [\d.]+ \(([+-]\d+\.\d) %", "\n".join(S7[j] for j in find(S7, "  I-G1b ", many=True)))]
+assert len(i7["G1b"]) == 5, i7["G1b"]
+amac("IgonebMaxPct", max(abs(x) for x in i7["G1b"]), "I-G1 (b) largest |difference| of the in-run D from the family's, per cent", SNAME["S7"], G7I, "{:.1f}")
+assert VI == {"I1": "MET", "I2": "MET", "I3": "MET", "I4": "MET", "I5": "MET", "I6": "NOT MET", "I7": "MET"}, VI
+# argmax rates under LETTERS-AFTER (two-sided lines), from the N(H*) block's rate line
+i = find(S7, "  N(H*) LETTERS-AFTER: t", start=R7, end=X7)
+rl = re.findall(r"(0|A:H|A\+:H|N:H): M->T (\d\.\d\d) P->S (\d\.\d\d) B->B (\d\.\d\d)", S7[i + 1])
+rl = {k: v for k, *v in rl}
+smac("IsixMTLetter", "S7", i + 1, rl["0"][0], "argmax rate of M's target, unblocked, LETTERS-AFTER", G7I)
+smac("IsixMTALetter", "S7", i + 1, rl["A:H"][0], "argmax rate of M's target under A(H*), LETTERS-AFTER", G7I)
+smac("IsixBBALetter", "S7", i + 1, rl["A:H"][2], "argmax rate of the natural answer under A(H*), LETTERS-AFTER", G7I)
+# recomputed from the raw files (exploratory / post hoc): R(64) by story type; the non-additive part and row margins under A(H*)
+G7J = json.loads((ROOT / "results/gpu_stage7/heads/gate.json").read_text())
+for ft, arm in (("Opt", "P1"), ("Letter", "LETTER"), ("Post", "POST")):
+    ev = G7J["arms"][arm]["eval"]
+    dist = np.array([e["core"]["distractor_location"] in (e["core"]["base"], e["core"]["source"]) for e in ev])
+    su = np.array([e["curves"]["H"]["suff"][G7J["provenance"]["KS"].index(64)] - e["curves"]["H"]["none"] for e in ev])
+    al = np.array([e["curves"]["H"]["allG"] - e["curves"]["H"]["none"] for e in ev])
+    assert abs(su.mean() / al.mean() - float(i7[ft, "G2"]["R"][0])) < 0.0006, (ft, su.mean() / al.mean())
+    rmac(f"IrSixtyfourRest{ft}", su[~dist].mean() / al[~dist].mean(), f"R(64) on the E cores whose distractor is not B or S, {F7[ft]}", "results/gpu_stage7/heads/gate.json", G7I)
+    rmac(f"IrSixtyfourDist{ft}", su[dist].mean() / al[dist].mean(), f"R(64) on the E cores whose distractor is B or S, {F7[ft]}", "results/gpu_stage7/heads/gate.json", G7I)
+rmac("InDist", int(dist.sum()), "E cores whose distractor location is B or S", "results/gpu_stage7/heads/gate.json", G7I, "{:d}")
+L7 = json.loads((ROOT / "results/gpu_stage7/link/mistral.json").read_text())["arms"]["P1"]
+
+
+def m7(r, key, a="iT", b="iS"):
+    c = r["runs"][key]["cand"]
+    return c[r[a]] - c[r[b]]
+
+
+SD7 = (101, 102, 103)
+for cond, tg in (("0", "U"), ("A:H", "A")):
+    D = np.array([np.mean([m7(r, f"{cond}/M_{s}") - m7(r, f"{cond}/P_{s}") for s in SD7]) for r in L7])
+    K = np.array([np.mean([m7(r, f"{cond}/PK_{s}") - m7(r, f"{cond}/P_{s}") for s in SD7]) for r in L7])
+    V = np.array([np.mean([m7(r, f"{cond}/PV_{s}") - m7(r, f"{cond}/P_{s}") for s in SD7]) for r in L7])
+    assert abs(D.mean() - float(i7["nats", "Opt"][0 if tg == "A" else 3])) < 0.006, (cond, D.mean())
+    rmac(f"InonAdd{tg}", (D - K - V).mean(), f"non-additive part D - K - V of M's effect, nats, OPTIONS-AFTER, {'A(H*)' if tg == 'A' else 'unblocked'}", "results/gpu_stage7/link/mistral.json", G7I, "{:.2f}")
+    rmac(f"ImP{tg}", np.mean([np.mean([m7(r, f"{cond}/P_{s}") for s in SD7]) for r in L7]), f"mean margin log p(T) - log p(S) of the P rows, OPTIONS-AFTER, {cond}", "results/gpu_stage7/link/mistral.json", G7I, "{:.2f}")
+    rmac(f"ImM{tg}", np.mean([np.mean([m7(r, f"{cond}/M_{s}") for s in SD7]) for r in L7]), f"mean margin log p(T) - log p(S) of the M rows, OPTIONS-AFTER, {cond}", "results/gpu_stage7/link/mistral.json", G7I, "{:.2f}")
+    rmac(f"IbMargin{tg}", np.mean([m7(r, f"{cond}/B", "iB", "iS") for r in L7]), f"mean margin log p(B) - log p(S) of the natural B row, OPTIONS-AFTER, {cond}", "results/gpu_stage7/link/mistral.json", G7I, "{:.2f}")
+
+# ---- tab_prereg_i.tex: preregistration I (stage 7), gates and every verdict as scored (OPTIONS-AFTER / LETTERS-AFTER)
+OL = ("Opt", "Letter")
+
+
+def _gv(p):
+    ls = [S7[j] for j in find(S7, p, many=True)]
+    assert ls, p
+    return "MET" if all(l.rstrip().endswith("-> MET") for l in ls) else "NOT MET"
+
+
+GV = {g: _gv("  " + g + " ") for g in ("I-G0", "I-G2", "I-G3")}
+GV["I-G1"] = "MET" if all(_gv(f"  I-G1{x} ") == "MET" for x in "abcd") else "NOT MET"
+_g4 = S7[find(S7, "  I-G4 ")].rstrip()
+assert _g4.endswith("takeover: no (not a verdict gate)") or _g4.endswith("takeover: yes (not a verdict gate)"), _g4
+GV["I-G4"] = "NOT MET" if _g4.endswith("takeover: no (not a verdict gate)") else "MET"
+_sc = grab(S7, find(S7, "  I-G1d "), r"x_all\| (\d+(?:\.\d+)?), max \|N\(H\*_OPTIONS-AFTER\) - unblocked\| (\d+(?:\.\d+)?) nats")
+ir = []
+ir.append(("I-G0", r"FP32 exactness of the blinding, ablation and knockout code (unit tests), before any model",
+           f"{i7['G0'][0]} passed, {i7['G0'][1]} failed, {i7['G0'][2]} skipped", GV["I-G0"]))
+ir.append(("I-G1", r"Reproduction of stage 3b ($|\Delta\varphi|$, $|\Delta\psi_K|$, $|\Delta\psi_V| \leq 0.03$, five formats); in-run rows; knockout floor; no effect at rows before the writing token",
+           f"largest difference {M_('IgoneaMaxDiff')}; in-run $D$ within {M_('IgonebMaxPct')}\\,\\%; structural check {max(_sc, key=float)} nats", GV["I-G1"]))
+ir.append(("I-G2", r"The readers at 24B: $\bar d_{\mathrm{full}} \geq 3$; $d_G/d_{\mathrm{full}} \geq 0.7$; $R(64) \geq 0.7$, $\mathrm{KO}(64) \geq 0.8$; random sets $\leq 0.25$; BF16 floor",
+           f"$\\bar d_{{\\mathrm{{full}}}}$ {slash(*(tx(i7[f, 'G2']['d'][0]) for f in OL))}; $d_G/d_{{\\mathrm{{full}}}}$ {slash(*(tx(i7[f, 'G2']['ratio'][0]) for f in OL))}; $R$ {slash(*(tx(i7[f, 'G2']['R'][0]) for f in OL))}; "
+           f"KO {slash(*(tx(i7[f, 'G2']['KO'][0]) for f in OL))}; random $R$ {slash(*(tx(i7[f, 'G2']['Rr'][0]) for f in OL))}, KO {slash(*(tx(i7[f, 'G2']['KOr'][0]) for f in OL))}", GV["I-G2"]))
+ir.append(("I-G3", r"The remap acts: $D \geq 3$ nats; direct read at $G$ $\geq 1$ nat", f"$D$ {slash(*(tx(i7[f, 'D']) for f in OL))}", GV["I-G3"]))
+ir.append(("I-G4", r"For reading I5/I6 as a value takeover (not a verdict gate): under A$^+$, $t \geq 0.6$ and $\Delta_V > 0$ (CI excluding 0)",
+           f"$t$ {tci(i7['G4'][0])}; $\\Delta_V$ {tci(i7['G4'][1], True)}", GV["I-G4"]))
+ir.append(("I1", r"The remap's key is read at the option words: $g_K \geq 0.7$, lower bound $\geq 0.6$", slash(*(tci(i7[f, 'I1']) for f in OL)), VI["I1"]))
+ir.append(("I2", r"Through the natural readers: $\mathrm{KO}_x(H^*) \geq 0.8$, lower bound $\geq 0.7$", slash(*(tci(i7[f, 'I2']) for f in OL)), VI["I2"]))
+ir.append(("I3", r"Specificity: $\mathrm{KO}_x \leq 0.25$ for three random sets and the active set", f"at most {M_('IthreeMax')}", VI["I3"]))
+ir.append(("I4", r"Under A($H^*$) the key share falls toward \fmtNone{}: $c_\kappa$ (\fmtOpt{}), $\tilde c_K$ (\fmtLetter{}) $\geq 0.5$, lower bound $\geq 0.3$",
+           f"{tci(i7['I4'])} ($\\kappa$ {tx(M_('IfourKappaU'))} $\\to$ {tx(M_('IfourKappaA'))}; \\fmtNone{{}} {tx(M_('IfourKappaNone'))}) / {tci(i7['I4L'])}", VI["I4"]))
+ir.append(("I5", r"The value channel carries more (\fmtOpt{}): $\Delta_V > 0$ (CI excluding 0) and $\geq F_V$",
+           f"{tci(i7['I5'], True)} nats, $F_V$ = {M_('IfiveFloor')}; {M_('IfiveRatio')} of the lost key effect", VI["I5"]))
+ir.append(("I6", r"The behaviour is kept (\fmtOpt{}): $t \geq 0.75$, lower bound $\geq 0.6$",
+           f"{tci(i7['I6'])}; M's target is the argmax in {M_('IsixMTA')} of (core, fit) items ({M_('IsixMT')} unblocked)", VI["I6"]))
+ir.append(("I7", r"Random and active sets change nothing: $|\Delta\kappa|$, $|\Delta\tilde\psi_V|$, $|t-1| \leq 0.10$", f"at most {M_('IsevenMax')}", VI["I7"]))
+lines = [r"\begin{tabular}{p{0.05\textwidth}p{0.36\textwidth}p{0.41\textwidth}p{0.08\textwidth}}", r"\toprule", r" & Gate or prediction & Observed (\fmtOpt{} / \fmtLetter{}) & Verdict \\", r"\midrule"]
+for gid, pr, ob, v in ir:
+    if gid == "I1":
+        lines.append(r"\midrule")
+    lines.append(f"{gid} & {pr} & {ob} & {verd(v)} \\\\")
+lines += [r"\bottomrule", r"\end{tabular}"]
+wtab("tab_prereg_i.tex", lines)
+
+# ---- tab_link.tex: the remap under each blocking, per format (appendix app:stage7); every cell a printed score-file string
+def cond7(line):
+    d = {"t": grab_s(line, r"t " + CIR), "pk": grab_s(line, r"psi~_K " + NUM)[0], "pv": grab_s(line, r"psi~_V " + NUM)[0],
+         "k": grab_s(line, r"kappa " + CIR), "ku": grab_s(line, r"\(unblocked " + NUM + r"\)")[0],
+         "dv": grab_s(line, r"dV " + CIR), "drop": re.search(r"kappa [^;]*?\((\d+\.\d) % of resamples dropped\)", line),
+         "nats": grab_s(line, r"nats D " + NUM + " K " + NUM + " V " + NUM + r" \(unblocked " + NUM + " / " + NUM + " / " + NUM + r"\)")}
+    return d
+
+
+def grab_s(line, pat):
+    m_ = re.search(pat, line)
+    assert m_, (pat, line[:160])
+    return m_.groups()
+
+
+TL = []
+for ft, f in F7.items():
+    i = find(S7, f"  I-G1b {f}")
+    psu = grab_s(S7[i], r"unblocked batch psi_K " + NUM + r" vs [^,]+, psi_V " + NUM)
+    i = find(S7, f"  N(H*) {f}: t", start=R7, end=X7)
+    am = dict(re.findall(r"(0|A:H|A\+:H|N:H): M->T (\d\.\d\d)", S7[i + 1]))
+    assert set(am) == {"0", "A:H", "A+:H", "N:H"}, S7[i + 1][:200]
+    rows = []
+    a_ = cond7(S7[find(S7, f"  A(H*) {f}: t", start=R7, end=X7)])
+    rows.append(("unblocked", ("1", None, None), (a_["ku"], None, None), psu[0], psu[1], None, a_["nats"][3:], am["0"]))
+    for lab, key, amk in ((r"A($H^*$)", f"  A(H*) {f}: t", "A:H"), (r"A$^+$($H^*$)", f"  A+(H*) {f}: t", "A+:H"), (r"N($H^*$)", f"  N(H*) {f}: t", "N:H")):
+        c = cond7(S7[find(S7, key, start=R7, end=X7)])
+        assert not c["drop"] or float(c["drop"].group(1)) <= 5, (lab, f)
+        rows.append((lab, c["t"], c["k"], c["pk"], c["pv"], c["dv"], c["nats"][:3], am[amk]))
+    j = find(S7, f"   {f}:", start=find(S7, "-- exploratory conditions (step 2)"), end=find(S7, "-- remap ranking"))
+    for lab, key in ((r"N(all at $G$)$^\dagger$", "N:allG"), (r"A(block 5)$^\dagger$", "A:L4"), (r"N(rand0)$^\dagger$", "N:rand0"), (r"A($H^*_{\text{\fmtOpt{}}}$)$^\dagger$", "A:H_P1")):
+        hits = [x for x in range(j + 1, j + 12) if S7[x].strip().startswith(key + " ")]
+        if not hits:
+            assert key == "A:H_P1" and ft != "Letter", (key, f)
+            continue
+        c = cond7(S7[hits[0]])
+        kk = ("nan", None, None) if c["drop"] and float(c["drop"].group(1)) > 5 else (c["k"][0], None, None)
+        rows.append((lab, c["t"], kk, c["pk"], c["pv"], c["dv"], c["nats"][:3], None))
+    TL.append((ft, rows))
+FTEX = {"Opt": r"\fmtOpt{}", "Letter": r"\fmtLetter{}", "Post": r"\fmtPost{}"}
+lines = [r"\begin{tabular}{@{}llccccccc@{}}", r"\toprule",
+         r"Format & Condition & $t$ & $\kappa$ & $\tilde\psi_K$ & $\tilde\psi_V$ & $\Delta_V$ (nats) & $D$ / $K$ / $V$ (nats) & M$\to$T \\", r"\midrule"]
+for ft, rows in TL:
+    for n_, (lab, t, k, pk, pv, dv, nats, mt) in enumerate(rows):
+        tt = tx(t[0]) if t[1] is None else tci(t)
+        kk = tx(k[0]) if k[1] is None else tci(k)
+        lines.append(f"{FTEX[ft] if n_ == 0 else ''} & {lab} & {tt} & {kk} & {tx(pk)} & {tx(pv)} & {'--' if dv is None else tci(dv, True)} & "
+                     f"{' / '.join(tx(x) for x in nats)} & {'--' if mt is None else mt} \\\\")
+    lines.append(r"\midrule" if ft != "Post" else r"\bottomrule")
+lines.append(r"\end{tabular}")
+wtab("tab_link.tex", lines)
+
 
 # ---------------------------------------------------------------- checks
 # (1) every score-file macro still equals its line at the printed precision

@@ -10,7 +10,7 @@
   refit points in Fig. 2c, Table 5 (preregistration F), App. D and Table 7, and scope updates in the abstract,
   intro, limitations and conclusion. To fit 8 pages, the failed-predictions subsection is shorter (details in
   App. A).
-- **v3** (`paper2_v3.pdf`, built from `paper/` on this branch; `paper/main.pdf` is the same file): v2 plus GPU stages 5
+- **v3** (`paper2_v3.pdf`; source: commit `0854e26`, `paper/`): v2 plus GPU stages 5
   and 6 (preregistrations G and H, both scored before writing; outcome records in `docs/PREREGISTRATION.md`), following
   `docs/V3_PLAN.md`. New title (the intervention clause dropped). New: the two-hop read (Sec. 3.4, Fig. 3 `fig_readers`:
   about 5 % of heads, with a duplicate-token core, read the key at the option words; the answer reads the option words;
@@ -26,3 +26,24 @@
   Sec. 4.3 and a new appendix Table 8 sort the 14 failed predictions of G and H by kind (direction kept but threshold
   missed: G20, H9; met in part: G7, G10, G12-G14, G21; competence gate: G19; rival rejected: H10; falsified: G11, G16,
   H7, H8); limitations (ii), (v), (x) and the practical rule's hedge corrected; trims to keep the 8-page main text.
+- **v4** (`paper2_v4.pdf`, built from `paper/` on this branch; `paper/main.pdf` is the same file): v3 (as revised
+  2026-10-08) plus GPU stage 7, preregistration I, scored before writing (outcome record in `docs/PREREGISTRATION.md`;
+  `paper2_v3.pdf` is unchanged, as entry I requires). It replaces v3's "That the readers are the same at 24B and 72B is
+  an inference" for 24B: at Mistral-Small-24B the top 5 % of heads read the option words' key in three formats (Gate
+  I-G2); the released remap's key effect is read there and through these heads, not random or active sets (I1-I3);
+  ablating them moves its key share under options-after near the no-mention level (I4; under letters-after it falls only
+  to 0.661, and I4 is scored there on the key-only effect) and raises what its values carry (I5), but keeps only part of
+  its effect on the margin (I6 not met, t = 0.565, and I-G4 not met: the entry's partial takeover, listed as falsified
+  in Table 9; answers are kept under options-after but not under letters-after, reported); random sets change nothing
+  (I7). Qwen2.5-72B was not run. New: the "readers at 24B" paragraph in Sec. 4, Table 8 (preregistration I), App. H
+  with the blocking table (Table 34), the I6 row of the failures table (Table 9; 15 failed predictions of G, H and I in
+  Sec. 4.3), I in the claim-status tables, the accounts table (two rows), the history and the disclosures (including
+  the k = 128 curve point that the stage-7 code did not measure), and scope updates in the abstract, intro, limitations
+  and conclusion. To keep the 8-page main text: shorter Sec. 4.2 (the Phi values and depth detail to App. G.2; H8's
+  interval left to Table 7; H7's secondary gaps to Table 7 and App. G.2), Sec. 3.4 (rankings to App. G.1; the three-hop
+  sentence), Secs. 3.2, 3.3 and 3.5 (the three-task scope sentence, the plural, the top-10 overlap), the method's
+  description of Prakash et al.'s material (to App. G), the Fig. 2 and 3 captions, intro sentences on the binding swap
+  and on the readers, Related Work sentences on the binding swap and the joint clamp, the F3 interval in Sec. 4.1 (in
+  Table 5), and the intro's pointer to the accounts table (now in Sec. 4.3). The release script also anonymises
+  first-person references to the earlier work, the repository name, scratch paths and paper-numbered identifiers,
+  and excludes itself.

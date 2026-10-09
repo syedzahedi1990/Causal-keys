@@ -1,0 +1,193 @@
+==== 2026-10-09T11:39:21Z python -m pytest tests/test_stage7_link.py tests/test_head_splice.py tests/test_knockout.py tests/test_refit_remap.py tests/test_stage7_score.py -v -rA -p no:cacheprovider
+========================================================================= test session starts =========================================================================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /venv/main/bin/python
+rootdir: /workspace/Causal-keys
+plugins: anyio-4.15.1
+collecting ... collected 74 items
+
+tests/test_stage7_link.py::test_empty_sets_equal_unblocked PASSED                                                                                               [  1%]
+tests/test_stage7_link.py::test_bx_all_equals_frames_addition PASSED                                                                                            [  2%]
+tests/test_stage7_link.py::test_rows_G_only_equals_rowsplice PASSED                                                                                             [  4%]
+tests/test_stage7_link.py::test_bx_notG_with_pin_equals_exchange_plus_rowsplice PASSED                                                                          [  5%]
+tests/test_stage7_link.py::test_pin_runs_before_headsplice_khook PASSED                                                                                         [  6%]
+tests/test_stage7_link.py::test_self_ablation_is_unablated PASSED                                                                                               [  8%]
+tests/test_stage7_link.py::test_aplus_masks_exactly_S_and_L4_at_G PASSED                                                                                        [  9%]
+tests/test_stage7_link.py::test_readerko_all_heads_equals_4d_knockout PASSED                                                                                    [ 10%]
+tests/test_stage7_link.py::test_null_knockout_and_explicit_mask PASSED                                                                                          [ 12%]
+tests/test_stage7_link.py::test_mixed_batches_equal_single_rows PASSED                                                                                          [ 13%]
+tests/test_stage7_link.py::test_natural_passes_and_tables_equal_run_core PASSED                                                                                 [ 14%]
+tests/test_stage7_link.py::test_family_rows_equal_run_family PASSED                                                                                             [ 16%]
+tests/test_stage7_link.py::test_positions_up_to_p PASSED                                                                                                        [ 17%]
+tests/test_stage7_link.py::test_list_before_structural_zero PASSED                                                                                              [ 18%]
+tests/test_stage7_link.py::test_pins PASSED                                                                                                                     [ 20%]
+tests/test_stage7_link.py::test_rank_a3_zero_below_onset_and_remap_rows PASSED                                                                                  [ 21%]
+tests/test_stage7_link.py::test_hooks_at_the_24b_head_geometry PASSED                                                                                           [ 22%]
+tests/test_head_splice.py::test_headsplice_all_heads_is_full_clamp_and_empty_is_clean PASSED                                                                    [ 24%]
+tests/test_head_splice.py::test_headsplice_rows_G_and_group_slices_equal_rowsplice PASSED                                                                       [ 25%]
+tests/test_head_splice.py::test_headsplice_batched_grid_equals_single_runs PASSED                                                                               [ 27%]
+tests/test_head_splice.py::test_self_ablation_is_clean PASSED                                                                                                   [ 28%]
+tests/test_head_splice.py::test_hopsplice_all_rows_is_plain_clamp PASSED                                                                                        [ 29%]
+tests/test_head_splice.py::test_hopsplice_no_overwrite_and_answer_only_cache PASSED                                                                             [ 31%]
+tests/test_head_splice.py::test_hop_batch_equals_single_rows PASSED                                                                                             [ 32%]
+tests/test_knockout.py::test_groups_core0_qwen PASSED                                                                                                           [ 33%]
+tests/test_knockout.py::test_groups_core0_mistral PASSED                                                                                                        [ 35%]
+tests/test_knockout.py::test_target_ids PASSED                                                                                                                  [ 36%]
+tests/test_knockout.py::test_mask_shapes PASSED                                                                                                                 [ 37%]
+tests/test_knockout.py::test_knockout_exact PASSED                                                                                                              [ 39%]
+tests/test_knockout.py::test_run_item_exactness PASSED                                                                                                          [ 40%]
+tests/test_knockout.py::test_scorer_synthetic_rules PASSED                                                                                                      [ 41%]
+tests/test_refit_remap.py::test_tolerant_verify[None-None-PASS] PASSED                                                                                          [ 43%]
+tests/test_refit_remap.py::test_tolerant_verify[README.md-None-PASS_EXCEPT_README] PASSED                                                                       [ 44%]
+tests/test_refit_remap.py::test_tolerant_verify[None-README.md-PASS_EXCEPT_README] PASSED                                                                       [ 45%]
+tests/test_refit_remap.py::test_tolerant_verify[gpu/train.py-None-None] PASSED                                                                                  [ 47%]
+tests/test_refit_remap.py::test_tolerant_verify[gpu/behavior_engine.py-None-None] PASSED                                                                        [ 48%]
+tests/test_refit_remap.py::test_tolerant_verify[gpu/runtime/load.py-None-None] PASSED                                                                           [ 50%]
+tests/test_refit_remap.py::test_tolerant_verify[gpu/behavior_data/datasets.json.gz-None-None] PASSED                                                            [ 51%]
+tests/test_refit_remap.py::test_tolerant_verify[docs/notes.md-None-None] PASSED                                                                                 [ 52%]
+tests/test_refit_remap.py::test_tolerant_verify[None-gpu/train.py-None] PASSED                                                                                  [ 54%]
+tests/test_refit_remap.py::test_tolerant_verify_pins[gpu/behavior_data/datasets.json.gz] PASSED                                                                 [ 55%]
+tests/test_refit_remap.py::test_tolerant_verify_pins[gpu/behavior_engine.py] PASSED                                                                             [ 56%]
+tests/test_refit_remap.py::test_tolerant_verify_pins[gpu/runtime/load.py] PASSED                                                                                [ 58%]
+tests/test_refit_remap.py::test_tolerant_verify_pins[gpu/train.py] PASSED                                                                                       [ 59%]
+tests/test_refit_remap.py::test_resolved_commit PASSED                                                                                                          [ 60%]
+tests/test_refit_remap.py::test_prompt_identity PASSED                                                                                                          [ 62%]
+tests/test_refit_remap.py::test_tolerant_verify_on_release PASSED                                                                                               [ 63%]
+tests/test_refit_remap.py::test_p1_prompt_equal_on_all_training_records PASSED                                                                                  [ 64%]
+tests/test_refit_remap.py::test_none_prompt PASSED                                                                                                              [ 66%]
+tests/test_refit_remap.py::test_none_shares_token_prefix_through_event_span PASSED                                                                              [ 67%]
+tests/test_refit_remap.py::test_injection_points_reach_unmodified_train PASSED                                                                                  [ 68%]
+tests/test_refit_remap.py::test_load_refit_and_scorer_check_basis_inventory PASSED                                                                              [ 70%]
+tests/test_refit_remap.py::test_scorer_population PASSED                                                                                                        [ 71%]
+tests/test_refit_remap.py::test_git_state_excludes_output_root PASSED                                                                                           [ 72%]
+tests/test_refit_remap.py::test_fixed_tokenizer_detects_skipped_fix SKIPPED (no cached Mistral-Small-24B tokenizer)                                             [ 74%]
+tests/test_refit_remap.py::test_post_run_failure_recorded PASSED                                                                                                [ 75%]
+tests/test_refit_remap.py::test_tokenizer_check_records_fix PASSED                                                                                              [ 77%]
+tests/test_stage7_score.py::test_all_met PASSED                                                                                                                 [ 78%]
+tests/test_stage7_score.py::test_kappa_undefined_after_blocking_is_not_met PASSED                                                                               [ 79%]
+tests/test_stage7_score.py::test_dropped_resamples_rule PASSED                                                                                                  [ 81%]
+tests/test_stage7_score.py::test_evaluability_split PASSED                                                                                                      [ 82%]
+tests/test_stage7_score.py::test_no_mention_gates PASSED                                                                                                        [ 83%]
+tests/test_stage7_score.py::test_i5_denominator_only_is_not_met PASSED                                                                                          [ 85%]
+tests/test_stage7_score.py::test_g1d_at_0p1_nats PASSED                                                                                                         [ 86%]
+tests/test_stage7_score.py::test_both_formats_and_p1_only PASSED                                                                                                [ 87%]
+tests/test_stage7_score.py::test_boundaries PASSED                                                                                                              [ 89%]
+tests/test_stage7_score.py::test_provenance_mismatch_and_i0 PASSED                                                                                              [ 90%]
+tests/test_stage7_score.py::test_test_tag_skips_sizes PASSED                                                                                                    [ 91%]
+tests/test_stage7_score.py::test_g1c_kappa_waiver_and_failure PASSED                                                                                            [ 93%]
+tests/test_stage7_score.py::test_i3_i7_not_met_and_remap_ranking PASSED                                                                                         [ 94%]
+tests/test_stage7_score.py::test_population_provenance_and_scorer_error PASSED                                                                                  [ 95%]
+tests/test_stage7_score.py::test_i0_skipped_or_too_few PASSED                                                                                                   [ 97%]
+tests/test_stage7_score.py::test_partial_exploratory_batches PASSED                                                                                             [ 98%]
+tests/test_stage7_score.py::test_unblocked_kappa_drops_make_i4_not_evaluable PASSED                                                                             [100%]
+
+=============================================================================== PASSES ================================================================================
+___________________________________________________________________ test_empty_sets_equal_unblocked ___________________________________________________________________
+------------------------------------------------------------------------ Captured stderr setup ------------------------------------------------------------------------
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+------------------------------------------------------------------------- Captured log setup --------------------------------------------------------------------------
+WARNING  huggingface_hub.utils._http:_http.py:1023 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+________________________________________________________ test_bx_notG_with_pin_equals_exchange_plus_rowsplice _________________________________________________________
+------------------------------------------------------------------------ Captured stdout call -------------------------------------------------------------------------
+x_notG without the key pin differs from the reference by 0.00476 (the leak the pin removes)
+__________________________________________________________ test_load_refit_and_scorer_check_basis_inventory ___________________________________________________________
+------------------------------------------------------------------------ Captured stdout call -------------------------------------------------------------------------
+  provenance: OK, scored families = gated fit runs, basis files as evaluated, prefills as named
+  provenance: MISMATCH
+    /tmp/pytest-of-root/pytest-0/test_load_refit_and_scorer_che0/a/fit/run/bases/m3_ts101.npz: sha256 45da3346fbf6 is not COMPLETE.json's inventory entry
+    frames: basis none/m3_101 sha256 fc17a37951c3, file read here 45da3346fbf6
+  provenance: MISMATCH
+    /tmp/pytest-of-root/pytest-0/test_load_refit_and_scorer_che0/a/fit/run: missing FRAME.json
+_______________________________________________________________________ test_scorer_population ________________________________________________________________________
+------------------------------------------------------------------------ Captured stdout call -------------------------------------------------------------------------
+  population: OK, 96 cores in every family x format cell
+  population: MISMATCH
+    frames fit_none LETTER: n=95, cores differ from the first cell's
+  population: MISMATCH
+    frames fit_none LETTER: n=95, cores differ from the first cell's
+  population: MISMATCH
+    frames: args n=2 arms='P1,NONE,BEFORE,POST,LETTER', expected n=0 arms='P1,NONE,BEFORE,POST,LETTER'
+    cells hold n=2 cores, expected 96
+  population: OK, 2 cores in every family x format cell
+___________________________________________________________________ test_post_run_failure_recorded ____________________________________________________________________
+------------------------------------------------------------------------ Captured stdout call -------------------------------------------------------------------------
+2026-10-09T11:43:18Z start {"frame": "NONE", "loader": "ours", "repo": "Qwen/Qwen2.5-0.5B-Instruct", "revision": null, "device": "cpu", "test": true}
+2026-10-09T11:43:18Z integrity {"status": "PASS_EXCEPT_README", "mismatches": ["README.md"]}
+2026-10-09T11:43:18Z p1_equality {"records": 2000}
+2026-10-09T11:43:34Z prefix_check {"frame": "NONE", "pairs": 1000}
+2026-10-09T11:43:34Z frame_written {"injections": ["gpu.behavior_engine.prompt", "reproduce.integrity.verify", "gpu.runtime.load.load_engine", "gpu.train.datasets", "gpu.train.schedule", "gpu.train.require"]}
+======================================================================= short test summary info =======================================================================
+PASSED tests/test_stage7_link.py::test_empty_sets_equal_unblocked
+PASSED tests/test_stage7_link.py::test_bx_all_equals_frames_addition
+PASSED tests/test_stage7_link.py::test_rows_G_only_equals_rowsplice
+PASSED tests/test_stage7_link.py::test_bx_notG_with_pin_equals_exchange_plus_rowsplice
+PASSED tests/test_stage7_link.py::test_pin_runs_before_headsplice_khook
+PASSED tests/test_stage7_link.py::test_self_ablation_is_unablated
+PASSED tests/test_stage7_link.py::test_aplus_masks_exactly_S_and_L4_at_G
+PASSED tests/test_stage7_link.py::test_readerko_all_heads_equals_4d_knockout
+PASSED tests/test_stage7_link.py::test_null_knockout_and_explicit_mask
+PASSED tests/test_stage7_link.py::test_mixed_batches_equal_single_rows
+PASSED tests/test_stage7_link.py::test_natural_passes_and_tables_equal_run_core
+PASSED tests/test_stage7_link.py::test_family_rows_equal_run_family
+PASSED tests/test_stage7_link.py::test_positions_up_to_p
+PASSED tests/test_stage7_link.py::test_list_before_structural_zero
+PASSED tests/test_stage7_link.py::test_pins
+PASSED tests/test_stage7_link.py::test_rank_a3_zero_below_onset_and_remap_rows
+PASSED tests/test_stage7_link.py::test_hooks_at_the_24b_head_geometry
+PASSED tests/test_head_splice.py::test_headsplice_all_heads_is_full_clamp_and_empty_is_clean
+PASSED tests/test_head_splice.py::test_headsplice_rows_G_and_group_slices_equal_rowsplice
+PASSED tests/test_head_splice.py::test_headsplice_batched_grid_equals_single_runs
+PASSED tests/test_head_splice.py::test_self_ablation_is_clean
+PASSED tests/test_head_splice.py::test_hopsplice_all_rows_is_plain_clamp
+PASSED tests/test_head_splice.py::test_hopsplice_no_overwrite_and_answer_only_cache
+PASSED tests/test_head_splice.py::test_hop_batch_equals_single_rows
+PASSED tests/test_knockout.py::test_groups_core0_qwen
+PASSED tests/test_knockout.py::test_groups_core0_mistral
+PASSED tests/test_knockout.py::test_target_ids
+PASSED tests/test_knockout.py::test_mask_shapes
+PASSED tests/test_knockout.py::test_knockout_exact
+PASSED tests/test_knockout.py::test_run_item_exactness
+PASSED tests/test_knockout.py::test_scorer_synthetic_rules
+PASSED tests/test_refit_remap.py::test_tolerant_verify[None-None-PASS]
+PASSED tests/test_refit_remap.py::test_tolerant_verify[README.md-None-PASS_EXCEPT_README]
+PASSED tests/test_refit_remap.py::test_tolerant_verify[None-README.md-PASS_EXCEPT_README]
+PASSED tests/test_refit_remap.py::test_tolerant_verify[gpu/train.py-None-None]
+PASSED tests/test_refit_remap.py::test_tolerant_verify[gpu/behavior_engine.py-None-None]
+PASSED tests/test_refit_remap.py::test_tolerant_verify[gpu/runtime/load.py-None-None]
+PASSED tests/test_refit_remap.py::test_tolerant_verify[gpu/behavior_data/datasets.json.gz-None-None]
+PASSED tests/test_refit_remap.py::test_tolerant_verify[docs/notes.md-None-None]
+PASSED tests/test_refit_remap.py::test_tolerant_verify[None-gpu/train.py-None]
+PASSED tests/test_refit_remap.py::test_tolerant_verify_pins[gpu/behavior_data/datasets.json.gz]
+PASSED tests/test_refit_remap.py::test_tolerant_verify_pins[gpu/behavior_engine.py]
+PASSED tests/test_refit_remap.py::test_tolerant_verify_pins[gpu/runtime/load.py]
+PASSED tests/test_refit_remap.py::test_tolerant_verify_pins[gpu/train.py]
+PASSED tests/test_refit_remap.py::test_resolved_commit
+PASSED tests/test_refit_remap.py::test_prompt_identity
+PASSED tests/test_refit_remap.py::test_tolerant_verify_on_release
+PASSED tests/test_refit_remap.py::test_p1_prompt_equal_on_all_training_records
+PASSED tests/test_refit_remap.py::test_none_prompt
+PASSED tests/test_refit_remap.py::test_none_shares_token_prefix_through_event_span
+PASSED tests/test_refit_remap.py::test_injection_points_reach_unmodified_train
+PASSED tests/test_refit_remap.py::test_load_refit_and_scorer_check_basis_inventory
+PASSED tests/test_refit_remap.py::test_scorer_population
+PASSED tests/test_refit_remap.py::test_git_state_excludes_output_root
+PASSED tests/test_refit_remap.py::test_post_run_failure_recorded
+PASSED tests/test_refit_remap.py::test_tokenizer_check_records_fix
+PASSED tests/test_stage7_score.py::test_all_met
+PASSED tests/test_stage7_score.py::test_kappa_undefined_after_blocking_is_not_met
+PASSED tests/test_stage7_score.py::test_dropped_resamples_rule
+PASSED tests/test_stage7_score.py::test_evaluability_split
+PASSED tests/test_stage7_score.py::test_no_mention_gates
+PASSED tests/test_stage7_score.py::test_i5_denominator_only_is_not_met
+PASSED tests/test_stage7_score.py::test_g1d_at_0p1_nats
+PASSED tests/test_stage7_score.py::test_both_formats_and_p1_only
+PASSED tests/test_stage7_score.py::test_boundaries
+PASSED tests/test_stage7_score.py::test_provenance_mismatch_and_i0
+PASSED tests/test_stage7_score.py::test_test_tag_skips_sizes
+PASSED tests/test_stage7_score.py::test_g1c_kappa_waiver_and_failure
+PASSED tests/test_stage7_score.py::test_i3_i7_not_met_and_remap_ranking
+PASSED tests/test_stage7_score.py::test_population_provenance_and_scorer_error
+PASSED tests/test_stage7_score.py::test_i0_skipped_or_too_few
+PASSED tests/test_stage7_score.py::test_partial_exploratory_batches
+PASSED tests/test_stage7_score.py::test_unblocked_kappa_drops_make_i4_not_evaluable
+SKIPPED [1] tests/test_refit_remap.py:224: no cached Mistral-Small-24B tokenizer
+============================================================== 73 passed, 1 skipped in 566.58s (0:09:26) ==============================================================

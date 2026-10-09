@@ -1,0 +1,7 @@
+==== 2026-10-09T11:51:23Z python experiments/stage7_link.py --p1-root /root/paper1/v5.5-reviewer-repository --out results/gpu_stage7 --revision 9527884be6e5616bdd54de542f9ae13384489724 --stage rank
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+[transformers] The tokenizer you are loading from 'mistralai/Mistral-Small-24B-Instruct-2501' with an incorrect regex pattern: https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503/discussions/84#69121093e8b480e709447d5e. This will lead to incorrect tokenization. You should set the `fix_mistral_regex=True` flag when loading this tokenizer to fix this issue.
+[P1] ranked on 60 stories (19s); top-5 [(7, 6), (14, 9), (7, 4), (14, 11), (22, 1)]
+[LETTER] ranked on 60 stories (38s); top-5 [(7, 6), (14, 9), (14, 11), (7, 4), (8, 26)]
+[POST] ranked on 60 stories (56s); top-5 [(7, 6), (12, 27), (14, 11), (8, 26), (13, 28)]
+wrote rank.json, sets ec052231976c, mu 82a1e28a9a47 (75s)

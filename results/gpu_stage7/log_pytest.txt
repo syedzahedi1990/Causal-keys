@@ -1,0 +1,46 @@
+==== 2026-10-09T11:48:51Z python -m pytest tests/test_interventions.py tests/test_encoding.py tests/test_row_restricted.py tests/test_clamp.py -v -rA -p no:cacheprovider
+========================================================================= test session starts =========================================================================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /venv/main/bin/python
+rootdir: /workspace/Causal-keys
+plugins: anyio-4.15.1
+collecting ... collected 15 items
+
+tests/test_interventions.py::test_identity_edit_is_noop PASSED                                                                                                  [  6%]
+tests/test_interventions.py::test_full_resid_patch_transfers_source PASSED                                                                                      [ 13%]
+tests/test_interventions.py::test_self_key_exchange_noop_and_null_norm PASSED                                                                                   [ 20%]
+tests/test_interventions.py::test_rotated_subspace_orthonormal PASSED                                                                                           [ 26%]
+tests/test_interventions.py::test_row_splice_exact PASSED                                                                                                       [ 33%]
+tests/test_encoding.py::test_standard_arms_registered_and_unchanged PASSED                                                                                      [ 40%]
+tests/test_encoding.py::test_register_core_dependent_and_independent_arms PASSED                                                                                [ 46%]
+tests/test_encoding.py::test_encode_raw_and_any PASSED                                                                                                          [ 53%]
+tests/test_row_restricted.py::test_registered_arm_groups PASSED                                                                                                 [ 60%]
+tests/test_row_restricted.py::test_gpt2_rowsplice_exact PASSED                                                                                                  [ 66%]
+tests/test_clamp.py::test_kv_sites PASSED                                                                                                                       [ 73%]
+tests/test_clamp.py::test_gpt2_clamp_exact PASSED                                                                                                               [ 80%]
+tests/test_clamp.py::test_qwen_clamp_matches_single_position_hooks PASSED                                                                                       [ 86%]
+tests/test_clamp.py::test_format_factorial_regression PASSED                                                                                                    [ 93%]
+tests/test_clamp.py::test_row_restricted_regression PASSED                                                                                                      [100%]
+
+=============================================================================== PASSES ================================================================================
+_______________________________________________________________________ test_encode_raw_and_any _______________________________________________________________________
+------------------------------------------------------------------------ Captured stderr call -------------------------------------------------------------------------
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+-------------------------------------------------------------------------- Captured log call --------------------------------------------------------------------------
+WARNING  huggingface_hub.utils._http:_http.py:1023 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+======================================================================= short test summary info =======================================================================
+PASSED tests/test_interventions.py::test_identity_edit_is_noop
+PASSED tests/test_interventions.py::test_full_resid_patch_transfers_source
+PASSED tests/test_interventions.py::test_self_key_exchange_noop_and_null_norm
+PASSED tests/test_interventions.py::test_rotated_subspace_orthonormal
+PASSED tests/test_interventions.py::test_row_splice_exact
+PASSED tests/test_encoding.py::test_standard_arms_registered_and_unchanged
+PASSED tests/test_encoding.py::test_register_core_dependent_and_independent_arms
+PASSED tests/test_encoding.py::test_encode_raw_and_any
+PASSED tests/test_row_restricted.py::test_registered_arm_groups
+PASSED tests/test_row_restricted.py::test_gpt2_rowsplice_exact
+PASSED tests/test_clamp.py::test_kv_sites
+PASSED tests/test_clamp.py::test_gpt2_clamp_exact
+PASSED tests/test_clamp.py::test_qwen_clamp_matches_single_position_hooks
+PASSED tests/test_clamp.py::test_format_factorial_regression
+PASSED tests/test_clamp.py::test_row_restricted_regression
+=================================================================== 15 passed in 119.39s (0:01:59) ====================================================================

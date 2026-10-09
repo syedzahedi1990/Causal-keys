@@ -1,0 +1,193 @@
+Stage 7 scoring, preregistration P-2026-10-08-I; root results/gpu_stage7; tag mistral; reference /workspace/Causal-keys/results/gpu_stage3b/paper1_frames_v/mistral.json
+
+PROVENANCE (the pipeline's COMMIT.txt, ENV.txt, REVISIONS.txt, every line; every results file)
+  COMMIT.txt:
+    ==== 2026-10-09T11:24:59Z TEST_MODE=0 FORCE=0 FORCE_STEPS= DEADLINE_H=3.5
+    35df52f2e7373d318dc1ac0e957007e4d24e63f7
+    ?? results/gpu_stage7/
+    ==== 2026-10-09T11:39:09Z TEST_MODE=0 FORCE=0 FORCE_STEPS= DEADLINE_H=3.5
+    35df52f2e7373d318dc1ac0e957007e4d24e63f7
+    ?? gpu_stage7_results.tgz
+    ?? results/gpu_stage7/
+  ENV.txt:
+    ==== 2026-10-09T11:25:13Z TEST_MODE= HF hub cache /workspace/.hf_home/hub; deadline for the exploratory parts 14:54:59Z
+    python 3.12.14 torch 2.11.0+cu128 transformers 5.18.0 numpy 2.5.3 gpus 1 NVIDIA A100 80GB PCIe
+    name, memory.total [MiB], driver_version
+    NVIDIA A100 80GB PCIe, 81920 MiB, 615.71.09
+    ==== 2026-10-09T11:39:10Z TEST_MODE= HF hub cache /workspace/.hf_home/hub; deadline for the exploratory parts 15:09:09Z
+    python 3.12.14 torch 2.11.0+cu128 transformers 5.18.0 numpy 2.5.3 gpus 1 NVIDIA A100 80GB PCIe
+    name, memory.total [MiB], driver_version
+    NVIDIA A100 80GB PCIe, 81920 MiB, 615.71.09
+    mistralai/Mistral-Small-24B-Instruct-2501 revision 9527884be6e5616bdd54de542f9ae13384489724 (pinned)
+    mistralai/Mistral-Small-24B-Instruct-2501 loaded snapshot(s): 9527884be6e5616bdd54de542f9ae13384489724
+    mistralai/Mistral-Small-24B-Instruct-2501 removed from the HF cache (/workspace/.hf_home/hub/models--mistralai--Mistral-Small-24B-Instruct-2501)
+  REVISIONS.txt:
+    mistralai/Mistral-Small-24B-Instruct-2501 9527884be6e5616bdd54de542f9ae13384489724
+  preflight.json: commit 35df52f2e7, model mistralai/Mistral-Small-24B-Instruct-2501 rev 9527884be6e5616bdd54de542f9ae13384489724, dtype -, attn -, device NVIDIA A100 80GB PCIe, transformers 5.18.0, torch 2.11.0+cu128, test_mode False
+  heads/rank.json: commit 35df52f2e7, model mistralai/Mistral-Small-24B-Instruct-2501 rev 9527884be6e5616bdd54de542f9ae13384489724, dtype torch.bfloat16, attn eager, device NVIDIA A100 80GB PCIe, transformers 5.18.0, torch 2.11.0+cu128, test_mode False
+  heads/gate.json: commit 35df52f2e7, model mistralai/Mistral-Small-24B-Instruct-2501 rev 9527884be6e5616bdd54de542f9ae13384489724, dtype torch.bfloat16, attn sdpa, device NVIDIA A100 80GB PCIe, transformers 5.18.0, torch 2.11.0+cu128, test_mode False
+  heads/remaprank.json: commit 35df52f2e7, model mistralai/Mistral-Small-24B-Instruct-2501 rev 9527884be6e5616bdd54de542f9ae13384489724, dtype torch.bfloat16, attn eager, device NVIDIA A100 80GB PCIe, transformers 5.18.0, torch 2.11.0+cu128, test_mode False
+  link/mistral.json: commit 35df52f2e7, model mistralai/Mistral-Small-24B-Instruct-2501 rev 9527884be6e5616bdd54de542f9ae13384489724, dtype torch.bfloat16, attn sdpa, device NVIDIA A100 80GB PCIe, transformers 5.18.0, torch 2.11.0+cu128, test_mode False
+  head sets sha256 ec052231976cc18e: recomputed OK; every later file records it: OK; MU sha256 82a1e28a9a47d0aa: OK
+  the predecessor's release (preflight.json): RELEASE.json 2dea297d508e, bases and stories file equal the pins (stage-4 provenance; release manifest); bases used: released original_1000
+  the predecessor's release (link/mistral.json): RELEASE.json 2dea297d508e, bases and stories file equal the pins (stage-4 provenance; release manifest); bases used: released original_1000
+  frames/mistral.json: mistralai/Mistral-Small-24B-Instruct-2501 rev 9527884be6e5616bdd54de542f9ae13384489724, device NVIDIA A100 80GB PCIe x1, transformers 5.18.0
+  commits: ['35df52f2e7']
+
+POPULATION (E: 96 native cores per format and condition, one order; R: make_cores(60, Random(0)))
+  link: P1 n=96; LETTER n=96; POST n=96; NONE n=96; BEFORE n=96; same cores in the same order in every format: OK
+  gate: P1 n=96, LETTER n=96, POST n=96, NONE clamp n=96; cores as the link run: OK
+  rank: P1 n=60 make_cores(n, Random(0)) OK; LETTER n=60 make_cores(n, Random(0)) OK; POST n=60 make_cores(n, Random(0)) OK; R and E share 0 stories
+  frames: 600 results
+  population: OK
+
+GATES (I-G0 before any model; I-G1 reproduction and floors; I-G2 the readers at 24B; I-G3 the remap acts; I-G4 not a verdict gate)
+  I-G0  FP32 exactness, tests/test_stage7_link.py in log_pytest_stage7.txt (last of 1 run(s), 2026-10-09T11:39:21Z): 17 passed, 0 failed, 0 skipped (>= 17 tests, none failing or skipped) -> MET
+  I-G1a OPTIONS-AFTER   phi +0.705 vs +0.705 (diff +0.000), psiK +0.528 vs +0.528 (diff +0.000), psiV +0.229 vs +0.229 (diff +0.000) each within 0.03 -> MET
+  I-G1a LETTERS-AFTER   phi +0.749 vs +0.749 (diff +0.000), psiK +0.777 vs +0.777 (diff +0.000), psiV +0.018 vs +0.018 (diff +0.000) each within 0.03 -> MET
+  I-G1a SENTENCE-AFTER  phi +0.719 vs +0.719 (diff +0.000), psiK +0.196 vs +0.196 (diff +0.000), psiV +0.523 vs +0.523 (diff +0.000) each within 0.03 -> MET
+  I-G1a NO-MENTION      phi +0.708 vs +0.708 (diff +0.000), psiK +0.069 vs +0.069 (diff +0.000), psiV +0.803 vs +0.803 (diff +0.000) each within 0.03 -> MET
+  I-G1a LIST-BEFORE     phi +0.738 vs +0.738 (diff +0.000), psiK -0.001 vs -0.001 (diff +0.000), psiV +0.971 vs +0.971 (diff +0.000) each within 0.03 -> MET
+  I-G1b OPTIONS-AFTER   unblocked batch psi_K +0.528 vs +0.528, psi_V +0.229 vs +0.229 (within 0.03), D 13.67 vs 13.70 (-0.2 %, within 3 %); B_x x_all psi_K +0.528 vs +0.528 (within 0.03) -> MET
+  I-G1b LETTERS-AFTER   unblocked batch psi_K +0.777 vs +0.777, psi_V +0.018 vs +0.018 (within 0.03), D 12.87 vs 12.87 (+0.0 %, within 3 %); B_x x_all psi_K +0.776 vs +0.777 (within 0.03) -> MET
+  I-G1b SENTENCE-AFTER  unblocked batch psi_K +0.196 vs +0.196, psi_V +0.522 vs +0.523 (within 0.03), D 12.16 vs 12.17 (-0.0 %, within 3 %); B_x x_all psi_K +0.197 vs +0.196 (within 0.03) -> MET
+  I-G1b NO-MENTION      unblocked batch psi_K +0.070 vs +0.069, psi_V +0.803 vs +0.803 (within 0.03), D 14.35 vs 14.34 (+0.1 %, within 3 %) -> MET
+  I-G1b LIST-BEFORE     unblocked batch psi_K +0.001 vs -0.001, psi_V +0.971 vs +0.971 (within 0.03), D 12.14 vs 12.13 (+0.1 %, within 3 %) -> MET
+  I-G1c OPTIONS-AFTER   (gates the N lines only) |kappa_null - kappa| 0.0000, |psi~_V null - psi_V| 0.0000, |t - 1| 0.0000 (each <= 0.02) -> MET
+  I-G1c LETTERS-AFTER   (gates the N lines only) |kappa_null - kappa| 0.0000, |psi~_V null - psi_V| 0.0000, |t - 1| 0.0000 (each <= 0.02) -> MET
+  I-G1c SENTENCE-AFTER  (gates the N lines only) |kappa_null - kappa| 0.0000, |psi~_V null - psi_V| 0.0000, |t - 1| 0.0000 (each <= 0.02) -> MET
+  I-G1d LIST-BEFORE       max |B_x(H*_OPTIONS-AFTER at the list rows) - x_all| 0, max |N(H*_OPTIONS-AFTER) - unblocked| 0 nats (<= 0.1) -> MET
+  I-G2  OPTIONS-AFTER   (a) d_full +17.020 [+16.475,+17.568] >= 3, CI excl. 0: MET; (b) d_G/d_full +0.853 [+0.840,+0.867] >= 0.7: MET [mention-specific d_G/(d_full - d_full(NONE)) +0.984 [+0.964,+1.004]]; (c) R(64) +0.832 [+0.788,+0.871] >= 0.7, KO(64) +0.971 [+0.964,+0.978] >= 0.8, R_rand +0.001 [-0.000,+0.002] <= 0.25, KO_rand +0.011 [+0.008,+0.015] <= 0.25: MET [k80 64]; (d) Gate a2 |none - clean| 0.061, |all_T - full| 0.075 <= 0.500: MET -> MET
+  I-G2  LETTERS-AFTER   (a) d_full +18.186 [+17.818,+18.547] >= 3, CI excl. 0: MET; (b) d_G/d_full +0.987 [+0.981,+0.992] >= 0.7: MET [mention-specific d_G/(d_full - d_full(NONE)) +1.127 [+1.099,+1.157]]; (c) R(64) +0.822 [+0.775,+0.865] >= 0.7, KO(64) +0.991 [+0.989,+0.994] >= 0.8, R_rand +0.001 [+0.000,+0.002] <= 0.25, KO_rand +0.013 [+0.010,+0.016] <= 0.25: MET [k80 64]; (d) Gate a2 |none - clean| 0.055, |all_T - full| 0.061 <= 0.500: MET -> MET
+  I-G2  SENTENCE-AFTER  (a) d_full +8.686 [+7.973,+9.353] > 0, CI excl. 0: MET; (b) d_G/d_full +0.682 [+0.635,+0.728] >= 0.5: MET [mention-specific d_G/(d_full - d_full(NONE)) +0.921 [+0.860,+0.990]]; (c) R(64) +0.912 [+0.878,+0.942] >= 0.7, KO(64) +1.012 [+1.003,+1.022] >= 0.8, R_rand +0.002 [-0.000,+0.004] <= 0.25, KO_rand +0.037 [+0.026,+0.051] <= 0.25: MET [k80 32]; (d) Gate a2 |none - clean| 0.045, |all_T - full| 0.089 <= 0.500: MET -> MET
+        H1/H2 pattern at 24B (OPTIONS-AFTER): replicated
+        H1/H2 pattern at 24B (LETTERS-AFTER): replicated
+        H1/H2 pattern at 24B (SENTENCE-AFTER): replicated
+  I-G3  OPTIONS-AFTER   (1) D 13.67 >= 3: MET; (2) a(all) - a(all@G) 7.04 >= 1: MET
+  I-G3  LETTERS-AFTER   (1) D 12.87 >= 3: MET; (2) a(all) - a(all@G) 10.02 >= 1: MET
+  I-G3  SENTENCE-AFTER  (1) D 12.16 >= 3: MET; (2) a(all) - a(all@G) 2.16 >= 1: MET
+  I-G3  NO-MENTION      (1) D 14.35 >= 3: MET
+  I-G4  OPTIONS-AFTER     A+(H*): t +0.556 [+0.534,+0.578] >= 0.6, dV +2.496 [+2.250,+2.737] > 0 with CI excluding 0 -> I5/I6 readable as value takeover: no (not a verdict gate)
+
+VERDICTS (I1-I7; confirmatory formats OPTIONS-AFTER and LETTERS-AFTER: MET if met in both, NOT MET if not met in an evaluable format, else NOT EVALUABLE; I5 and I6 under OPTIONS-AFTER alone)
+  I1  the remap's key is read at the option words          -> MET
+         OPTIONS-AFTER: g_K +0.976 [+0.963,+0.990] (>= 0.7, lower >= 0.6); g~_K +1.133 [+1.116,+1.151] -> MET
+         LETTERS-AFTER: g_K +0.999 [+0.997,+1.000] (>= 0.7, lower >= 0.6); g~_K +1.109 [+1.092,+1.127] -> MET
+  I2  through the natural readers                          -> MET
+         OPTIONS-AFTER: KO_x(H*) +0.994 [+0.989,+0.999] (>= 0.8, lower >= 0.7); r_K(H*) +0.030, psi_K^x(H*) +0.016 vs psi_K(NO-MENTION) +0.070 -> MET
+         LETTERS-AFTER: KO_x(H*) +0.993 [+0.990,+0.995] (>= 0.8, lower >= 0.7); r_K(H*) +0.009, psi_K^x(H*) +0.007 vs psi_K(NO-MENTION) +0.070 -> MET
+  I3  specificity of the route (random and active sets)    -> MET
+         OPTIONS-AFTER: KO_x rand0 +0.073 [+0.057,+0.090], rand1 +0.059 [+0.043,+0.077], rand2 +0.028 [+0.022,+0.035], active +0.040 [+0.027,+0.054] each <= 0.25 -> MET
+         LETTERS-AFTER: KO_x rand0 +0.082 [+0.065,+0.099], rand1 +0.075 [+0.061,+0.092], rand2 +0.029 [+0.023,+0.036], active -0.024 [-0.031,-0.019] each <= 0.25 -> MET
+  I4  the key share falls toward NO-MENTION under A(H*)    -> MET
+         OPTIONS-AFTER: c_kappa +0.946 [+0.905,+0.991] (>= 0.5, lower >= 0.3; resamples dropped by kappa^A alone 0.0 %, by an unblocked kappa 0.0 %); kappa^A +0.113 [+0.080,+0.143] vs +0.698 (NO-MENTION +0.080)  [consistency check: follows from I1 x I2 without a takeover] -> MET
+         LETTERS-AFTER: c~_K +0.845 [+0.818,+0.871] (>= 0.5, lower >= 0.3); two-sided: kappa^A +0.661 [+0.615,+0.708], c_kappa +0.352 [+0.305,+0.398]  [consistency check: follows from I1 x I2 without a takeover] -> MET
+  I5  the value channel carries more of the remap          -> MET
+         OPTIONS-AFTER: dV +2.388 [+2.141,+2.631] nats > 0 (CI excl. 0) and >= F_V 2.10; psi~_V +0.404, psi_V^A +0.714, dV / (K - K^A) +0.366 -> MET
+  I6  the behaviour is kept                                -> NOT MET
+         OPTIONS-AFTER: t +0.565 [+0.542,+0.589] (>= 0.75, lower >= 0.6); argmax rates 0: M->T 0.82 P->S 1.00 B->B 1.00 (initial location M 0.00 P 0.00 B 0.00); A:H: M->T 0.80 P->S 1.00 B->B 1.00 (initial location M 0.01 P 0.00 B 0.00) -> NOT MET
+  I7  random sets change nothing                           -> MET
+         OPTIONS-AFTER: rand0: |d kappa| 0.005, |d psi~_V| 0.000, |t - 1| 0.019; rand1: |d kappa| 0.006, |d psi~_V| 0.001, |t - 1| 0.008; rand2: |d kappa| 0.010, |d psi~_V| 0.005, |t - 1| 0.006; active: |d kappa| 0.002, |d psi~_V| 0.004, |t - 1| 0.015 (each <= 0.10) -> MET
+         LETTERS-AFTER: rand0: |d kappa| 0.001, |d psi~_V| 0.001, |t - 1| 0.019; rand1: |d kappa| 0.002, |d psi~_V| 0.002, |t - 1| 0.019; rand2: |d kappa| 0.006, |d psi~_V| 0.005, |t - 1| 0.018; active: |d kappa| 0.009, |d psi~_V| 0.007, |t - 1| 0.001 (each <= 0.10) -> MET
+
+REPORTED (not scored: SENTENCE-AFTER against the same thresholds, LETTERS-AFTER I5/I6 two-sided, the knockout contrast N(H*))
+  I1 SENTENCE-AFTER: g_K +0.901 [+0.849,+0.946] (>= 0.5, reported); g~_K +1.547 [+1.408,+1.801] -> meets the threshold (no verdict) [gates: passed]
+  I2 SENTENCE-AFTER: KO_x(H*) +1.023 [+1.002,+1.048] (>= 0.8, lower >= 0.7); r_K(H*) +0.078, psi_K^x(H*) +0.015 vs psi_K(NO-MENTION) +0.070 -> meets the threshold (no verdict) [gates: passed]
+  I3 SENTENCE-AFTER: KO_x rand0 +0.040 [+0.011,+0.071], rand1 +0.078 [+0.057,+0.103], rand2 +0.020 [+0.007,+0.036], active +0.003 [-0.002,+0.008] each <= 0.25 -> meets the threshold (no verdict) [gates: passed]
+  I4 SENTENCE-AFTER: c~_K +1.465 [+1.344,+1.669] (>= 0.5, lower >= 0.3); two-sided: kappa^A +0.012 [-0.000,+0.025], c_kappa +1.350 [+1.269,+1.473]  [consistency check: follows from I1 x I2 without a takeover] -> meets the threshold (no verdict) [gates: passed]
+  I5 SENTENCE-AFTER: dV +4.220 [+3.816,+4.622] nats > 0 (CI excl. 0) and >= F_V 1.29; psi~_V +0.869, psi_V^A +0.921, dV / (K - K^A) +1.867 -> meets the threshold (no verdict) [gates: passed]
+  I6 SENTENCE-AFTER: t +0.944 [+0.928,+0.960] (>= 0.75, lower >= 0.6); argmax rates 0: M->T 0.87 P->S 1.00 B->B 1.00 (initial location M 0.00 P 0.00 B 0.00); A:H: M->T 0.88 P->S 1.00 B->B 1.00 (initial location M 0.00 P 0.00 B 0.00) -> meets the threshold (no verdict) [gates: passed]
+  I7 SENTENCE-AFTER: rand0: |d kappa| 0.027, |d psi~_V| 0.026, |t - 1| 0.000; rand1: |d kappa| 0.024, |d psi~_V| 0.031, |t - 1| 0.007; rand2: |d kappa| 0.009, |d psi~_V| 0.005, |t - 1| 0.005; active: |d kappa| 0.017, |d psi~_V| 0.008, |t - 1| 0.010 (each <= 0.10) -> meets the threshold (no verdict) [gates: passed]
+  I5 LETTERS-AFTER (two-sided, no verdict): dV +0.945 [+0.791,+1.102] nats > 0 (CI excl. 0) and >= F_V 2.82; psi~_V +0.092, psi_V^A +0.238, dV / (K - K^A) +0.123
+  I6 LETTERS-AFTER (two-sided, no verdict): t +0.385 [+0.358,+0.410] (>= 0.75, lower >= 0.6); argmax rates 0: M->T 0.76 P->S 1.00 B->B 1.00 (initial location M 0.03 P 0.00 B 0.00); A:H: M->T 0.46 P->S 0.85 B->B 0.83 (initial location M 0.02 P 0.01 B 0.05)
+  N(H*) OPTIONS-AFTER: t +0.722 [+0.697,+0.748]; psi~_K +0.046, psi~_V +0.605; blocked scale psi_K +0.063, psi_V +0.838, non-additive +0.099; kappa +0.070 [+0.042,+0.097] (unblocked +0.698); c_kappa +1.016 [+0.977,+1.055]; c~_K +1.052 [+1.010,+1.091]; dV +5.140 [+4.835,+5.452] nats (floor 2.10); dV / lost K +0.779; nats D 9.87 K 0.62 V 8.27 (unblocked 13.67 / 7.22 / 3.13)
+        argmax rates 0: M->T 0.82 P->S 1.00 B->B 1.00 (initial location M 0.00 P 0.00 B 0.00); A:H: M->T 0.80 P->S 1.00 B->B 1.00 (initial location M 0.01 P 0.00 B 0.00); A+:H: M->T 0.79 P->S 0.99 B->B 1.00 (initial location M 0.01 P 0.01 B 0.00); N:H: M->T 0.83 P->S 1.00 B->B 1.00 (initial location M 0.00 P 0.00 B 0.00)
+        t under A +0.565 [+0.542,+0.589] vs under N +0.722 [+0.697,+0.748]
+  N(H*) LETTERS-AFTER: t +0.296 [+0.252,+0.342]; psi~_K +0.134, psi~_V +0.154; blocked scale psi_K +0.454, psi_V +0.519, non-additive +0.027; kappa +0.466 [+0.427,+0.507] (0.3 % of resamples dropped) (unblocked +0.977); c_kappa +0.569 [+0.528,+0.611] (0.3 % of resamples dropped); c~_K +0.908 [+0.865,+0.949]; dV +1.746 [+1.408,+2.122] nats (floor 2.82); dV / lost K +0.211; nats D 3.81 K 1.73 V 1.98 (unblocked 12.87 / 9.99 / 0.23)
+        argmax rates 0: M->T 0.76 P->S 1.00 B->B 1.00 (initial location M 0.03 P 0.00 B 0.00); A:H: M->T 0.46 P->S 0.85 B->B 0.83 (initial location M 0.02 P 0.01 B 0.05); A+:H: M->T 0.47 P->S 0.85 B->B 0.85 (initial location M 0.03 P 0.02 B 0.01); N:H: M->T 0.39 P->S 0.64 B->B 0.69 (initial location M 0.19 P 0.24 B 0.21)
+        t under A +0.385 [+0.358,+0.410] vs under N +0.296 [+0.252,+0.342]
+  N(H*) SENTENCE-AFTER: t +0.968 [+0.956,+0.982]; psi~_K +0.017, psi~_V +0.910; blocked scale psi_K +0.018, psi_V +0.940, non-additive +0.042; kappa +0.019 [+0.007,+0.031] (unblocked +0.274); c_kappa +1.314 [+1.241,+1.424]; c~_K +1.411 [+1.304,+1.589]; dV +4.722 [+4.430,+5.020] nats (floor 1.29); dV / lost K +2.169; nats D 11.78 K 0.21 V 11.07 (unblocked 12.16 / 2.39 / 6.35)
+        argmax rates 0: M->T 0.87 P->S 1.00 B->B 1.00 (initial location M 0.00 P 0.00 B 0.00); A:H: M->T 0.88 P->S 1.00 B->B 1.00 (initial location M 0.00 P 0.00 B 0.00); A+:H: M->T 0.88 P->S 1.00 B->B 1.00 (initial location M 0.00 P 0.00 B 0.00); N:H: M->T 0.88 P->S 1.00 B->B 1.00 (initial location M 0.00 P 0.00 B 0.00)
+        t under A +0.944 [+0.928,+0.960] vs under N +0.968 [+0.956,+0.982]
+  A(H*) OPTIONS-AFTER: t +0.565 [+0.542,+0.589]; psi~_K +0.052, psi~_V +0.404; blocked scale psi_K +0.091, psi_V +0.714, non-additive +0.195; kappa +0.113 [+0.080,+0.143] (unblocked +0.698); c_kappa +0.946 [+0.905,+0.991]; c~_K +1.039 [+1.007,+1.073]; dV +2.388 [+2.141,+2.631] nats (floor 2.10); dV / lost K +0.366; nats D 7.73 K 0.70 V 5.52 (unblocked 13.67 / 7.22 / 3.13)
+  A+(H*) OPTIONS-AFTER: t +0.556 [+0.534,+0.578]; psi~_K +0.046, psi~_V +0.411; blocked scale psi_K +0.082, psi_V +0.740, non-additive +0.178; kappa +0.100 [+0.067,+0.129] (unblocked +0.698); c_kappa +0.968 [+0.927,+1.012]; c~_K +1.052 [+1.020,+1.086]; dV +2.496 [+2.250,+2.737] nats (floor 2.10); dV / lost K +0.378; nats D 7.60 K 0.62 V 5.63 (unblocked 13.67 / 7.22 / 3.13)
+  A(H*) LETTERS-AFTER: t +0.385 [+0.358,+0.410]; psi~_K +0.179, psi~_V +0.092; blocked scale psi_K +0.465, psi_V +0.238, non-additive +0.297; kappa +0.661 [+0.615,+0.708] (unblocked +0.977); c_kappa +0.352 [+0.305,+0.398]; c~_K +0.845 [+0.818,+0.871]; dV +0.945 [+0.791,+1.102] nats (floor 2.82); dV / lost K +0.123; nats D 4.95 K 2.30 V 1.18 (unblocked 12.87 / 9.99 / 0.23)
+  A+(H*) LETTERS-AFTER: t +0.373 [+0.347,+0.398]; psi~_K +0.205, psi~_V +0.102; blocked scale psi_K +0.548, psi_V +0.275, non-additive +0.177; kappa +0.666 [+0.627,+0.706] (unblocked +0.977); c_kappa +0.346 [+0.306,+0.385]; c~_K +0.809 [+0.780,+0.837]; dV +1.086 [+0.927,+1.244] nats (floor 2.82); dV / lost K +0.147; nats D 4.80 K 2.63 V 1.32 (unblocked 12.87 / 9.99 / 0.23)
+  A(H*) SENTENCE-AFTER: t +0.944 [+0.928,+0.960]; psi~_K +0.011, psi~_V +0.869; blocked scale psi_K +0.011, psi_V +0.921, non-additive +0.068; kappa +0.012 [-0.000,+0.025] (unblocked +0.274); c_kappa +1.350 [+1.269,+1.473]; c~_K +1.465 [+1.344,+1.669]; dV +4.220 [+3.816,+4.622] nats (floor 1.29); dV / lost K +1.867; nats D 11.48 K 0.13 V 10.57 (unblocked 12.16 / 2.39 / 6.35)
+  A+(H*) SENTENCE-AFTER: t +0.943 [+0.927,+0.959]; psi~_K +0.010, psi~_V +0.871; blocked scale psi_K +0.011, psi_V +0.924, non-additive +0.066; kappa +0.011 [-0.001,+0.024] (unblocked +0.274); c_kappa +1.352 [+1.271,+1.477]; c~_K +1.469 [+1.347,+1.676]; dV +4.242 [+3.833,+4.650] nats (floor 1.29); dV / lost K +1.871; nats D 11.47 K 0.12 V 10.59 (unblocked 12.16 / 2.39 / 6.35)
+
+SUMMARY: 6 MET, 1 NOT MET, 0 NOT EVALUABLE of 7; provenance OK; population OK
+
+######## EXPLORATORY (not scored)
+-- head sets and the gate curves (step 1)
+   OPTIONS-AFTER: H* = top-64 by a3 over R; layer histogram 5:3 6:3 7:3 8:2 9:1 10:4 11:1 12:3 13:1 14:8 15:3 16:1 17:3 19:2 20:1 21:1 22:4 23:4 24:3 25:2 26:1 27:1 28:1 30:3 34:2 35:2 37:1
+      overlap with the top-64 of the layer-0 ranking (H's): 56; of those layer-0 heads 4 lie in layers 0-4
+      R(k)  8:+0.36 16:+0.69 32:+0.78 64:+0.83 128:+0.83
+      KO(k) 8:+0.91 16:+0.95 32:+0.96 64:+0.97 128:+0.97
+      rand0   R(64) -0.002  KO(64) +0.007
+      rand1   R(64) +0.000  KO(64) +0.018
+      rand2   R(64) +0.004  KO(64) +0.009
+      active  R(64) +0.001  KO(64) +0.014
+      duplicate / induction scores over H*: median D +0.104, median I +0.039
+   LETTERS-AFTER: H* = top-64 by a3 over R; layer histogram 5:3 6:2 7:3 8:2 9:1 10:4 11:1 12:4 13:1 14:7 15:2 16:1 17:4 19:3 20:1 21:1 22:4 23:5 24:2 25:1 26:2 27:1 28:1 30:3 34:2 35:2 37:1
+      overlap with the top-64 of the layer-0 ranking (H's): 57; of those layer-0 heads 4 lie in layers 0-4
+      R(k)  8:+0.35 16:+0.67 32:+0.78 64:+0.82 128:+0.82
+      KO(k) 8:+0.94 16:+0.98 32:+0.99 64:+0.99 128:+0.99
+      rand0   R(64) +0.001  KO(64) +0.009
+      rand1   R(64) +0.001  KO(64) +0.020
+      rand2   R(64) +0.001  KO(64) +0.010
+      active  R(64) -0.000  KO(64) -0.003
+      duplicate / induction scores over H*: median D +0.104, median I +0.041
+   SENTENCE-AFTER: H* = top-64 by a3 over R; layer histogram 5:2 6:1 7:2 8:2 9:1 10:3 11:1 12:5 13:2 14:7 15:3 16:2 17:5 18:3 19:3 20:1 22:4 23:4 24:4 27:1 30:3 34:2 35:2 37:1
+      overlap with the top-64 of the layer-0 ranking (H's): 59; of those layer-0 heads 4 lie in layers 0-4
+      R(k)  8:+0.31 16:+0.52 32:+0.91 64:+0.91 128:+0.91
+      KO(k) 8:+0.97 16:+1.01 32:+1.02 64:+1.01 128:+1.01
+      rand0   R(64) -0.001  KO(64) +0.039
+      rand1   R(64) +0.003  KO(64) +0.074
+      rand2   R(64) +0.005  KO(64) -0.000
+      active  R(64) +0.002  KO(64) +0.001
+      duplicate / induction scores over H*: median D +0.108, median I +0.041
+   overlap of H* across formats: OPTIONS-AFTER & LETTERS-AFTER = 59 of 64 (hypergeometric P 4.7e-86)
+   overlap of H* across formats: OPTIONS-AFTER & SENTENCE-AFTER = 43 of 64 (hypergeometric P 1.2e-45)
+   overlap of H* across formats: LETTERS-AFTER & SENTENCE-AFTER = 43 of 64 (hypergeometric P 1.2e-45)
+-- exploratory parts skipped at the deadline: none
+-- exploratory conditions (step 2)
+   OPTIONS-AFTER:
+      N:allG   t +0.739 [+0.713,+0.767]; psi~_K -0.006, psi~_V +0.684; blocked scale psi_K -0.008, psi_V +0.925, non-additive +0.083; kappa -0.009 [-0.029,+0.011] (unblocked +0.698); c_kappa +1.143 [+1.123,+1.163]; c~_K +1.164 [+1.147,+1.183]; dV +6.220 [+5.899,+6.541] nats (floor 2.10); dV / lost K +0.852; nats D 10.11 K -0.08 V 9.35 (unblocked 13.67 / 7.22 / 3.13)
+      A:L4     t +1.006 [+1.002,+1.010]; psi~_K +0.561, psi~_V +0.230; blocked scale psi_K +0.557, psi_V +0.228, non-additive +0.214; kappa +0.709 [+0.692,+0.725] (unblocked +0.698); c_kappa -0.019 [-0.026,-0.012]; c~_K -0.071 [-0.093,-0.051]; dV +0.013 [-0.020,+0.048] nats (floor 2.10); dV / lost K -0.029; nats D 13.76 K 7.67 V 3.14 (unblocked 13.67 / 7.22 / 3.13)
+      N:rand0  t +0.985 [+0.977,+0.992]; psi~_K +0.497, psi~_V +0.230; blocked scale psi_K +0.504, psi_V +0.233, non-additive +0.263; kappa +0.684 [+0.666,+0.699] (unblocked +0.698); c_kappa +0.023 [+0.015,+0.031]; c~_K +0.069 [+0.048,+0.093]; dV +0.011 [-0.006,+0.029] nats (floor 2.10); dV / lost K +0.025; nats D 13.47 K 6.79 V 3.14 (unblocked 13.67 / 7.22 / 3.13)
+      removal through the readers rho_K^x(H*) +0.635 [+0.619,+0.650] (frames rho_K 0.762); sufficiency R_x(H*) +0.724 [+0.680,+0.763]
+      KO_x(k) 8:+0.97 16:+1.00 32:+0.99 128:+0.99
+      seed 101: g_K +0.977, KO_x(H*) +0.996
+      seed 102: g_K +0.961, KO_x(H*) +0.994
+      seed 103: g_K +0.989, KO_x(H*) +0.992
+      distractor at B or S (n=36): g_K +0.984, KO_x(H*) +0.985
+      the rest (n=60): g_K +0.972, KO_x(H*) +0.998
+   LETTERS-AFTER:
+      N:allG   t +0.190 [+0.156,+0.224]; psi~_K +0.040, psi~_V +0.137; blocked scale psi_K +0.210, psi_V +0.720, non-additive +0.069; kappa +nan [+0.161,+0.272] (99.0 % of resamples dropped) (unblocked +0.977); c_kappa +nan [+0.786,+0.906] (99.0 % of resamples dropped); c~_K +1.042 [+1.015,+1.069]; dV +1.524 [+1.180,+1.896] nats (floor 2.82); dV / lost K +0.161; nats D 2.44 K 0.51 V 1.76 (unblocked 12.87 / 9.99 / 0.23)
+      A:L4     t +1.017 [+1.011,+1.023]; psi~_K +0.849, psi~_V +0.021; blocked scale psi_K +0.834, psi_V +0.021, non-additive +0.145; kappa +0.976 [+0.969,+0.982] (unblocked +0.977); c_kappa +0.002 [-0.000,+0.004]; c~_K -0.102 [-0.135,-0.075]; dV +0.038 [+0.020,+0.058] nats (floor 2.82); dV / lost K -0.041; nats D 13.09 K 10.92 V 0.27 (unblocked 12.87 / 9.99 / 0.23)
+      N:rand0  t +0.978 [+0.967,+0.988]; psi~_K +0.748, psi~_V +0.018; blocked scale psi_K +0.765, psi_V +0.018, non-additive +0.217; kappa +0.977 [+0.970,+0.984] (unblocked +0.977); c_kappa +0.000 [-0.002,+0.002]; c~_K +0.041 [+0.023,+0.060]; dV -0.007 [-0.027,+0.011] nats (floor 2.82); dV / lost K -0.020; nats D 12.59 K 9.62 V 0.23 (unblocked 12.87 / 9.99 / 0.23)
+      A:H_P1   t +0.373 [+0.347,+0.398]; psi~_K +0.170, psi~_V +0.093; blocked scale psi_K +0.455, psi_V +0.249, non-additive +0.296; kappa +0.646 [+0.597,+0.696] (unblocked +0.977); c_kappa +0.369 [+0.319,+0.417]; c~_K +0.858 [+0.832,+0.884]; dV +0.961 [+0.797,+1.129] nats (floor 2.82); dV / lost K +0.123; nats D 4.80 K 2.18 V 1.19 (unblocked 12.87 / 9.99 / 0.23)
+      removal through the readers rho_K^x(H*) +0.965 [+0.958,+0.971] (frames rho_K 0.986); sufficiency R_x(H*) +0.680 [+0.632,+0.724]
+      KO_x(k) 8:+0.96 16:+0.98 32:+0.99 128:+0.99
+      KO_x(H*_OPTIONS-AFTER) under LETTERS-AFTER +0.993 [+0.990,+0.995]
+      seed 101: g_K +0.999, KO_x(H*) +0.993
+      seed 102: g_K +1.000, KO_x(H*) +0.992
+      seed 103: g_K +0.997, KO_x(H*) +0.993
+      distractor at B or S (n=36): g_K +0.998, KO_x(H*) +0.988
+      the rest (n=60): g_K +0.999, KO_x(H*) +0.995
+   SENTENCE-AFTER:
+      N:allG   t +0.949 [+0.934,+0.964]; psi~_K +0.022, psi~_V +0.888; blocked scale psi_K +0.023, psi_V +0.936, non-additive +0.041; kappa +0.024 [+0.012,+0.037] (unblocked +0.274); c_kappa +1.287 [+1.220,+1.384]; c~_K +1.376 [+1.279,+1.530]; dV +4.459 [+4.114,+4.807] nats (floor 1.29); dV / lost K +2.100; nats D 11.54 K 0.27 V 10.81 (unblocked 12.16 / 2.39 / 6.35)
+      A:L4     t +1.005 [+1.003,+1.007]; psi~_K +0.214, psi~_V +0.516; blocked scale psi_K +0.213, psi_V +0.513, non-additive +0.274; kappa +0.294 [+0.252,+0.332] (unblocked +0.274); c_kappa -0.104 [-0.132,-0.082]; c~_K -0.141 [-0.185,-0.109]; dV -0.075 [-0.113,-0.033] nats (floor 1.29); dV / lost K +0.343; nats D 12.23 K 2.61 V 6.27 (unblocked 12.16 / 2.39 / 6.35)
+      N:rand0  t +0.998 [+0.996,+1.000]; psi~_K +0.180, psi~_V +0.540; blocked scale psi_K +0.181, psi_V +0.541, non-additive +0.278; kappa +0.250 [+0.210,+0.289] (unblocked +0.274); c_kappa +0.119 [+0.086,+0.162]; c~_K +0.127 [+0.088,+0.179]; dV +0.220 [+0.144,+0.306] nats (floor 1.29); dV / lost K +1.122; nats D 12.14 K 2.19 V 6.57 (unblocked 12.16 / 2.39 / 6.35)
+      removal through the readers rho_K^x(H*) +0.309 [+0.282,+0.336]; sufficiency R_x(H*) +0.855 [+0.804,+0.911]
+      KO_x(k) 8:+1.06 16:+1.08 32:+1.04 128:+1.02
+      seed 101: g_K +0.875, KO_x(H*) +1.026
+      seed 102: g_K +0.871, KO_x(H*) +1.014
+      seed 103: g_K +0.953, KO_x(H*) +1.030
+      distractor at B or S (n=36): g_K +1.004, KO_x(H*) +1.009
+      the rest (n=60): g_K +0.866, KO_x(H*) +1.029
+-- remap ranking (a3 of P vs P + K_M at the T and S rows, eager, in-sample on E)
+   OPTIONS-AFTER: |H_rem & H*| = 57 of 64, Jaccard 0.803, hypergeometric P 1.0e-79; KO_x(H_rem) +1.003 [+0.999,+1.008] (in-sample)
+   LETTERS-AFTER: |H_rem & H*| = 55 of 64, Jaccard 0.753, hypergeometric P 6.8e-74; KO_x(H_rem) +0.993 [+0.991,+0.995] (in-sample)
+   SENTENCE-AFTER: |H_rem & H*| = 59 of 64, Jaccard 0.855, hypergeometric P 4.7e-86; KO_x(H_rem) +1.034 [+1.013,+1.060] (in-sample)

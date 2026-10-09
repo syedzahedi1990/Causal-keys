@@ -1,0 +1,3 @@
+==== 2026-10-09T11:51:08Z python -c from huggingface_hub import snapshot_download; p = snapshot_download('mistralai/Mistral-Small-24B-Instruct-2501', revision='9527884be6e5616bdd54de542f9ae13384489724', ignore_patterns=['consolidated*']); print(p); assert p.rstrip('/').endswith('9527884be6e5616bdd54de542f9ae13384489724'), p
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+/workspace/.hf_home/hub/models--mistralai--Mistral-Small-24B-Instruct-2501/snapshots/9527884be6e5616bdd54de542f9ae13384489724

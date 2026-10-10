@@ -12,8 +12,10 @@ with an independently computed reference: a plain forward, a separately construc
   K_S / K_X: the all-heads all-rows row equals the full key clamp of that row (the transfer batch of the run);
   8 the run's K/V clamp rows equal format_factorial.run_item's K_S, K_X, V_S rows; 9 the INLINE_CHAT item code equals
   ioi_factorial.run_item on INLINE; 10 the case-marginalised trie scoring with a HopSplice whose tables are the run's own
-  K/V equals the plain trie scoring (the mask extension over the trie nodes); 11 the flag of a story from write_pass
-  equals the flag from an independent o_proj pre-hook capture. The pipeline treats a skipped test as failing the gate."""
+  K/V equals the plain trie scoring (no-op), and the trie equals the plain sum over one-token forms; 11 the flag of a story from write_pass
+  equals the flag from an independent o_proj pre-hook capture; 12 the per-head hop-2 key splice with every head equals
+  HopSplice ans_K; 13 trie scoring under a non-trivial HopSplice equals plain per-form forwards. The pipeline treats a
+  skipped test as failing the gate."""
 import types
 
 import pytest
@@ -71,6 +73,7 @@ def attn_out(m, layer):
 
 def test_zero_injection_equals_clean(ctx):
     m, d = ctx["m"], ctx["d"]
+    plain(m, d["ids"]["B"])   # warm-up: the session's first CPU forward once differed by 1.4e-3 (not reproducible)
     ref = plain(m, d["ids"]["B"])
     z = {l: torch.zeros(m.D) for l in range(m.nL)}
     out, _, _ = s8.fwd(m, d["ids"]["B"], 1, add=add_map([[(d["row"]["X"], z, 1.0)]], range(m.nL)))
@@ -291,3 +294,62 @@ def test_flag_from_write_pass_matches_independent_capture(ctx):
             zB, zK = store[l][0], store[l][1]
             ref += 0.5 * (Wl[:, sl] @ (zK[rows[0], sl] - zB[rows[0], sl]) + Wl[:, sl] @ (zB[rows[1], sl] - zK[rows[1], sl]))
         assert close(mine[l], ref, 1e-4), (l, md(mine[l], ref))
+
+
+def test_hop2_key_splice_equals_hopsplice_answer_key(ctx):
+    """The per-head hop-2 batch (J-D-HOP2): with every head listed, the answer row reading the clean run's keys at G
+    through HeadSplice equals HopSplice's ans_K row (the answer row reads the clean K at G, its own V) under the same
+    injection; the inj row equals the injection alone and the none row the clean run."""
+    m, d, vec = ctx["m"], ctx["d"], ctx["vec"]
+    Ls = [3, 7, 11, 13]
+    v = {l: 3.0 * unit(vec[l]) for l in Ls}
+    inj = [(d["row"]["X"], v, 1.0)]
+    S = {"hop_top": [[3, 1], [7, 2], [13, 0]], "hop_rand": [[5, 5]]}
+    cand = d["cid"]
+    h = s8.hop2(m, d["ids"]["B"], d["T"], d["G"], inj, S, Ls, cand)
+    _, cap, _ = s8.fwd(m, d["ids"]["B"], 2, add=add_map([[], inj], Ls), kv=(d["G"], range(m.nL), "kv"))
+    kvt = {"base": {k: t[0] for k, t in cap.items()}, "ksrun": {k: t[1] for k, t in cap.items()}}
+    configure_hop(m.hop, ["move", "ans_K"], kvt, d["G"], d["T"], s8.ROUTE_SPEC)
+    ref, _, _ = s8.fwd(m, d["ids"]["B"], 2, add=add_map([inj, inj], Ls), hop=True)
+    clean = plain(m, d["ids"]["B"])[0, cand]
+    got = {k: torch.tensor(x) for k, x in h.items()}
+    assert close(got["all"], ref["lp"][1, cand]), md(got["all"], ref["lp"][1, cand])
+    assert close(got["inj"], ref["lp"][0, cand]) and close(got["none"], clean)
+    assert md(got["all"], got["inj"]) > 1e-3 and md(got["top10"], got["inj"]) > 1e-6     # the splices act
+
+
+def test_trie_scoring_hop_mask_extends_over_the_trie(ctx):
+    """J-D6-ROUTE's batch: HopSplice with the clean run's K/V at G read by the answer row of an injected run, scored
+    through the trie, equals plain causal forwards of prompt + each form in which the answer row and every form
+    position read pass B (an independent reference for the trie + HopSplice + Inject path; at 0.5B the second tokens of
+    the multi-token forms are near-certain, so the trie nodes' own reading moves the scores by < 1e-5)."""
+    m, vec = ctx["m"], ctx["vec"]
+    dp = s8.prep(m.tok, ctx["core"], "POST")
+    fs = s8.fs_of(m.tok)
+    assert any(len(s) > 1 for s in fs.seqs), "this test needs multi-token forms"
+    Ls = [3, 7, 11, 13]
+    v = {l: 4.0 * unit(vec[l]) for l in Ls}
+    inj = [(dp["row"]["X"], v, 1.0)]
+    ids, T, G = dp["ids"]["B"], dp["T"], dp["G"]
+    _, cap, _ = s8.fwd(m, ids, 2, add=add_map([[], inj], Ls), kv=(G, range(m.nL), "kv"))
+    kvt = {"base": {k: t[0] for k, t in cap.items()}, "ksrun": {k: t[1] for k, t in cap.items()}}
+    spec = s8.ROUTE_SPEC | {"inj": s8.ROUTE_SPEC["move"]}
+    configure_hop(m.hop, ["inj", "ans_KV"], kvt, G, T, spec)
+    out, _, _ = s8.fwd(m, ids, 2, add=add_map([inj, inj], Ls), hop=True, fs=fs)
+    seqlp = {}
+    for s in fs.seqs:
+        x = torch.cat([ids, torch.tensor([list(s[:-1])], dtype=ids.dtype)], 1) if len(s) > 1 else ids
+        configure_hop(m.hop, ["ans_KV"], kvt, G, T, spec)
+        mk = torch.zeros(1, x.shape[1], dtype=torch.bool)
+        mk[0, T - 1:] = True                       # the answer row and every form position read pass B
+        m.hop.mask, m.hop.active = mk, True
+        m.inj.add, m.inj.active = add_map([inj], Ls), True
+        try:
+            lp = torch.log_softmax(m.model(x, use_cache=False).logits[0].float(), -1)
+        finally:
+            s8.reset(m)
+        seqlp[s] = sum(float(lp[T - 1 + t, s[t]]) for t in range(len(s)))
+    for j, w in enumerate(LOCATIONS):
+        want = float(torch.logsumexp(torch.tensor([seqlp[s] for s in fs.sets["E"][w]]), 0))
+        assert abs(float(out["E"][1, j]) - want) < TOL, (w, float(out["E"][1, j]), want)
+    assert float((out["E"][1] - out["E"][0]).abs().max()) > 1e-3     # the route splice acts

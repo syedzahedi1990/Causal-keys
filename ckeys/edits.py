@@ -195,25 +195,36 @@ def capture_resid(model, layers, pos: int):
 
 
 @torch.no_grad()
-def prefix_pass(model, prefix: torch.Tensor, p: int, resid_layers=(), kv_layers=(), write=None, chunk: int = 128):
+def prefix_pass(model, prefix: torch.Tensor, p: int, resid_layers=(), kv_layers=(), write=None, chunk: int = 128,
+                pad: bool = False):
     """One prefix pass (positions 0..p) per row. ``prefix`` [R or 1, p+1]; ``write`` = (layer, vecs [R, D]) or None.
-    Returns ({layer: [R, D]} residuals at p, {(layer, ch): [R, D]} K/V at p). Rows are run in chunks of ``chunk``."""
+    Returns ({layer: [R, D]} residuals at p, {(layer, ch): [R, D]} K/V at p). Rows are run in chunks of ``chunk``.
+    ``pad``: every forward has exactly ``chunk`` rows (the last chunk is padded with copies of its first row, whose
+    outputs are dropped). A row's activations depend on the batch only through the kernels, which the shape selects; so
+    with ``chunk`` equal to the row count of the natural pass, an edit's tables are computed by the natural pass's
+    kernels, and a row that writes h_t,l(p) (T) reproduces the natural tables bitwise in BF16 on the GPU as in FP32
+    (one 66-row pass differs from a 5-row pass by the BF16 batch floor, about the size of J-C-G1's nu_T bound)."""
     dev = next(model.parameters()).device
     R = write[1].shape[0] if write is not None else prefix.shape[0]
     res, kv = {}, {}
     for a in range(0, R, chunk):
         b = min(R, a + chunk)
-        ids = (prefix if prefix.shape[0] > 1 else prefix.expand(R, -1))[a:b].to(dev)
+        ids = (prefix if prefix.shape[0] > 1 else prefix.expand(R, -1))[a:b]
+        w = write[1][a:b] if write is not None else None
+        n = b - a
+        if pad and n < chunk:
+            ids = torch.cat([ids, ids[:1].expand(chunk - n, -1)])
+            w = torch.cat([w, w[:1].expand(chunk - n, -1)]) if w is not None else None
         with contextlib.ExitStack() as st:
             if write is not None:
-                st.enter_context(write_resid(model, write[0], p, write[1][a:b]))
+                st.enter_context(write_resid(model, write[0], p, w))
             r = st.enter_context(capture_resid(model, resid_layers, p))
             k = st.enter_context(capture_kv(model, [p], kv_layers))
-            model(ids, use_cache=False, logits_to_keep=1)
+            model(ids.to(dev), use_cache=False, logits_to_keep=1)
         for l, v in r.items():
-            res.setdefault(l, []).append(v.float().cpu())
+            res.setdefault(l, []).append(v[:n].float().cpu())
         for q, v in k.items():
-            kv.setdefault(q, []).append(v[:, 0].cpu())
+            kv.setdefault(q, []).append(v[:n, 0].cpu())
     return {l: torch.cat(v) for l, v in res.items()}, {q: torch.cat(v) for q, v in kv.items()}
 
 

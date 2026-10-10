@@ -13,7 +13,8 @@ Output (--out, default {results}/STAGE8B_SCORE.txt), in this order: PROVENANCE, 
 per confirmatory line: code, class, kind, prior, verdict; then per model the numbers, bounds and evaluability), REPORTED
 (per-family verdicts with the pre-written sentence that applies, J-B-G2 detail, the numbers behind the figure),
 SUMMARY (per class and kind: lines, MET, NOT MET, NOT EVALUABLE, observed against expected met count, Brier score; the
-met rate among R account lines; the Holm sensitivity analysis), EXPLORATORY. The paper tables tab_fresh.tex,
+met rate among R account lines; the Holm sensitivity analysis over the R-class account lines, computed with the
+shared analysis/stage8_holm.py), EXPLORATORY. The paper tables tab_fresh.tex,
 tab_mass.tex and tab_invariance.tex are written to the results directory.
 --test (TEST_MODE; also when every results file is tagged TEST_): size floors and J-B-G1 are waived, J-B-G2 has no
 reference, and the verdicts are plumbing checks, not results.
@@ -47,8 +48,8 @@ POP_SHA = {"F": "e87047c9c877a21db89bf5081d082de748ea5d77b620e33135d178c3bf24b14
            "S0": "48bb0a3ad22463ee1831cabaef714d87b2a7cb7f721e23d877111f19ba0d6900",
            "C": "a625fd13d1dd67bc0c01c3a173807c7b71ee8347451c139d93ffc20f1c6486e9"}
 N_POP = {"F": 150, "S0": 150, "C": 30}
-G0_FILES = {"tests/test_fresh.py": 24, "tests/test_fresh_factorial.py": 10, "tests/test_stage8b_score.py": 10,
-            "tests/test_surface.py": 13, "tests/test_generate.py": 4, "tests/test_clamp_families.py": 5}   # every test of each file
+G0_FILES = {"tests/test_fresh.py": 24, "tests/test_fresh_factorial.py": 12, "tests/test_stage8b_score.py": 14,
+            "tests/test_surface.py": 13, "tests/test_generate.py": 5, "tests/test_clamp_families.py": 5}   # every test of each file
 G0_SKIP_OK = ("cached_tokenizer", "study_tokenizers")   # tokenizer tests that skip without a cache; JB-G0b repeats them
 MODEL_ORDER = ln.P4 + ln.N4 + (ln.FALLBACK, ln.SMALL, ln.JB8_KEY) + ln.X2
 
@@ -230,20 +231,29 @@ def build_models(root, F, g0, test, out):
                 if not ff.exists() or pr.get("frames_sha256") != sha_file(ff):
                     why.append(f"{name}: the frames file differs from the one used")
         models[k] = ln.Model(k, P.get("F"), P.get("S0"), ok=not why, why="; ".join(why), test=test)
-    slots = {}
-    used_fb = False
-    for k in ln.N4:
-        if k in models and models[k].F is not None:
-            slots[k] = k
-        elif ln.FALLBACK in models and not used_fb and (f" {k} " in fetch_failed + " " or k in fetch_failed
-                                                        or (k in models and models[k].F is None)):
-            slots[k] = ln.FALLBACK
-            used_fb = True
-        else:
-            slots[k] = k
-    if ln.FALLBACK in models and not used_fb:
-        out(f"  note: {ln.FALLBACK} results present but no N4 slot was refused; {ln.FALLBACK} is reported only")
+    slots = fallback_slots(root, models, fetch_failed, out)
     return models, pops, slots
+
+
+def fallback_slots(root, models, fetch_failed, out):
+    """The N4 slots. The pipeline records its one fallback decision in COMMIT.txt ("fallback: yi9 replaces <key>"),
+    taken when <key>'s files were refused (FETCH_FAILED.txt) or its tokenizer check failed (that check's file is then
+    moved aside as a failed step's output, so the record is the only trace), always before any output of <key> existed.
+    Without a record, a key refused in FETCH_FAILED.txt (exit 1) is the replaced one. yi9 fills at most one slot, and
+    only when it has results."""
+    commit = (root / "COMMIT.txt").read_text() if (root / "COMMIT.txt").exists() else ""
+    rec = [k for k in re.findall(rf"fallback: {re.escape(ln.FALLBACK)} replaces (\S+)", commit) if k in ln.N4]
+    refused = set(re.findall(r"FETCH REFUSED (\S+)", fetch_failed))
+    target = rec[0] if rec else next((k for k in ln.N4 if k in refused and (k not in models or models[k].F is None)), None)
+    if len(set(rec)) > 1:
+        out(f"  note: COMMIT.txt records more than one fallback ({sorted(set(rec))}); the first, {rec[0]}, is used")
+    have_fb = ln.FALLBACK in models and models[ln.FALLBACK].F is not None
+    slots = {k: (ln.FALLBACK if (k == target and have_fb) else k) for k in ln.N4}
+    if target and have_fb and target in models and models[target].F is not None:
+        out(f"  note: {target} has F results although {ln.FALLBACK} replaced it; the slot is {ln.FALLBACK}'s (the recorded decision)")
+    if ln.FALLBACK in models and ln.FALLBACK not in slots.values():
+        out(f"  note: {ln.FALLBACK} results present but no N4 slot was replaced; {ln.FALLBACK} is reported only")
+    return slots
 
 
 @functools.lru_cache(maxsize=None)
@@ -480,29 +490,59 @@ def summary(res, out):
     R = [c for c in res if ln.LINES[c][0] == "R" and ln.LINES[c][1] == "A" and res[c][0] is not None]
     out(f"  met rate among R account lines with a verdict: {sum(res[c][0] is True for c in R)} of {len(R)} "
         f"(expected {sum(ln.LINES[c][2] for c in R):.2f})")
-    comps = [(code, k, c) for code, (_, per) in res.items() for k, r in per.items() if r.ok is not None
-             for c in r.comps if c.p is not None]
-    rej = st.holm([c.p for _, _, c in comps])
-    hok = {}
-    for (code, k, c), r in zip(comps, rej):
-        hok.setdefault((code, k), True)
-        hok[(code, k)] &= r or not c.passed
-    flagged = []
+    holm_sensitivity(res, out)
+
+
+def holm_family(res):
+    """The Holm family (common part): the one-sided interval components of this part's R-class account lines, in every
+    model where the line is evaluable; [(code, model, Comp, component dict of analysis/stage8_holm.py)]."""
+    fam = []
+    for code, (_, per) in res.items():
+        if ln.LINES[code][0] != "R" or ln.LINES[code][1] != "A":
+            continue
+        for k, r in per.items():
+            if r.ok is None:
+                continue
+            for c in r.comps:
+                if c.ne is None and c.holm is not None:
+                    h = c.holm
+                    fam.append((code, k, c, {"line": code, "name": f"{k}: H1 {h['name']} {h['direction']} {h['bound']:g}",
+                                             "est": h["est"], "se": h["se"], "bound": h["bound"], "direction": h["direction"]}))
+    return fam
+
+
+def holm_sensitivity(res, out):
+    """Holm over the family above with the shared helper; per line, the components whose decision changes and the
+    verdict the line would get with Holm's decisions in place of the interval decisions (reported, no verdict uses it)."""
+    fam = holm_family(res)
+    try:
+        from stage8_holm import holm as holm_shared   # analysis/stage8_holm.py, identical in every part (D2)
+        got = holm_shared([d for *_, d in fam]) if fam else []
+    except Exception as ex:  # noqa: BLE001  (reported; no verdict depends on it)
+        out(f"  Holm sensitivity NOT COMPUTED: analysis/stage8_holm.py failed ({type(ex).__name__}: {ex})")
+        return None
+    by = {(d.get("line"), d.get("name")): d for d in got}
+    rej = {}
+    for i, (code, k, c, d) in enumerate(fam):
+        g = by.get((code, d["name"]), got[i] if i < len(got) else {})
+        rej[id(c)] = bool(g.get("reject", g.get("rejected", False)))
+    out(f"  Holm sensitivity (analysis/stage8_holm.py: one-sided p from the bootstrap SE, step-down at familywise 0.025 over "
+        f"the {len(fam)} interval components of the R-class account lines, in the models where the line is evaluable; "
+        f"reported, no verdict uses it):")
+    changed = {}
     for code, (v, per) in res.items():
-        new = {k: (None if r.ok is None else (r.ok and hok.get((code, k), True))) for k, r in per.items()}
+        if ln.LINES[code][0] != "R" or ln.LINES[code][1] != "A":
+            continue
+        flips = [f"{k}: {c.label.split(' rejected at')[0]} {'rejected -> not rejected' if c.passed else 'not rejected -> rejected'}"
+                 for cc, k, c, _ in fam if cc == code and rej[id(c)] != c.passed]
+        new = {k: (None if r.ok is None else all(rej.get(id(c), c.passed) for c in r.comps)) for k, r in per.items()}
         sset = ln.LINES[code][3]
-        if code in ("J-B6c", "J-B8"):
-            nv = st.comb_single(new)
-        elif code == "J-B7":
-            a = st.comb_every({k: x for k, x in new.items() if k.startswith("P4 ")})
-            b = st.comb_k_of({k: x for k, x in new.items() if k.startswith("N4 ")})
-            nv = False if (a is False or b is False) else None if (a is None or b is None) else True
-        else:
-            nv = st.comb_k_of(new) if sset == "N4" else st.comb_single(new) if sset == "SMALL" else st.comb_every(new)
-        if nv != v:
-            flagged.append(f"{code} {st.V(v)} -> {st.V(nv)}")
-    out(f"  Holm sensitivity (step-down at one-sided familywise 0.025 over {len(comps)} interval components, p = (1 + "
-        f"resamples on the null side) / (B + 1)): " + ("no verdict changes" if not flagged else "verdicts that change: " + "; ".join(flagged)))
+        nv = st.comb_k_of(new) if sset == "N4" else st.comb_single(new) if sset == "SMALL" else st.comb_every(new)
+        changed[code] = (bool(flips), nv != v)
+        out(f"    {code}: {sum(cc == code for cc, *_ in fam)} components; decisions changed by Holm: "
+            + ("none" if not flips else "; ".join(flips)) + f"; verdict {st.V(v)}" + (f" -> {st.V(nv)} under Holm" if nv != v else
+                                                                                     " (unchanged under Holm)"))
+    return changed
 
 
 def per_family(res, out):

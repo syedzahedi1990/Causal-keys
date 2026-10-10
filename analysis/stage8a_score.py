@@ -12,7 +12,8 @@ pipeline's files; per results file commit, model, revision, dtype, attention, de
 SQuAD, stage-6 and mu hashes; MISMATCH when the files hold more than one commit, a hash differs, or outside TEST a dtype
 or attention other than the entry's), POPULATION, GATES, PREDICTIONS (one line per line: code, class, prior, verdict,
 then each model's numbers, bounds and evaluability), REPORTED, SUMMARY (per class: lines, MET, NOT MET, NOT
-EVALUABLE, the sum of the recorded priors against the met count; the Holm sensitivity analysis), EXPLORATORY.
+EVALUABLE with reasons, the observed met count against the sum of the priors of the lines with a verdict, the Brier
+score; the Holm sensitivity analysis of the R-class lines by analysis/stage8_holm.py, per line), EXPLORATORY.
 Combination: a J-A line is MET if met in every evaluable model with >= 3 evaluable including >= 1 fresh family (Llama,
 Gemma, or the Yi fallback), NOT MET if not met in any evaluable model, else NOT EVALUABLE; a head line is MET if met in
 both Qwen2.5-7B and Mistral-7B, NOT MET if not met in an evaluable one, else NOT EVALUABLE. J-A3 is derived and not counted.
@@ -37,12 +38,13 @@ sys.path.insert(0, str(HERE.parent))
 from stage8a_parts import common as cm  # noqa: E402
 from stage8a_parts import factorial as fa  # noqa: E402
 from stage8a_parts import heads as hd  # noqa: E402
+from stage8_holm import holm as holm_j  # noqa: E402  (entry J's shared Holm sensitivity helper, decision D2)
 
 ITEMS = HERE.parent / "data" / "stage8a_items.json"
 SQUAD_SHA = "95aa6a52d5d6a735563366753ca50492a658031da74f301ac5238b03966972c9"
 STAGE6_SHA = {"Qwen2.5-7B-Instruct.json": "ed828a9b701d60f552eb8dc10247d85de44364b75f6086e5abe4eedb637353be",
               "Mistral-7B-Instruct-v0.3.json": "88ababd91bdb3155ef8e4aa691eff30d9edf88a13260148c145e654ed37e69af"}
-A_G0 = {"tests/test_natural_clamp.py": 12, "tests/test_kvquant.py": 4}
+A_G0 = {"tests/test_natural_clamp.py": 14, "tests/test_kvquant.py": 4}
 HA_G0 = {"tests/test_natural_heads.py": 5}
 MODEL_ORDER = ("llama8", "gemma9", "yi9", "qwen7", "mistral7")
 
@@ -249,41 +251,81 @@ def score_lines(models, heads, out, res):
                 out("          " + "; ".join(str(c) for c in r.comps))
 
 
+def holm_family(res):
+    """The Holm family of entry J (D2): every interval component (one bound of one statistic in one model) of Part A's
+    R-class account lines, in every model where the line has a verdict. Returns the helper's components and, for each,
+    (line, model, decision under the interval rule)."""
+    comps, where = [], []
+    for code in cm.ORDER:
+        if code not in res or cm.LINES[code][0] != "R":
+            continue
+        for k, r in res[code][1].items():
+            if r.ok is None:
+                continue
+            for c in r.comps:
+                for name, passed, t in c.tests:
+                    # a degenerate bootstrap (every resample equal, se 0) is passed as se 1e-12: p is then 0 or 1 by the
+                    # side of the bound the estimate lies on (0.5 on the bound), the normal approximation's limit
+                    se = t["se"] if not (t["se"] == 0) else 1e-12
+                    comps.append(dict(t, se=se, line=code, name=f"{k}: {name}"))
+                    where.append((code, k, passed))
+    return comps, where
+
+
 def summary(res, out):
-    out("\nSUMMARY (account lines by class; J-A3 derived and not counted; no measurement-validity line in part A)")
-    tot = {}
-    for code, (v, _) in res.items():
-        cls, prior, _ = cm.LINES[code]
-        if cls == "D":
-            continue
-        t = tot.setdefault(cls, {"n": 0, "met": 0, "not": 0, "ne": 0, "prior": 0.0})
-        t["n"] += 1
-        t["prior"] += prior
-        t["met" if v is True else "not" if v is False else "ne"] += 1
+    out("\nSUMMARY (G4: per class; all part-A lines are account lines, none is a measurement-validity line; J-A3 derived and "
+        "not counted; expected = the sum of the recorded priors of the lines with a verdict; Brier = mean (prior - 1[MET])^2 "
+        "over the same lines; NOT EVALUABLE lines are left out of both and listed)")
     for cls in ("L", "M", "R"):
-        t = tot.get(cls, {"n": 0, "met": 0, "not": 0, "ne": 0, "prior": 0.0})
-        out(f"  class {cls}: {t['n']} lines: {t['met']} MET, {t['not']} NOT MET, {t['ne']} NOT EVALUABLE; sum of recorded priors "
-            f"{t['prior']:.2f} against {t['met']} met")
-    ev_R = tot.get("R", {"met": 0, "not": 0})
-    out(f"  met rate among evaluated R lines: {ev_R['met']} of {ev_R['met'] + ev_R['not']}")
-    # Holm over every interval component of the counted lines, in every model where the line was evaluable
-    comps = [(code, k, c) for code, (_, per) in res.items() if cm.LINES[code][0] != "D"
-             for k, r in per.items() if r.ok is not None for c in r.comps if c.p is not None]
-    rej = cm.holm([c.p for _, _, c in comps])
-    holm_ok = {}
-    for (code, k, c), r in zip(comps, rej):
-        holm_ok.setdefault((code, k), True)
-        holm_ok[(code, k)] &= r or not c.passed
-    flagged = []
-    for code, (v, per) in res.items():
-        if cm.LINES[code][0] == "D":
+        codes = [c for c in cm.ORDER if c in res and cm.LINES[c][0] == cls]
+        ev = [c for c in codes if res[c][0] is not None]
+        met = sum(res[c][0] is True for c in ev)
+        exp = sum(cm.LINES[c][1] for c in ev)
+        brier = float(np.mean([(cm.LINES[c][1] - (res[c][0] is True)) ** 2 for c in ev])) if ev else float("nan")
+        ne = [c for c in codes if res[c][0] is None]
+        why = ["{} ({})".format(c, "; ".join(f"{k}: {r.why}" for k, r in res[c][1].items() if r.ok is None) or "no model run")
+               for c in ne]
+        out(f"  account lines, class {cls}: {len(codes)} lines: {met} MET, {sum(res[c][0] is False for c in ev)} NOT MET, "
+            f"0 MET IN PART, {len(ne)} NOT EVALUABLE; observed {met} against expected {exp:.2f}; Brier {brier:.3f}"
+            + (f"; not evaluable: {' | '.join(why)}" if ne else ""))
+    R = [c for c in cm.ORDER if c in res and cm.LINES[c][0] == "R" and res[c][0] is not None]
+    out(f"  met rate among R account lines with a verdict: {sum(res[c][0] is True for c in R)} of {len(R)} "
+        f"(expected {sum(cm.LINES[c][1] for c in R):.2f})")
+    comps, where = holm_family(res)
+    try:
+        hres = holm_j(comps) if comps else []
+    except Exception:  # noqa: BLE001  (the sensitivity analysis never stops the report)
+        out("  Holm sensitivity: the helper failed\n" + traceback.format_exc())
+        return
+    hdec = {}
+    changed = {}
+    for (code, k, passed), h in zip(where, hres):
+        hdec.setdefault((code, k), []).append(bool(h["reject"]))
+        if bool(h["reject"]) != passed:
+            changed.setdefault(code, []).append(f"{h['name']} (p {h['p']:.2g}, Holm threshold {h['threshold']:.2g}; interval "
+                                                f"rule {'rejects' if passed else 'does not reject'}, Holm "
+                                                f"{'rejects' if h['reject'] else 'does not reject'})")
+    out(f"  Holm sensitivity (analysis/stage8_holm.py; reported, no verdict uses it): step-down at one-sided 0.025 over the "
+        f"{len(comps)} interval components of the R-class account lines in the models where the line has a verdict; "
+        f"p = Phi(-(est - bound)/se) for '>' and Phi((est - bound)/se) for '<', se the bootstrap standard deviation")
+    for code in cm.ORDER:
+        if code not in res or cm.LINES[code][0] != "R":
             continue
-        new = {k: (None if r.ok is None else (r.ok and holm_ok.get((code, k), True))) for k, r in per.items()}
+        v, per = res[code]
+        new = {}
+        for k, r in per.items():
+            if r.ok is None:
+                new[k] = None
+            elif r.undef:
+                new[k] = False
+            else:
+                pts = all(c.passed for c in r.comps if not c.tests)
+                new[k] = pts and all(hdec.get((code, k), [True]))
         nv = cm.comb_both(new) if code.startswith("J-A-HA") else cm.comb_models(new)
-        if nv != v:
-            flagged.append(f"{code} {cm.V(v)} -> {cm.V(nv)}")
-    out(f"  Holm sensitivity (step-down at 0.05 over {len(comps)} interval components, p = 2 x the bootstrap tail beyond "
-        f"the bound): " + ("no verdict changes" if not flagged else "verdicts that change: " + "; ".join(flagged)))
+        ch = changed.get(code, [])
+        out(f"    {code}: " + (f"{len(ch)} component decision(s) change under Holm: " + "; ".join(ch) if ch
+                               else "no component decision changes under Holm")
+            + (f"; verdict {cm.V(v)} -> {cm.V(nv)} under Holm" if nv != v else f"; verdict unchanged ({cm.V(v)})"))
 
 
 def main(argv=None):

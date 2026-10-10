@@ -1,7 +1,9 @@
 """Score part C of preregistration P-2026-10-10-J (docs/PREREGISTRATION.md, GPU stage 8): independently obtained identity
 edits at the writing token and the channel-ratio law. Gates J-C-G0 to J-C-G8, the confirmatory lines J-C1 ... J-C-WIN,
 the reported lines (the pi(t) diagnostic, the depth-tracking consistency check JC4, the lexical-code reading, kappa
-against sigma), the summary by risk class and the exploratory report (part scorers in analysis/stage8c_parts).
+against sigma), the summary by risk class (the met rate among R lines; the Holm sensitivity analysis of the R-class
+account lines with the shared helper analysis/stage8_holm.py, decision D2) and the exploratory report (part scorers in
+analysis/stage8c_parts).
 
 Inputs under --results (default results/gpu_stage8c), as written by scripts/gpu_stage8c.sh: preflight/, calib/, das/,
 eval/, readers/, explore/ (experiments/stage8_edits.py), overlap/<tag>/ (experiments/stage8_overlap.py), jc6/<tag>/
@@ -28,17 +30,19 @@ sys.path.insert(0, str(HERE.parent))
 from stage8c_parts import law as LW  # noqa: E402
 from stage8c_parts import prakash as PK  # noqa: E402
 from stage8c_parts import readers as RD  # noqa: E402
-from stage8c_parts.stats import LOG05, LOG08, LOG125, Q, V, holm, mean_q  # noqa: E402
+from stage8c_parts.stats import LOG05, LOG08, LOG125, Q, V, component, mean_q  # noqa: E402
 
 MODELS = ("qwen7", "mistral7", "llama8")
 FAMILIES = {"qwen7": ("E1", "E2", "E3", "E4", "E5"), "mistral7": ("E1", "E2", "E4", "E5"), "llama8": ("E1", "E2", "E5")}
 E5_SUB = ("E5FR", "E5DE", "E5SYN", "E5NL")
 MIN_STORIES = 60
-G0_FILES = {"tests/test_stage8_edits.py": 14, "tests/test_sae.py": 7, "tests/test_stage8c_score.py": 12}
+G0_FILES = {"tests/test_stage8_edits.py": 15, "tests/test_sae.py": 7, "tests/test_stage8c_score.py": 14}
 POP_E = "a23465a211577f4c6e9efe78d4c7a588b598c05437406001145a420fec9d8c1b"
-# code -> (class, kind, prior, title); the priors were recorded in the entry before any stage-8 output
+# code -> (class, kind, prior, title); the priors were recorded in the entry before any stage-8 output. The class follows the
+# prior (decision D1: L = implied by data in hand and prior >= 0.9; M = prior >= 0.8; R = prior < 0.8), so J-C1 (Tier 0,
+# prior 0.80) is class M.
 LINES = {
-    "J-C1": ("L", "A", 0.80, "the law in Tier 0: E1 at every depth, E2 at l in {3, 7}; Qwen2.5-7B, Mistral-7B"),
+    "J-C1": ("M", "A", 0.80, "the law in Tier 0: E1 at every depth, E2 at l in {3, 7}; Qwen2.5-7B, Mistral-7B"),
     "J-C2": ("M", "A", 0.80, "the law in Tier 1: E2 at l in {11, 15} (Qwen2.5-7B, Mistral-7B); E1, E2 at Llama-3.1-8B"),
     "J-C3": ("R", "A", 0.55, "the law for E3, third-party SAE features (Qwen2.5-7B)"),
     "J-C4": ("R", "A", 0.35, "the law for E4, the DAS remap at p (Qwen2.5-7B, Mistral-7B; seeds as a level)"),
@@ -53,15 +57,15 @@ LINES = {
 
 
 PATTERNS = {}     # line code -> {combo: pattern of the law (equivalent, R1, R3, graded departure)}
-COMPONENTS = []   # (line code, label, bootstrap p, rejected by the line's own interval rule): the Holm sensitivity analysis
+COMPONENTS = []   # (line code, {line, name, est, se, bound, direction}, rejected by the line's own interval rule): Holm (D2)
 CARRIERS = []     # (model, component, depth) of every identity-carrying PERP / NONLEX component of an effective edit (J-C5)
 
 
 def comp_tost(code, lab, q):
     """The two one-sided components of a TOST statistic (own rule: the 90 % interval, 5 % per side)."""
     lo, hi = q.ci(0.90)
-    COMPONENTS.append((code, f"{lab} H0: lambda <= -log 1.25", q.p_le(-LOG125), bool(lo > -LOG125)))
-    COMPONENTS.append((code, f"{lab} H0: lambda >= log 1.25", q.p_ge(LOG125), bool(hi < LOG125)))
+    COMPONENTS.append(component(code, f"{lab} H0: lambda <= -log 1.25", q, -LOG125, ">", lo > -LOG125))
+    COMPONENTS.append(component(code, f"{lab} H0: lambda >= log 1.25", q, LOG125, "<", hi < LOG125))
 
 
 def load_json(f):
@@ -372,7 +376,7 @@ def j_bound(G: Gates, I: Inputs):
             p2 = mean_q([s["q"] for s in st2])
             ok = bool(p5.pt <= LOG05 and p5.upper() < LOG08 and p2.pt >= LOG08)
             per[lab] = ok
-            COMPONENTS.append(("J-C-BOUND", f"{lab} H0: lambda_E5 >= log 0.8", p5.p_ge(LOG08), bool(p5.upper() < LOG08)))
+            COMPONENTS.append(component("J-C-BOUND", f"{lab} H0: lambda_E5 >= log 0.8", p5, LOG08, "<", p5.upper() < LOG08))
             lines.append(f"    {lab}: pooled lambda_E5 {p5.txt()} (<= log 0.5 = {LOG05:+.3f}; H0: >= log 0.8 rejected, upper < {LOG08:+.3f}) over "
                          f"{len(st)} statistics; E2 at the same cells {p2.txt()} (>= log 0.8) -> {'met' if ok else 'not met'}")
     return combine(per, 1), per, lines
@@ -407,7 +411,7 @@ def j_readers(G: Gates, I: Inputs):
             out[grp][f"{k} {D}"] = ok
             if ok is not None:
                 kq = Rr.ko(D, "H")
-                COMPONENTS.append((f"J-C-READ{grp}", f"{k} {D} H0: KO <= 0.5", kq.p_le(RD.KO_LO), bool(kq.lower() > RD.KO_LO)))
+                COMPONENTS.append(component(f"J-C-READ{grp}", f"{k} {D} H0: KO <= 0.5", kq, RD.KO_LO, ">", kq.lower() > RD.KO_LO))
             lines.append(f"    {k} {D}: {t} -> {V(ok)}")
     return (combine(out["a"], 1), out["a"], lines), (combine(out["b"], 1), out["b"], [])
 
@@ -450,8 +454,8 @@ def j_prakash(I: Inputs):
 
 # --------------------------------------------------------------------------- reported and exploratory
 def reported(G: Gates, I: Inputs, out):
-    """The reported lines; returns whether every effective (model, family, depth) acts through the natural lexical code
-    (None when there is none), for outcome (b) of the headline."""
+    """The reported lines; returns whether every effective (model, family, depth) of an evaluable model (E3: at a layer
+    passing J-C-G3) acts through the natural lexical code (None when there is none), for outcome (b) of the headline."""
     out("\nREPORTED (no verdict counted)")
     codes = []
     for k in ("qwen7", "mistral7"):
@@ -485,9 +489,14 @@ def reported(G: Gates, I: Inputs, out):
                 par = m.psi("NONE", l, f"PAR:{Z}", "KV").pt if m.has("NONE", l, f"{LW.probe('PAR:' + Z)}|KV|S") else float("nan")
                 lex = m.psi("NONE", l, f"LEX:{Z}", "KV").pt if m.has("NONE", l, f"{LW.probe('LEX:' + Z)}|KV|S") else float("nan")
                 code = bool((par / phiZ >= 0.8) or (lex / phiZ >= 0.8))
-                codes.append(code)
+                # outcome (b) counts the families that count for the law lines: an evaluable model (J-C-G1, J-C-G2, J-C-G8)
+                # and, for E3, a layer passing J-C-G3
+                counted = G is not None and G.ok(k) and (Z != "E3" or bool(G.g3.get(l)))
+                if counted:
+                    codes.append(code)
                 out(f"  lexical-code reading {k} {Z} l={l}: phi {phiZ:+.3f}, PAR {par:+.3f}, LEX {lex:+.3f} -> "
-                    + ("acts through the natural lexical code (PAR or LEX >= 0.8 of the edit)" if code else "not carried by PAR or LEX alone"))
+                    + ("acts through the natural lexical code (PAR or LEX >= 0.8 of the edit)" if code else "not carried by PAR or LEX alone")
+                    + ("" if counted else " (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)"))
     out("  JC4 depth tracking (consistency check; delta_sigma = sigma(f, 3) - sigma(f, 15) >= 0.25 with both cells evaluable):")
     qual = []
     for k, m in I.models.items():
@@ -592,6 +601,44 @@ def exploratory(G: Gates, I: Inputs, out):
                                                for x, v in D.get("fits", {}).items()))
 
 
+def holm_sensitivity(R, out):
+    """Decision D2 (common part): Holm's step-down at familywise one-sided 0.025 over the interval components of this
+    part's R-class account lines that have a verdict, computed by the shared helper analysis/stage8_holm.py (one-sided p
+    from the bootstrap SE: Phi(-(est - bound)/se) for '>', Phi((est - bound)/se) for '<'). Per line: the components whose
+    decision changes and the verdict with Holm's decisions in place of the interval decisions (a MET line whose component
+    is no longer rejected becomes NOT MET; every other verdict is unchanged, since a point floor or a component the
+    interval rule rejects is unaffected). Reported; no verdict uses it."""
+    fam = [(c, d, own) for c, d, own in COMPONENTS if LINES.get(c, ("",))[0] == "R" and R.get(c, (None,))[0] is not None]
+    bad = [d["name"] for _, d, _ in fam if not (np.isfinite(d["est"]) and np.isfinite(d["se"]))]
+    fam = [x for x in fam if np.isfinite(x[1]["est"]) and np.isfinite(x[1]["se"])]
+    try:
+        from stage8_holm import holm as holm_shared   # analysis/stage8_holm.py, identical in every part (D2)
+        got = holm_shared([d for _, d, _ in fam]) if fam else []
+        assert len(got) == len(fam), (len(got), len(fam))
+        if all("line" in h and "name" in h for h in got):     # match the results to the components by (line, name)
+            key = {(h["line"], h["name"]): h for h in got}
+            assert len(key) == len(got), "component names are not unique within a line"
+            got = [key[(d["line"], d["name"])] for _, d, _ in fam]
+    except Exception as ex:  # noqa: BLE001  (the sensitivity analysis never stops the report)
+        out(f"  Holm sensitivity NOT COMPUTED: analysis/stage8_holm.py failed ({type(ex).__name__}: {ex})")
+        return
+    out(f"  Holm sensitivity (analysis/stage8_holm.py; reported, no verdict uses it): step-down at familywise one-sided 0.025 "
+        f"over the {len(fam)} interval components of the R-class account lines with a verdict (normal p from the bootstrap "
+        f"SE)" + (f"; {len(bad)} undefined components left out" if bad else ""))
+    for code, (cls, *_rest) in LINES.items():
+        if cls != "R":
+            continue
+        v = R.get(code, (None,))[0]
+        rows = [(d, own, h) for (c, d, own), h in zip(fam, got) if c == code]
+        flips = [f"{d['name']} (p {h['p']:.2g}; interval rule {'rejects' if own else 'does not reject'}, Holm "
+                 f"{'rejects' if h['reject'] else 'does not reject'})" for d, own, h in rows if bool(h["reject"]) != own]
+        lost = any(own and not bool(h["reject"]) for d, own, h in rows)
+        nv = False if (v is True and lost) else v
+        out(f"    {code}: {len(rows)} components; " + (f"{len(flips)} decision(s) change under Holm: " + "; ".join(flips[:12])
+                                                       + (" ..." if len(flips) > 12 else "") if flips else "no decision changes under Holm")
+            + (f"; verdict {V(v)} -> {V(nv)} under Holm" if nv != v else f"; verdict unchanged ({V(v)})"))
+
+
 # --------------------------------------------------------------------------- main
 def headline(R, lexical_all=None):
     """The pre-committed headline reading (C-6) and the Section-5 outcome of the entry (C-12), checked in this order:
@@ -685,18 +732,14 @@ def main(argv=None):
         met = sum(bool(v) for _, v in ev)
         brier = np.mean([(LINES[c][2] - bool(v)) ** 2 for c, v in ev]) if ev else float("nan")
         ne = [c for c, v in zip(codes, vs) if v is None]
-        out(f"  class {cls} (account lines): {len(codes)} lines; MET {met}, NOT MET {len(ev) - met}, NOT EVALUABLE {len(ne)}"
-            f"{' (' + ', '.join(ne) + ')' if ne else ''}; observed {met} vs expected {exp:.2f} (sum of priors of the lines with a verdict); Brier {brier:.3f}")
+        out(f"  account lines, class {cls}: {len(codes)} lines: {met} MET, {len(ev) - met} NOT MET, 0 MET IN PART, "
+            f"{len(ne)} NOT EVALUABLE; observed {met} against expected {exp:.2f}; Brier {brier:.3f}"
+            + (f"; not evaluable: {', '.join(ne)}" if ne else ""))
+    rl = [c for c, x in LINES.items() if x[0] == "R" and R.get(c, (None,))[0] is not None]
+    out(f"  met rate among R account lines with a verdict: {sum(R[c][0] is True for c in rl)} of {len(rl)} "
+        f"(expected {sum(LINES[c][2] for c in rl):.2f})")
     out("  measurement-validity lines: none in part C (the T control and the sensitivity rows are gates)")
-    ch = holm([(f"{c}: {lab}", p, own) for c, lab, p, own in COMPONENTS], alpha=0.025)
-    out(f"  Holm (sensitivity, no verdict uses it): {len(COMPONENTS)} interval components at familywise one-sided 0.025; "
-        f"{len(ch)} decisions change" + "".join(f"\n    {lab}: p {p:.4f}, own rule {'rejects' if own else 'does not reject'}, Holm "
-                                                 f"{'rejects' if rej else 'does not reject'}" for lab, p, own, rej in ch[:40]))
-    if COMPONENTS and 1.0 / 10001 > 0.025 / len(COMPONENTS):
-        out(f"    note: the smallest bootstrap p (1 / 10,001) exceeds the first Holm threshold 0.025 / {len(COMPONENTS)}, so Holm over "
-            "all of the part's components cannot reject any; the list above is then uninformative by construction")
-    flip = sorted({lab.split(":")[0] for lab, p, own, rej in ch if own and not rej and R.get(lab.split(":")[0], (None,))[0] is True})
-    out("    verdicts that would change under Holm (MET lines with a component no longer rejected): " + (", ".join(flip) or "none"))
+    holm_sensitivity(R, out)
     out(f"  provenance {'OK' if prov_ok else 'MISMATCH'}; population {'OK' if pop_ok else 'MISMATCH'}; J-C-G0 {V(g0)}"
         + (f"; SCORER ERROR in {errors}" if errors else ""))
     try:

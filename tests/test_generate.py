@@ -101,3 +101,20 @@ def test_parse_and_frames():
     assert discover_frames(recs, fixed=(" the ",)) == [" {a} thinks it is in the "]
     assert discover_frames(recs[:2] + [("NONE", None)] * 98, fixed=()) == [" {a} thinks it is in the "]
     assert discover_frames([("NONE", "x ")] + [("NONE", None)] * 99, fixed=()) == []
+
+
+def test_end_of_turn_tokens_end_an_answer(qwen):
+    """generation_config may list only <eos> (Gemma-2, Yi-1.5); the chat template's end-of-turn token must still stop."""
+    model, tok = qwen
+    from ckeys.generate import _eos_ids
+    im_end = tok.convert_tokens_to_ids("<|im_end|>")
+    saved = model.generation_config.eos_token_id
+    try:
+        model.generation_config.eos_token_id = [tok.convert_tokens_to_ids("<|endoftext|>")]
+        assert im_end in _eos_ids(model, tok)
+        ids, _ = story_ids(tok)
+        g = greedy(model, tok, ids, max_new=24)[0]
+        assert im_end not in g and "<|im_end|>" not in tok.decode(g)
+        assert g == greedy_reference(model, tok, ids, max_new=24)[0]
+    finally:
+        model.generation_config.eos_token_id = saved

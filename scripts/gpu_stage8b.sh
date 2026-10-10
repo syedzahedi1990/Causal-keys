@@ -18,13 +18,13 @@
 # formats), x2 (exploratory: Qwen2.5-1.5B and 3B on S0 under E, arms P1 AFTER POST NONE), x1 (exploratory: Qwen2.5-7B on
 # the first 60 S0 cores, AFTER POST NONE, FP32 sdpa and BF16 eager); then the scorer (analysis/stage8b_score.py ->
 # $OUT/STAGE8B_SCORE.txt and the paper tables), MANIFEST.sha256 and the archive.
-# Deadline (DEADLINE_H, default 3.5 h; STAGE8_DEADLINE): every eval step gets --reserve-min = the core minutes of the models
+# Deadline (DEADLINE_H, default 4.5 h; STAGE8_DEADLINE): every eval step gets --reserve-min = the core minutes of the models
 # after it plus 10, and stops before an arm that would start inside that reserve (exit 3: partial, redone next session);
 # jb8 runs only if 45 min remain, x2 if 15, x1 if 12. The next model's weights are prefetched in the background.
 # Batch sizes (A100-80GB, prompts <= 160 tokens plus <= ~400 trie nodes): one 3-row and one 13-row scoring forward and one
 # 8-row generation batch (<= 16 new tokens) per item and arm; the JB-G3 fallback (score_cached) chunks node continuations
-# into 256 rows; under 10 GB beyond the weights at 14B. Compute estimate (entry, Compute): about 2.6 GPU-h for the core,
-# about 3.4 h with jb8, x2 and x1. Disk: >= 120 GB (two models at a time; 47 GB for jb8).
+# into 256 rows; under 10 GB beyond the weights at 14B. Compute estimate (entry, Compute): about 3.2 GPU-h for the core
+# (the sum of CORE_MIN, the pytest and the score), about 4.3 h with jb8, x2 and x1. Disk: >= 120 GB (two models at a time; 47 GB for jb8).
 # Usage:
 #   J=$(git log --format=%H -1 --grep='^Finalise preregistration J$') && git checkout "$J"
 #   bash scripts/gpu_stage8b.sh                  # HF_TOKEN optional
@@ -35,7 +35,7 @@
 # FORCE, FORCE_STEPS, KEEP_CACHE, TESTS=0, PY, S8_MODELS, MINGIB.
 cd "$(dirname "$0")/.." || exit 2
 PART=b
-S8_DEADLINE_H_DEFAULT=3.5
+S8_DEADLINE_H_DEFAULT=4.5
 # shellcheck source=scripts/stage8_common.sh
 source scripts/stage8_common.sh
 s8_init
@@ -69,7 +69,7 @@ all_done() { local k=$1 s; for s in tok calib g3 evalF; do s8_done "${s}_$k" || 
 run_key() {  # run_key <key> <reserve minutes>: 0 done, 1 files refused, 2 tokenizer check failed (both before any output)
   local key=$1 reserve=$2 dir t="${TAGP}$1"
   if all_done "$key"; then echo "==================== $key: every step kept"; return 0; fi
-  dir=$(s8_fetch "$key") || return 1
+  dir=$(s8_fetch "$key") || { s8_check; return 1; }   # s8_check dies on a fetch failure that is not a refusal (disk, manifest)
   local M=(--model "$dir" --key "$key")
   S8_OUTPUTS="$OUT/tokcheck/$t.json" s8_step "tok_$key" $PY "${FF[@]}" --stage tokcheck "${M[@]}" || { s8_drop "$key"; return 2; }
   S8_OUTPUTS="$OUT/frames/$t.json" s8_step "calib_$key" $PY "${FF[@]}" --stage calib "${M[@]}"
@@ -82,15 +82,22 @@ run_key() {  # run_key <key> <reserve minutes>: 0 done, 1 files refused, 2 token
   else
     echo "FAILED eval of $key not run: no frames or G3 file" | tee -a "$OUT/FAILED.txt"
   fi
-  s8_drop "$key"
+  [ "$key" = qwen7 ] || s8_drop "$key"   # qwen7 stays on disk for x1 (dropped after it)
   return 0
 }
 
-FALLBACK=
+# a fallback decided in an earlier session of this OUT stands (COMMIT.txt): the replaced model is not run again
+FALLBACK=$(grep -o 'fallback: yi9 replaces [A-Za-z0-9._-]*' "$OUT/COMMIT.txt" 2>/dev/null | head -n 1 | awk '{print $4}')
 for i in "${!KEYS[@]}"; do
   key=${KEYS[$i]}
   next=${KEYS[$((i + 1))]:-mistral24}
-  if ! on TEST_MODE && ! all_done "$next"; then s8_fetch "$next" > /dev/null 2>&1 & fi   # prefetch (the fetcher locks)
+  [ -n "$FALLBACK" ] && [ "$next" = "$FALLBACK" ] && next=yi9
+  if ! on TEST_MODE && ! all_done "$next"; then s8_prefetch "$next"; fi   # background prefetch (the fetcher locks)
+  if [ -n "$FALLBACK" ] && [ "$key" = "$FALLBACK" ]; then
+    echo "$(s8_utc) $key was replaced by yi9 in an earlier session (COMMIT.txt); yi9 runs in its slot" | tee -a "$OUT/COMMIT.txt"
+    run_key yi9 "$(reserve_after "$i")" || echo "FAILED the fallback yi9 (exit $?)" | tee -a "$OUT/FAILED.txt"
+    continue
+  fi
   rc=0; run_key "$key" "$(reserve_after "$i")" || rc=$?
   [ $rc = 0 ] && continue
   why=$([ $rc = 1 ] && echo "its files failed verification" || echo "its tokenizer check (J-B-G0b) failed")
@@ -166,6 +173,7 @@ if { s8_done x1_fp32 && s8_done x1_eager; } || s8_time_left "$X1_MIN"; then
 else
   s8_skip x1 "less than $X1_MIN min to the deadline"
 fi
+s8_drop qwen7
 
 # ---- score, manifest, archive
 s8_finish analysis/stage8b_score.py

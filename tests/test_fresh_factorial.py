@@ -10,7 +10,8 @@ runs on the GPU, each against an independently computed reference.
 5. experiments/paper1_frames.py --score E: L equals the old lp_rows (every run of run_core, locations and letters); the
    default path writes byte-identical output to the file before the flag was added.
 6. score_cached equals score_reference on tiny random Gemma-2 (eager, sliding layers) and Phi-3 (fused qkv) models.
-7. Frame admission rejects a frame that breaks the disjointness rule.
+7. Frame admission rejects a frame that breaks the disjointness rule (in calibration, and per core under --score E).
+8. The tokenizer check (J-B-G0b) fails when the null sentence would not have the after-sentence's length.
 """
 import json
 import os
@@ -271,3 +272,42 @@ def test_frame_admission_rejects_prefix_conflicts():
     fs, dropped = fresh.form_set(T(), it1, [" {a} put it in the ", "box"])
     assert dropped == ["box"] and f" {it1.names['a']} put it in the box" in fs.sets["E"]["box"].values()
     assert FRAMES_SIGMA[0] + "box" in fs.sets["sigma"]["box"].values()
+
+
+def _char_tok():
+    class T:
+        def __call__(self, s, add_special_tokens=False):
+            return type("E", (), {"input_ids": [3 + (ord(ch) % 120) for ch in s]})()
+
+        def decode(self, ids):
+            return "".join(chr(i - 3) for i in ids)
+    return T()
+
+
+def test_paper1_frames_score_formset_drops_a_conflicting_frame():
+    import experiments.paper1_frames as pf
+    core = native_core()
+    pf.SCORE.update(mode="E", frames=(" {a} put it in the ", "box"), fs=None)
+    try:
+        fs, dropped = pf.score_formset(_char_tok(), "P1", core)       # "box" + "box" extends the form "" + "box"
+    finally:
+        pf.SCORE.update(mode="L", frames=(), fs=None)
+    assert dropped == ["box"] and f" {core['agent']} put it in the shelf" in fs.sets["E"]["shelf"].values()
+    pf.SCORE.update(mode="E", frames=(" {a} put it in the ",), fs=None)
+    try:
+        assert pf.score_formset(_char_tok(), "P1", core)[1] == []
+    finally:
+        pf.SCORE.update(mode="L", frames=(), fs=None)
+
+
+def test_tokcheck_requires_one_sentence_length(monkeypatch, tmp_path):
+    import argparse
+    P = {n: fresh.population(n)[:2] for n in ("F", "C", "S0")}
+    monkeypatch.setattr(fresh, "population", lambda name: P[name])
+    a = argparse.Namespace(stage="tokcheck", model=NAME, revision=None, key="qwen7", test=True, out=str(tmp_path),
+                           tag="TEST_qwen7", attn="auto", dtype="float32", max_new=16)
+    assert ff.stage_tokcheck(a) == 0
+    monkeypatch.setattr(fresh, "NULL_NOUNS", fresh.NULL_NOUNS[:5] + ("hippopotamus",))   # several tokens
+    assert ff.stage_tokcheck(a) == 1
+    rep = json.loads((tmp_path / "tokcheck" / "TEST_qwen7.json").read_text())
+    assert any("differ between the lexicons, the null nouns or the orders" in f for f in rep["fails"]), rep["fails"]

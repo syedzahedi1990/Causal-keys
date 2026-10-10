@@ -11,6 +11,7 @@ S or X in a key row exactly when K > BONUS; base levels set the minimum row mass
 """
 import hashlib
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -213,7 +214,8 @@ def test_every_line_met(allmet):
     assert rc in (0, 2), txt[-3000:]
     for code in ln.ORDER:
         assert verdict(txt, code) == "MET", (code, "\n".join(l for l in txt.splitlines() if code in l)[:3000])
-    assert "class L: 5 lines: 5 MET" in txt and "measurement-validity lines, class R: 5 lines: 5 MET" in txt
+    assert "account lines, class L: 3 lines: 3 MET" in txt and "account lines, class M: 7 lines: 7 MET" in txt
+    assert "account lines, class R: 6 lines: 6 MET" in txt and "measurement-validity lines, class R: 5 lines: 5 MET" in txt
     for f in ("tab_fresh.tex", "tab_mass.tex", "tab_invariance.tex"):
         assert (root / f).read_text().startswith(r"\begin{tabular}")
     assert "Holm sensitivity" in txt and "J-B-G0  FP32 exactness" in txt and "-> MET" in txt.split("J-B-G0  FP32")[1][:2000]
@@ -283,6 +285,22 @@ def test_fallback_slot_and_test_mode(tmp_path):
     assert "llama8->yi9: MET" in txt
 
 
+def test_fallback_slot_after_a_failed_tokenizer_check(tmp_path):
+    """The pipeline moves a failed tokcheck file aside (scripts/stage8_common.sh, S8_OUTPUTS), so the replaced model
+    leaves no file; COMMIT.txt's record names it. Another N4 model without F results (a deadline) keeps its own slot."""
+    full(tmp_path, jb8=False, skip_models=("phi4",))
+    write_model(tmp_path, "yi9", np.random.default_rng(9))
+    J = json.loads((tmp_path / "eval" / "falcon7_F.json").read_text())
+    J["provenance"]["arms_not_run"], J["results"] = list(F_ARMS), []          # falcon7: every arm cut by the deadline
+    (tmp_path / "eval" / "falcon7_F.json").write_text(json.dumps(J))
+    (tmp_path / "COMMIT.txt").write_text("2026-10-10T01:00:00Z fallback: yi9 replaces phi4 (its tokenizer check (J-B-G0b) "
+                                         "failed; no output of phi4 exists)\n")
+    rc, txt = score(tmp_path)
+    assert "'phi4': 'yi9'" in txt and "'falcon7': 'falcon7'" in txt
+    assert "phi4->yi9: MET" in per_model(txt, "J-B1-N4", "phi4->yi9")
+    assert "NOT EVALUABLE" in per_model(txt, "J-B1-N4", "falcon7") and verdict(txt, "J-B1-N4") == "MET"
+
+
 def test_pytest_gate(tmp_path):
     pytest_log(tmp_path, skip="tests/test_fresh.py::test_1")
     out = []
@@ -320,14 +338,68 @@ def test_bootstrap_deterministic_and_two_stage():
     assert e.bound(0.9875, "lo") <= e.bound(0.95, "lo")
 
 
-def test_combination_rules_and_holm():
+def test_combination_rules():
     assert st.comb_every({"a": True, "b": True, "c": True, "d": None}) is True
     assert st.comb_every({"a": True, "b": False, "c": True, "d": True}) is False
     assert st.comb_every({"a": True, "b": True, "c": None, "d": None}) is None
     assert st.comb_k_of({"a": True, "b": True, "c": True, "d": False}) is True
     assert st.comb_k_of({"a": True, "b": True, "c": False, "d": None}) is False
     assert st.comb_k_of({"a": True, "b": True, "c": None, "d": None}) is None
-    assert st.holm([0.001, 0.03, 0.009]) == [True, False, True]
-    assert st.holm([0.009, 0.009, 0.02]) == [False, False, False]     # step-down: stops at the first non-rejection
     e = st.Est(1.0, np.r_[np.full(97, 1.0), np.full(3, -1.0)], 100)
     assert abs(st.pval(e, lambda b: b <= 0) - 4 / 101) < 1e-12
+
+
+def test_risk_class_follows_the_recorded_prior():
+    """Common part, G4: L = implied by data in hand, prior >= 0.9; M = prior >= 0.8; R = prior < 0.8."""
+    for code, (cls, kind, prior, *_rest) in ln.LINES.items():
+        assert kind in ("A", "V") and 0 < prior < 1, code
+        assert (cls == "L" and prior >= 0.9) or (cls == "M" and prior >= 0.8) or (cls == "R" and prior < 0.8), (code, cls, prior)
+
+
+def _holm_res():
+    """Three lines in one model: an R account line (J-B3-N4: one interval component met only at 95 %, one point), an M
+    account line (J-B1-N4) and an R validity line (J-B6b); only J-B3-N4's interval component is in the Holm family."""
+    b = st.boot_of(None, 60)
+    rng = np.random.default_rng(3)
+    x = rng.normal(0.0, 1.0, 60)
+    x = x - x.mean() + 0.30                                             # mean 0.30, bootstrap SE ~ 0.13
+    e = st.est(b, st.mean, x)
+    lo = st.lower(e, 0.0, 0.95, "r(POST)")                              # 95 %: rejected (lower bound > 0)
+    res = {"J-B3-N4": (True, {"llama8": st.Res(True, "", [lo, st.point("r(POST) >= 0.15", True)])}),
+           "J-B1-N4": (True, {"llama8": st.Res(True, "", [st.lower(e, 0.0, 0.95, "s_ID(AFTER)")])}),
+           "J-B6b": (True, {"qwen7": st.Res(True, "", [st.lower(e, 0.0, 0.95, "x")])})}
+    return res, lo, e
+
+
+def test_holm_family_and_the_shared_helper_contract(monkeypatch):
+    import types
+    res, lo, e = _holm_res()
+    calls = []
+
+    def fake(components):
+        calls.append([dict(c) for c in components])
+        return [dict(c, p=0.5, threshold=0.025, reject=False) for c in components]
+    monkeypatch.setitem(sys.modules, "stage8_holm", types.SimpleNamespace(holm=fake))
+    out = []
+    ch = S.holm_sensitivity(res, out.append)
+    assert len(calls) == 1 and [c["line"] for c in calls[0]] == ["J-B3-N4"]          # R-class account lines only
+    c = calls[0][0]
+    assert set(c) == {"line", "name", "est", "se", "bound", "direction"} and c["direction"] == ">" and c["bound"] == 0.0
+    assert abs(c["est"] - 0.30) < 1e-9 and abs(c["se"] - float(np.std(e.bs, ddof=1))) < 1e-12 and 0.05 < c["se"] < 0.3
+    assert lo.passed and ch == {"J-B3-N4": (True, True)}                    # the decision and the verdict change
+    assert any("decisions changed by Holm: llama8: H0 r(POST) <= 0 rejected -> not rejected" in l for l in out)
+    upp = st.upper(e, 1.0, 0.9875, "r(POST)")
+    assert upp.holm["direction"] == "<" and upp.holm["bound"] == 1.0
+
+
+def test_holm_with_the_shared_helper():
+    """analysis/stage8_holm.py (common part) on the family: p from the bootstrap SE, step-down at 0.025."""
+    import stage8_holm
+    res, lo, e = _holm_res()
+    got = stage8_holm.holm([d for *_, d in S.holm_family(res)])
+    assert len(got) == 1 and got[0]["line"] == "J-B3-N4"
+    z = (e.pt - 0.0) / float(np.std(e.bs, ddof=1))
+    assert abs(got[0]["p"] - 0.5 * math.erfc(z / math.sqrt(2))) < 1e-9
+    out = []
+    S.holm_sensitivity(res, out.append)
+    assert any(l.strip().startswith("J-B3-N4: 1 components") for l in out)

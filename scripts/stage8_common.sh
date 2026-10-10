@@ -17,7 +17,8 @@
 # s8_init. Switches TEST_MODE, KEEP_CACHE, FORCE, TESTS take 0 or 1 only (unset = 0, except TESTS = 1); DEADLINE_H is a
 # positive number of hours (default S8_DEADLINE_H_DEFAULT); FORCE_STEPS is a comma-separated list of step names or
 # shell globs (r2_*). Outside TEST_MODE it refuses (exit 1, logs archived): a J entry (the section of
-# docs/PREREGISTRATION.md whose heading contains P-2026-10-10-J) that still says "DRAFT, not yet final" (awk alone
+# docs/PREREGISTRATION.md whose heading contains P-2026-10-10-J) that still has a line starting with the draft marker
+# "**DRAFT, not yet final.**" (a quotation of the words elsewhere in a line does not count; awk alone
 # decides: an awk | grep -q pipeline under pipefail gets status 141 when grep exits first, and the refusal is skipped);
 # modified tracked files; a history without a commit whose subject is exactly "Finalise preregistration J"; code
 # (ckeys experiments analysis scripts tests data) that differs between HEAD and that commit; a J section that differs
@@ -39,14 +40,20 @@
 # FAILED_EXPLORATORY.txt and does not fail the run). Exit status 3 of a step means "complete up to the deadline, parts
 # skipped": no done file, recorded in SKIPPED.txt, so the next session runs the step again; it is not a failure.
 # s8_time_left <m> is true when at least m minutes remain before STAGE8_DEADLINE. s8_skip <name> <reason> records the
-# skip in $OUT/SKIPPED.txt (a step done earlier is reported as kept instead). The scorer reads SKIPPED.txt.
+# skip in $OUT/SKIPPED.txt (a step done earlier is reported as kept instead). The scorer reads SKIPPED.txt. s8_init moves
+# an earlier session's FAILED.txt, FAILED_EXPLORATORY.txt, FETCH_FAILED.txt and SKIPPED.txt aside (<name>.<UTC>.txt), so
+# each lists this session only and a step skipped earlier but run now is not reported as skipped.
 # s8_fetch <key> runs scripts/fetch_verified.py into $S8_MODELS/<key> (log $OUT/logs/fetch_<key>.log), copies
 # VERIFIED.json to $OUT/verified/<key>.json, appends "<repo> <revision> key=... attn=... token=... sources=..." to
-# REVISIONS.txt and prints the directory. On a refusal (a file not verified) it prints nothing, records the key in
-# FETCH_FAILED.txt and returns 1, so the part script applies the entry's fallback rule (01-ai/Yi-1.5-9B-Chat, key yi9)
-# before any output of the refused model exists. Any other failure (not enough disk, a bad manifest) is not a
-# verification failure: s8_fetch returns its status and the next s8_step, s8_fetch or s8_finish dies with the reason,
-# so no fallback runs. A background prefetch (s8_fetch <key> > /dev/null &) is safe: the fetcher locks the directory.
+# REVISIONS.txt and prints the directory. On a refusal (fetcher status 1: a file not verified) it prints nothing,
+# records the key in FETCH_FAILED.txt and returns 1, so the part script applies the entry's fallback rule
+# (01-ai/Yi-1.5-9B-Chat, key yi9) before any output of the refused model exists. Status 1 means a refusal and nothing
+# else. Any other failure is not a verification failure (2 manifest or usage, 3 an unexpected error, 4 not enough disk,
+# 5 download errors that a retry could fix, 6 stray files in the model directory, or a fatal error recorded earlier in
+# the session, returned as 5): s8_fetch returns that status, never 1, and the next s8_step, s8_fetch or s8_finish dies
+# with the reason (a caller that sees a status other than 0 or 1 may call s8_check to die at once), so no fallback runs.
+# s8_prefetch <key> fetches in the background (the fetcher locks the directory, so the later s8_fetch of the key waits
+# for it and re-verifies): its failures are only logged (logs/fetch_<key>.log); the foreground s8_fetch decides.
 # s8_attn <key> prints the key's attention implementation (eager for Gemma-2, sdpa otherwise). s8_done <name> is true
 # when the step is done and not forced, so a rerun need not fetch the weights of a model whose steps are all kept.
 # s8_drop <key> deletes $S8_MODELS/<key> unless KEEP_CACHE=1, TEST_MODE, or the key was verified there before this
@@ -116,7 +123,7 @@ s8_init() {
   export GIT_TERMINAL_PROMPT=0 HF_HUB_DISABLE_PROGRESS_BARS=1 TOKENIZERS_PARALLELISM=false
   export HF_XET_CHUNK_CACHE_SIZE_BYTES=${HF_XET_CHUNK_CACHE_SIZE_BYTES:-0}   # no second copy of the weights in a download cache
   export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
-  local f; for f in FAILED FAILED_EXPLORATORY FETCH_FAILED; do [ -f "$OUT/$f.txt" ] && mv "$OUT/$f.txt" "$OUT/$f.$(s8_stamp).txt"; done
+  local f; for f in FAILED FAILED_EXPLORATORY FETCH_FAILED SKIPPED; do [ -f "$OUT/$f.txt" ] && mv "$OUT/$f.txt" "$OUT/$f.$(s8_stamp).txt"; done
   { echo "==== $(s8_utc) stage 8 part $PART TEST_MODE=$TEST_MODE FORCE=${FORCE:-0} FORCE_STEPS=$FORCE_STEPS DEADLINE_H=$DEADLINE_H TESTS=${TESTS:-1} KEEP_CACHE=${KEEP_CACHE:-0}"
     git rev-parse HEAD; git status --short; } 2>&1 | tee -a "$OUT/COMMIT.txt"
 
@@ -124,7 +131,8 @@ s8_init() {
   if ! on TEST_MODE; then  # the preregistered code only: the finalised entry, no local changes, the code of the finalising commit
     awk '/^## / && /P-2026-10-10-J/{e = 1} END{exit !e}' docs/PREREGISTRATION.md \
       || die "no entry $S8_ENTRY in docs/PREREGISTRATION.md: check out the commit '$S8_FINAL_SUBJECT' (docs/GPU_RUNBOOK.md)"
-    awk '/^## /{f = ($0 ~ /P-2026-10-10-J/)} f && /DRAFT, not yet final/{d = 1} END{exit !d}' docs/PREREGISTRATION.md \
+    # only a line that starts with the marker counts: the entry quotes the marker's words in prose (its pipeline list)
+    awk '/^## /{f = ($0 ~ /P-2026-10-10-J/)} f && /^[[:space:]]*[*_]*DRAFT, not yet final/{d = 1} END{exit !d}' docs/PREREGISTRATION.md \
       && die "preregistration $S8_ENTRY is still a DRAFT: check out the commit '$S8_FINAL_SUBJECT' (docs/GPU_RUNBOOK.md)"
     # (awk decides alone: an awk | grep -q pipeline under pipefail gets status 141 when grep exits first, and the refusal is skipped)
     git rev-parse HEAD > /dev/null 2>&1 && [ -z "$(git status --porcelain --untracked-files=no)" ] \
@@ -266,7 +274,9 @@ s8_attn() {  # s8_attn <key>: the key's attention implementation from the manife
 
 s8_fetch() {  # s8_fetch <key>: print the local directory of the key's verified files (TEST_MODE: the 0.5B hub id)
   local key=$1 dir log rc=0 line
-  s8_check
+  # a fatal error recorded earlier (e.g. by a fetch in a command substitution): return 5, never 1 (a die here would
+  # only end the subshell of DIR=$(s8_fetch ...) with status 1, which a caller would take for a refusal)
+  if [ -s "${S8_STATE:-/nonexistent}/fatal" ]; then cat "$S8_STATE/fatal" >&2; return 5; fi
   log="$OUT/logs/fetch_$key.log"
   if on TEST_MODE; then
     echo "==== $(s8_utc) TEST_MODE: $key -> $S8_TINY (from the HF cache or the hub; not verified)" >> "$log"
@@ -278,13 +288,25 @@ s8_fetch() {  # s8_fetch <key>: print the local directory of the key's verified 
   [ -e "$S8_STATE/seen_$key" ] || { touch "$S8_STATE/seen_$key"; [ -f "$dir/VERIFIED.json" ] && touch "$S8_STATE/pre_$key"; }
   echo "==== $(s8_utc) fetch $key -> $dir" >> "$log"
   PYTHONPATH=. $PY scripts/fetch_verified.py --key "$key" --dest "$dir" >> "$log" 2>&1 || rc=$?
+  if on S8_PREFETCH; then   # a background prefetch only logs; the foreground s8_fetch of the key decides
+    echo "==== $(s8_utc) prefetch of $key: exit $rc" >> "$log"; return $rc
+  fi
   mkdir -p "$OUT/verified"
   if [ $rc = 1 ]; then   # a verification failure: the entry's fallback rule applies
     [ -f "$dir/VERIFY_FAILED.json" ] && cp "$dir/VERIFY_FAILED.json" "$OUT/verified/$key.FAILED.$(s8_stamp).json"
     echo "$(s8_utc) FETCH REFUSED $key (exit 1; see $log)" | tee -a "$OUT/FETCH_FAILED.txt" >&2
     return 1
-  elif [ $rc != 0 ]; then   # disk, manifest or setup: not a verification failure; the next library call stops the run
-    echo "fetch of $key: exit $rc ($([ $rc = 4 ] && echo 'not enough disk at '"$dir" || echo 'manifest or setup error')); not a verification failure, no fallback (see $log)" > "$S8_STATE/fatal"
+  elif [ $rc != 0 ]; then   # not a verification failure: the next library call stops the run, no fallback
+    local why
+    case $rc in
+      2) why="a bad manifest, key or usage";;
+      3) why="an unexpected error of the fetcher";;
+      4) why="not enough disk at $dir";;
+      5) why="download errors that a retry could fix (network, I/O); run the script again later";;
+      6) why="files that the manifest does not list in $dir (remove them)";;
+      *) why="the fetcher was stopped or crashed";;
+    esac
+    echo "fetch of $key: exit $rc ($why); not a verification failure, no fallback (see $log)" > "$S8_STATE/fatal"
     cat "$S8_STATE/fatal" >&2
     return $rc
   fi
@@ -292,6 +314,11 @@ s8_fetch() {  # s8_fetch <key>: print the local directory of the key's verified 
   line=$($PY -c "import json, re, sys; j = json.load(open(sys.argv[1])); src = sorted({m for r in j['files'].values() for m in re.findall(r'[\w.-]+/[\w.-]+@[0-9a-f]{10}', r['source'])}); print(j['repo'], j['revision'], 'key=' + j['key'], 'attn=' + j['attn'], 'token=' + ('yes' if j['token_used'] else 'no'), 'sources=' + ','.join(src))" "$dir/VERIFIED.json")
   grep -qxF "$line" "$OUT/REVISIONS.txt" 2>/dev/null || echo "$line" >> "$OUT/REVISIONS.txt"
   echo "$dir"
+}
+
+s8_prefetch() {  # s8_prefetch <key>: fetch in the background (outside TEST_MODE); failures only logged
+  on TEST_MODE && return 0
+  S8_PREFETCH=1 s8_fetch "$1" > /dev/null 2>&1 &
 }
 
 s8_drop() {  # s8_drop <key>: delete the key's verified files unless KEEP_CACHE=1 (or TEST_MODE, or verified before this session)

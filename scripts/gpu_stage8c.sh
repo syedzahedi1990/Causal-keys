@@ -4,7 +4,8 @@
 # sentences of ckeys/neutral.py), E3 (the BatchTopK dictionaries of andyrdt/saes-qwen2.5-7b-instruct, Qwen2.5-7B only), E4
 # (rank-16 DAS at p, seeds 101 PCA / 102 random), E5 (French, German, synonym forms; NONLEX of E1), controls T and R, the
 # PAR / PERP and LEX / NONLEX components, the synthetic rows of J-C-G8; models qwen7 (E1-E5), mistral7 (E1, E2, E4, E5),
-# llama8 (E1, E2, E5; yi9 takes its place when its files fail verification, before any output of it exists), depths
+# llama8 (E1, E2, E5; yi9 takes its place when its files fail verification, s8_fetch status 1, or its preflight fails,
+# before any output of it exists; the decision is kept by every later session of the same OUT), depths
 # l in {3, 7, 11, 15}; then the overlap screen on Prakash et al.'s material (qwen7, llama8) and J-C6 at qwen14.
 # Steps (scripts/stage8_common.sh: each kept once done, FORCE=1 / FORCE_STEPS=<names or globs> redo, logs in
 # $OUT/logs/<step>.log, a failed step goes to FAILED.txt and the pipeline goes on), experiments/stage8_edits.py unless named:
@@ -29,8 +30,9 @@
 # jc6, then the overlap screens are what the deadline drops.
 # Batch sizes (A100-80GB, prompts <= ~170 tokens plus <= ~60 trie nodes): scoring forwards of 64 rows (--chunk), each led
 # by the in-batch self row (about 13k tokens, < 10 GB of activations and logits at 7-8B); HeadSplice reader forwards of 26
-# rows (two attention passes in the masked layers); prefix captures of up to 128 rows of <= 70 tokens; DAS training at
-# batch 1 (one forward and backward of ~130 tokens); the Prakash steps use prakash_swap's batches (16 rows of ~200 tokens;
+# rows (two attention passes in the masked layers); prefix captures of <= 70 tokens (eval: the edit rows in 5-row
+# forwards, the natural pass's shape, so T's tables equal the natural ones bitwise); DAS training at batch 1 (one
+# forward and backward of ~130 tokens); the Prakash steps use prakash_swap's batches (16 rows of ~200 tokens;
 # 10-row exchange batches at 14B). Compute estimate (entry, Compute): about 3.5 GPU-h for the core, about 4.8 h with the
 # screens, J-C6 and the exploratory steps (DEADLINE_H 5.0 fits them in one session). Disk: >= 80 GB (two models, the four dictionaries of 3.76 GB each).
 # Usage:
@@ -95,7 +97,7 @@ run_key() {  # run_key <key> <reserve minutes>: 0 done, 1 files refused, 2 prefl
   if core_done "$key" && { [ "$key" = mistral7 ] || [ "$key" = yi9 ] || s8_done "overlap_$key"; } && s8_done "explore_$key"; then
     echo "==================== $key: every step kept"; return 0
   fi
-  dir=$(s8_fetch "$key") || return 1
+  dir=$(s8_fetch "$key") || { s8_check; return 1; }   # s8_check dies on a fetch failure that is not a refusal (disk, network)
   local M=(--model "$dir" --key "$key" --sae-dir "$SAE_DIR")
   S8_OUTPUTS="$OUT/preflight/$t.json" s8_step "preflight_$key" $PY "${EV[@]}" --stage preflight "${M[@]}" || { s8_drop "$key"; return 2; }
   S8_OUTPUTS="$OUT/calib/$t.json $OUT/calib/$t.pt" s8_step "calib_$key" $PY "${EV[@]}" --stage calib "${M[@]}"
@@ -131,11 +133,19 @@ run_key() {  # run_key <key> <reserve minutes>: 0 done, 1 files refused, 2 prefl
   return 0
 }
 
-FALLBACK=
+# a fallback decided in an earlier session of this OUT stands (COMMIT.txt): the replaced model is not run again, so the
+# fallback's outputs are never mixed with outputs of the replaced model from a later session
+FALLBACK=$(grep -o 'fallback: yi9 replaces [A-Za-z0-9._-]*' "$OUT/COMMIT.txt" 2>/dev/null | head -n 1 | awk '{print $4}')
 for i in "${!KEYS[@]}"; do
   key=${KEYS[$i]}
   next=${KEYS[$((i + 1))]:-qwen14}
-  if ! on TEST_MODE && ! core_done "$next"; then s8_fetch "$next" > /dev/null 2>&1 & fi   # prefetch (the fetcher locks)
+  [ -n "$FALLBACK" ] && [ "$next" = "$FALLBACK" ] && next=yi9
+  if ! on TEST_MODE && ! core_done "$next"; then s8_prefetch "$next"; fi   # background prefetch (the fetcher locks)
+  if [ -n "$FALLBACK" ] && [ "$key" = "$FALLBACK" ]; then
+    echo "$(s8_utc) $key was replaced by yi9 in an earlier session (COMMIT.txt); yi9 runs in its slot" | tee -a "$OUT/COMMIT.txt"
+    run_key yi9 "$(reserve_after "$i")" || echo "FAILED the fallback yi9 (exit $?)" | tee -a "$OUT/FAILED.txt"
+    continue
+  fi
   rc=0; run_key "$key" "$(reserve_after "$i")" || rc=$?
   [ $rc = 0 ] && continue
   why=$([ $rc = 1 ] && echo "its files failed verification" || echo "its preflight failed")

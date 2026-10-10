@@ -82,6 +82,19 @@ def gen_text(tok, ids, gen) -> str:
     return full[len(pre):] if full.startswith(pre) else tok.decode(list(gen))
 
 
+def end_ids(tok) -> set:
+    """Ids that end an answer: the tokenizer's special tokens (all_special_ids and the added tokens marked special). Some
+    generation configs list only <eos> and not the end of the chat turn (Gemma-2-9b-it: <end_of_turn>; Yi-1.5-9B-Chat:
+    <|im_end|>), so greedy decoding goes on past it; its text would otherwise be parsed as part of the answer."""
+    added = getattr(tok, "added_tokens_decoder", None) or {}
+    return set(tok.all_special_ids) | {i for i, t in added.items() if getattr(t, "special", False)}
+
+
+def cut(gen, ends) -> list:
+    """A generation up to its first special token (excluded)."""
+    return next((list(gen[:n]) for n, t in enumerate(gen) if t in ends), list(gen))
+
+
 class Invalid(Exception):
     """An item that is not valid for a tokenizer and frame in a format (skipped, with its reason)."""
 
@@ -157,19 +170,25 @@ def decided_stop(tok, it, fmt):
     """stop(r, ids) for ckeys.generate.greedy: True once the generation's answer class can no longer change. Entity
     formats: the first line has >= W + 2 normalized words, W the most words of a normalized candidate (appending text
     changes at most the last normalized word, so the first W + 1 are final, and ``matches`` against every candidate is
-    fixed). Letter formats: two characters after the skipped leading markdown (letter_of reads at most two)."""
+    fixed). Letter formats: two characters after the skipped leading markdown (letter_of reads at most two), neither of
+    them the replacement character of an incomplete multi-byte character (which a later token completes). Every format:
+    a special token (end_ids) ends the answer, which is then read up to it (cut)."""
+    ends = end_ids(tok)
     if fmt in LETTER_FORMATS:
-        return lambda r, ids: len(tok.decode(ids).lstrip().lstrip("*_`([\"' ")) >= 2
+        def first2(ids):
+            s = tok.decode(ids).lstrip().lstrip("*_`([\"' ")
+            return len(s) >= 2 and "\ufffd" not in s[:2]
+        return lambda r, ids: ids[-1] in ends or first2(ids)
     W = max(len(norm(it[k]).split()) for k in ("answer", "S", "X", "Z", "D"))
-    return lambda r, ids: len(norm(tok.decode(ids).split("\n")[0]).split()) >= W + 2
+    return lambda r, ids: ids[-1] in ends or len(norm(tok.decode(ids).split("\n")[0]).split()) >= W + 2
 
 
 @torch.no_grad()
 def generate_rows(model, tok, it, d, kv, rows: dict, nL, max_new, extra=None, stop=True):
     """Greedy generation (ckeys.generate.greedy: prompt pass with the clamps, decode steps read the clamped cache) of
     the rows on the B prompt, plus ``extra`` = {name: run} unclamped rows on another run's prompt (e.g. {"S_run": "S"}).
-    ``stop``: end a row once its answer class is decided (decided_stop). Per row: ids, text, the entity it names
-    (answer_of) and g1 (the token after w when the generation starts with w)."""
+    ``stop``: end a row once its answer class is decided (decided_stop). Per row: ids (up to the first special token,
+    cut), text, the entity it names (answer_of) and g1 (the token after w when the generation starts with w)."""
     extra = extra or {}
     names = list(rows) + list(extra)
     tabs = tables(kv, [rows[n] for n in rows] + [rows.get("ID", next(iter(rows.values())))] * len(extra), nL, len(d["P"]))
@@ -177,10 +196,10 @@ def generate_rows(model, tok, it, d, kv, rows: dict, nL, max_new, extra=None, st
     keep = torch.tensor([True] * len(rows) + [False] * len(extra))
     with clamp_kv(model, d["P"], tabs, range(nL), per_row=keep):
         gens = greedy(model, tok, ids, max_new=max_new, stop=decided_stop(tok, it, d["fmt"]) if stop else None)
-    w = d["w"]
+    w, ends = d["w"], end_ids(tok)
     out = {}
     for r, n in enumerate(names):
-        g = gens[r]
+        g = cut(gens[r], ends)
         txt = gen_text(tok, ids[r].tolist(), g)
         out[n] = {"ids": g, "text": txt, "who": answer_of(txt, it, d["fmt"]),
                   "g1": g[len(w)] if len(g) > len(w) and g[:len(w)] == w else None}

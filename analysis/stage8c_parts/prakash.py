@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from .stats import NAN, Q, boot_of
+from .stats import NAN, Q, boot_of, component
 
 B0, B0_TEST, B2 = 0.3, 1e-3, 3.0
 NM, QN, OA = "NO-MENTION", "QNAMES", "OPTIONS-AFTER"
@@ -113,7 +113,7 @@ def jc6(J, test, comps=None):
         ok = bool(caa.kappa.pt <= J6_KAPPA and dk.pt >= J6_DIFF and dk.lower() > 0 and dk.drop <= 0.05 and bind.rule)
         per[f] = ok
         if comps is not None:
-            comps.append(("J-C6", f"{f} H0: kappa_BIND - kappa_CAA <= 0", dk.p_le(0.0), bool(dk.lower() > 0)))
+            comps.append(component("J-C6", f"{f} H0: kappa_BIND - kappa_CAA <= 0", dk, 0.0, ">", dk.lower() > 0))
         lines.append(f"    kappa_CAA {caa.kappa.pt:+.3f} (<= {J6_KAPPA}); kappa_BIND - kappa_CAA {dk.txt()} (>= {J6_DIFF}; H0: <= 0 rejected) -> {'met' if ok else 'not met'}")
     if not g7 or per.get(NM) is None or per.get(OA) is None:
         v = None
@@ -173,7 +173,7 @@ def window(J, test, comps=None):
         between = lo <= E[QN].kappa.pt <= hi
     h9 = bool(d.pt >= H9_DIFF and d.lower() > 0 and d.drop <= 0.05 and between)
     if comps is not None:
-        comps.append(("J-C-WIN", f"l_w={lw} H0: kappa(OA) - kappa(NM) <= 0", d.p_le(0.0), bool(d.lower() > 0)))
+        comps.append(component("J-C-WIN", f"l_w={lw} H0: kappa(OA) - kappa(NM) <= 0", d, 0.0, ">", d.lower() > 0))
     lines.append(f"  H7: gaps {', '.join(f'{f} {g:.3f}' for f, g in gaps.items())} (<= {H7_GAP}); r {r:+.3f} (>= {H7_R}) -> {'met' if h7 else 'not met'}")
     lines.append(f"  H9: kappa(OA) - kappa(NM) {d.txt()} (>= {H9_DIFF}, H0: <= 0 rejected); QNAMES between: {between} -> {'met' if h9 else 'not met'}")
     return bool(h7 and h9), lines

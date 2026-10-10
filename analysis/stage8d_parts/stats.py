@@ -1,12 +1,13 @@
 """Statistics of the stage-8 part-D scorer (P-2026-10-10-J part D): the story bootstrap, estimates as (point, resamples),
-interval criteria as one-sided tests of named nulls with bootstrap p-values (the Holm sensitivity analysis), verdict
-words and the combination of models.
+interval criteria as one-sided tests of named nulls, the interval components handed to the shared Holm helper
+(analysis/stage8_holm.py, decision D2), verdict words and the combination of models.
 
 Bootstrap (entry, Statistics): stories (cores) are resampled with replacement, 10,000 resamples, numpy default_rng(seed
 20261010); one fixed index set per population size n, shared by every row, arm and statistic computed on stories of that
 size, so contrasts between rows of the same stories are paired. Every ratio of means is recomputed in every resample.
 A one-sided test "H0: theta <= t" is rejected when the lower bound of the 95 % percentile interval is > t (a test at
-2.5 %); its bootstrap p is (1 + #{resamples <= t}) / (B + 1).
+2.5 %). Each test is also recorded as a Holm component {line, name, est, se, bound, direction}: est the point estimate,
+se the standard deviation of the defined resamples (ddof 1), direction '>' for H1: theta > t and '<' for H1: theta < t.
 """
 from __future__ import annotations
 
@@ -73,6 +74,12 @@ class Q:
     def drop(self):
         return float(np.isnan(self.bs).mean()) if self.bs.size else 1.0
 
+    @property
+    def se(self):
+        """Bootstrap standard error: the standard deviation of the defined resamples (ddof 1)."""
+        b = self.bs[~np.isnan(self.bs)]
+        return float(np.std(b, ddof=1)) if b.size > 1 else NAN
+
     def p_le(self, t):
         """p of H0: theta <= t (rejected when the lower bound > t)."""
         b = self.bs[~np.isnan(self.bs)]
@@ -124,26 +131,39 @@ def V(ok):
     return "NOT EVALUABLE" if ok is None else "MET" if ok else "NOT MET"
 
 
+def component(code, name, q: Q, bound, direction, own):
+    """One interval component for the Holm sensitivity analysis (decision D2; analysis/stage8_holm.py): (line code,
+    {line, name, est, se, bound, direction}, rejected by the line's own interval rule). A degenerate bootstrap (se 0) is
+    passed as se 1e-12 (p then 0 or 1 by the side of the bound the estimate lies on), as in the other parts."""
+    se = q.se
+    se = 1e-12 if se == 0 else se
+    return (code, {"line": code, "name": name, "est": float(q.pt), "se": float(se), "bound": float(bound),
+                   "direction": direction}, bool(own))
+
+
 class Tests:
-    """Collects the interval components of a line: each (label, p, rejected under the 95 % interval rule)."""
+    """Collects the interval components of a line: each (label, rejected under the 95 % interval rule), and, into
+    ``sink``, the Holm component of every test (``component``). A line evaluates every one of its tests before it
+    combines them with its point conditions, so the Holm family does not depend on which point conditions hold."""
 
     def __init__(self, code=None, sink=None):
         self.code, self.sink, self.items = code, sink, []
 
+    def _rec(self, label, q, t, direction, rej):
+        self.items.append((label, rej))
+        if self.sink is not None:
+            self.sink.append(component(self.code, label, q, t, direction, rej))
+
     def lower_gt(self, q: Q, t, label):
         """H0: theta <= t; rejected when the lower bound > t."""
         rej = bool(np.isfinite(q.lo()) and q.lo() > t)
-        self.items.append((f"{label} H0: <= {t:g}", q.p_le(t), rej))
-        if self.sink is not None:
-            self.sink.append((self.code, f"{label} H0: <= {t:g}", q.p_le(t), rej))
+        self._rec(f"{label} H0: <= {t:g}", q, t, ">", rej)
         return rej
 
     def upper_lt(self, q: Q, t, label):
         """H0: theta >= t; rejected when the upper bound < t."""
         rej = bool(np.isfinite(q.hi()) and q.hi() < t)
-        self.items.append((f"{label} H0: >= {t:g}", q.p_ge(t), rej))
-        if self.sink is not None:
-            self.sink.append((self.code, f"{label} H0: >= {t:g}", q.p_ge(t), rej))
+        self._rec(f"{label} H0: >= {t:g}", q, t, "<", rej)
         return rej
 
     def inside(self, q: Q, lo, hi, label):
@@ -151,24 +171,6 @@ class Tests:
         a = self.lower_gt(q, lo, label)
         b = self.upper_lt(q, hi, label)
         return a and b
-
-    def excludes0(self, q: Q, label):
-        """Two-sided: the 95 % interval excludes 0 (the side of the point estimate is the one-sided test)."""
-        return self.lower_gt(q, 0.0, label) if q.pt >= 0 else self.upper_lt(q, 0.0, label)
-
-
-def holm(components, alpha=0.025):
-    """components: (label, p, rejected under its own interval rule). Holm's step-down at familywise one-sided alpha;
-    returns the components whose decision changes."""
-    comps = sorted(components, key=lambda c: c[1])
-    m, stop, changed = len(comps), False, []
-    for k, (lab, p, own) in enumerate(comps):
-        rej = (not stop) and p <= alpha / (m - k)
-        if not rej:
-            stop = True
-        if rej != own:
-            changed.append((lab, p, own, rej))
-    return changed
 
 
 def combine(per_model: dict, need: int):

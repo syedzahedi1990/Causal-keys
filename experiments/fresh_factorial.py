@@ -14,7 +14,8 @@ Stages (each a separate process and results file; the pipeline is scripts/gpu_st
   tokcheck  JB-G0b, tokenizer only (no weights): both lexicons single-token and stable in context; the FormSet of every
             F, C and S0 item builds (no form a proper prefix of another) and decodes back; every arm of F, C and S0 gives
             B, S, X prompts of one length differing at one position; every sentence (and null sentence) within +-3 tokens
-            of ROOM. -> OUT/tokcheck/<tag>.json; exit 1 if any check fails
+            of ROOM, and of one length with either lexicon, the null nouns and any order (so POST-NULL has POST's
+            length). -> OUT/tokcheck/<tag>.json; exit 1 if any check fails
   calib     R0 (frame discovery on C; no statistic): greedy generations of the clean B, S, X runs of the 30 C cores in
             the arms ARMS_CAL; frames = the text before the first candidate with the names as {a} {b} {o} {d}; admitted if
             not a fixed E frame and in >= 2 % (and >= 2) of some arm's generations, at most 16, most frequent first
@@ -335,6 +336,8 @@ def stage_tokcheck(a):
         lens[k] = sorted(ls)
         if min(ls) < room - 3 or max(ls) > room + 3:
             fails.append(f"sentence {k}: {sorted(ls)} tokens against ROOM {room}")
+        if len(ls) != 1:   # POST-NULL has the POST sentence's length; the lexicon and the order change no length
+            fails.append(f"sentence {k}: lengths {sorted(ls)} differ between the lexicons, the null nouns or the orders")
     rep["sentence_tokens"], rep["room_tokens"] = lens, room
     skipped, nodes, bad_decode = {}, {}, []
     for name in ("F", "C", "S0"):

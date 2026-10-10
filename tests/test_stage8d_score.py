@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "analysis"))
 import stage8d_score as SC  # noqa: E402
 from stage8d_parts import lines as LN  # noqa: E402
-from stage8d_parts.stats import Boot, Q, boot, combine, holm, ratio  # noqa: E402
+from stage8d_parts.stats import Boot, Q, boot, combine, ratio  # noqa: E402
 from stage8d_parts.stats import Tests as OneSided  # noqa: E402
 
 LOC = ("box", "basket", "shelf", "drawer", "cabinet", "closet")
@@ -64,7 +64,7 @@ def test_bootstrap_seeded_and_ratio_recomputed():
     assert boot(30) is boot(30)
 
 
-def test_one_sided_tests_and_holm():
+def test_one_sided_tests_and_holm_components():
     q = Q(1.0, np.linspace(0.5, 1.5, 10001))
     sink = []
     t = OneSided("X", sink)
@@ -72,9 +72,71 @@ def test_one_sided_tests_and_holm():
     assert t.upper_lt(q, 1.6, "c") and not t.upper_lt(q, 1.4, "d")
     assert t.inside(q, 0.4, 1.6, "e") and not t.inside(q, 0.6, 1.6, "f")
     assert len(sink) == len(t.items) == 8
-    assert q.p_le(0.4) == pytest.approx(1 / 10002) and q.p_le(1.0) > 0.4
-    ch = holm([("a", 0.001, True), ("b", 0.02, True), ("c", 0.3, False)], alpha=0.025)
-    assert [c[0] for c in ch] == ["b"]
+    # each test is one Holm component of analysis/stage8_holm.py: {line, name, est, se, bound, direction}
+    code, d, own = sink[0]
+    assert code == "X" and own is True and set(d) == {"line", "name", "est", "se", "bound", "direction"}
+    assert d["line"] == "X" and d["est"] == 1.0 and d["bound"] == 0.4 and d["direction"] == ">"
+    assert d["se"] == pytest.approx(float(np.std(q.bs, ddof=1)))
+    assert sink[2][1]["direction"] == "<" and sink[2][1]["bound"] == 1.6 and sink[1][2] is False
+    assert [x[1]["direction"] for x in sink[4:6]] == [">", "<"]          # equivalence = two one-sided components
+    assert len({x[1]["name"] for x in sink}) == 8
+
+
+def test_risk_class_follows_the_prior():
+    """Decision D1: L = prior >= 0.9, M = 0.8 <= prior < 0.9, R = prior < 0.8 (the class is relabelled, the prior kept)."""
+    for code, (cls, kind, prior, *_rest) in SC.LINES.items():
+        want = "L" if prior >= 0.9 else "M" if prior >= 0.8 else "R"
+        assert cls == want, (code, cls, prior)
+        assert kind == "A"
+    assert SC.LINES["J-D4"][0] == "M" and SC.LINES["J-D8-Q"][0] == "M"
+
+
+def test_holm_family_contract(tmp_path, monkeypatch):
+    """The family handed to analysis/stage8_holm.py: the interval components of the R-class lines with a verdict, from
+    the models where the line is evaluable, every component of such a line whatever its point conditions, names unique;
+    a MET line with a component Holm no longer rejects is reported as NOT MET under Holm."""
+    import types
+    calls = []
+
+    def fake(components):
+        calls.append([dict(c) for c in components])
+        return [dict(c, p=0.5, threshold=0.025, reject=False) for c in reversed(components)]   # any order
+    monkeypatch.setitem(sys.modules, "stage8_holm", types.SimpleNamespace(holm=fake))
+    build(tmp_path, mistral_bind=False, qwen_ioi_v=-1.0)
+    rc = SC.main(["--results", str(tmp_path), "--test"])
+    text = (tmp_path / "STAGE8D_SCORE.txt").read_text()
+    assert rc == 0 and len(calls) == 1, text
+    fam = calls[0]
+    lines = {c["line"] for c in fam}
+    rlines = {c for c, x in SC.LINES.items() if x[0] == "R"}
+    assert lines <= rlines and "J-D1" in lines and "J-D-HOP2" in lines
+    assert "J-D5" not in lines                     # NOT EVALUABLE (one evaluable model): no component
+    assert not lines & {"J-D4", "J-D8-Q", "J-D7", "J-D6a"}     # M and L lines are not in the family
+    names = [(c["line"], c["name"]) for c in fam]
+    assert len(set(names)) == len(names)
+    assert all(set(c) == {"line", "name", "est", "se", "bound", "direction"} for c in fam)
+    # J-D-HOP2 is NOT MET on a point condition (carry 0.1 in INLINE) in both models; its tests are still in the family
+    hop = [c["name"] for c in fam if c["line"] == "J-D-HOP2"]
+    assert sorted(hop) == sorted(f"{k} {a} carry(top10) H0: <= 0.2" for k in ("qwen7", "mistral7") for a in ("Q_OUT", "INLINE"))
+    assert "J-D1: 2 components; 2 decision(s) change under Holm" in text
+    assert "verdict MET -> NOT MET under Holm" in text and "J-D-ROUTE-IOI: " in text
+
+
+def test_holm_with_the_shared_helper(tmp_path):
+    """analysis/stage8_holm.py (common part) on this part's family: normal p from the bootstrap SE, step-down at 0.025."""
+    import math
+    import stage8_holm
+    q = Q(0.30, np.random.default_rng(0).normal(0.30, 0.1, 10000))
+    sink = []
+    OneSided("J-D1", sink).lower_gt(q, 0.0, "qwen7 x")
+    got = stage8_holm.holm([d for _, d, _ in sink])
+    z = (0.30 - 0.0) / float(np.std(q.bs, ddof=1))
+    assert len(got) == 1 and got[0]["line"] == "J-D1" and abs(got[0]["p"] - 0.5 * math.erfc(z / math.sqrt(2))) < 1e-9
+    build(tmp_path, mistral_bind=False, qwen_ioi_v=-1.0)
+    SC.main(["--results", str(tmp_path), "--test"])
+    text = (tmp_path / "STAGE8D_SCORE.txt").read_text()
+    assert "Holm sensitivity (analysis/stage8_holm.py" in text and "NOT COMPUTED" not in text
+    assert any(l.strip().startswith("J-D1: 2 components") for l in text.splitlines())
 
 
 def test_combine_rule():
@@ -333,7 +395,7 @@ def test_end_to_end(tmp_path):
     assert "(a) MEDIATED, READ BY VALUE AT 1.5B" in text
     for sec in ("GATES", "PREDICTIONS", "REPORTED", "SUMMARY", "EXPLORATORY"):
         assert sec in text
-    assert "class R (account lines)" in text and "Holm" in text
+    assert "account lines, class R:" in text and "Holm" in text
 
 
 def test_gate_failures_make_lines_not_evaluable(tmp_path):

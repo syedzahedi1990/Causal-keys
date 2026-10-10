@@ -6,3 +6,6 @@ results/cache/
 .venv-s4/
 gpu_stage4_results.tgz
 results/gpu_stage5/attention/*.npz
+results/gpu_stage8*_test/
+gpu_stage8*_results.tgz
+gpu_stage8*_test_results.tgz

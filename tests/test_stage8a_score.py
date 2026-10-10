@@ -116,10 +116,15 @@ def test_bootstrap_is_two_stage_and_reproducible():
     e2 = cm.est(arts, cm.mean, x)
     assert (e.lo, e.hi) == (e2.lo, e2.hi)
     c = cm.lower(e, e.pt + 100, "x")
-    assert not c.passed and c.p == 1.0
+    assert not c.passed and c.tests[0][1] is False and c.tests[0][2] == {"est": e.pt, "se": e.se, "bound": e.pt + 100, "direction": ">"}
     c = cm.lower(e, -100, "x")
-    assert c.passed and c.p == 0.0
-    assert cm.inside(cm.est(arts, cm.mean, np.zeros(45)), -0.1, 0.1, "z").passed
+    assert c.passed and c.tests[0][1] is True
+    assert abs(e.se - float(np.std(e.bs, ddof=1))) < 1e-12 and e.se > 0
+    c = cm.upper(e, 100, "x")
+    assert c.passed and c.tests[0][2]["direction"] == "<"
+    c = cm.inside(cm.est(arts, cm.mean, np.zeros(45)), -0.1, 0.1, "z")
+    assert c.passed and [t[2]["direction"] for t in c.tests] == [">", "<"] and [t[2]["bound"] for t in c.tests] == [-0.1, 0.1]
+    assert cm.point("x", True).tests == []
 
 
 def test_combination_rules_and_holm():
@@ -129,8 +134,16 @@ def test_combination_rules_and_holm():
     assert cm.comb_models({"llama8": True, "qwen7": False, "mistral7": None}) is False
     assert cm.comb_both({"qwen7": True, "mistral7": True}) is True and cm.comb_both({"qwen7": True}) is None
     assert cm.comb_both({"qwen7": None, "mistral7": False}) is False
-    assert cm.holm([0.01, 0.04, 0.03]) == [True, False, False]
-    assert cm.holm([0.001, 0.02, 0.04]) == [True, True, True]
+
+
+def test_classes_follow_the_recorded_priors():
+    """Entry J, G4 (decision D1): L needs a prior >= 0.9, M >= 0.8, R is every line below 0.8."""
+    for code, (cls, prior, _) in cm.LINES.items():
+        assert cls in ("L", "M", "R", "D"), code
+        assert (cls == "R") == (prior < 0.8) or cls == "D", (code, cls, prior)
+        assert cls != "L" or prior >= 0.9, (code, cls, prior)
+        assert cls != "M" or prior >= 0.8, (code, cls, prior)
+    assert set(fa.LINE_FNS) | set(hd.HEAD_FNS) == set(cm.LINES)
 
 
 def test_every_line_met_on_data_built_to_meet_it(four):
@@ -161,8 +174,9 @@ def test_not_met_and_not_evaluable_paths(four):
     prior = M("llama8", seed=6, cb_win="B")          # every item has the closed-book prior on B: no prior-free items
     assert fa.a7(prior).ok is None and "prior-free n 0" in fa.a7(prior).why
     assert fa.a7(four["llama8"]).ok is True
-    tinyg4 = M("llama8", seed=8, kv={"OPTA": (0.6, 0.6)})
-    assert fa.a1(tinyg4).ok is None and fa.a1(tinyg4).why == "J-A-G4"
+    tinyg4 = M("llama8", seed=8, kv={"OPTA": (0.6, 0.6)})   # s_ID's own denominator collapses in OPTA: NOT MET
+    assert fa.a1(tinyg4).ok is False and "J-A-G4" in fa.a1(tinyg4).txt and fa.a1(tinyg4).undef
+    assert fa.a2(tinyg4).ok is True and fa.a3(tinyg4).ok is False and fa.a4(tinyg4).ok is not None
     test_m = fa.Model("llama8", model_json("llama8", n=5, seed=1), None, test=True)
     assert test_m.gates["OPTA"]["G2"] and fa.a8d(test_m).ok is not None
 
@@ -222,7 +236,7 @@ def test_head_lines(four):
 
 def test_pytest_gate_parser(tmp_path):
     (tmp_path / "logs").mkdir()
-    good = "".join(f"tests/test_natural_clamp.py::t{i} PASSED\n" for i in range(12)) + "".join(f"tests/test_kvquant.py::k{i} PASSED\n" for i in range(4))
+    good = "".join(f"tests/test_natural_clamp.py::t{i} PASSED\n" for i in range(14)) + "".join(f"tests/test_kvquant.py::k{i} PASSED\n" for i in range(4))
     (tmp_path / "logs" / "pytest.log").write_text("==== test session starts ====\n" + good.replace("t0 PASSED", "t0 FAILED")
                                                   + "==== test session starts ====\n" + good)
     lines = []
@@ -247,5 +261,33 @@ def test_full_report(tmp_path, four):
     for sec in ("PROVENANCE", "POPULATION", "GATES", "PREDICTIONS", "REPORTED", "SUMMARY", "EXPLORATORY"):
         assert sec in text
     assert "J-A1      [M, prior 0.80]" in text and "-> MET" in text
-    assert "J-A-HA1   [M, prior 0.75] sparse natural readers (N*) -> NOT EVALUABLE" in text   # one head model only
-    assert "class R:" in text and "Holm sensitivity" in text
+    assert "J-A-HA1   [R, prior 0.75] sparse natural readers (N*) -> NOT EVALUABLE" in text   # one head model only
+    assert "account lines, class R:" in text and "Holm sensitivity" in text and "J-A6a: no component decision changes" in text
+
+
+def test_holm_family_is_the_r_lines_interval_components(four):
+    """D2: the family holds the interval components of the R-class lines only (each model with a verdict; an 'inside'
+    criterion gives two), each with its estimate, bootstrap SE, bound and direction; a component the interval rule
+    passes on a wide interval but Holm does not reject is reported, and the verdict change is flagged."""
+    res = verdicts(four)
+    comps, where = sc.holm_family(res)
+    assert comps and {c["line"] for c in comps} == {c for c in res if cm.LINES[c][0] == "R"}
+    assert all(set(c) >= {"line", "name", "est", "se", "bound", "direction"} and c["direction"] in "<>" for c in comps)
+    n_a6a = sum(c["line"] == "J-A6a" for c in comps)
+    assert n_a6a == 4 * 2        # two lower-bound tests in each of four models
+    lines = []
+    sc.summary(res, lines.append)
+    text = "\n".join(lines)
+    assert "account lines, class L: 1 lines" in text and "account lines, class M: 5 lines" in text
+    assert "account lines, class R: 10 lines: 10 MET" in text    # the head lines are not in this synthetic result
+    assert "observed 10 against expected 4.65" in text and "Brier" in text
+    assert "J-A6a: no component decision changes under Holm; verdict unchanged (MET)" in text
+    # a model whose J-A6a key-source lower bound sits just above 0.5: passed by the interval, not by a strict Holm
+    r = res["J-A6a"][1]["llama8"]
+    t = r.comps[1].tests[0]
+    r.comps[1].tests[0] = (t[0], True, dict(t[2], est=0.52, se=0.0105))
+    lines = []
+    sc.summary(res, lines.append)
+    text = "\n".join(lines)
+    assert "J-A6a: 1 component decision(s) change under Holm: llama8: key-source rate > 0.5" in text
+    assert "verdict MET -> NOT MET under Holm" in text

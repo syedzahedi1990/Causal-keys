@@ -5,8 +5,10 @@ pinned in scripts/stage8_models.json, captured from the Hugging Face API on 2026
 
 Sources, per file, in this order (the first copy that verifies is used):
   1. a copy already in --dest (re-verified on every call, so the command is idempotent);
-  2. the local Hugging Face cache, if it holds the file at the pinned revision of a listed repo (a symlink is made;
-     --no-cache skips this);
+  2. the local Hugging Face cache, if it holds the file at the pinned revision of a listed repo (a hard link to the
+     cache's blob, so that a later change or removal of the cache entry cannot change or remove the verified bytes; a
+     symbolic link only where the cache is on another file system; the link is verified after it is made; --no-cache
+     skips this);
   3. downloads: the official repo at the pinned revision (for a gated repo only when HF_TOKEN is set), then, for a gated
      repo, the ungated repos the manifest lists for that file, each at its pinned revision. A mirror is listed only
      where its file has the official hash and size, so a verified copy is byte-identical to the official file.
@@ -17,9 +19,14 @@ Output: DEST/VERIFIED.json (written atomically, only when every file verifies; a
 key, repo, revision, attention implementation, the manifest's sha256, and per file the expected and observed hash and
 the source used. A transient download error is retried three times per source (30 s, 60 s back-off); an error that a
 retry cannot fix (401, 403, 404, a gated or missing repo or file) moves on to the next source at once.
-Exit status: 0 verified; 1 refused (a file not verified from any source, with DEST/VERIFY_FAILED.json listing every
-attempt, or a file in DEST that the manifest does not list); 2 a bad manifest, key or usage; 4 not enough free disk at
-DEST for the files still to fetch (2 GiB margin; nothing is fetched). Only status 1 is a verification failure.
+Exit status: 0 verified; 1 refused: a file of the manifest is not verified, because every listed source delivered bytes
+that do not match or answered with an error that a retry cannot fix (DEST/VERIFY_FAILED.json lists every attempt);
+2 a bad manifest, key or usage; 3 an unexpected error of the fetcher (a traceback); 4 not enough free disk at DEST for
+the files still to fetch (2 GiB margin; nothing is fetched); 5 a file not obtained because a source still failed with
+an error that a retry could fix (network, I/O) after its retries, and no file refused for certain: the fetch stops at
+that file (VERIFY_FAILED.json), and a later call goes on; 6 DEST holds a regular file that the manifest does not
+list (remove it). Only status 1 is a verification failure (the entry's fallback rule applies to it alone); 2-6 are
+problems of the environment.
 The token is read from HF_TOKEN (or HUGGING_FACE_HUB_TOKEN) and never printed.
 Downloads use huggingface_hub when it is importable, else plain HTTPS (urllib) with retries. --local-root R replaces
 every download by a copy from R/<owner>/<name>/<revision>/<file> (offline use and tests). --verify-only never fetches.
@@ -231,13 +238,26 @@ def write_atomic(obj, path):
 MARGIN = 2 << 30   # bytes of free disk kept beyond the files still to fetch
 
 
+def link_blob(src: str, target: Path) -> str:
+    """Link a verified cache blob into DEST: a hard link (the bytes stay even if the cache entry is later replaced or
+    removed), or a symbolic link where the cache is on another file system. Returns "hard" or "symbolic"."""
+    try:
+        os.link(src, target)
+        return "hard"
+    except OSError:
+        os.symlink(src, target)
+        return "symbolic"
+
+
 def fetch(key, dest, manifest=MANIFEST, token=None, download=None, use_cache=True, verify_only=False, log=None,
           tries=3, wait=30):
     """Assemble and verify DEST for one manifest key. Returns the VERIFIED record. Raises SystemExit(1) when a file
-    cannot be verified (its bytes do not match from any source that delivered it, or no source delivered it after
-    `tries` attempts each, with `wait`-second back-off), or DEST holds a file the manifest does not list; SystemExit(4)
-    when the disk cannot hold the files still to fetch (an environment problem, not a verification failure);
-    SystemExit(<message>) for a bad manifest or key."""
+    cannot be verified (every listed source delivered bytes that do not match or failed with an error that a retry
+    cannot fix); SystemExit(5) when a file was not obtained because a source still failed with a transient error after
+    `tries` attempts (`wait`-second back-off) and no file was refused for certain (the fetch stops at that file);
+    SystemExit(6) when DEST holds a file the manifest does not list and every listed file verified; SystemExit(4) when
+    the disk cannot hold the files still to fetch; SystemExit(<message>) for a bad manifest or key. Only 1 is a
+    verification failure."""
     log = log or (lambda *a: print(*a, file=sys.stderr, flush=True))
     man = load_manifest(manifest)
     bad = validate_manifest(man)
@@ -280,15 +300,17 @@ def fetch(key, dest, manifest=MANIFEST, token=None, download=None, use_cache=Tru
                 log(f"{key}/{fname}: the existing copy does not verify ({obs}); fetched again")
                 target.unlink()
             srcs = [] if verify_only else sources_for(e, fname, bool(token))
+            transient = []   # sources that still failed with a transient error after their retries
             for repo, rev in (srcs if use_cache else []):   # first a verified copy in the local HF cache (linked)
                 src = f"{repo}@{rev} (local HF cache)"
                 if (c := cache_lookup(repo, rev, fname)) is not None:
-                    ok, obs = verify_file(c, spec)
-                    rec["attempts"].append({"source": src, "ok": ok, "observed": obs})
+                    how = link_blob(os.path.realpath(c), target)
+                    ok, obs = verify_file(target, spec)   # the link itself is verified, after it is made
+                    rec["attempts"].append({"source": src, "ok": ok, "observed": obs, "link": how})
                     if ok:
-                        os.symlink(os.path.realpath(c), target)
-                        rec.update(ok=True, source=src, observed=obs[rec["kind"]])
+                        rec.update(ok=True, source=src, link=how, observed=obs[rec["kind"]])
                         break
+                    target.unlink()
             for repo, rev in ([] if rec.get("ok") else srcs):   # then downloads, source by source
                 src = f"{repo}@{rev}"
                 shutil.rmtree(part, ignore_errors=True)
@@ -299,9 +321,13 @@ def fetch(key, dest, manifest=MANIFEST, token=None, download=None, use_cache=Tru
                         p = download(repo, rev, fname, part, token)
                         break
                     except Exception as ex:
-                        rec["attempts"].append({"source": src, "error": f"{type(ex).__name__}: {ex}"[:300]})
+                        rec["attempts"].append({"source": src, "error": f"{type(ex).__name__}: {ex}"[:300],
+                                                "permanent": permanent(ex)})
                         log(f"{key}/{fname}: {src} failed (try {t + 1}): {type(ex).__name__}: {str(ex)[:200]}")
-                        if permanent(ex) or t == tries - 1:
+                        if permanent(ex):
+                            break
+                        if t == tries - 1:   # still failing with an error a retry could fix: not a verification failure
+                            transient.append(src)
                             break
                         time.sleep(wait * (t + 1))
                 if p is None:
@@ -319,11 +345,17 @@ def fetch(key, dest, manifest=MANIFEST, token=None, download=None, use_cache=Tru
             if not rec["ok"]:
                 why = e.get("unverifiable_without_token", {}).get(fname) if not token else None
                 bad_bytes = any(a.get("ok") is False for a in rec["attempts"])
-                rec["reason"] = why or ("not fetched (--verify-only)" if verify_only else
-                                        "bytes that do not match the official hash" if bad_bytes else
-                                        "unavailable from every listed source")
+                rec["transient"] = transient
+                rec["reason"] = ("not fetched (--verify-only)" if verify_only else
+                                 "download errors that a retry could fix (network, I/O) at " + ", ".join(transient)
+                                 + "; not a verification failure" if transient else
+                                 why or ("bytes that do not match the official hash" if bad_bytes else
+                                         "unavailable from every listed source (errors a retry cannot fix)"))
                 failed.append(fname)
             recs[fname] = rec
+            if transient and not rec["ok"]:
+                log(f"{key}/{fname}: not obtained ({rec['reason']}); the fetch stops here, a later call goes on")
+                break
         extra = sorted(p.name for p in dest.iterdir() if p.name not in e["files"] and p.name not in OWN
                        and not p.name.startswith(".") and (p.is_file() or p.is_symlink()))
         out = {"key": key, "repo": e["repo"], "revision": e["revision"], "attn": e["attn"], "gated": e["gated"],
@@ -340,6 +372,14 @@ def fetch(key, dest, manifest=MANIFEST, token=None, download=None, use_cache=Tru
                 msg.append(f"{len(failed)} file(s) not verified: " + ", ".join(f"{f} ({recs[f]['reason']})" for f in failed))
             if extra:
                 msg.append("files not in the manifest in " + str(dest) + ": " + ", ".join(extra))
+            if failed and all(recs[f].get("transient") for f in failed):   # nothing refused for certain: environment
+                log(f"{key}: NOT VERIFIED (exit 5: download errors that a retry could fix; not a verification failure). "
+                    + " ".join(msg))
+                raise SystemExit(5)
+            if not failed:
+                log(f"{key}: NOT VERIFIED (exit 6: remove the files that the manifest does not list; not a verification "
+                    f"failure). " + " ".join(msg))
+                raise SystemExit(6)
             log(f"{key}: REFUSED. " + " ".join(msg))
             raise SystemExit(1)
         write_atomic(out, dest / "VERIFIED.json")
@@ -369,6 +409,11 @@ def main(argv=None):
             print(ex.code, file=sys.stderr)
             return 2
         return int(ex.code or 0)
+    except Exception:   # an unexpected error is a problem of the fetcher or the host, never a verification failure
+        import traceback
+        traceback.print_exc()
+        print(f"{a.key}: unexpected error of the fetcher (exit 3; not a verification failure)", file=sys.stderr)
+        return 3
     return 0
 
 

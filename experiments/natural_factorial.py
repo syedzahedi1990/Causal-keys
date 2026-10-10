@@ -57,8 +57,8 @@ from ckeys.interventions import blocks
 from ckeys.kvquant import quantize_kv
 from ckeys.natural_formats import (CB_FORMATS, FORMATS, FRAMES, answer_of, choose_frame, decision_ids, encode_cb,
                                    encode_item, frame_of)
-from ckeys.natural_rows import (BASE, COMPETENCE, FULL_FORMATS, Invalid, capture, core_rows, decided_stop, explore_rows,
-                                gen_text, generate_rows, passage_positions, prep, score_rows, valid_all)
+from ckeys.natural_rows import (BASE, COMPETENCE, FULL_FORMATS, Invalid, capture, core_rows, cut, decided_stop, end_ids,
+                                explore_rows, gen_text, generate_rows, passage_positions, prep, score_rows, valid_all)
 from ckeys.squad_items import SQUAD_DEV_SHA256, load_squad
 from experiments.format_factorial import provenance as ff_provenance
 from experiments.ioi_factorial import device_name
@@ -120,6 +120,13 @@ def split(items, name):
     return sorted([i for i in items if i["split"] == name], key=lambda i: i["rank"])
 
 
+def populations(path=ITEMS):
+    """Part A's populations without the SQuAD file: {split: [SQuAD v1.1 dev question ids in rank order]} for R, E, YEAR
+    and LEAK of data/stage8a_items.json. They are natural items, not templated cores (no make_cores tuple)."""
+    items = json.load(open(path))
+    return {s: [i["id"] for i in split(items, s)] for s in ("R", "E", "YEAR", "LEAK")}
+
+
 # --------------------------------------------------------------------------- model
 def load_model(a):
     cfg = AutoConfig.from_pretrained(a.model, revision=a.revision)
@@ -161,19 +168,34 @@ def read_frame(a):
 
 
 # --------------------------------------------------------------------------- stage preflight (no model)
+# The Hub revisions of the build's tokenizers (scripts/build_stage8a_items.py TOKENIZERS) when data/stage8a_items.json was
+# built: the preflight loads exactly these, so a later commit to one of the repositories cannot change the rebuild.
+BUILD_TOKENIZER_REVISIONS = {"Qwen/Qwen2.5-7B-Instruct": "a09a35458c702b33eeacc393d103063234e8bc28",
+                             "mistralai/Mistral-7B-Instruct-v0.3": "c170c708c41dac9275d15a8fff4eca08d52bab71",
+                             "unsloth/Meta-Llama-3.1-8B-Instruct": "a2856192dd7c25b842431f39c179a6c2c2f627d1",
+                             "unsloth/gemma-2-9b-it": "fc7d4737cda11c3a19af2b722319e846670b4d89"}
+
+
+def build_tokenizers(names):
+    """{key: local snapshot directory of the repository's tokenizer files at the pinned revision} for build(tokenizers=)."""
+    from huggingface_hub import snapshot_download
+    return {k: snapshot_download(n, revision=BUILD_TOKENIZER_REVISIONS[n], allow_patterns=["*.json", "*.model", "*.model.v3", "*.txt", "*.jinja"],
+                                 ignore_patterns=["*.safetensors", "*.safetensors.index.json", "*.bin"]) for k, n in names.items()}
+
+
 def stage_preflight(a):
     t0 = time.time()
     data = load_squad(a.squad)   # asserts the sha256
     spec = importlib.util.spec_from_file_location("build_stage8a_items", ROOT / "scripts" / "build_stage8a_items.py")
     b = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(b)
-    out, cnt, why, nft, R_titles = b.build(a.squad)
+    out, cnt, why, nft, R_titles = b.build(a.squad, build_tokenizers(b.TOKENIZERS))
     blob = json.dumps(out, indent=1, sort_keys=True, ensure_ascii=False) + "\n"
     same = Path(a.items).read_text() == blob
     by = collections.Counter(f"{i['split']}/{i['sub']}" for i in out)
     res = {"provenance": ff_provenance(a) | {"test_mode": a.test}, "squad_sha256": SQUAD_DEV_SHA256, "n_articles": len(data),
            "items_sha256": sha_file(a.items), "rebuild_sha256": hashlib.sha256(blob.encode()).hexdigest(), "rebuild_identical": same,
-           "tokenizers": b.TOKENIZERS, "counts": dict(sorted(by.items())), "valid_ft": nft, "R_titles": R_titles,
+           "tokenizers": {k: [n, BUILD_TOKENIZER_REVISIONS[n]] for k, n in b.TOKENIZERS.items()}, "counts": dict(sorted(by.items())), "valid_ft": nft, "R_titles": R_titles,
            "build_counts": dict(sorted(cnt.items())), "invalid": dict(why), "seconds": round(time.time() - t0, 1)}
     write_atomic(res, Path(a.out) / "preflight.json")
     assert same, "the rebuilt items differ from data/stage8a_items.json"
@@ -191,7 +213,7 @@ def stage_frames(a):
     for fmt in ("NOM", "OPTA"):
         for it in R:
             _, ids, _, _ = encode_item(tok, it, fmt, it["answer"])
-            g = greedy(model, tok, torch.tensor([ids]), max_new=MAX_NEW)[0]
+            g = cut(greedy(model, tok, torch.tensor([ids]), max_new=MAX_NEW)[0], end_ids(tok))
             txt = gen_text(tok, ids, g)
             recs.append({"id": it["id"], "fmt": fmt, "text": txt, "prefix": frame_of(txt, it["answer"])})
     _, counts = choose_frame([r["prefix"] for r in recs])
@@ -234,9 +256,10 @@ def run_quant(model, tok, it, d, nL, run, rows, bits, max_new):
     with quantize_kv(model, pos, bits, sel, stats=stats):
         gens = greedy(model, tok, ids, max_new=max_new, stop=decided_stop(tok, it, d["fmt"]))
     out = {"n_pos": len(pos), "bits": bits, "rows": {}, "relerr": {}}
+    ends = end_ids(tok)
     for r, n in enumerate(names):
-        txt = gen_text(tok, d["ids"][run], gens[r])
-        g = gens[r]
+        g = cut(gens[r], ends)
+        txt = gen_text(tok, d["ids"][run], g)
         out["rows"][n] = {"ids": g, "text": txt, "who": answer_of(txt, it, d["fmt"]),
                           "g1": g[len(d["w"])] if len(g) > len(d["w"]) and g[:len(d["w"])] == d["w"] else None}
     for ch in "kv":

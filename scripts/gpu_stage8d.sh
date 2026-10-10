@@ -61,7 +61,7 @@ core_done() { local k=$1 s; for s in ${STEPS[$k]}; do s8_done "${s}_$k" || retur
 run_key() {  # run_key <key>: the core steps; 0 done (failed steps recorded), 1 files refused, 2 preflight failed
   local key=$1 dir t="${TAGP}$1" s
   if core_done "$key"; then echo "==================== $key: every core step kept"; return 0; fi
-  dir=$(s8_fetch "$key") || return 1
+  dir=$(s8_fetch "$key") || { s8_check; return 1; }   # s8_check dies on a fetch failure that is not a refusal (disk, network)
   DIRS[$key]=$dir
   local M=(--model "$dir" --key "$key")
   S8_OUTPUTS="$OUT/preflight/$t.json" s8_step "preflight_$key" $PY "${EX[@]}" --stage preflight "${M[@]}" || { s8_drop "$key"; return 2; }
@@ -87,7 +87,7 @@ run_key() {  # run_key <key>: the core steps; 0 done (failed steps recorded), 1 
 for i in "${!KEYS[@]}"; do
   key=${KEYS[$i]}
   next=${KEYS[$((i + 1))]:-}
-  if [ -n "$next" ] && ! on TEST_MODE && ! core_done "$next"; then s8_fetch "$next" > /dev/null 2>&1 & fi
+  if [ -n "$next" ] && ! on TEST_MODE && ! core_done "$next"; then s8_prefetch "$next"; fi
   rc=0; run_key "$key" || rc=$?
   case $rc in
     0) ;;

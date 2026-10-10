@@ -23,8 +23,10 @@ Stage 8 (P-2026-10-10-J, part B, JB8): --score E routes every scoring pass throu
 lower-case L equals lp_rows, tests/test_fresh_factorial.py). Each run then also stores "E" and "sig" (the six candidates'
 emitted-form and 12-form log-sums) and "mass" ({"L", "sig", "E"}: the sums of the six probabilities); "cand" stays the
 lower-case log-probs and "argmax" the global argmax at the answer position. E's frames are FRAMES_E_FIXED plus the
-discovered frames of --frames (a frames file of experiments/fresh_factorial.py --stage calib), instantiated per core;
-under LETTER the letters' forms are " X", "X", " **X" and "**X". --model-dir loads a verified local directory
+discovered frames of --frames (a frames file of experiments/fresh_factorial.py --stage calib), instantiated per core
+(a discovered frame that makes one form a proper prefix of another with a core's names is dropped for that core, the
+last admitted first, and listed in the item's "frames_dropped"); under LETTER the letters' forms are " X", "X", " **X"
+and "**X". --model-dir loads a verified local directory
 (scripts/fetch_verified.py) in place of the profile's Hub repository. Without --score E (the default) nothing changes:
 the same passes, the same fields and the same provenance as before.
 """
@@ -180,13 +182,21 @@ LETTER_FRAMES = {"sigma": (" ", ""), "E": (" ", "", " **", "**")}
 
 def score_formset(tok, arm, core):
     """The FormSet of the arm's alphabet for --score E (locations: sigma and E with the discovered frames and the core's
-    names; letters: LETTER_FRAMES)."""
+    names; letters: LETTER_FRAMES), and the discovered frames dropped for this core: a discovered frame whose forms,
+    with this core's names, make one sequence a proper prefix of another is dropped, the last admitted first (as
+    ckeys.fresh.form_set does for the stage-8 populations)."""
     from ckeys.surface import FRAMES_E_FIXED, FRAMES_SIGMA, FormSet
     if alphabet(arm) != tuple(LOCATIONS):
-        return FormSet(tok, alphabet(arm), LETTER_FRAMES)
-    frames = {"sigma": FRAMES_SIGMA, "E": tuple(FRAMES_E_FIXED) + tuple(f for f in SCORE["frames"] if f not in FRAMES_E_FIXED)}
+        return FormSet(tok, alphabet(arm), LETTER_FRAMES), []
+    disc, dropped = [f for f in SCORE["frames"] if f not in FRAMES_E_FIXED], []
     names = {"a": core["agent"], "b": core["other"], "o": core["object"], "d": core["distractor"]}
-    return FormSet(tok, alphabet(arm), frames, names=names)
+    while True:
+        try:
+            return FormSet(tok, alphabet(arm), {"sigma": FRAMES_SIGMA, "E": tuple(FRAMES_E_FIXED) + tuple(disc)}, names=names), dropped
+        except ValueError:
+            if not disc:
+                raise
+            dropped.insert(0, disc.pop())
 
 
 def rows_of(model, ids, cid):
@@ -281,9 +291,12 @@ def run_core(model, tok, core, arm, bases, dev, prefill="Answer:"):
     ib = ids["B"].to(dev)
     cid = candidate_ids(tok, arm)
     nL = len(blocks(model))
+    dropped = None
     if SCORE["mode"] == "E":
-        SCORE["fs"] = score_formset(tok, arm, core)
+        SCORE["fs"], dropped = score_formset(tok, arm, core)
     res = {"core": core, "arm": arm, "span": [span[0], span[-1] + 1], "vpos": vpos, "runs": {}}
+    if dropped:   # --score E only: discovered frames dropped for this core (prefix rule)
+        res["frames_dropped"] = dropped
     # natural runs + event-span residuals at the fit layer
     h = {}
     for name in ("B", "S", "T"):

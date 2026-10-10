@@ -42,16 +42,18 @@ COV_MIN, FLOOR_FRAC, ANCHOR_FRAC, COMP_MIN, COMP_N_MIN = 0.8, 0.05, 0.1, 0.8, 30
 S_DEN, S_VNEG = 0.2, 0.05
 
 # code -> (class, kind, recorded prior P(met), set, title). kind: "A" account line, "V" measurement-validity line.
+# Class follows the recorded prior P(MET | evaluable) (common part, G4): L = implied by data in hand on the same models
+# and material, prior >= 0.9; M = prior >= 0.8; R = prior < 0.8 (tests/test_stage8b_score.py checks every line).
 LINES = {
     "J-B1-P4f": ("L", "A", 0.90, "P4f", "the list after the story opens a key read that carries most of the identity"),
     "J-B1-N4": ("M", "A", 0.85, "N4", "the list after the story opens a key read that carries most of the identity"),
     "J-B2-P4f": ("L", "A", 0.90, "P4f", "the same list or sentence before the writing token adds no key read over no mention"),
     "J-B2-N4": ("M", "A", 0.85, "N4", "the same list or sentence before the writing token adds no key read over no mention"),
-    "J-B3-P4f": ("L", "A", 0.80, "P4f", "a neutral sentence after the story opens an intermediate key read"),
+    "J-B3-P4f": ("M", "A", 0.80, "P4f", "a neutral sentence after the story opens an intermediate key read"),
     "J-B3-N4": ("R", "A", 0.50, "N4", "a neutral sentence after the story opens an intermediate key read"),
     "J-B4-P4f": ("L", "A", 0.90, "P4f", "without a later mention the identity is copied through the value"),
     "J-B4-N4": ("M", "A", 0.85, "N4", "without a later mention the identity is copied through the value"),
-    "J-B5-P4f": ("L", "A", 0.85, "P4f", "the channel that decides the generated answer flips with a later list"),
+    "J-B5-P4f": ("M", "A", 0.85, "P4f", "the channel that decides the generated answer flips with a later list"),
     "J-B5-N4": ("M", "A", 0.80, "N4", "the channel that decides the generated answer flips with a later list"),
     "J-B5b-P4f": ("R", "A", 0.45, "P4f", "the sentence read changes generated answers: beta_K(POST) > beta_K(PRE)"),
     "J-B5b-N4": ("R", "A", 0.40, "N4", "the sentence read changes generated answers: beta_K(POST) > beta_K(PRE)"),

@@ -199,9 +199,11 @@ def test_stray_file_refused(tmp_path):
     dest = tmp_path / "d"
     run_fetch("gated", dest, mp, root)
     (dest / "tokenizer.model").write_bytes(b"stray")
-    with pytest.raises(SystemExit):
+    with pytest.raises(SystemExit) as ex:
         run_fetch("gated", dest, mp, root)
+    assert ex.value.code == 6   # the directory's state, not a verification failure of the model's files: no fallback
     assert json.loads((dest / "VERIFY_FAILED.json").read_text())["unexpected_files"] == ["tokenizer.model"]
+    assert not (dest / "VERIFIED.json").exists()
 
 
 def test_cache_copy_used_only_when_it_verifies(tmp_path, monkeypatch):
@@ -213,8 +215,39 @@ def test_cache_copy_used_only_when_it_verifies(tmp_path, monkeypatch):
     monkeypatch.setattr(fv, "cache_lookup", lambda repo, rev, f: (cache / f) if (cache / f).exists() and repo == "mirror/one" else None)
     dest = tmp_path / "d"
     out = fv.fetch("gated", dest, mp, download=fv.local_root_download(root), use_cache=True, log=lambda *a: None)
-    assert (dest / "config.json").is_symlink() and out["files"]["config.json"]["source"].endswith("(local HF cache)")
+    r = out["files"]["config.json"]
+    assert r["source"].endswith("(local HF cache)") and r["link"] == "hard"
+    assert not (dest / "config.json").is_symlink() and (dest / "config.json").stat().st_ino == (cache / "config.json").stat().st_ino
     assert not (dest / "model.safetensors").is_symlink() and out["files"]["model.safetensors"]["source"] == f"mirror/one@{REV['m1']}"
+    assert (dest / "model.safetensors").stat().st_ino != (cache / "model.safetensors").stat().st_ino   # the bad copy not linked
+    # the cache entry replaced later (a re-download renames a new file over the blob) or removed: the verified bytes stay
+    (cache / "new").write_bytes(b'{"model_type": "toY"}\n')
+    os.replace(cache / "new", cache / "config.json")
+    assert (dest / "config.json").read_bytes() == FILES["config.json"][0]
+    (cache / "config.json").unlink()
+    assert (dest / "config.json").read_bytes() == FILES["config.json"][0]
+
+
+def test_cache_symlink_only_across_file_systems(tmp_path, monkeypatch):
+    """Where a hard link is impossible (another file system) the blob is symbolically linked, and the link is verified
+    after it is made; a later call re-verifies it like any existing copy."""
+    root, mp, man = fake_world(tmp_path)
+    cache = tmp_path / "cache"
+    cache.mkdir()
+    (cache / "config.json").write_bytes(FILES["config.json"][0])
+    monkeypatch.setattr(fv, "cache_lookup", lambda repo, rev, f: (cache / f) if (cache / f).exists() and repo == "mirror/one" else None)
+    def no_link(*a):
+        raise OSError(18, "Invalid cross-device link")
+    monkeypatch.setattr(fv.os, "link", no_link)
+    dest = tmp_path / "d"
+    out = fv.fetch("gated", dest, mp, download=fv.local_root_download(root), use_cache=True, log=lambda *a: None)
+    assert (dest / "config.json").is_symlink() and out["files"]["config.json"]["link"] == "symbolic"
+    # the cache file changes behind the symbolic link: the next call re-verifies, drops the link and fetches again
+    (cache / "config.json").write_bytes(b'{"model_type": "toY"}\n')
+    out = fv.fetch("gated", dest, mp, download=fv.local_root_download(root), use_cache=False, log=lambda *a: None)
+    r = out["files"]["config.json"]
+    assert r["attempts"][0]["source"] == "existing copy" and r["source"] == f"mirror/one@{REV['m1']}"
+    assert not (dest / "config.json").is_symlink() and (dest / "config.json").read_bytes() == FILES["config.json"][0]
 
 
 def test_verify_only_fetches_nothing(tmp_path):
@@ -236,6 +269,9 @@ def test_cli_exit_codes(tmp_path):
     assert r.returncode == 1 and "REFUSED" in r.stderr
     r = subprocess.run(cli + ["--key", "nokey", "--dest", str(tmp_path / "x")], capture_output=True, text=True, env=env)
     assert r.returncode == 2 and "unknown key" in r.stderr
+    (tmp_path / "afile").write_text("x")   # --dest is a regular file: an unexpected error (exit 3), never a refusal (1)
+    r = subprocess.run(cli + ["--key", "gated", "--dest", str(tmp_path / "afile")], capture_output=True, text=True, env=env)
+    assert r.returncode == 3 and "not a verification failure" in r.stderr
     man["models"]["gated"]["revision"] = "main"
     mp.write_text(json.dumps(man))
     r = subprocess.run(cli + ["--key", "gated", "--dest", str(tmp_path / "x")], capture_output=True, text=True, env=env)
@@ -379,6 +415,18 @@ def test_guard_draft_entry(tmp_path):
     assert r.returncode == 1 and "is still a DRAFT" in r.stdout and "INIT_OK" not in r.stdout
     assert "still a DRAFT" in (tmp_path / "out" / "FAILED.txt").read_text() and (tmp_path / "out.tgz").exists()
     assert init(repo, tmp_path, TEST_MODE="1").returncode == 0   # TEST_MODE: no guards
+
+
+def test_guard_final_entry_that_quotes_the_marker_runs(tmp_path):
+    """The final entry describes the guard in prose and so quotes the marker's words; only a line that starts with the
+    marker (**DRAFT, not yet final.**) makes the entry a draft. The common part of entry J has such a prose line."""
+    prose = '1. It refuses to start if:\n   - this section still says "DRAFT, not yet final" (the check reads the section);'
+    repo = toy_repo(tmp_path, status="**Final.** Fixed in the commit.\n\n" + prose)
+    r = init(repo, tmp_path, MINGIB="100000")
+    assert "still a DRAFT" not in r.stdout and "final at" in r.stdout, r.stdout + r.stderr
+    repo2 = toy_repo(tmp_path / "t2", status="**DRAFT, not yet final.** Under construction.\n\n" + prose)
+    r = init(repo2, tmp_path / "t2")
+    assert r.returncode == 1 and "is still a DRAFT" in r.stdout
 
 
 def test_guard_no_entry_and_bad_switches(tmp_path):
@@ -533,13 +581,44 @@ def test_transient_errors_retried_permanent_not(tmp_path):
     assert calls.count(("mirror/one", "config.json")) == 3 and out["files"]["config.json"]["source"] == f"mirror/one@{REV['m1']}"
     assert calls.count(("mirror/one", "model.safetensors")) == 1
     assert out["files"]["model.safetensors"]["source"] == f"mirror/two@{REV['m2']}"
-    # every try fails: the file is unavailable (not a byte mismatch), status 1
+    # every try fails with a transient error (network): not a verification failure but status 5, and the fetch stops at
+    # the first such file (no fallback may follow a network outage)
     with pytest.raises(SystemExit) as ex:
         fv.fetch("plain", tmp_path / "p", mp, download=lambda *a: (_ for _ in ()).throw(Flaky("timeout")),
                  use_cache=False, log=lambda *a: None, wait=0, tries=2)
-    assert ex.value.code == 1
+    assert ex.value.code == 5
     f = json.loads((tmp_path / "p" / "VERIFY_FAILED.json").read_text())
-    assert f["files"]["config.json"]["reason"] == "unavailable from every listed source" and len(f["files"]["config.json"]["attempts"]) == 2
+    assert f["failed"] == ["config.json"] and len(f["files"]["config.json"]["attempts"]) == 2
+    assert "retry could fix" in f["files"]["config.json"]["reason"] and f["files"]["config.json"]["transient"] == [f"org/plain@{REV['plain']}"]
+    # every source answers 404 (a retry cannot fix it): a refusal, status 1
+    def gone(*a):
+        e = Flaky("404 Client Error")
+        e.code = 404
+        raise e
+    with pytest.raises(SystemExit) as ex:
+        fv.fetch("plain", tmp_path / "q", mp, download=gone, use_cache=False, log=lambda *a: None, wait=0)
+    assert ex.value.code == 1
+    f = json.loads((tmp_path / "q" / "VERIFY_FAILED.json").read_text())
+    assert f["failed"] == list(FILES) and f["files"]["config.json"]["reason"].startswith("unavailable from every listed source")
+    # one mirror gives wrong bytes, the other times out: not refused for certain (the other might serve the right
+    # bytes), status 5; a file refused for certain elsewhere makes it a refusal (1) even with a transient failure later
+    root2, mp2, _ = fake_world(tmp_path / "w2", corrupt_m1=("config.json",))
+    good2 = fv.local_root_download(root2)
+    def m2_down(repo, rev, fname, tmpdir, token):
+        if repo == "mirror/two":
+            raise Flaky("timeout")
+        return good2(repo, rev, fname, tmpdir, token)
+    with pytest.raises(SystemExit) as ex:
+        fv.fetch("gated", tmp_path / "r", mp2, download=m2_down, use_cache=False, log=lambda *a: None, wait=0, tries=2)
+    assert ex.value.code == 5
+    (root2 / "mirror/two" / REV["m2"] / "config.json").write_bytes(b'{"model_type": "toY"}\n')   # now wrong there too
+    def tok_down(repo, rev, fname, tmpdir, token):
+        if fname == "tokenizer.json":
+            raise Flaky("timeout")
+        return good2(repo, rev, fname, tmpdir, token)
+    with pytest.raises(SystemExit) as ex:
+        fv.fetch("gated", tmp_path / "s", mp2, download=tok_down, use_cache=False, log=lambda *a: None, wait=0, tries=2)
+    assert ex.value.code == 1
 
 
 def test_not_enough_disk_is_status_4(tmp_path, monkeypatch):
@@ -573,7 +652,9 @@ DIR=$(s8_fetch pre); echo "PRE=$DIR rc=$?"
 DIR=$(s8_fetch bad); echo "BAD=$DIR rc=$?"
 s8_drop good; s8_drop pre; echo "DROPPED"
 s8_step after_refusal true && echo "STEP_OK"
+s8_prefetch bad2; s8_prefetch disk2; wait; [ -s "$S8_STATE/fatal" ] && echo PREFETCH_FATAL || echo PREFETCH_QUIET
 DIR=$(s8_fetch disk); echo "DISK=$DIR rc=$?"
+DIR=$(s8_fetch good); echo "AFTER_FATAL=$DIR rc=$?"
 s8_step after_disk true; echo "NOT REACHED"
 '''
 
@@ -584,7 +665,7 @@ def test_s8_fetch_refusal_and_fatal_errors(tmp_path):
     shutil.copy(LIB, repo / "scripts")
     (repo / "scripts" / "fetch_verified.py").write_text(FAKE_FETCHER)
     env = {k: v for k, v in os.environ.items() if k not in ("KEEP_CACHE", "TEST_MODE")}
-    env.update(PY=PY, FAKE_RC_bad="1", FAKE_RC_disk="4")
+    env.update(PY=PY, FAKE_RC_bad="1", FAKE_RC_disk="4", FAKE_RC_bad2="1", FAKE_RC_disk2="5")
     r = subprocess.run(["bash", "-c", FETCH_SH], cwd=repo, capture_output=True, text=True, env=env, timeout=120)
     s, out = r.stdout, repo / "out"
     assert f"GOOD={repo}/models/good rc=0" in s and f"PRE={repo}/models/pre rc=0" in s and "BAD= rc=1" in s, s + r.stderr
@@ -594,3 +675,9 @@ def test_s8_fetch_refusal_and_fatal_errors(tmp_path):
     assert not (repo / "models" / "good").exists() and (repo / "models" / "pre").exists()   # dropped / kept
     assert "STEP_OK" in s and "DISK= rc=4" in s and "NOT REACHED" not in s and r.returncode == 1
     assert "not enough disk" in (out / "FAILED.txt").read_text() and "disk" not in (out / "FETCH_FAILED.txt").read_text()
+    # a background prefetch only logs: neither its refusal nor its environment error is recorded or stops the run
+    assert "PREFETCH_QUIET" in s and "bad2" not in (out / "FETCH_FAILED.txt").read_text()
+    assert "prefetch of disk2: exit 5" in (out / "logs" / "fetch_disk2.log").read_text()
+    # after a fatal error, a fetch in a command substitution returns 5, never 1 (which a script would take for a refusal
+    # and answer with the fallback), and prints no directory
+    assert "AFTER_FATAL= rc=5" in s

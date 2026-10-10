@@ -116,7 +116,7 @@ def test_bootstrap_two_stage_deterministic_and_seed_level():
     assert pt2 == 0.5 and set(np.round(np.unique(bs2), 6)) <= {0.0, 0.5, 1.0} and 0.3 < bs2.mean() < 0.7
 
 
-def test_tost_log_ratio_holm():
+def test_tost_log_ratio_holm_components():
     q = ST.Q(0.0, np.random.default_rng(0).normal(0, 0.05, 10000))
     assert ST.tost(q)
     assert not ST.tost(ST.Q(0.0, np.random.default_rng(0).normal(0, 0.3, 10000)))     # too wide
@@ -124,8 +124,17 @@ def test_tost_log_ratio_holm():
     lr = ST.log_ratio(ST.Q(0.5, np.full(10, 0.5)), ST.Q(1.0, np.full(10, 1.0)))
     assert abs(lr.pt - math.log(0.5)) < 1e-12
     assert abs(ST.log_ratio(ST.Q(-1.0, np.full(3, -1.0)), ST.Q(1.0, np.ones(3))).pt - math.log(0.01)) < 1e-12
-    ch = ST.holm([("a", 0.001, True), ("b", 0.02, True), ("c", 0.5, False)], alpha=0.025)
-    assert [c[0] for c in ch] == ["b"]                                                   # 0.02 > 0.025 / 2
+    # the Holm components (decision D2): TOST gives H1: lambda > -log 1.25 ('>') and H1: lambda < log 1.25 ('<') with the
+    # bootstrap SE; the own decisions are the 90 % interval's
+    SC.COMPONENTS.clear()
+    SC.comp_tost("J-C3", "x", q)
+    (c1, d1, o1), (c2, d2, o2) = SC.COMPONENTS
+    assert c1 == c2 == "J-C3" and d1["line"] == "J-C3" and o1 and o2
+    assert (d1["direction"], d1["bound"], d2["direction"], d2["bound"]) == (">", -math.log(1.25), "<", math.log(1.25))
+    assert abs(d1["se"] - 0.05) < 0.002 and d1["est"] == 0.0
+    deg = ST.component("J-C4", "y", ST.Q(1.0, np.ones(50)), 0.5, ">", True)[1]
+    assert deg["se"] == 1e-12                                                            # degenerate bootstrap
+    SC.COMPONENTS.clear()
 
 
 # --------------------------------------------------------------------------- the law
@@ -314,6 +323,45 @@ def test_screen_and_window():
     assert PK.window({"l_w": 6, "cells": cells_b, "clamp_cells": cl}, False)[0] is False
 
 
+def test_lexical_code_counts_only_evaluable_models():
+    """Outcome (b) reads the lexical-code reading of the effective families of the evaluable models only (J-C-G1, J-C-G2,
+    J-C-G8 passed; E3 at the layers passing J-C-G3): a model removed from the law lines cannot decide it."""
+    fams = ("E1", "E2", "E3", "E4a", "E4b")
+    lexy = LW.Model(make_eval(n=24, depths=(3,), comps={f"{c}:{z}": (0.9, 0.9) for c in ("PAR", "LEX") for z in fams}))
+    flat = LW.Model(make_eval(n=24, depths=(3,), comps={f"{c}:{z}": (0.1, 0.1) for c in ("PAR", "LEX") for z in fams}))
+    G, I = gates_for({"qwen7": lexy, "mistral7": flat})
+    assert SC.reported(G, I, lambda s: None) is False                                    # both evaluable: mistral7 decides
+    G.model_ok["mistral7"] = False
+    assert SC.reported(G, I, lambda s: None) is True                                     # mistral7 not evaluable: left out
+    G2, I2 = gates_for({"qwen7": flat}, g3={3: True})
+    G2.model_ok["qwen7"] = False
+    assert SC.reported(G2, I2, lambda s: None) is None                                   # nothing counted
+
+
+def test_holm_sensitivity_family_and_verdicts():
+    """D2: the family is the interval components of the R-class lines with a verdict (J-C1, class M, is left out); a MET
+    line whose component Holm no longer rejects becomes NOT MET under Holm; the helper is analysis/stage8_holm.py."""
+    SC.COMPONENTS.clear()
+    rng = np.random.default_rng(0)
+    q_far = ST.Q(0.0, rng.normal(0.0, 0.02, 10000))          # far inside +-log 1.25: both components rejected by any rule
+    q_edge = ST.Q(0.13, rng.normal(0.13, 0.05, 10000))       # 90 % interval inside; the '<' component's normal p ~ 0.03
+    SC.comp_tost("J-C3", "far", q_far)
+    SC.comp_tost("J-C4", "edge", q_edge)
+    SC.comp_tost("J-C1", "m-class", q_edge)                  # class M: not in the family
+    R = {"J-C1": (True, {}, []), "J-C3": (True, {}, []), "J-C4": (True, {}, [])}
+    lines = []
+    SC.holm_sensitivity(R, lines.append)
+    text = "\n".join(lines)
+    assert "NOT COMPUTED" not in text, text
+    assert "over the 4 interval components" in text, text
+    j3 = next(x for x in lines if x.strip().startswith("J-C3:"))
+    j4 = next(x for x in lines if x.strip().startswith("J-C4:"))
+    assert "2 components" in j3 and "no decision changes" in j3 and "verdict unchanged (MET)" in j3, j3
+    assert "2 components" in j4 and "MET -> NOT MET under Holm" in j4, j4
+    assert not any(x.strip().startswith("J-C1:") for x in lines)
+    SC.COMPONENTS.clear()
+
+
 def test_headline_outcomes():
     R = lambda **v: {k.replace("_", "-"): (x, {}, []) for k, x in v.items()}  # noqa: E731
     SC.PATTERNS.clear()
@@ -356,12 +404,12 @@ def test_main_on_results_dir(tmp_path, good):
     for sec in ("PROVENANCE", "POPULATION", "GATES", "PREDICTIONS", "HEADLINE", "REPORTED", "SUMMARY", "EXPLORATORY"):
         assert sec in text, sec
     assert "J-C-G0  FP32 unit tests" in text and "-> MET" in text
-    assert re.search(r"J-C1\s+L A prior 0.80\s+MET", text) and re.search(r"J-C-BOUND\s+R A prior 0.50\s+MET", text), text[-3000:]
+    assert re.search(r"J-C1\s+M A prior 0.80\s+MET", text) and re.search(r"J-C-BOUND\s+R A prior 0.50\s+MET", text), text[-3000:]
     assert re.search(r"J-C6\s+M A prior 0.85\s+NOT EVALUABLE", text)
-    assert "class R (account lines)" in text and rc == 0, rc
+    assert "account lines, class R:" in text and rc == 0, rc
     (root / "logs" / "pytest.log").write_text(log.replace("PASSED", "FAILED", 1))
     SC.main(["--results", str(root)])
-    assert re.search(r"J-C1\s+L A prior 0.80\s+NOT EVALUABLE", (root / "STAGE8C_SCORE.txt").read_text())
+    assert re.search(r"J-C1\s+M A prior 0.80\s+NOT EVALUABLE", (root / "STAGE8C_SCORE.txt").read_text())
 
 
 import re  # noqa: E402

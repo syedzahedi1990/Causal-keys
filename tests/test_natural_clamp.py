@@ -163,6 +163,29 @@ def test_generation_under_kv_s_is_greedy_on_the_s_prompt(qwen, fmt):
         assert g["KV_S"]["g1"] == g["KV_S"]["ids"][len(d["w"])]
 
 
+def test_answer_ends_at_a_special_token_missing_from_the_eos_list(qwen):
+    """Gemma-2-9b-it's generation config lists only <eos>, not <end_of_turn> (Yi-1.5-9B-Chat: not <|im_end|>), so greedy
+    decoding goes on past the end of the turn. Here <|im_end|> is removed from the EOS list: the model then writes it
+    after the answer, and the rows must still name the same entities (the answer is read up to the special token)."""
+    model, tok, nL = qwen
+    it = item(list(CTX)[0])
+    d = prep(tok, it, "NOM", " ")
+    kv, _ = capture(model, d, range(nL), "cpu")
+    rows = {n: BASE[n] for n in ("ID", "KV_S", "KV_X")}
+    ref = generate_rows(model, tok, it, d, kv, rows, nL, 12)
+    eos = model.generation_config.eos_token_id
+    model.generation_config.eos_token_id = [t for t in eos if t != tok.convert_tokens_to_ids("<|im_end|>")]
+    try:
+        got = generate_rows(model, tok, it, d, kv, rows, nL, 12)
+        raw = greedy_reference(model, tok, torch.tensor([d["ids"]["B"]]), max_new=12)[0]
+    finally:
+        model.generation_config.eos_token_id = eos
+    assert tok.convert_tokens_to_ids("<|im_end|>") in raw, "the model must write <|im_end|> after its answer"
+    assert answer_of(gen_text(tok, d["ids"]["B"], raw), it, "NOM") == "other"     # read with the special token's text
+    assert {n: (g["who"], g["ids"], g["g1"]) for n, g in got.items()} == {n: (g["who"], g["ids"], g["g1"]) for n, g in ref.items()}
+    assert [g["who"] for g in got.values()] == ["B", "S", "X"]
+
+
 def test_passage_positions_and_frames(qwen):
     model, tok, nL = qwen
     it = item(list(CTX)[1])
@@ -180,6 +203,39 @@ def test_passage_positions_and_frames(qwen):
     assert tok.decode(dd["w"]).strip() == "**" and len(set(dd["dec"].values())) == 5
     for e in (it0["answer"], it0["S"], it["answer"], it["S"]):
         assert frame_cont(tok, text, ids, e, " ") == cont_ids(tok, text, ids, e)
+
+
+def test_early_stop_never_changes_the_answer_class():
+    """decided_stop (tokenizer only, every committed item): along every token prefix of many continuations (each
+    candidate, markdown frames, possessives, punctuation, longer and shorter names, letters with markdown), the answer
+    class from the prefix where the row stops equals the class of the whole continuation, and the stop fires."""
+    tok = AutoTokenizer.from_pretrained(NAME)
+    n_stop = 0
+    for it in list(ITEMS.values()):
+        for fmt in ("NOM", "LETA"):
+            text = chat_text(tok, "Read the passage and answer the question.") if fmt == "NOM" else chat_text(tok, "Pick a letter.")
+            ids = tok(text, add_special_tokens=False).input_ids
+            stop = decided_stop(tok, it, fmt)
+            if fmt == "NOM":
+                ents = [it[k] for k in ("answer", "S", "X", "Z", "D")]
+                gens = [f" {e}{t}" for e in ents for t in ("", ".", "'s house", " Jr. and the rest of it", ", the second one")]
+                gens += [f" **{e}**, as the passage says" for e in ents]
+                gens += [f" The {ents[0]} and {ents[1]}", f" {ents[0].split()[0]} {ents[2]} is it",
+                         f" {ents[1]}-{ents[0]} was named", " none of them, sorry about that"]
+            else:
+                gens = [f" {L}{t}" for L in "ABCD" for t in ("", ".", ") the answer", "**", "lpha and beta", " is it")]
+                gens += [" **B**", " (C) text", " The answer is A", " `D` here"]
+            for g in gens:
+                full = tok(text + g, add_special_tokens=False).input_ids
+                assert full[:len(ids)] == ids
+                gen = full[len(ids):]
+                k = next((n for n in range(1, len(gen) + 1) if stop(0, gen[:n])), None)
+                if k is None:
+                    continue
+                n_stop += 1
+                cut, whole = gen_text(tok, ids, gen[:k]), gen_text(tok, ids, gen)
+                assert answer_of(cut, it, fmt) == answer_of(whole, it, fmt), (it["id"], fmt, cut, whole)
+    assert n_stop > 1000
 
 
 def test_frame_cont_is_cont_ids_on_every_item_and_parsing():

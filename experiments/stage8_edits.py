@@ -660,14 +660,16 @@ def compact(out):
 
 @torch.no_grad()
 def e3_precompute(a, model, tok, E, cal, dev, depths):
-    """E3 vectors for every E story (and target) at each depth, one dictionary on the device at a time."""
+    """E3 vectors for every E story (and target) at each depth, one dictionary on the device at a time. h_B is read from
+    the natural pass's shape (NAT_ROWS), so it is the h_B of eval's natural pass bitwise and E3 = h_B + its SAE edit."""
     vec = {}
     for l in depths:
         S, _ = load_sae(a, l, dev)
         cl = cal.T["sae"][l]
         for si, c in enumerate(E):
             d = edits.prep(tok, c)
-            res, _ = edits.prefix_pass(model, d["prefix"], d["p"], resid_layers=[l])
+            pre = torch.cat([d["ids"]["NONE"][k][:, :d["p"] + 1] for k in NAT_ROWS])
+            res, _ = edits.prefix_pass(model, pre, d["p"], resid_layers=[l])
             for t, it in (("S", d["iS"]), ("X", d["iX"])):
                 vec[(si, l, t)] = e3_vectors_for(S, res[l][0], it, d["iB"], cl)
         del S
@@ -732,12 +734,29 @@ def stage_eval(a):
     return status
 
 
+NAT_ROWS = ("B", "S", "X", "piS", "piX")     # the rows of the natural prefix pass of an E story
+
+
+def natural_pass(model, d, depths, nL):
+    """The natural prefix pass of one E story (NAT_ROWS, NONE prefix): block outputs at p at ``depths`` and K/V at p from
+    block min(depths) + 1."""
+    pre = torch.cat([d["ids"]["NONE"][k][:, :d["p"] + 1] for k in NAT_ROWS])
+    return edits.prefix_pass(model, pre, d["p"], resid_layers=depths, kv_layers=range(min(depths) + 1, nL))
+
+
+def edit_pass(model, d, l, vecs, layers):
+    """The edit vectors ``vecs`` [R, D] written at (p, l) of the B prefix: K/V at p in ``layers``. Run in forwards of
+    exactly len(NAT_ROWS) rows (the last padded), the natural pass's shape, so that an edit's tables are computed by the
+    natural pass's kernels: T then equals the natural tables bitwise (BF16 included) and an edit differs from them only
+    through what it writes (J-C-G1)."""
+    return edits.prefix_pass(model, d["prefix"], d["p"], kv_layers=layers, write=(l, vecs), chunk=len(NAT_ROWS), pad=True)[1]
+
+
 def eval_story(a, model, tok, si, c, cal, fam, inst, decomp, nL, cols):
     d = edits.prep(tok, c)
     p = d["p"]
-    names = ("B", "S", "X", "piS", "piX")
-    pre = torch.cat([d["ids"]["NONE"][k][:, :p + 1] for k in names])
-    res, kv = edits.prefix_pass(model, pre, p, resid_layers=a.depths, kv_layers=range(min(a.depths) + 1, nL))
+    names = NAT_ROWS
+    res, kv = natural_pass(model, d, a.depths, nL)
     h = {k: {l: res[l][i] for l in a.depths} for i, k in enumerate(names)}
     targets = {"S": d["iS"], "X": d["iX"]}
     fs = {f: edits.form_set(tok, f, c, cal.frames) for f in edits.FORMATS}
@@ -747,7 +766,7 @@ def eval_story(a, model, tok, si, c, cal, fam, inst, decomp, nL, cols):
         layers = list(range(l + 1, nL))
         vec = fam.vectors(si, l, h, d["iB"], targets)
         vn = list(vec)
-        _, kvE = edits.prefix_pass(model, d["prefix"], p, kv_layers=layers, write=(l, torch.stack([vec[n] for n in vn])))
+        kvE = edit_pass(model, d, l, torch.stack([vec[n] for n in vn]), layers)
         tab = {n: split_tables(kvE, i, layers) for i, n in enumerate(vn)}
         tabB = split_tables(kv, 0, layers)
         tabT = {"S": split_tables(kv, 1, layers), "X": split_tables(kv, 2, layers)}

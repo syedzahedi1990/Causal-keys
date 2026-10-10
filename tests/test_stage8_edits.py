@@ -231,6 +231,23 @@ def test_T_rows_equal_natural_rows_and_layout(ctx):
         assert all(torch.allclose(sv[2][q], tabB[(q, "v")] + 0.8 * (tabT["X"][(q, "v")] - tabB[(q, "v")])) for q in lay)
 
 
+def test_T_tables_bitwise_through_the_eval_passes(ctx):
+    """J-C-G1's floor: eval's edit pass runs in forwards of the natural pass's shape (5 rows, the last padded), so T's
+    tables equal the natural tables bitwise even among 66 edit rows (one 66-row forward differs from the 5-row natural
+    pass by the batch-shape floor: 8e-6 here in FP32, the BF16 rounding floor of nu, about 0.02, on a GPU)."""
+    m, d, nL = ctx["model"], ctx["d"], ctx["nL"]
+    l = 7
+    lay = list(range(l + 1, nL))
+    res, kv = s8.natural_pass(m, d, [3, l], nL)
+    g = torch.Generator().manual_seed(0)
+    vec = torch.cat([res[l][1:3], res[l][0:1] + 0.5 * torch.randn(64, res[l].shape[-1], generator=g)])
+    kvE = s8.edit_pass(m, d, l, vec, lay)
+    assert all(kvE[(q, ch)].shape[0] == 66 for q in lay for ch in "kv")
+    assert all(torch.equal(kvE[(q, ch)][i], kv[(q, ch)][1 + i]) for q in lay for ch in "kv" for i in (0, 1))
+    _, kv5 = edits.prefix_pass(m, d["prefix"], d["p"], kv_layers=lay, write=(l, vec[60:]), chunk=5, pad=True)
+    assert all(torch.equal(kv5[(q, ch)], kvE[(q, ch)][60:]) for q in lay for ch in "kv")     # padding drops its rows
+
+
 def test_components_and_kv_stats_known_answers():
     g = torch.Generator().manual_seed(1)
     d, dn = torch.randn(32, generator=g), torch.randn(32, generator=g)

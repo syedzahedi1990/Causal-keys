@@ -18,10 +18,22 @@ from .story import LOCATIONS
 CAND_RE = re.compile(r"(?i)\b(" + "|".join(LOCATIONS) + r")")
 
 
+END_OF_TURN = ("<end_of_turn>", "<|im_end|>", "<|eot_id|>", "<|end|>", "<|endoftext|>", "</s>", "<eos>")
+
+
 def _eos_ids(model, tok):
+    """The ids that end an answer: generation_config's eos ids, the tokenizer's eos, and the chat templates' end-of-turn
+    tokens that exist in this vocabulary (generation_config lists only <eos> for Gemma-2 and Yi-1.5, whose turns end with
+    <end_of_turn> and <|im_end|>)."""
     e = model.generation_config.eos_token_id if getattr(model, "generation_config", None) else None
-    e = e if e is not None else tok.eos_token_id
-    return set(e if isinstance(e, (list, tuple)) else [e]) - {None}
+    ids = set(e if isinstance(e, (list, tuple)) else [e]) | {getattr(tok, "eos_token_id", None)}
+    conv = getattr(tok, "convert_tokens_to_ids", None)
+    unk = getattr(tok, "unk_token_id", None)
+    for t in END_OF_TURN:
+        i = conv(t) if conv else None
+        if isinstance(i, int) and i != unk:
+            ids.add(i)
+    return ids - {None}
 
 
 @torch.no_grad()
@@ -30,7 +42,7 @@ def greedy(model, tok, ids: torch.Tensor, max_new: int = 16, stop=None, newline:
     dev = next(model.parameters()).device
     R = ids.shape[0]
     eos = _eos_ids(model, tok)
-    out = model(ids.to(dev), use_cache=True)
+    out = model(ids.to(dev), use_cache=True, logits_to_keep=1)
     past, nxt = out.past_key_values, out.logits[:, -1].argmax(-1)
     res, done = [[] for _ in range(R)], [False] * R
     for step in range(max_new):

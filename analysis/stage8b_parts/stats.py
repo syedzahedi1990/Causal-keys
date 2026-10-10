@@ -1,5 +1,5 @@
 """Statistics of the stage-8 part-B scorer (P-2026-10-10-J part B): the two-stage cluster bootstrap, estimates with
-definedness rules, one-sided interval criteria with their bootstrap p-values (Holm sensitivity), verdict words and the
+definedness rules, one-sided interval criteria (with the inputs of the shared Holm helper), verdict words and the
 rules that combine models.
 
 Bootstrap (entry, Statistics): for a population whose items carry cluster labels (lexicon, base, source), resample the
@@ -11,8 +11,10 @@ Definedness: a statistic returns its value and two masks. "own" fails when the a
 share whose denominator collapses); "anchor" fails when the LIST-AFTER anchor of a ratio does. At the point or in more
 than 5 % of the resamples: own -> the criterion is not met; anchor -> the criterion is not evaluable.
 Intervals are percentile intervals at the line's level (95 %: every-model lines and single-model lines; 98.75 %: the
-"3 of 4" lines). "lower bound > t" is the one-sided test of H0: theta <= t, with bootstrap p = (1 + #{resamples <= t}) /
-(B + 1) over the defined resamples; "upper bound < t" likewise; "inside (a, b)" is two one-sided tests, p the larger.
+"3 of 4" lines). "lower bound > t" is the one-sided test of H0: theta <= t; "upper bound < t" likewise; "inside (a, b)"
+is two one-sided tests. A one-sided interval component also records its point estimate, the bootstrap SE (the SD of the
+defined resamples), its bound and direction ('>' for H1: theta > t, '<' for H1: theta < t): the input of the Holm
+sensitivity analysis, which every stage-8 part computes with the shared helper analysis/stage8_holm.py (common part).
 """
 from __future__ import annotations
 
@@ -132,8 +134,9 @@ class Comp:
     """One component of a line in one model: an effect-size condition on the point estimate, or an interval
     criterion (a one-sided test of a named null) with its bootstrap p-value; ``ne`` names why it is not evaluable."""
 
-    def __init__(self, label, passed, p=None, ne=None):
+    def __init__(self, label, passed, p=None, ne=None, holm=None):
         self.label, self.passed, self.p, self.ne = label, bool(passed), p, ne
+        self.holm = holm   # one-sided interval components: {name, est, se, bound, direction} (analysis/stage8_holm.py)
 
     def __str__(self):
         return f"{self.label}: {'NOT EVALUABLE (' + self.ne + ')' if self.ne else 'yes' if self.passed else 'no'}"
@@ -157,6 +160,12 @@ def point(label, cond, e=None):
     return Comp(label + " (point)", bool(cond))
 
 
+def _holm(e, thr, direction, what):
+    """The shared Holm helper's component (without its line): point estimate, bootstrap SE, bound, direction."""
+    se = float(np.std(e.bs, ddof=1)) if e.bs.size > 1 else NAN
+    return {"name": what, "est": e.pt, "se": se, "bound": float(thr), "direction": direction}
+
+
 def pval(e, null_side) -> float:
     if not e.bs.size:
         return 1.0
@@ -170,7 +179,7 @@ def lower(e, thr, level, what):
     if u is not None:
         return u
     lo = e.bound(level, "lo")
-    return Comp(lab, not math.isnan(lo) and lo > thr, pval(e, lambda b: b <= thr))
+    return Comp(lab, not math.isnan(lo) and lo > thr, pval(e, lambda b: b <= thr), holm=_holm(e, thr, ">", what))
 
 
 def upper(e, thr, level, what):
@@ -180,7 +189,7 @@ def upper(e, thr, level, what):
     if u is not None:
         return u
     hi = e.bound(level, "hi")
-    return Comp(lab, not math.isnan(hi) and hi < thr, pval(e, lambda b: b >= thr))
+    return Comp(lab, not math.isnan(hi) and hi < thr, pval(e, lambda b: b >= thr), holm=_holm(e, thr, "<", what))
 
 
 def inside(e, a, b, level, what):
@@ -234,16 +243,3 @@ def comb_k_of(per: dict, k: int = 3):
 def comb_single(per: dict):
     vals = list(per.values())
     return vals[0] if vals else None
-
-
-def holm(pvals, alpha=0.025):
-    """Holm's step-down over one-sided p-values at familywise alpha: a list of booleans (rejected)."""
-    order = sorted(range(len(pvals)), key=lambda i: pvals[i])
-    rej = [False] * len(pvals)
-    m = len(pvals)
-    for k, i in enumerate(order):
-        if pvals[i] <= alpha / (m - k):
-            rej[i] = True
-        else:
-            break
-    return rej

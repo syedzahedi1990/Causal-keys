@@ -1,7 +1,7 @@
 """Score part D of preregistration P-2026-10-10-J (docs/PREREGISTRATION.md, GPU stage 8): what the reader heads write (the
 identity flag), the sign of the key read, and the 1.5B / 3B route. Gates J-D-G0 to J-D-G7, the confirmatory lines J-D1 ...
 J-D6-ROUTE, the D6 decision table, the reported lines, the summary by risk class (with the Holm sensitivity analysis over
-the interval components of the R lines) and the exploratory report.
+the interval components of the R lines, computed by the shared helper analysis/stage8_holm.py) and the exploratory report.
 
 Inputs under --results (default results/gpu_stage8d), as written by scripts/gpu_stage8d.sh: <stage>/<tag>.json for the
 stages preflight, sets, fit, inject, ablate, bind, sign, diss, before, xtask of experiments/stage8_flag.py (tags qwen7,
@@ -27,7 +27,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent))
 from stage8d_parts import lines as LN  # noqa: E402
-from stage8d_parts.stats import Tests, V, combine, f3, holm  # noqa: E402
+from stage8d_parts.stats import Tests, V, combine, f3  # noqa: E402
 
 BIG, SMALL, DISS = ("qwen7", "mistral7"), ("qwen1.5", "qwen3b"), ("qwen1.5", "qwen3b", "qwen7")
 KEYS = ("qwen7", "mistral7", "qwen1.5", "qwen3b")
@@ -36,7 +36,7 @@ STEPS_OF = {"qwen7": ("preflight", "sets", "fit", "inject", "ablate", "bind", "s
             "mistral7": ("preflight", "sets", "fit", "inject", "ablate", "bind", "sign"),
             "qwen1.5": ("preflight", "sets", "fit", "diss"), "qwen3b": ("preflight", "sets", "fit", "diss")}
 SIZES = {"inject": 100, "ablate": 60, "bind": 100, "Q": 100, "IOI": 100, "diss": {"qwen1.5": 100, "qwen3b": 60, "qwen7": 100}}
-G0_FILES = {"tests/test_flag.py": 11, "tests/test_questions.py": 11, "tests/test_stage8d_score.py": 12}
+G0_FILES = {"tests/test_flag.py": 13, "tests/test_questions.py": 11, "tests/test_stage8d_score.py": 15}
 POP_SHA = {  # = experiments/stage8_flag.POP_SHA (tests/test_stage8d_score.py checks the copy)
     "R": "9036af1a838a12d58a7a7eb40f70dd800dd659bfd6e95ed1ab5a2ce10862f936",
     "R'": "fe348ba40a19182a67cee382a3533c1af009273acb740c01d418662a570122a2",
@@ -51,19 +51,21 @@ POP_SHA = {  # = experiments/stage8_flag.POP_SHA (tests/test_stage8d_score.py ch
 SETS_SHA = {"qwen7": "dea841d0d49899bac7ad35c71a851ca7ec5d212d8ecd5310407de54d5c77e72a",
             "mistral7": "55a1b17b1ba16b6afc4e0ae94b15818b8b5c11f02d985deea214aa0d49152220"}
 FLOOR = 0.05                         # J-D-G2: mean |duplicated none row - none row| (nats)
-# code -> (class, kind, prior, models, title); the priors were recorded in the entry before any stage-8 output
+# code -> (class, kind, prior, models, title); the priors were recorded in the entry before any stage-8 output. Class
+# follows the prior (decision D1): L = implied by data in hand on the same models and material, prior >= 0.9;
+# M = prior >= 0.8; R = prior < 0.8.
 LINES = {
     "J-D1": ("R", "A", 0.55, BIG, "sufficiency: the leave-one-word-out flag moves the answer to an absent option (ID_inj^LOO / ID_K)"),
     "J-D2": ("R", "A", 0.55, BIG, "specificity against structured controls (own write orthogonal to the flag, mean H* output, active-set flag)"),
     "J-D3": ("R", "A", 0.50, BIG, "necessity: ablating one direction per layer at the option rows removes the key read (rho_K)"),
-    "J-D4": ("L", "A", 0.85, BIG, "the injected flag is read at hop 2 by key (r_ans^inj)"),
+    "J-D4": ("M", "A", 0.85, BIG, "the injected flag is read at hop 2 by key (r_ans^inj)"),
     "J-D-ADDR": ("M", "A", 0.80, BIG, "the flag is identity-free: the key-only and the natural (K and V) writes give the same flag"),
     "J-D-KN": ("R", "A", 0.40, BIG, "a non-candidate key acts as removing B's flag, with no specific beneficiary"),
     "J-D5": ("R", "A", 0.25, BIG, "the flag of an initial-state sentence carries its binding (Psi_bind > 0 in both sentence orders)"),
     "J-D7": ("M", "A", 0.85, BIG, "consistency: the key read is negative under Q_OUT and positive under Q_IN"),
     "J-D-SIGN-Q": ("M", "A", 0.85, BIG, "Q_OUT: the key and the value reads are both negative (task semantics)"),
     "J-D-SIGN-IOI": ("L", "A", 0.90, BIG, "IOI INLINE: the key read is negative while the value read is positive"),
-    "J-D8-Q": ("L", "A", 0.85, BIG, "consistency: the frozen H* carry the Q_IN and Q_OUT key reads"),
+    "J-D8-Q": ("M", "A", 0.85, BIG, "consistency: the frozen H* carry the Q_IN and Q_OUT key reads"),
     "J-D8-IOI": ("R", "A", 0.55, BIG, "the frozen H* carry the negative IOI INLINE key read at the listed names"),
     "J-D-ROUTE-IOI": ("R", "A", 0.40, BIG, "IOI INLINE: the negative read is applied at the answer row's key read of the listed names"),
     "J-D-HOP2": ("R", "A", 0.25, BIG, "the same top-10 hop-2 heads carry the injected flag's Q_OUT and IOI effects (same reader, opposite sign)"),
@@ -72,7 +74,7 @@ LINES = {
     "J-D6-ROUTE": ("R", "A", 0.35, ("qwen1.5",), "at 1.5B the answer reads the sentence-row flag by value (r_ans^inj(V) > r_ans^inj(K))"),
 }
 NEED = {code: (1 if len(v[3]) == 1 else 2) for code, v in LINES.items()}
-COMPONENTS = []                      # (line code, label, bootstrap p, rejected by the line's own rule): Holm sensitivity
+COMPONENTS = []                      # (line code, Holm component dict, rejected by the line's own rule): Holm sensitivity
 
 
 def canon(obj) -> str:
@@ -314,10 +316,13 @@ def lines_all(G: Gates, I: Inputs):
     def run(code, fn, models):
         per, det = {}, []
         for k in models:
+            n0 = len(COMPONENTS)
             try:
                 v, txt = fn(k)
             except Exception:  # noqa: BLE001
                 v, txt = None, "scorer error:\n" + traceback.format_exc()
+            if v is None:          # the Holm family holds the components of the models where the line is evaluable
+                del COMPONENTS[n0:]
             per[k] = v
             det.append(f"    {k:8s} {V(v):13s} {txt}")
         R[code] = (combine(per, NEED[code]), per, det)
@@ -327,7 +332,8 @@ def lines_all(G: Gates, I: Inputs):
             return None, "gates (J-D-G0, J-D-G1, J-D-G2) not passed or no results"
         x = G.inj[k].d1()
         t = T("J-D1")
-        ok = x["ratio"].pt >= 0.5 and t.lower_gt(x["ratio"], 0.35, f"{k} ID_inj^LOO/ID_K") and x["pi_x"] >= 0.5
+        a = t.lower_gt(x["ratio"], 0.35, f"{k} ID_inj^LOO/ID_K")
+        ok = bool(x["ratio"].pt >= 0.5 and a and x["pi_x"] >= 0.5)
         return ok, f"ID_inj^LOO/ID_K {x['ratio'].txt()} (>= 0.5; H0: <= 0.35), pi_X(move, LOO) {x['pi_x']:.2f} (>= 0.5); ID_K {x['idk'].txt()}"
     run("J-D1", d1, BIG)
 
@@ -337,9 +343,8 @@ def lines_all(G: Gates, I: Inputs):
         x = G.inj[k].d2()
         t, ok, parts = T("J-D2"), True, [f"iota(move) {x['move'].txt()}"]
         for c, s in x["controls"].items():
-            a = s["diff"].pt >= 0.4 and t.lower_gt(s["diff"], 0.0, f"{k} iota(flag)-iota({c})")
-            b = s["frac"].pt <= 0.3
-            ok &= bool(a and b)
+            a = t.lower_gt(s["diff"], 0.0, f"{k} iota(flag)-iota({c})")
+            ok &= bool(s["diff"].pt >= 0.4 and a and s["frac"].pt <= 0.3)
             parts.append(f"{c}: iota {s['iota'].txt()}, difference {s['diff'].txt()} (>= 0.4; H0: <= 0), ratio {f3(s['frac'].pt)} (<= 0.3)")
         return ok, "; ".join(parts)
     run("J-D2", d2, BIG)
@@ -353,7 +358,8 @@ def lines_all(G: Gates, I: Inputs):
             return None, f"ID_K(none) {base.txt()} < 1 nat (J-D-G7)"
         rf, rp, rm = a.rho("flag"), a.rho("pc1"), a.rho("meanH")
         t = T("J-D3")
-        ok = rf.pt <= 0.5 and t.upper_lt(rf, 0.6, f"{k} rho_K(flag)") and rp.pt >= 0.7 and rm.pt >= 0.7
+        a = t.upper_lt(rf, 0.6, f"{k} rho_K(flag)")
+        ok = bool(rf.pt <= 0.5 and a and rp.pt >= 0.7 and rm.pt >= 0.7)
         return ok, f"rho_K flag {rf.txt()} (<= 0.5; H0: >= 0.6), pc1 {rp.txt()} (>= 0.7), mean-H* output {rm.txt()} (>= 0.7)"
     run("J-D3", d3, BIG)
 
@@ -364,7 +370,9 @@ def lines_all(G: Gates, I: Inputs):
         if not denom_ok(x["denom"], 1.0):
             return None, f"route denominator dl_X(move) {x['denom'].txt()} (J-D-G7: >= 1 nat, CI excl. 0)"
         t = T("J-D4")
-        ok = x["r"]["KV"].pt >= 0.6 and t.lower_gt(x["r"]["KV"], 0.45, f"{k} r_ans(KV)") and t.lower_gt(x["KmV"], 0.0, f"{k} r_ans(K)-r_ans(V)")
+        a = t.lower_gt(x["r"]["KV"], 0.45, f"{k} r_ans(KV)")
+        b = t.lower_gt(x["KmV"], 0.0, f"{k} r_ans(K)-r_ans(V)")
+        ok = bool(x["r"]["KV"].pt >= 0.6 and a and b)
         return ok, (f"r_ans^inj(KV) {x['r']['KV'].txt()} (>= 0.6; H0: <= 0.45), K {x['r']['K'].txt()}, V {x['r']['V'].txt()}, "
                     f"K - V {x['KmV'].txt()} (H0: <= 0); denominator {x['denom'].txt()}")
     run("J-D4", d4, BIG)
@@ -375,7 +383,8 @@ def lines_all(G: Gates, I: Inputs):
         wc = I.get("fit", k)["summary"]["wcos_K_KV"]
         r = G.inj[k].addr()
         t = T("J-D-ADDR")
-        ok = wc >= 0.9 and 0.8 <= r.pt <= 1.25 and t.inside(r, 0.7, 1.4, f"{k} ID_inj(KV)/ID_inj(K)")
+        a = t.inside(r, 0.7, 1.4, f"{k} ID_inj(KV)/ID_inj(K)")
+        ok = bool(wc >= 0.9 and 0.8 <= r.pt <= 1.25 and a)
         return ok, f"weighted cos(Delta^K, Delta^KV) {wc:+.3f} (>= 0.9); ID_inj(KV)/ID_inj(K) {r.txt()} (in [0.8, 1.25]; 95 % CI inside [0.7, 1.4])"
     run("J-D-ADDR", addr, BIG)
 
@@ -385,7 +394,8 @@ def lines_all(G: Gates, I: Inputs):
         x = G.inj[k].kn()
         tol = 0.1 * abs(x["idk"].pt)
         t = T("J-D-KN")
-        ok = x["r"].pt >= 0.8 and 0.7 <= x["beta"].pt <= 1.3 and t.inside(x["spec"], -tol, tol, f"{k} mean(dl_S - dl_X | K_N)")
+        a = t.inside(x["spec"], -tol, tol, f"{k} mean(dl_S - dl_X | K_N)")
+        ok = bool(x["r"].pt >= 0.8 and 0.7 <= x["beta"].pt <= 1.3 and a)
         return ok, (f"mean per-story Pearson {x['r'].txt()} (>= 0.8; {x['r_nan']} undefined), B-loss ratio {x['beta'].txt()} (in [0.7, 1.3]), "
                     f"mean(dl_S - dl_X) {x['spec'].txt()} (95 % CI inside +-{tol:.3f} = 0.1 x ID_K)")
     run("J-D-KN", kn, BIG)
@@ -421,8 +431,10 @@ def lines_all(G: Gates, I: Inputs):
         ki, _ = G.cell[(k, "Q_IN")].ids()
         ko, _ = G.cell[(k, "Q_OUT")].ids()
         t = T("J-D7")
-        ok = ko.pt <= -1 and t.upper_lt(ko, 0.0, f"{k} ID_K(Q_OUT)") and ki.pt >= 1 and t.lower_gt(ki, 0.0, f"{k} ID_K(Q_IN)") \
-            and t.lower_gt(ki - ko, 0.0, f"{k} ID_K(Q_IN)-ID_K(Q_OUT)")
+        a = t.upper_lt(ko, 0.0, f"{k} ID_K(Q_OUT)")
+        b = t.lower_gt(ki, 0.0, f"{k} ID_K(Q_IN)")
+        c = t.lower_gt(ki - ko, 0.0, f"{k} ID_K(Q_IN)-ID_K(Q_OUT)")
+        ok = bool(ko.pt <= -1 and a and ki.pt >= 1 and b and c)
         return ok, f"ID_K(Q_OUT) {ko.txt()} (<= -1; H0: >= 0), ID_K(Q_IN) {ki.txt()} (>= 1; H0: <= 0), paired difference {(ki - ko).txt()} (H0: <= 0)"
     run("J-D7", d7, BIG)
 
@@ -432,7 +444,9 @@ def lines_all(G: Gates, I: Inputs):
             return None, why
         ik, iv = G.cell[(k, "Q_OUT")].ids()
         t = T("J-D-SIGN-Q")
-        ok = t.upper_lt(ik, 0.0, f"{k} ID_K(Q_OUT)") and t.upper_lt(iv, 0.0, f"{k} ID_V(Q_OUT)")
+        a = t.upper_lt(ik, 0.0, f"{k} ID_K(Q_OUT)")
+        b = t.upper_lt(iv, 0.0, f"{k} ID_V(Q_OUT)")
+        ok = bool(a and b)
         return ok, f"Q_OUT ID_K {ik.txt()} (H0: >= 0), ID_V {iv.txt()} (H0: >= 0)"
     run("J-D-SIGN-Q", signq, BIG)
 
@@ -442,7 +456,9 @@ def lines_all(G: Gates, I: Inputs):
             return None, why
         ik, iv = G.cell[(k, "INLINE")].ids()
         t = T("J-D-SIGN-IOI")
-        ok = t.upper_lt(ik, 0.0, f"{k} ID_K(INLINE)") and t.lower_gt(iv, 0.0, f"{k} ID_V(INLINE)")
+        a = t.upper_lt(ik, 0.0, f"{k} ID_K(INLINE)")
+        b = t.lower_gt(iv, 0.0, f"{k} ID_V(INLINE)")
+        ok = bool(a and b)
         return ok, f"INLINE ID_K {ik.txt()} (H0: >= 0), ID_V {iv.txt()} (H0: <= 0)"
     run("J-D-SIGN-IOI", signioi, BIG)
 
@@ -454,8 +470,9 @@ def lines_all(G: Gates, I: Inputs):
             return None, f"J-D-G4 {arm} not passed"
         x = G.cell[(k, arm)].transfer()
         t = T(code)
-        ok = x["R"].pt >= 0.6 and t.lower_gt(x["R"], 0.45, f"{k} {arm} R(H*)") and x["KO"].pt >= 0.6 and \
-            t.lower_gt(x["KO"], 0.45, f"{k} {arm} KO(H*)") and x["Rrand"].pt <= 0.15 and x["KOrand"].pt <= 0.15
+        a = t.lower_gt(x["R"], 0.45, f"{k} {arm} R(H*)")
+        b = t.lower_gt(x["KO"], 0.45, f"{k} {arm} KO(H*)")
+        ok = bool(x["R"].pt >= 0.6 and a and x["KO"].pt >= 0.6 and b and x["Rrand"].pt <= 0.15 and x["KOrand"].pt <= 0.15)
         return ok, (f"{arm}: R(H*) {x['R'].txt()} (>= 0.6; H0: <= 0.45), KO(H*) {x['KO'].txt()} (>= 0.6; H0: <= 0.45), "
                     f"random R {f3(x['Rrand'].pt)} KO {f3(x['KOrand'].pt)} (<= 0.15); d_Gc/ID_K {f3(x['dGc'].pt)}")
 
@@ -475,7 +492,8 @@ def lines_all(G: Gates, I: Inputs):
         if not denom_ok(x["denom"], 1.0):
             return None, f"denominator dm(K_S) {x['denom'].txt()} (J-D-G7: |mean| >= 1 nat, CI excl. 0)"
         t = T("J-D-ROUTE-IOI")
-        ok = x["r"]["KV"].pt >= 0.6 and t.lower_gt(x["KmV"], 0.0, f"{k} r_ans(K)-r_ans(V) IOI")
+        a = t.lower_gt(x["KmV"], 0.0, f"{k} r_ans(K)-r_ans(V) IOI")
+        ok = bool(x["r"]["KV"].pt >= 0.6 and a)
         return ok, (f"K_S rows: r_ans(KV) {x['r']['KV'].txt()} (>= 0.6), K {x['r']['K'].txt()}, V {x['r']['V'].txt()}, K - V {x['KmV'].txt()} "
                     f"(H0: <= 0); r_other {x['r']['other'].txt()} (>= 0.5 would mean S2 or tail rows carry it); dm(K_S) {x['denom'].txt()}")
     run("J-D-ROUTE-IOI", route, BIG)
@@ -485,12 +503,14 @@ def lines_all(G: Gates, I: Inputs):
         if why:
             return None, why
         t, parts, ok, diff = T("J-D-HOP2"), [], True, True
-        for arm in ("Q_OUT", "INLINE"):
-            x = G.cell[(k, arm)].hop2()
+        X = {arm: G.cell[(k, arm)].hop2() for arm in ("Q_OUT", "INLINE")}
+        for arm, x in X.items():
             if not denom_ok(x["dinj"], 0.5):
                 return None, f"{arm}: injection effect {x['dinj'].txt()} (J-D-G7: |mean| >= 0.5 nat, CI excl. 0)"
+        for arm, x in X.items():
             c = x["carry"]["top10"]
-            ok &= bool(c.pt >= 0.5 and t.lower_gt(c, 0.2, f"{k} {arm} carry(top10)"))
+            a = t.lower_gt(c, 0.2, f"{k} {arm} carry(top10)")
+            ok &= bool(c.pt >= 0.5 and a)
             diff &= bool(c.pt <= 0.2 and np.isfinite(c.hi()) and c.hi() < 0.5)
             parts.append(f"{arm}: carry(top-10) {c.txt()} (>= 0.5; H0: <= 0.2), all heads {f3(x['carry']['all'].pt)}, "
                          f"random 10 {f3(x['carry']['rand10'].pt)}; dl_X(inj) {x['dinj'].txt()}")
@@ -506,7 +526,8 @@ def lines_all(G: Gates, I: Inputs):
         om = G.diss[k].omega()
         kap = I.get("fit", k)["summary"]["kappa_POST_P1"]
         t = T("J-D6a")
-        ok = om.pt >= 0.6 and t.lower_gt(om, 0.4, f"{k} omega") and kap >= 0.7
+        a = t.lower_gt(om, 0.4, f"{k} omega")
+        ok = bool(om.pt >= 0.6 and a and kap >= 0.7)
         return ok, f"omega {om.txt()} (>= 0.6; H0: <= 0.4), kappa {kap:+.3f} (>= 0.7)"
     run("J-D6a", d6a, DISS)
 
@@ -522,7 +543,8 @@ def lines_all(G: Gates, I: Inputs):
         tol = max(0.1, 0.5 * abs(x["rho_nat"].pt))
         t = T("J-D6")
         same = np.sign(x["rho"].pt) == np.sign(x["rho_nat"].pt)
-        ok = bool(same) and t.inside(x["d"], -tol, tol, f"{k} rho - rho_nat")
+        a = t.inside(x["d"], -tol, tol, f"{k} rho - rho_nat")
+        ok = bool(same and a)
         return ok, (f"rho {x['rho'].txt()}, rho_nat {x['rho_nat'].txt()} (same sign: {bool(same)}), rho - rho_nat {x['d'].txt()} "
                     f"(95 % CI inside +-{tol:.3f}); dl_X(inj) P1 {x['inj']['P1'].txt()}, POST {x['inj']['POST'].txt()}; "
                     f"N_X P1 {x['NX']['P1'].txt()}, POST {x['NX']['POST'].txt()}; {len(G.diss[k].ci)} competent cores")
@@ -668,6 +690,47 @@ def exploratory(G: Gates, I: Inputs, out):
                 f"weighted cos {v['wcos_task_belief']:+.3f}")
 
 
+def holm_sensitivity(R, out):
+    """Decision D2 (common part): Holm's step-down at familywise one-sided 0.025 over the interval components of this
+    part's R-class account lines that have a verdict (the components of the models where the line is evaluable), by the
+    shared helper analysis/stage8_holm.py (one-sided p from the bootstrap SE: Phi(-(est - bound)/se) for '>',
+    Phi((est - bound)/se) for '<'). Per line: the components whose decision changes, and the verdict with Holm's
+    decisions in place of the interval decisions (a MET line with a component no longer rejected becomes NOT MET; a
+    component Holm rejects but the interval rule does not is listed and changes no verdict). Reported; no verdict uses
+    it. Returns {code: (a decision changed, the verdict changed)}."""
+    fam = [(c, d, own) for c, d, own in COMPONENTS if LINES.get(c, ("",))[0] == "R" and R.get(c, (None,))[0] is not None]
+    bad = [d["name"] for _, d, _ in fam if not (np.isfinite(d["est"]) and np.isfinite(d["se"]))]
+    fam = [x for x in fam if np.isfinite(x[1]["est"]) and np.isfinite(x[1]["se"])]
+    try:
+        from stage8_holm import holm as holm_shared   # analysis/stage8_holm.py, identical in every part (D2)
+        keys = [(d["line"], d["name"]) for _, d, _ in fam]
+        assert len(set(keys)) == len(keys), "component names must be unique"
+        res_ = holm_shared([dict(d) for _, d, _ in fam]) if fam else []
+        by = {(g["line"], g["name"]): g for g in res_}
+        got = [by[k_] for k_ in keys]          # matched by (line, name), whatever order the helper returns
+    except Exception as ex:  # noqa: BLE001  (the sensitivity analysis never stops the report)
+        out(f"  Holm sensitivity NOT COMPUTED: analysis/stage8_holm.py failed ({type(ex).__name__}: {ex})")
+        return {}
+    out(f"  Holm sensitivity (analysis/stage8_holm.py; reported, no verdict uses it): step-down at familywise one-sided 0.025 "
+        f"over the {len(fam)} interval components of the R-class account lines with a verdict (normal p from the bootstrap "
+        f"SE)" + (f"; {len(bad)} undefined components left out" if bad else ""))
+    res = {}
+    for code, (cls, *_rest) in LINES.items():
+        if cls != "R":
+            continue
+        v = R.get(code, (None,))[0]
+        rows = [(d, own, h) for (c, d, own), h in zip(fam, got) if c == code]
+        flips = [f"{d['name']} (p {h['p']:.2g}; interval rule {'rejects' if own else 'does not reject'}, Holm "
+                 f"{'rejects' if h['reject'] else 'does not reject'})" for d, own, h in rows if bool(h["reject"]) != own]
+        lost = any(own and not bool(h["reject"]) for d, own, h in rows)
+        nv = False if (v is True and lost) else v
+        res[code] = (bool(flips), nv != v)
+        out(f"    {code}: {len(rows)} components; " + (f"{len(flips)} decision(s) change under Holm: " + "; ".join(flips[:12])
+                                                       + (" ..." if len(flips) > 12 else "") if flips else "no decision changes under Holm")
+            + (f"; verdict {V(v)} -> {V(nv)} under Holm" if nv != v else f"; verdict unchanged ({V(v)})"))
+    return res
+
+
 # --------------------------------------------------------------------------- main
 def main(argv=None):
     ap = argparse.ArgumentParser()
@@ -719,20 +782,13 @@ def main(argv=None):
         ne = [c for c, v in zip(codes, vs) if v is None]
         if cls == "R":
             rl = ev
-        out(f"  class {cls} (account lines): {len(codes)} lines; MET {met}, NOT MET {len(ev) - met}, NOT EVALUABLE {len(ne)}"
-            f"{' (' + ', '.join(ne) + ')' if ne else ''}; observed {met} vs expected {exp:.2f} (sum of priors of the lines with a verdict); Brier {brier:.3f}")
+        out(f"  account lines, class {cls}: {len(codes)} lines: {met} MET, {len(ev) - met} NOT MET, 0 MET IN PART, "
+            f"{len(ne)} NOT EVALUABLE; observed {met} against expected {exp:.2f}; Brier {brier:.3f}"
+            + (f"; not evaluable: {', '.join(ne)}" if ne else ""))
     out("  measurement-validity lines: none in part D (the batch floors and competence checks are gates)")
-    out(f"  R lines (the abstract's risky set): {sum(bool(v) for _, v in rl)} of {len(rl)} with a verdict met")
-    rcodes = {c for c, x in LINES.items() if x[0] == "R"}
-    comps = [(f"{c}: {lab}", p, own) for c, lab, p, own in COMPONENTS if c in rcodes]
-    ch = holm(comps, alpha=0.025)
-    out(f"  Holm (sensitivity, no verdict uses it): {len(comps)} interval components of the R lines at familywise one-sided 0.025; "
-        f"{len(ch)} decisions change" + "".join(f"\n    {lab}: p {p:.4f}, own rule {'rejects' if own else 'does not reject'}, Holm "
-                                              f"{'rejects' if rej else 'does not reject'}" for lab, p, own, rej in ch[:40]))
-    if comps and 1.0 / 10001 > 0.025 / len(comps):
-        out(f"    note: the smallest bootstrap p (1 / 10,001) exceeds the first Holm threshold 0.025 / {len(comps)}")
-    flip = sorted({lab.split(":")[0] for lab, p, own, rej in ch if own and not rej and R.get(lab.split(":")[0], (None,))[0] is True})
-    out("    verdicts that would change under Holm (MET lines with a component no longer rejected): " + (", ".join(flip) or "none"))
+    out(f"  met rate among R account lines with a verdict: {sum(bool(v) for _, v in rl)} of {len(rl)} "
+        f"(expected {sum(LINES[c][2] for c, _ in rl):.2f})")
+    holm_sensitivity(R, out)
     out(f"  provenance {'OK' if prov_ok else 'MISMATCH'}; population {'OK' if pop_ok else 'MISMATCH'}; J-D-G0 {V(g0)}"
         + (f"; SCORER ERROR in {errors}" if errors else ""))
     try:

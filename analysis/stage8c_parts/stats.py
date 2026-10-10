@@ -1,5 +1,6 @@
 """Statistics of the stage-8 part-C scorer (P-2026-10-10-J part C): the hierarchical bootstrap, estimates as (point,
-resamples), interval criteria as one-sided tests with bootstrap p-values (Holm sensitivity), TOST, verdict words.
+resamples), interval criteria as one-sided tests (each with its bootstrap SE: the input of the shared Holm sensitivity
+helper analysis/stage8_holm.py, decision D2), TOST, verdict words.
 
 Bootstrap (entry, Statistics): stories are nested in (base, source) clusters. Two-stage: resample the clusters with
 replacement, then the stories within each drawn cluster with replacement; 10,000 resamples, seed 20261012, one index set
@@ -92,14 +93,11 @@ class Q:
     def upper(self, level=0.95):
         return self.ci(level)[1]
 
-    def p_le(self, t):
-        """Bootstrap p of H0: theta <= t (rejected when the lower bound > t): (1 + #{resamples <= t}) / (B + 1)."""
+    @property
+    def se(self):
+        """The bootstrap standard error (standard deviation of the defined resamples): the Holm sensitivity input."""
         b = self.bs[~np.isnan(self.bs)]
-        return (1 + int((b <= t).sum())) / (b.size + 1)
-
-    def p_ge(self, t):
-        b = self.bs[~np.isnan(self.bs)]
-        return (1 + int((b >= t).sum())) / (b.size + 1)
+        return float(b.std()) if b.size > 1 else NAN
 
     def txt(self, level=0.95):
         lo, hi = self.ci(level)
@@ -143,17 +141,12 @@ def V(ok):
     return "NOT EVALUABLE" if ok is None else "MET" if ok else "NOT MET"
 
 
-def holm(components, alpha=0.025):
-    """components: list of (label, p, rejected under its own interval rule). Holm's step-down at familywise one-sided
-    ``alpha``; returns the labels whose decision changes (rejected by the interval rule but not by Holm, or vice versa)."""
-    comps = sorted(components, key=lambda c: c[1])
-    m = len(comps)
-    stop = False
-    changed = []
-    for k, (lab, p, own) in enumerate(comps):
-        rej = (not stop) and p <= alpha / (m - k)
-        if not rej:
-            stop = True
-        if rej != own:
-            changed.append((lab, p, own, rej))
-    return changed
+def component(code, name, q: Q, bound, direction, own):
+    """One interval component for the Holm sensitivity analysis of entry J (decision D2; analysis/stage8_holm.py):
+    (line code, {line, name, est, se, bound, direction}, rejected by the line's own interval rule). ``direction`` '>' for
+    H1: theta > bound, '<' for H1: theta < bound. A degenerate bootstrap (se 0) is passed as se 1e-12 (p then 0 or 1 by
+    the side of the bound the estimate lies on)."""
+    se = q.se
+    se = 1e-12 if se == 0 else se
+    return (code, {"line": code, "name": name, "est": float(q.pt), "se": float(se), "bound": float(bound),
+                   "direction": direction}, bool(own))

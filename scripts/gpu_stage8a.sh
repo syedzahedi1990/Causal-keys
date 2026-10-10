@@ -10,14 +10,15 @@
 #   preflight    SQuAD v1.1 dev (downloaded once into $OUT/squad, or SQUAD=<a local copy>; sha256 asserted), the item
 #                rebuild with the build's tokenizers, byte-identical to data/stage8a_items.json; stops the run otherwise
 #   per model, in the order llama8, gemma9, qwen7, mistral7 (yi9 replaces llama8 or gemma9 when its files fail
-#   verification, before any output of it exists; at most one replacement):
+#   verification, s8_fetch status 1, before any output of it exists; at most one replacement, recorded in
+#   $OUT/FALLBACK.txt and kept by every later session; any other fetch failure stops the run with no fallback):
 #     frames_<key>     the answer frame (greedy ID generations on the first 30 R items in NOM and OPTA)
 #     factorial_<key>  every valid E item in the six formats, the closed-book prompts, KIVI 2-bit (J-A7)
 #     heads_<key>      qwen7 and mistral7: rank (60 R), curves (80 E), ablation at Q+ (every E item), explore
 #     explore_<key>    exploratory; run only when the time left covers it and the rest of the core
 #   score        analysis/stage8a_score.py -> $OUT/STAGE8A_SCORE.txt; MANIFEST.sha256; the archive
 # Deadline (DEADLINE_H, default 4.5 h; STAGE8_DEADLINE): each factorial gets --reserve-min = the core minutes of the
-# models after it (plus 10); before LETA and MENB it projects that format's time from OPTA / MENA and, if it would end past
+# models after it (plus 10, plus HEADS_MIN for the same model's heads step at qwen7 and mistral7); before LETA and MENB it projects that format's time from OPTA / MENA and, if it would end past
 # the deadline minus the reserve, runs LETA with the reduced rows and skips MENB (recorded; exit 3 = partial, the next
 # session redoes the step). An explore step runs only when the time left exceeds the reserve plus its estimate; its own
 # parts check the deadline. Exploratory passes are dropped first, then the LETA rows, then MENB (entry, A-13).
@@ -55,9 +56,12 @@ S8_OUTPUTS="$OUT/preflight.json" s8_step preflight $PY experiments/natural_facto
 # ---- the models
 TAGP=; on TEST_MODE && TAGP=TEST_
 declare -A CORE_MIN=([llama8]=32 [gemma9]=48 [yi9]=34 [qwen7]=58 [mistral7]=58)   # fetch, frames, factorial (+ heads)
+HEADS_MIN=20     # the heads step of qwen7 / mistral7 (in CORE_MIN), reserved in the same model's factorial
 EXPLORE_MIN=14
 KEYS=(llama8 gemma9 qwen7 mistral7)
-FALLBACK=
+# the fallback decided in an earlier session of this OUT stays: the replaced key does not run again (no mixing of a
+# replaced model's later output with the fallback's)
+FALLBACK=$(head -n 1 "$OUT/FALLBACK.txt" 2> /dev/null | awk '{print $1}')
 reserve_after() {  # minutes of core the models after position $1 still need, plus the score
   local i s=10
   for ((i = $1 + 1; i < ${#KEYS[@]}; i++)); do s=$((s + CORE_MIN[${KEYS[$i]}])); done
@@ -65,13 +69,15 @@ reserve_after() {  # minutes of core the models after position $1 still need, pl
 }
 has_output() { compgen -G "$OUT/frames/${TAGP}$1.json" > /dev/null || compgen -G "$OUT/factorial/${TAGP}$1.json" > /dev/null; }
 
-run_key() {  # run_key <key> <reserve minutes>
-  local key=$1 reserve=$2 dir t="${TAGP}$1"
-  dir=$(s8_fetch "$key") || return 1
+run_key() {  # run_key <key> <reserve minutes>; status 0, or s8_fetch's status (1 = the files failed verification)
+  local key=$1 reserve=$2 dir t="${TAGP}$1" rc=0 own=0
+  dir=$(s8_fetch "$key") || rc=$?
+  [ $rc = 0 ] || return $rc
+  { [ "$key" = qwen7 ] || [ "$key" = mistral7 ]; } && own=$HEADS_MIN
   local M=(--model "$dir" --key "$key" --squad "$SQ" --out "$OUT")
   S8_OUTPUTS="$OUT/frames/$t.json" s8_step "frames_$key" $PY experiments/natural_factorial.py --stage frames "${M[@]}"
   if [ -f "$OUT/frames/$t.json" ]; then
-    S8_OUTPUTS="$OUT/factorial/$t.json" s8_step "factorial_$key" $PY experiments/natural_factorial.py --stage factorial "${M[@]}" --reserve-min "$reserve"
+    S8_OUTPUTS="$OUT/factorial/$t.json" s8_step "factorial_$key" $PY experiments/natural_factorial.py --stage factorial "${M[@]}" --reserve-min "$((reserve + own))"
   else
     echo "FAILED factorial_$key not run: no frames file" | tee -a "$OUT/FAILED.txt"
   fi
@@ -87,16 +93,35 @@ run_key() {  # run_key <key> <reserve minutes>
   return 0
 }
 
+run_fallback() {  # run_fallback <position>: yi9 in the place of KEYS[position]
+  local rc=0
+  run_key yi9 "$(reserve_after "$1")" || rc=$?
+  [ $rc = 0 ] && return 0
+  [ $rc = 1 ] || s8_check   # a disk or manifest error stops the run here with its reason
+  echo "FAILED fetch of the fallback yi9 (exit $rc)" | tee -a "$OUT/FAILED.txt"
+}
+
 for i in "${!KEYS[@]}"; do
   key=${KEYS[$i]}
-  if run_key "$key" "$(reserve_after "$i")"; then continue; fi
-  # the files of $key failed verification (FETCH_FAILED.txt): the entry's single fallback, before any output of $key
-  if { [ "$key" = llama8 ] || [ "$key" = gemma9 ]; } && [ -z "$FALLBACK" ] && ! has_output "$key"; then
+  if [ -n "$FALLBACK" ] && [ "$key" = "$FALLBACK" ]; then   # replaced in an earlier session: yi9 runs in its place
+    echo "$(s8_utc) $key replaced by yi9 in an earlier session ($OUT/FALLBACK.txt); $key is not run" | tee -a "$OUT/COMMIT.txt"
+    run_fallback "$i"
+    continue
+  fi
+  rc=0
+  run_key "$key" "$(reserve_after "$i")" || rc=$?
+  [ $rc = 0 ] && continue
+  # status 1 only: the files of $key failed verification (FETCH_FAILED.txt), so the entry's single fallback applies,
+  # before any output of $key exists; any other status (not enough disk, a manifest error) is not a verification
+  # failure: s8_check stops the run with the reason and no fallback runs
+  [ $rc = 1 ] || s8_check
+  if [ $rc = 1 ] && { [ "$key" = llama8 ] || [ "$key" = gemma9 ]; } && [ -z "$FALLBACK" ] && ! has_output "$key"; then
     FALLBACK=$key
+    echo "$key $(s8_utc)" > "$OUT/FALLBACK.txt"
     echo "$(s8_utc) fallback: yi9 replaces $key (its files failed verification; no output of $key exists)" | tee -a "$OUT/COMMIT.txt"
-    run_key yi9 "$(reserve_after "$i")" || echo "FAILED fetch of the fallback yi9" | tee -a "$OUT/FAILED.txt"
+    run_fallback "$i"
   else
-    echo "FAILED fetch of $key (no fallback applies)" | tee -a "$OUT/FAILED.txt"
+    echo "FAILED fetch of $key (exit $rc; no fallback applies)" | tee -a "$OUT/FAILED.txt"
   fi
 done
 

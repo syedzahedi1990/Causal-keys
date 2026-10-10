@@ -28,14 +28,23 @@ KV_ROWS = ("ID", "K_S", "V_S", "K_X", "V_X")
 class Res:
     """A line's result in one model: ok True / False / None (not evaluable, with ``why``), the text and components."""
 
-    def __init__(self, ok, txt, comps=(), why=""):
-        self.ok, self.txt, self.comps, self.why = ok, txt, list(comps), why
+    def __init__(self, ok, txt, comps=(), why="", undef=""):
+        self.ok, self.txt, self.comps, self.why, self.undef = ok, txt, list(comps), why, undef
 
 
-def judge(txt, comps, ev, why):
+def judge(txt, comps, ev, why, undefined=""):
+    """The line's result in one model. ``ev`` False: NOT EVALUABLE (gates, rows not run, size floors) with ``why``.
+    ``undefined``: a quantity of the line's own arms made undefined by the arm (J-A-G4: s_ID's denominator mean ID_K +
+    mean ID_V < 2 nats; J-A8: I_cont's denominator d_KV^cont(NOM) < 2 nats) counts against the line: NOT MET with the
+    reason, never NOT EVALUABLE (entry J, Evaluability)."""
     if not ev:
         return Res(None, txt, comps, why)
+    if undefined:
+        return Res(False, f"{txt}; counts against the line: {undefined}", comps, undef=undefined)
     return Res(all(c.passed for c in comps), txt, comps)
+
+
+G4_WHY = "J-A-G4 not met (s_ID undefined: mean ID_K + mean ID_V < 2 nats)"
 
 
 class Model:
@@ -166,7 +175,7 @@ def a1(m):
     ev, why = m.ev(("OPTA",), KV_ROWS)
     ids = m.C("OPTA")
     comps, txt, g4, _ = _sid_line(m, "OPTA", ids, 0.35, pt_min=0.5, idk_pos=True)
-    return judge(txt, comps, ev and g4, why or "J-A-G4")
+    return judge(txt, comps, ev, why, "" if g4 else G4_WHY)
 
 
 def a1b(m):
@@ -174,21 +183,21 @@ def a1b(m):
     ids = [i for i in m.C("OPTA") if m.recs["OPTA"][i]["nP"] >= 3]
     comps, txt, g4, _ = _sid_line(m, "OPTA", ids, 0.25, pt_min=0.4)
     fl = m.floor(len(ids), A1B_MIN)
-    return judge(f"|P| >= 3: {txt}", comps, ev and g4 and fl, why or ("J-A-G4" if not g4 else f"fewer than {A1B_MIN} items with |P| >= 3"))
+    return judge(f"|P| >= 3: {txt}", comps, ev and fl, why or f"fewer than {A1B_MIN} items with |P| >= 3", "" if g4 else G4_WHY)
 
 
 def a1c(m):
     ev, why = m.ev(("LETA",), KV_ROWS)
     ids = m.C("LETA")
     comps, txt, g4, _ = _sid_line(m, "LETA", ids, 0.35, pt_min=0.5) if ev else ([], "LETA K/V rows not run", False, None)
-    return judge(txt, comps, ev and g4, why or "J-A-G4")
+    return judge(txt, comps, ev, why, "" if g4 else G4_WHY)
 
 
 def a2(m):
     ev, why = m.ev(("NOM",), KV_ROWS)
     ids = m.C("NOM")
     comps, txt, g4, _ = _sid_line(m, "NOM", ids, None, hi_floor=0.3, pt_max=0.2, idv_pos=True)
-    return judge(txt, comps, ev and g4, why or "J-A-G4")
+    return judge(txt, comps, ev, why, "" if g4 else G4_WHY)
 
 
 def a3(m):
@@ -199,7 +208,7 @@ def a3(m):
     d = est(m.arts(ids), lambda a, b, c, e: sid(a, b) - sid(c, e), kO, vO, kN, vN)
     comps = [point("s_ID(OPTA) - s_ID(NOM) >= 0.4", d.pt >= 0.4), lower(d, 0, "s_ID(OPTA) - s_ID(NOM)")]
     g4 = m.g4(kO, vO) and m.g4(kN, vN)
-    return judge(f"n={len(ids)}: s_ID(OPTA) - s_ID(NOM) {d}", comps, ev and g4, why or "J-A-G4")
+    return judge(f"n={len(ids)}: s_ID(OPTA) - s_ID(NOM) {d}", comps, ev, why, "" if g4 else G4_WHY)
 
 
 def a4(m):
@@ -226,7 +235,7 @@ def a5(m):
     comps = [point("s_ID(MENA) - s_ID(NOM) >= 0.10", d.pt >= 0.10), lower(d, 0, "s_ID(MENA) - s_ID(NOM)"), lower(ik, 0, "ID_K(MENA)")]
     g4 = m.g4(kM, vM) and m.g4(kN, vN)
     return judge(f"n={len(ids)}: s_ID(MENA) - s_ID(NOM) {d}; ID_K(MENA) {ik}; s_ID(MENA) {est(arts, sid, kM, vM)}",
-                 comps, ev and g4, why or "J-A-G4")
+                 comps, ev, why, "" if g4 else G4_WHY)
 
 
 def a5b(m):
@@ -364,7 +373,7 @@ def a8(m):
     txt = (f"n={len(ids)} (leak-free PERSON/PLACE with a continuation token differing from c_B): I_cont(NOM) {Ic}; "
            f"I_dec(NOM) {Id}; d_KV^cont OPTA/NOM {r}; d^cont(NOM) K {c['NOM', 'K'].mean() if ids else NAN:+.2f} "
            f"V {c['NOM', 'V'].mean() if ids else NAN:+.2f} KV {dkv:+.2f} (>= 2 nats: {'yes' if base else 'no'})")
-    return judge(txt, comps, ev and fl and base, why or (f"n < {A8_MIN}" if not fl else "d_KV^cont(NOM) < 2 nats"))
+    return judge(txt, comps, ev and fl, why or f"n < {A8_MIN}", "" if base else "d_KV^cont(NOM) < 2 nats (I_cont undefined)")
 
 
 def a8d(m):

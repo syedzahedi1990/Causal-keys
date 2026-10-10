@@ -17,6 +17,7 @@ from ckeys.story import LOCATIONS, PREFIX, record
 from experiments import stage8_flag as s8
 
 TOKENIZERS = {"qwen": "Qwen/Qwen2.5-0.5B-Instruct", "mistral": "mistralai/Mistral-7B-Instruct-v0.3"}
+MANIFEST_KEY = {"qwen": "qwen0.5", "mistral": "mistral7"}   # Qwen2.5-0.5B/1.5B/3B/7B share tokenizer.json at their pins
 N = 50
 
 
@@ -25,12 +26,23 @@ def pops():
     return s8.populations(check=True)
 
 
+def _rev(key):
+    """The revision pinned in scripts/stage8_models.json (the tokenizer the GPU run loads)."""
+    from pathlib import Path
+    J = json.loads((Path(__file__).resolve().parents[1] / "scripts" / "stage8_models.json").read_text())
+    m = J["models"][MANIFEST_KEY[key]]
+    assert m["repo"] == TOKENIZERS[key], (m["repo"], TOKENIZERS[key])
+    return m["revision"]
+
+
 def _tok(name):
     from transformers import AutoTokenizer
+    key = next(k for k, v in TOKENIZERS.items() if v == name)
+    rev = _rev(key)
     try:
-        return AutoTokenizer.from_pretrained(name, local_files_only=True)
+        return AutoTokenizer.from_pretrained(name, revision=rev, local_files_only=True)
     except OSError:
-        return AutoTokenizer.from_pretrained(name)       # the Hub (Mistral-7B-v0.3 is not gated)
+        return AutoTokenizer.from_pretrained(name, revision=rev)   # the Hub at the pinned revision (not gated)
 
 
 def test_question_arms_text():

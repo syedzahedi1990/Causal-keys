@@ -1147,3 +1147,2049 @@ Numbers below are from `STAGE7_SCORE.txt` unless marked. *(recomputed)* means re
 - **LETTERS-AFTER I5 line.** It prints the criterion template ("> 0 (CI excl. 0) and >= F_V 2.82") without a verdict suffix, as the entry specifies for a two-sided line; Δ_V = 0.945 is below that floor.
 - **Weights download.** The 47 GB snapshot took about 15 s (11:51:08 to 11:51:23), although the hub cache did not hold the model before the run (it was removed at the end). The revision is asserted by the download command and the loaded snapshot is recorded (`ENV.txt`), so provenance is unaffected.
 - **The release copy.** The second session used a copy of the release that the author downloaded in a browser and uploaded to the box, because the box could not reach anonymous.4open.science. The script's checks (the pinned `RELEASE.json` hash, the nine bases and the stories file) passed before any test or model, as they do for a fetched copy.
+
+## P-2026-10-10-J: GPU stage 8, measurement, fresh samples, natural text, interventions and mechanism (paper v5)
+
+**DRAFT, not yet final.** This entry is under construction. The GPU scripts refuse to run while this line is here.
+
+<!-- At finalisation the lead replaces the line above with:
+**Final.** Fixed in the commit titled "Finalise preregistration J", together with the four scorers (`analysis/stage8a_score.py` ... `analysis/stage8d_score.py`) and their shared Holm helper (`analysis/stage8_holm.py`), the stage-8 code and data (`ckeys`, `experiments`, `data`), the tests, `scripts/stage8_common.sh`, `scripts/stage8_models.json` (sha256 `b840b71ea644d3f01e634c67ef2c2b9bdb26cdf53d3fe6b45d34c5e78c0cb707`), `scripts/fetch_verified.py` and the four GPU scripts, before any stage-8 GPU run. Each GPU script refuses a draft entry, a modified tree, code that differs from that commit, or a J section that differs from its text there, and runs its part's FP32 unit tests before it loads any model. The draft was committed at <<commit ids>>. **Seen before finalisation:** see the section of that name below and in each part.
+-->
+
+This entry has a common part (this section and the sections up to "Part A") and four parts, A to D. The common part fixes what holds for every part: the scripts, the model files, the statistics, the risk classes, the codes, the populations and the disclosure of pilots. Where a part's section and the common part disagree, the part's section states the exception and the reason. The designs, the critiques and the synthesis that amended them are kept in `docs/stage8_design/` (development record, not part of the anonymous release); the codes G1–G8 name the rules of this common part, and codes such as A-7 or C-3 in a part name the amendments of that synthesis.
+
+### Parts and scripts (G1)
+
+Stage 8 has four parts. They answer different objections and share no outputs:
+- **Part A, natural text** (`scripts/gpu_stage8a.sh`, `analysis/stage8a_score.py`): counterfactual SQuAD v1.1 passages whose answer is a multi-token entity, in four families (two never run before): the format law, cue-conflict behaviour against a closed-book prior, a KIVI quantization difference-in-differences, and the reader heads on natural text (J-A1 to J-A8d, J-A-HA1 to J-A-HA3b).
+- **Part B, fresh samples and new families, scored on the emitted forms** (`scripts/gpu_stage8b.sh`, `analysis/stage8b_score.py`): the templated factorial on fresh story cores with a second lexicon, new sentences and a null-sentence arm, in the four original and four new families, scored on the emitted forms and by generated answers; the published numbers re-scored on the original cores (J-B1 to J-B8, J-B-NULL, J-B-LB, J-B-SMALL).
+- **Part C, interventions** (`scripts/gpu_stage8c.sh`, `analysis/stage8c_score.py`): identity edits obtained independently of the natural clamp (steering vectors from held-out stories and from unrelated sentences, a third-party sparse autoencoder, a rank-16 remap trained at the writing token) and a non-lexical boundary family, tested against a channel-ratio law at matched depth; a screen for a depth where the binding swap and the key route overlap (J-C1 to J-C6, J-C-BOUND, J-C-READa, J-C-READb, J-C-SCREEN, J-C-WIN).
+- **Part D, mechanism** (`scripts/gpu_stage8d.sh`, `analysis/stage8d_score.py`): what the reader heads write: a per-layer flag tested for sufficiency, necessity and address-only content, a binding test, the signs of the key and value reads under a 'not mentioned' question and in IOI with their route, and the 1.5B/3B route (J-D1 to J-D8, J-D6a, J-D-ADDR, J-D-KN, J-D-SIGN-Q, J-D-SIGN-IOI, J-D-ROUTE-IOI, J-D-HOP2, J-D6-ROUTE).
+
+The parts are independent. The user may run them in any order, one after another on one box, or on different boxes. Each part writes `results/gpu_stage8<part>/`, its archive `gpu_stage8<part>_results.tgz` and its score `STAGE8<PART>_SCORE.txt`. No part reads another part's results, and no verdict of one part depends on another part's run.
+
+**The shared pipeline** (`scripts/stage8_common.sh`, sourced by the four scripts). Outside TEST_MODE it does the following, in this order:
+1. It refuses to start (exit 1, logs archived) if any of these holds:
+   - `docs/PREREGISTRATION.md` has no `## ` heading that contains P-2026-10-10-J;
+   - this section still has its draft marker, a line that begins with the bold words of the draft notice (the check reads the section whose `## ` heading contains P-2026-10-10-J, with awk alone; the words quoted inside a line do not count);
+   - tracked files have local changes;
+   - the history of HEAD has no commit whose subject is exactly "Finalise preregistration J";
+   - `ckeys`, `experiments`, `analysis`, `scripts`, `tests` or `data` differ between HEAD and the latest such commit;
+   - this entry's own section of `docs/PREREGISTRATION.md` differs from its text at that commit. An outcome section added later under its own `## ` heading is allowed.
+2. It pins transformers 5.18.0 and runs pip only when the installed version differs or a needed package is missing. It records the commit (`COMMIT.txt`), the environment (`ENV.txt`, `PIP_FREEZE.txt`) and the manifest's sha256 (in `ENV.txt` and at the head of `REVISIONS.txt`). It stops unless torch sees a CUDA device and the first one has at least 75 GiB (`MINGIB`, default 75).
+3. It runs the part's FP32 unit tests on the CPU before it loads any model (`logs/pytest.log`). A failure stops the script. These tests are each part's exactness gate (J-<part>-G0, defined in the part). Every part's test files also include `tests/test_stage8_populations.py` (rule G6, across the parts) and `tests/test_stage8_holm.py` (the shared Holm helper). `TESTS=0` skips them only after a pass of the same test files at the same HEAD on the same host in the same results directory (`PYTEST_OK.txt`).
+4. It fetches and verifies each model's files before that model's steps (next section). A part may fetch the next model in the background while the current one runs; such a prefetch only logs its result, and the fetch before the model's steps decides.
+5. It runs the part's steps. Each step's log is `logs/<step>.log`. A step that succeeded in an earlier run with the same results directory is kept (`steps/<step>.done`) unless `FORCE=1` is set or `FORCE_STEPS` names it (by name or shell pattern). A failed step is listed in `FAILED.txt` and the other steps still run; a failed exploratory step is listed in `FAILED_EXPLORATORY.txt` instead and does not fail the run. A results file that the part declares for a step (`S8_OUTPUTS`) and that the failed step wrote is moved aside to `<file>.failed.<UTC>` and is not scored. `FAILED.txt`, `FAILED_EXPLORATORY.txt`, `FETCH_FAILED.txt` and `SKIPPED.txt` list the current run only: a later run moves the earlier files aside (`<name>.<UTC>.txt`), so a step skipped in one run and done in the next is not reported as skipped.
+6. The deadline `STAGE8_DEADLINE` is `DEADLINE_H` hours after the start of the script: the clock starts before the checks of item 1, so setup counts. The default is set per part. Steps whose budget no longer fits are not started, in the order the part fixes, and are listed in `SKIPPED.txt`. A step that stops at the deadline partway through exits with status 3 and is also listed there. Both kinds are run again by a later session.
+7. It runs the part's scorer, writes `MANIFEST.sha256` (the sha256 of every file in the results directory) and writes the archive. The archive holds no weights. A scorer exit status other than 0 (for example on a provenance or population MISMATCH; each part states its statuses) lists the score step in `FAILED.txt`; the score file is still written and archived. The script exits with status 1 when `FAILED.txt` exists, else 0.
+
+In TEST_MODE (`TEST_MODE=1`), the script skips the guards, pip and the GPU check, keeps every model directory (`KEEP_CACHE=1`), and writes to `results/gpu_stage8<part>_test/` and `gpu_stage8<part>_test_results.tgz`. Every model the part names is replaced by Qwen2.5-0.5B-Instruct (from the Hugging Face cache or the Hub, not verified) in FP32 on the CPU, with n = 2–3. Every output is tagged `TEST_`, and its verdict lines are plumbing checks, not results.
+
+Every results file carries a provenance block with these fields:
+- the git commit, the library versions, the device and dtype;
+- the model's repository, revision and attention implementation, and the sha256 of its `VERIFIED.json`;
+- the population hashes;
+- the chat wrapper used (`WRAPPER_USED`);
+- every skipped item with its reason.
+
+Results are written atomically (a temporary file, then `os.replace`). The run settings are BF16, `use_cache=False` for every scoring pass, and sdpa attention except for Gemma-2 (eager); a part names the steps that load a model with eager attention for another reason (Part A's reader heads and Part D's head sets read attention weights). Every scored quantity is a difference against a reference row in the same batch.
+
+### Models and the sourcing of their files
+
+`scripts/stage8_models.json` (sha256 `b840b71ea644d3f01e634c67ef2c2b9bdb26cdf53d3fe6b45d34c5e78c0cb707`) pins each model's official repository and its commit. The commits are those current on 2026-10-10. Each equals the commit that stages 1–7 pinned, where a stage pinned one. The manifest gives the size and hash of every file of the model directory, as the Hugging Face API reported them on 2026-10-10 (`api/models/<repo>/revision/<commit>?blobs=true`):
+- sha256 of the content for files stored in LFS;
+- the git blob id, sha1(`blob <size>\0` + content), for the other files.
+
+The files are the top-level `*.json`, `*.safetensors`, `*.model`, `tokenizer.model.v3`, `*.txt` and `*.jinja`. Mistral's single-file `consolidated.safetensors` is excluded: the HF-format shards are used.
+
+| Key | Repository | Commit | Weights (GB) | Files | Attention | Source of the bytes |
+|---|---|---|---|---|---|---|
+| `qwen7` | Qwen/Qwen2.5-7B-Instruct | `a09a35458c702b33eeacc393d103063234e8bc28` | 15.23 | 11 | sdpa | official |
+| `qwen14` | Qwen/Qwen2.5-14B-Instruct | `cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8` | 29.54 | 15 | sdpa | official |
+| `qwen1.5` | Qwen/Qwen2.5-1.5B-Instruct | `989aa7980e4cf806f80c7fef2b1adb7bc71aa306` | 3.09 | 7 | sdpa | official |
+| `qwen3b` | Qwen/Qwen2.5-3B-Instruct | `aa8e72537993ba99e69dfaafa59ed015b17504d1` | 6.17 | 9 | sdpa | official |
+| `qwen0.5` | Qwen/Qwen2.5-0.5B-Instruct | `7ae557604adf67be50417f59c2c2f167def9a775` | 0.99 | 7 | sdpa | official |
+| `mistral7` | mistralai/Mistral-7B-Instruct-v0.3 | `c170c708c41dac9275d15a8fff4eca08d52bab71` | 14.50 | 12 | sdpa | official (HF-format shards) |
+| `olmo7` | allenai/OLMo-2-1124-7B-Instruct | `470b1fba1ae01581f270116362ee4aa1b97f4c84` | 14.60 | 11 | sdpa | official |
+| `llama8` | meta-llama/Llama-3.1-8B-Instruct (gated) | `0e9e39f249a16976918f6564b8830bc894c89659` | 16.06 | 10 | sdpa | with HF_TOKEN: official; else NousResearch/Meta-Llama-3.1-8B-Instruct@d10aef79, modularai/Llama-3.1-8B-Instruct-GGUF@96669450, RedHatAI/Llama-3.1-8B-Instruct@83c92747, unsloth/Meta-Llama-3.1-8B-Instruct@a2856192 |
+| `gemma9` | google/gemma-2-9b-it (gated) | `11c9b309abf73637e4b6f9a3fa1e92e615547819` | 18.48 | 11 | eager | with HF_TOKEN: official; else unsloth/gemma-2-9b-it@fc7d4737, thr3a/gemma-2-9b-it@e99c393f, dnhkng/RYS-Gemma-2-9b-it@dd19021a, RedHatAI/gemma-2-9b-it@42ea3c67, jebish7/gemma-2-9b-it@e6111e3d |
+| `gemma2b` | google/gemma-2-2b-it (gated) | `299a8560bedf22ed1c72a8a11e7dce4a7f9f51f8` | 5.23 | 9 | eager | with HF_TOKEN: official; else SceneWorks/gemma-2-2b-it@684c553b, 1024m/gemma-2-2b-it-Base@7dc6b306, jebish7/gemma-2-2b-it@275bb885, unsloth/gemma-2-9b-it@fc7d4737, dnhkng/RYS-Gemma-2-9b-it@dd19021a (the last two for tokenizer files that all Gemma-2 sizes share) |
+| `phi4` | microsoft/phi-4 | `2db69c1c3e91a05d2c64a3185acfbaf36f744e25` | 29.32 | 15 | sdpa | official |
+| `falcon7` | tiiuae/Falcon3-7B-Instruct | `1e57a0ecd176c7c139f289c60a74e57f887c3dfb` | 14.91 | 10 | sdpa | official |
+| `yi9` | 01-ai/Yi-1.5-9B-Chat (the fallback) | `1a0fc698cf883c4f5c325f026ca79f0ebd9955a5` | 17.66 | 11 | sdpa | official |
+| `mistral24` | mistralai/Mistral-Small-24B-Instruct-2501 | `9527884be6e5616bdd54de542f9ae13384489724` | 47.14 | 19 | sdpa | official (HF-format shards) |
+
+**Verification** (`scripts/fetch_verified.py`, rule G2). For each file, the fetcher tries these sources in order:
+1. a copy already in the model's directory, re-hashed on every run;
+2. a copy in the box's Hugging Face cache at the pinned commit of a repository that may serve the file (the official repository, for a gated one only when HF_TOKEN is set, then the ungated repositories listed for the file), hard-linked into the model's directory (so a later change or removal of the cache entry cannot change or remove the verified bytes; a symbolic link only where the cache is on another file system), and verified after it is linked;
+3. a download from the official repository at the pinned commit (for a gated repository, only when HF_TOKEN is set);
+4. for a gated repository, a download from each ungated repository the manifest lists for that file, in the listed order, each at its pinned commit.
+
+A copy is accepted only if its size and hash equal the official ones. Otherwise the next source is tried. A source that fails with a download error is tried at most three times in all (with waits of 30 s and then 60 s), and only once when no retry can fix the error (HTTP 401, 403 or 404, or a gated or missing repository, revision or file).
+
+`VERIFIED.json` is written into the model's directory, with the source of every file, only when every file verifies and the directory holds no other file. A model is **refused** (fetcher status 1, `FETCH REFUSED`, `FETCH_FAILED.txt`) before any of its steps runs only when a file of the manifest cannot be verified: every listed source delivered bytes that do not match, or answered with an error that a retry cannot fix. Only a refusal is a verification failure. The script stops instead, with its reason and without any fallback, when the fetch fails for a reason of the environment; a later run of the same script goes on from there:
+- the disk cannot hold the files still to fetch plus 2 GiB (checked before any download; status 4);
+- a source still fails with an error that a retry could fix (network, I/O) after its three tries, and no file was refused (status 5; the fetch stops at that file);
+- the model's directory holds a file that the manifest does not list (status 6);
+- a bad manifest (status 2) or an unexpected error of the fetcher (status 3).
+
+The ungated sources were found by comparing the Hub's sha256 (LFS) or git blob id, and the size, of every file with the official ones. At least two of the listed sources hold each file of each gated model (the manifest lists up to four per file, preferring the copies the design named and organisations' complete copies). Because every byte is checked against the official hash, the assembled directories are byte-identical to the official releases, and the paper describes Llama-3.1-8B-Instruct, Gemma-2-9B-it and Gemma-2-2B-it as "official weights (sha256-verified)".
+
+`tokenizer.model` of Mistral-7B-Instruct-v0.3 is committed in its repository as a 130-byte git blob that is an LFS pointer, and the Hub serves the 587,404-byte object it points to. The manifest therefore pins the object's sha256 (37f00374…), which the Hub reports as `x-linked-etag`, and not the pointer's blob id. This object is byte-identical to `tokenizer.model.v3`, whose blob id the manifest also pins.
+
+**The fallback rule (G2).** The single technical fallback for a fresh family is 01-ai/Yi-1.5-9B-Chat (`yi9`). It can take the place of Llama-3.1-8B or Gemma-2-9B in Part A, of one of Llama-3.1-8B, Gemma-2-9B, Phi-4 and Falcon3-7B in Part B, and of Llama-3.1-8B in Part C. Part D runs no fresh family and has no fallback: a model of Part D whose files are refused is listed in `FAILED.txt` and is not evaluable in any line. The fallback replaces a model only when one of these happens:
+- a file of that model fails verification (fetcher status 1);
+- in Parts B and C, the model's tokenizer-only check, run before any output of the model, fails (Part B's J-B-G0b, Part C's preflight).
+
+The fallback is decided before any output of the replaced model exists, at most once per part, and never on a fetch that failed for a reason of the environment (status 2–6). It is never used after any output of that model exists, and never after a competence, gate or verdict failure. The decision is written to the results directory (Part A: `FALLBACK.txt`; Parts B and C: the line "fallback: yi9 replaces <key>" in `COMMIT.txt`) and holds for every later run of the same part there: the replaced model is not run again, even when its files verify later, so the outputs of the fallback and of the replaced model are never mixed. In Part A, the factorial of every model, the fallback included, checks every item with that model's own tokenizer and skips the items that fail, with the count and the reasons reported. A refused fetch is also listed in `FETCH_FAILED.txt`, the fallback's revision and sources are in `REVISIONS.txt`, and the part's scorer names the replacement. If the fallback is itself refused, the replaced model's slot has no results and is not evaluable in any line; the line is then judged by the part's combination rule.
+
+### Statistics, intervals and the combination of models (G3)
+
+**Intervals.** Every interval is a percentile interval from 10,000 bootstrap resamples, with a fixed seed stated by the part. The index sets are shared by all arms, rows and scorings of a model, so contrasts are paired. Every ratio, share and difference of ratios is recomputed within each resample. The resampling unit is the cluster where clusters exist, with a two-stage cluster bootstrap that resamples the clusters, then the items within each drawn cluster:
+- Part A: articles;
+- Part B: the cells (lexicon, ordered location pair) (B-2);
+- Part C: stories within (base, source) pairs, with the E4 seeds as a further level (C-13);
+- Part D: stories (cores), resampled directly.
+
+A part with clusters names the statistics that resample items directly instead (Part B's J-B6c core bootstrap and J-B8; Part C's pair statistics of J-C6 and the screen).
+
+**Lines over several models.**
+- A line that must hold "in every evaluable model" is an intersection-union test. It uses the 95% interval of each model, without a multiplicity correction. The part states how many evaluable models such a line needs. Every part combines such a line by one rule: the line is NOT MET as soon as one evaluable model does not meet it, whatever the number of evaluable models; it is NOT EVALUABLE only when no evaluable model fails it and fewer models than the part requires are evaluable; otherwise it is MET. (Part A also requires a fresh family among the evaluable models, and its head lines require both head models.)
+- A line that must hold "in k of N models" follows the rule its part states. Only Part B has such lines (its N4 lines: 3 of 4): they use 98.75% intervals (Bonferroni over four models at a one-sided 2.5%), a model that is not evaluable for such a line counts as not meeting it, and with fewer than k evaluable models the line is NOT EVALUABLE.
+
+**Interval criteria as tests.** Every interval criterion is written as a one-sided test of a named null. Example: "H0: s_ID ≤ 0.35, rejected when the lower bound of the 95% interval is > 0.35", a one-sided test at 2.5%; with the 98.75% interval it is a test at 0.625%. An equivalence criterion ("the interval lies inside (a, b)") is two such tests, one per bound, on the line's interval; Part C's TOST equivalences use the 90% interval (two tests at 5%), as Part C states. A point floor (for example "s_ID ≥ 0.5") is an effect-size condition, not a test, and is described as such. A line is met in a model only if all of its tests reject and all of its point floors hold.
+
+**Holm sensitivity analysis.** This is reported, and no verdict uses it. It is computed identically in every part by the shared helper `analysis/stage8_holm.py` (tested in `tests/test_stage8_holm.py`, which every part's pytest step runs before any model). The family of a part is the interval components of its R-class account lines: one bound of one statistic in one model, taken from the models where the line is evaluable (Parts C and D also leave out a line that is NOT EVALUABLE as a whole; each part lists its family). For each component the helper computes the one-sided p-value from the normal approximation with the bootstrap standard error se (the standard deviation of the resampled statistic): p = Φ(−(est − bound)/se) when the alternative is "value > bound", and p = Φ((est − bound)/se) when it is "value < bound". A component with se = 0 gets the limit of that formula (0, 1 or 0.5 by the side of the bound the estimate lies on); a component whose estimate or se is undefined is never rejected and is left out of the family. The helper then applies Holm's step-down procedure at a familywise one-sided α of 0.025 over the family: the component of rank i (by increasing p) among m has the threshold 0.025/(m − i + 1), and the components are rejected in rank order up to the first that is not. For each R-class account line, the scorer prints the components whose decision changes when Holm's decision replaces the line's own interval decision, and the verdict the line would then get. Parts A and B recompute that verdict under the line's combination rule, with the point floors and the rule on undefined quantities unchanged. Parts C and D turn a MET line with a component that Holm does not reject into NOT MET and leave every other verdict unchanged (a component that Holm rejects and the interval rule does not is listed and changes no verdict).
+
+**Evaluability.** Evaluability is decided only by the gates and by rows that the manipulation under test does not change. A quantity made undefined by the manipulation or the arm itself (for example a share whose denominator collapses under the tested condition) counts against the line (NOT MET, with the reason printed), never as NOT EVALUABLE. A confirmatory line whose rows were not run before the deadline is NOT EVALUABLE, and the reason printed with it says that the rows were not run.
+
+### Risk classes, priors and the calibration summary (G4)
+
+Before any stage-8 output, this entry records for every confirmatory line a class and a prior, P(MET | evaluable): the probability that the line is MET, given that it is evaluable. Each prior has a one-line justification from data in hand. The class follows the recorded prior:
+- **L, replication.** The line is implied by data in hand on the same models and material, and its prior is at least 0.9.
+- **M, extrapolation.** The prior is at least 0.8 (and the line is not L): an extrapolation of a regularity seen in every model in hand, or a consequence of the causal mask together with another line.
+- **R, risky.** The prior is below 0.8, including every line on which no data in hand bears.
+Where a line's description and its prior would point to different classes, the prior decides.
+
+Each line also has a kind:
+- **account lines** test the paper's account;
+- **measurement-validity lines** test a measurement: scoring invariance, coverage, or the agreement of a score with generated answers.
+
+The two kinds are tallied separately. Gates are not predictions and are not tallied.
+
+**What each scorer prints.** Each scorer's SUMMARY gives, for each class (L, M, R) and separately for account and measurement-validity lines:
+- the number of lines;
+- the counts of MET, NOT MET, MET IN PART and NOT EVALUABLE lines;
+- the observed met count against the expected met count, which is the sum of the priors of the lines with a verdict of MET, NOT MET or MET IN PART (the priors are conditional on evaluability, so the NOT EVALUABLE lines do not enter);
+- the Brier score, the mean of (prior − 1[MET])² over the same lines.
+
+It then gives the met count among the R-class account lines with a verdict, against their expected count. MET IN PART counts as not met in these tallies; no part of this entry defines it, so every SUMMARY prints its count as 0. NOT EVALUABLE lines are left out of both counts and are listed by code; the reason of each is printed with its line in PREDICTIONS. A line that a part marks as derived from its other lines (Part A's J-A3) is printed with its verdict in PREDICTIONS and is not tallied.
+
+**In the paper.** The abstract reports only the met rate of the R-class account lines of this entry, over all four parts, next to the expected count: "k of n predictions we judged risky before the run held (expected k*)". The L and M tallies, the measurement-validity tallies and the Brier scores go in Table 3 and the appendix. The appendix also labels the lines of entries A–I by the same rule. Those labels are computed by a script from each entry's "seen before" record, are marked post hoc, and are never pooled with this entry's tallies.
+
+**Pre-written consequences (E-2).** Each part names the single primary line behind each planned abstract clause and each Table 1 row. For every primary line, it gives four consequences, for MET and for NOT MET:
+- the abstract text;
+- the consequence for the title;
+- the Table 1 row;
+- the figure.
+
+A claim enters the abstract only if its primary line is MET under its combination rule. MET IN PART appears in the body only, with the word "partly". NOT MET is replaced by the pre-written boundary statement.
+
+The title is "Looked Up or Copied? Later Mentions Decide Whether a Model Reads an In-Context Value Through Its Key or Its Value". Only Part A's natural-text primary lines can change it, as named in Part A (A1 and A3 in the design). If these are NOT MET or NOT EVALUABLE, the title becomes the templates-only fallback given in Part A's section. No outcome of Part C changes the title.
+
+### Codes and verdict words (G5)
+
+Confirmatory lines are numbered J-A1, J-A2, … in Part A, and J-B…, J-C…, J-D… in the other parts. Named lines keep their part's prefix (for example J-B-NULL, J-D-SIGN-Q). Gates are J-A-G0, J-A-G1, …, and the G0 gate of every part is its FP32 unit tests. Each verdict is one of MET, NOT MET, NOT EVALUABLE, or MET IN PART (only where a part defines it; no part of this entry does). Each scorer writes `STAGE8<PART>_SCORE.txt` with the sections PROVENANCE, POPULATION, GATES, PREDICTIONS, REPORTED, SUMMARY and EXPLORATORY; Part C adds HEADLINE and Part D its D6 DECISION TABLE. PREDICTIONS has one line per confirmatory line, giving:
+- the code;
+- the class (L/M/R) and the kind (Part A, whose lines are all account lines, prints the class only);
+- the prior;
+- the verdict;
+- the numbers and bounds it was decided on.
+
+The GPU script prints the GATES and SUMMARY blocks at the end of the run.
+
+### Populations (G6)
+
+U is the union of make_cores(1000, Random(s)) for s = 0, 1, 2, 3. Stages 1–7 drew templated cores from seeds 0 and 1 only, so U contains every core used before. A core is compared by its full tuple: (agent, other, object, distractor, initial, distractor_location, base, source). U holds 3,981 distinct tuples; 19 of the 4,000 draws repeat. Its hash is sha256(json.dumps(sorted(U))), with each tuple as a list in that field order and the default separators of `json.dumps`: abd1f0530a3d08a2058743f59102f8dd6dd360af06fc65dd3277c5b5eb176c3d.
+
+The rule: every templated population of stage 8 is disjoint from U and from every other stage-8 population, by full tuple. Each part's preflight and unit tests assert this for its own populations, and `tests/test_stage8_populations.py` (run at the build and by every part's pytest step before any model) asserts it across the parts, from the functions the GPU steps call (`ckeys.fresh.population` for Part B, `ckeys.edits.populations` for Part C, `experiments.stage8_flag.populations` for Part D). It also asserts that the three parts compute U identically (`ckeys.fresh.used_cores`, `ckeys.edits.universe`, `experiments.stage8_flag.u_set`) and that no confirmatory population is drawn from a pilot seed listed below. Each part lists its populations with their seeds, sizes and hashes.
+
+There are two exceptions, both re-uses of the stage-1 cores drawn from Random(0) and labelled in their parts:
+- S0 = make_cores(150, Random(0)), the cores of stages 1 and 3b, is re-measured on purpose by Part B's JB6 as the discovery sample. The sha256 of its 150 tuples in drawn order is fdd1bf1ba4d8d657f663f786c3ff92d0145e41cf02e123e602d594b183110121.
+- Part D's fit set R = make_cores(60, Random(0)), the first 60 cores of S0 (the stage-6 ranking set), and its subset R′ (the 45 cores with distractor_location ≠ initial), re-used on purpose as the in-sample fit set: the flags are fit where stage 6 ranked the reader heads (Part D states which quantities are computed there).
+
+The full space has 364,800 distinct cores (480 location configurations × 2 agent orders × 380 ordered object pairs). U enumerates every location configuration, so a fresh population is fresh in its tuples, not in its location configurations; Part B's lexicon and wording changes address this.
+
+Seeds that the pilots below already drew from, and that no confirmatory population may use:
+- make_cores seeds 0, 1, 7, 8, 9, 99, 101, 202 and 20261011;
+- `ckeys.ioi.make_cores` seeds 5 and 6.
+
+| Part | Population | Drawn from | Size | sha256 |
+|---|---|---|---|---|
+| A | R, E, YEAR, LEAK | SQuAD v1.1 dev questions, `data/stage8a_items.json` (`experiments.natural_factorial.populations`) | 71, 185, 80, 65 (build) | items file 40874aa1… (fixed by the finalising commit, not pinned in the code) |
+| B | F | the first 150 cores of the Random(20261013) stream not in U | 150 | e87047c9… (with its rendering) |
+| B | C (calibration) | the first 30 cores of the Random(20261014) stream not in U or F | 30 | a625fd13… (with its rendering) |
+| B | S0 (re-use) | make_cores(150, Random(0)) | 150 | 48bb0a3a… (with its rendering) |
+| C | E | Random(8101): π(S) ≠ B and π(X) ≠ B, not in U | 80 | a23465a2… |
+| C | H (H_fit, H_cal) | Random(8102), not in U or E | 200 (150, 50) | 8cc62cef… |
+| C | TSET, THOLD | Random(8103): π(S) ≠ B, not in U, E or H | 1,000, 100 | 06c56f93…, 136b7d94… |
+| D | R, R′ (fit; re-use) | make_cores(60, Random(0)) | 60, 45 | 9036af1a…, fe348ba4… |
+| D | E8 | Random(81), not in U or the pilots' and the other parts' seed streams | 100 | 2c198705… |
+| D | BIND | Random(84), distractor_location ≠ initial, not in U, those streams or E8 | 100 | 495c1462… |
+| D | F_IOI, E_IOI candidates | `ckeys.ioi.make_cores(90, Random(82))`, `(150, Random(83))`, disjoint from each other and from IOI seeds 0, 1, 5, 6 | 90, 150 | d41e791a…, 2b165365… |
+| D | XFIT, XEVAL (exploratory) | `ckeys.tasks` paint and schedule cores, Random(85), Random(86), not in task seeds 0–3 | 60, 40 per task | 9b9a320f…, be234aaf…, 4a56ae02…, 8b4c7c05… |
+
+The hashes are those of each part's own canonical form (each part states it; Part B's include each core's lexicon, sentence and candidate order). For Parts B–D the full values are pinned in `ckeys/fresh.py`, `ckeys/edits.py` and `experiments/stage8_flag.py` and asserted before any model. Part A's items file is fixed by the finalising commit (`data` is among the guarded directories); its sha256 is recorded in every Part A results file, and Part A's preflight stops the run unless the items rebuilt from the SQuAD file are byte-identical to it.
+
+### Seen before finalisation: the principle and the common part (G7)
+
+**The principle.** Every CPU pilot run for the design or the critique of this stage is listed in its part's "seen before finalisation" section with its numbers. This includes the critics' closed-book, cue-conflict, non-lexical-steering and core-overlap checks. The pilots' scripts and logs are in `pilots/stage8/` (the rewrite's design and critique read only literature and model nothing). They are listed by part:
+
+| Part | Design pilots | Critique pilots |
+|---|---|---|
+| A | `pilots/stage8/partA/` (item builds, prompt checks, the 0.5B pilots `pilot05*`, continuation, split, power) | `pilots/stage8/critic_natural/` (closed-book `cb15.json`, cue-conflict `cc15.json`, 1.5B) |
+| B | `pilots/stage8/partB/` (tokenizer check, Hub metadata, exactness, mini factorial at 0.5B, coverage at Llama-3.2-1B, in-hand statistics, power) | `pilots/stage8/critic_replication/` (JB9 chance, lexicon check; core overlap with seed 99) |
+| C | `pilots/stage8/partC/` (pilots A and B, memory test, power) | `pilots/stage8/critic_intervention/` (non-lexical steering at 1.5B, κ compression) |
+| D | `pilots/stage8/partD/` (0.5B flag, ablation, dissociation, IOI, injection; sign at 1.5B) | `pilots/stage8/critic_mechanism/` (`pilot_critic*`, `pilot_kv_inout`, 1.5B) |
+| E (rewrite) | the rewrite design (literature only; no model was run) | its critique (literature only) |
+
+No model output of any stage-8 confirmatory population has been seen. According to the pilots' logs and the design files, every pilot that ran a model ran it in FP32 on the CPU at 1.5B parameters or fewer (Qwen2.5-0.5B-Instruct, Qwen2.5-1.5B-Instruct, Llama-3.2-1B-Instruct). The larger models appear only in tokenizer-only and metadata checks. Each part's list is the authoritative record of its pilots.
+
+**Seen for the common part.**
+- **The Hub metadata of 2026-10-10.** This is the revision and the per-file sizes and hashes of the fourteen repositories in the manifest, and of about 2,100 public repositories whose names match Llama-3.1-8B-Instruct, Gemma-2-9B-it or Gemma-2-2B-it. They were searched for byte-identical copies of the gated files; every file of the three gated models has at least five (Gemma-2-2B-it's `generation_config.json`; at least ten for Gemma-2-9B-it and 23 for Llama-3.1-8B-Instruct). Every revision equals the one earlier stages pinned, where one was pinned. The 108 files that Part B's capture of the same morning also recorded have the same hashes, except one: Mistral-7B's `tokenizer.model`, for which that capture recorded the LFS pointer's blob id; the pointer is explained above. No model was run.
+- **The fetcher's checks.**
+  - The seven files of Qwen2.5-0.5B-Instruct were verified from the local Hugging Face cache.
+  - These small files were downloaded and verified: Llama-3.1-8B-Instruct's `config.json` from NousResearch through huggingface_hub, its `tokenizer_config.json` from modularai over plain HTTPS, and Mistral-7B's `tokenizer.model` over HTTPS.
+  - Two files of Gemma-2-2B-it were downloaded from SceneWorks/gemma-2-2b-it through huggingface_hub and matched the official sha256: `tokenizer.json` (17.5 MB) and `model-00002-of-00002.safetensors` (240.7 MB).
+  - Downloads from the gated official repositories without a token were refused with HTTP 401, as expected.
+- **The unit tests and plumbing runs.** `tests/test_fetch_verified.py` passed (29 tests): hashes, mirrors, retries, refusals against environment errors (statuses 1 and 3–6), the disk check, hard links from the cache, the manifest, the library's guards on throw-away repositories (including a final entry that quotes the words of the draft marker, which must run), a TEST_MODE dry run with a fake scorer, and `s8_fetch` and `s8_prefetch` with a stand-in fetcher. `tests/test_stage8_holm.py` (7 tests) and `tests/test_stage8_populations.py` (5 tests) passed. The TEST_MODE runs of the four scripts are listed in each part.
+
+### Shared code (G8)
+
+The parts build on code committed before this entry:
+- **43700ae:**
+  - `ckeys/surface.py`, the emitted-form trie scorer;
+  - span tables in `ckeys/headsplice.py`;
+  - the fused-qkv clamp sites of Phi-3/Phi-4 in `ckeys/clamp.py`;
+  - `ckeys/squad_items.py`, `ckeys/natural_formats.py` and `scripts/build_stage8a_items.py`;
+  - `tests/test_surface.py` and `tests/test_clamp_families.py`.
+- **107332e:** `ckeys/generate.py` (greedy decoding under cache clamps, answer parsing, frame discovery) and `tests/test_generate.py`.
+- **c6fd4a8:** the Part A item rules and `data/stage8a_items.json`.
+- **The stage-8 build (committed with this entry):**
+  - `scripts/stage8_common.sh`, `scripts/stage8_models.json`, `scripts/fetch_verified.py` and `tests/test_fetch_verified.py`;
+  - `analysis/stage8_holm.py` (the Holm sensitivity analysis of every part) and `tests/test_stage8_holm.py`;
+  - `tests/test_stage8_populations.py` (rule G6 across the parts);
+  - each part's experiments, scorer, tests and GPU script.
+
+The parts reuse these modules. Two were changed after their first commit, each with its tests: `ckeys/natural_formats.py` was extended for Part A in the stage-8 build (tested by Part A's gate files), and the stage-8 review changed `ckeys/generate.py` so that a chat template's end-of-turn token also ends a generated answer (`tests/test_generate.py`, which the GPU scripts of Parts A, B and C, the parts that use the module, run before any model; Part D does not use it). A change to a shared module needs a test that the GPU scripts run before any model.
+
+### Compute and commands
+
+| Part | GPU-hours (A100-80GB): core / with the exploratory and deadline-guarded steps | Default DEADLINE_H | Disk for weights |
+|---|---|---|---|
+| A | about 3.3 / about 4.1 | 4.5 | ≥ 60 GB (one model at a time; no prefetch) |
+| B | about 3.2 / about 4.3 | 4.5 | ≥ 140 GB (two models at a time besides Qwen2.5-7B, kept until x1; 47 GB for J-B8) |
+| C | about 3.5 / about 4.8 | 5.0 | ≥ 80 GB (two models and the four dictionaries) |
+| D | about 2.3 / about 2.5 | 3.5 | ≥ 50 GB (both 7B models and a prefetch) |
+
+The weights of all fourteen models total about 233 GB. A part needs only its own models. Each model's directory is deleted after its steps unless `KEEP_CACHE=1` is set or the model was already verified there before the run. The box needs at least 250 GB of disk; network access to huggingface.co (the models and Part C's dictionaries), rajpurkar.github.io (Part A's SQuAD file), github.com (the clone, and the published release that Part C's screen and J-C6 use) and anonymous.4open.science (Part B's J-B8 fetches the release of Anonymous (2026) there unless `P1R` names a local copy), and the Python package index when pip must install; and an optional HF_TOKEN, set only in the box's own terminal. The commands, on one A100-80GB:
+```bash
+# in a fresh clone of this repository (docs/GPU_RUNBOOK.md gives the clone line)
+J=$(git log --format=%H -1 --grep='^Finalise preregistration J$') && [ -n "$J" ] && git checkout "$J"
+bash scripts/gpu_stage8a.sh; bash scripts/gpu_stage8b.sh; bash scripts/gpu_stage8c.sh; bash scripts/gpu_stage8d.sh   # any order, any subset
+TEST_MODE=1 bash scripts/gpu_stage8<part>.sh   # the CPU plumbing test of one part
+```
+`docs/GPU_RUNBOOK.md` (Stage 8) gives the options (`DEADLINE_H`, `FORCE`, `FORCE_STEPS`, `KEEP_CACHE`, `TESTS`, `MINGIB`, `OUT`, `S8_MODELS`, `PY`) and explains reruns and how to send the results back; each part names its own further options (for example `SQUAD` in Part A, `P1R` in Part B, a local copy of the release in Part C, and `TEST_ALL` for the TEST_MODE runs of Parts B–D).
+
+### Part A. The format law on natural reading comprehension (counterfactual SQuAD)
+
+**Code.** `ckeys/natural_formats.py` (prompt formats, closed-book prompts, answer frames, frame-aware decision tokens, answer parsing), `ckeys/natural_rows.py` (rows, tables and per-item passes), `ckeys/kvquant.py` (KIVI-style fake quantization), `experiments/natural_factorial.py` (stages preflight, frames, factorial, explore), `experiments/natural_heads.py` (heads on natural text), `analysis/stage8a_score.py` with `analysis/stage8a_parts/` (scorer), `scripts/gpu_stage8a.sh` (pipeline; it sources `scripts/stage8_common.sh`). Items: `ckeys/squad_items.py`, `scripts/build_stage8a_items.py`, `data/stage8a_items.json`, `data/stage8a_type_audit.tsv`. Tests: `tests/test_natural_clamp.py` and `tests/test_kvquant.py` (Gate J-A-G0), `tests/test_natural_heads.py` (Gate J-A-HA-G0), `tests/test_stage8a_score.py` (the scorer on synthetic inputs).
+
+**Purpose.** Stages 1–7 showed the format law on templated stories with single-token values. Part A tests it on natural Wikipedia passages with multi-token, open-vocabulary answers, in four model families, two of them never run in stages 1–7. It answers four objections.
+- *Generality (objection 2).* SQuAD v1.1 dev passages; answers are PERSON, PLACE or NUMBER entities named once in the passage; spans are mostly 2–4 tokens; Llama-3.1-8B and Gemma-2-9B are fresh families; intervals come from a cluster bootstrap over articles.
+- *Emitted form (objection 4).* Each model's answer frame (the text it writes between "Answer:" and the entity) is fixed before the factorial from its own greedy generations on R items, and every decision token is scored after prompt + frame. Gate J-A-G3 requires the scored token to be the first generated token for B, S and X.
+- *A behavioural consequence.* Cue-conflict rows give the same cache two sources, neither of them the original answer: the key from one entity and the value from another. The account predicts that the generated answer names the key's entity under a later options list and the value's entity without one (J-A6).
+- *A practical consequence.* KIVI-style 2-bit quantization of the passage's cached values, against its keys, in multiple-choice and free-form formats, as a difference in differences (J-A7).
+- *Prior controls (the critique's F1).* A question with its options and no passage already favours the original answer B (65 % at 1.5B, see Seen before finalisation). Every verdict on an accuracy (J-A7, J-A7b, J-A-HA3a, J-A-HA3b) is therefore made on prior-free items (closed-book argmax not B, and the Z passage does not give B). The identity measures ID_K, ID_V and s_ID are S-versus-X double differences on a common B background; a prior for B cancels from them to first order.
+- *Heads on natural text.* The stage-6 reader-head analysis is repeated on the natural MCQ items at Qwen2.5-7B and Mistral-7B, with a transfer test of the template-found heads and a behavioural necessity test (J-A-HA1 to HA3).
+
+Part A does not test the templated sentence effect on fresh cores (objection 5 belongs to Part B), the sign of negative key reads (Part D), or interventions (Part C). J-A8 is a channel-level replication of induction-head K-composition (Elhage et al. 2021; Olsson et al. 2022), class M (prior 0.80), and is not a novelty claim.
+
+#### Material
+
+**Source.** SQuAD v1.1 dev (Rajpurkar et al. 2016; CC BY-SA 4.0), `https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.json`, sha256 `95aa6a52d5d6a735563366753ca50492a658031da74f301ac5238b03966972c9` (asserted by `ckeys.squad_items.load_squad`): 48 articles, 10,570 questions. The counterfactual substitution follows Longpre et al. (2021).
+
+**Item rules** (`ckeys/squad_items.py`; fixed before any model output):
+1. e_B is the majority answer (given by at least 2 of the 3 annotators). It occurs exactly once in the passage (word-bounded, case-sensitive) and not in the question (case-insensitive).
+2. Type: YEAR (`^(1[0-9]{3}|20[0-2][0-9])$`), NUMBER (`^(\d{1,3}(,\d{3})+|\d+)$`, not a year), or NAME (1–4 capitalised words with connectors). A NAME is PERSON when the wh-word is who/whom/whose and the answer is person-shaped (2–3 words of the person patterns, no word in the NONPERSON list); PLACE when the question has a place head noun (country, nation, city, town, village, capital, state, province, county, region, district, area, river, lake, island, continent), typed into the place classes country, city, region, water, island, continent (with the audited class corrections CLASS_FIX); ORG and the rest are dropped. "where" questions without a place head noun are dropped.
+3. Substitutes S, X, Z (Z is only ever clamped, never shown): NAME from the majority answers of the same subtype, place class and word count in other articles; NUMBER by replacing the leading digit (seeded order); YEAR in the same century, 3 ≤ |Δ| ≤ 60. Each item has its own stream `random.Random(int(sha256(id)[:8], 16))`. Every substitute is absent from the passage and the question, shares no word with e_B, the other substitutes or D, and no content word of it occurs in the passage or question.
+4. D, the fourth option: another majority answer of the same paragraph and subtype that occurs in the passage (D_in), else an absent pool entity. The option order is `random.Random(seed_of(id + "order")).shuffle([e_B, S, X, D])`, the same in every prompt of the item.
+5. No partial mentions: no content word of e_B (≥ 3 characters, not a connector) occurs in the passage outside e_B's span or in the question. Items that fail only this rule form the LEAK stratum (exploratory; for example a surname re-mentioned after the full name).
+6. Per tokenizer and format: the S, X and Z passages give prompts of B's token length that differ from B's only inside B's entity span P; the decision tokens of B, S, X, Z and D are pairwise distinct (stratum FT; YEAR items form stratum SP without this rule).
+7. The type audit (`data/stage8a_type_audit.tsv`, sha256 `e4d48380a950a8d8608f7c2396da033225287259cfe24a54e12fae74284c5c56`) was done on entity lists alone, with no model output: 44 entities excluded by type (EXCLUDE), 9 place classes corrected (CLASS_FIX).
+
+**Build** (`scripts/build_stage8a_items.py`, tokenizers of Qwen2.5-7B-Instruct, Mistral-7B-Instruct-v0.3, and the tokenizer files of unsloth/Meta-Llama-3.1-8B-Instruct and unsloth/gemma-2-9b-it): candidates PERSON 425, PLACE 89, NUMBER 295, YEAR 529; with three substitutes and a distractor: PERSON 349, PLACE 42, NUMBER 191, YEAR 529; 486 FT items valid in every tokenizer and format (invalid: 7 in Qwen, 1 in Gemma, all NOM). Article split: `random.Random(20261010).sample(sorted(titles of the valid FT items), 12)` gives the 12 R articles (American_Broadcasting_Company, Economic_inequality, European_Union_law, Fresno,_California, Geology, Imperialism, Intergovernmental_Panel_on_Climate_Change, Islamism, Martin_Luther, University_of_Chicago, Victoria_(Australia), Yuan_dynasty); the rest are E. Caps (seeded shuffle of the id-sorted list, at most 2 items per paragraph): R at most 8 per article (Random(1)); E at most 10 (Random(2)); YEAR at most 10 per E article, first 80 (Random(3)); LEAK at most 10 per E article, first 80 (Random(4)).
+
+| Split | Items | Articles | By type | Use |
+|---|---|---|---|---|
+| R | 71 | 12 | PERSON 38, NUMBER 28, PLACE 5 | frames (first 30), head ranking (first 60) |
+| E | 185 | 34 | PERSON 80, NUMBER 77, PLACE 28 (country 20, region 4, city 4); D_in 47 | factorial (every valid item), head curves (first 80), head ablation (every valid item) |
+| YEAR | 80 | 26 | YEAR | exploratory E4 |
+| LEAK | 65 | 21 | PERSON 64, PLACE 1 | exploratory |
+
+`data/stage8a_items.json` has sha256 `40874aa1033d1af829f5642916282a5440df2dad011c991b4ac2704a2c25b591`; `experiments.natural_factorial.populations()` returns the four splits' question ids. Part A's populations are SQuAD questions, not templated cores, so the G6 disjointness from U does not apply to them. The preflight downloads SQuAD, asserts its sha256, rebuilds the items with the same tokenizers at the Hub revisions the build used (Qwen2.5-7B-Instruct `a09a3545…`, Mistral-7B-Instruct-v0.3 `c170c708…`, unsloth/Meta-Llama-3.1-8B-Instruct `a2856192…`, unsloth/gemma-2-9b-it `fc7d4737…`; `BUILD_TOKENIZER_REVISIONS`) and stops the run unless the rebuild is byte-identical to the committed file. Each model's factorial then checks every E item in every format with its own tokenizer: item rule 6 as in the build (frame " "), and the decision tokens under the model's frame (below). It skips (and counts, with the reason) an item that fails either check in any format; the populations below are over the remaining items. The factorial file records the sha256 of the valid items' ids (sorted, one per line); the scorer checks it, and checks that the valid and the skipped items together are E.
+
+#### Models and sourcing
+
+BF16; sdpa attention except Gemma-2 (eager, soft-capping); use_cache=False in every scoring pass. Files come from `scripts/fetch_verified.py` via `s8_fetch` (rule G2): the official repository at the pinned revision with HF_TOKEN, otherwise byte-identical copies listed in `scripts/stage8_models.json`, each file verified against the official sha256 (LFS) or git blob id and size. Llama-3.1-8B-Instruct and Gemma-2-9B-it are "official weights (sha256-verified)".
+
+| Key | Model | Revision | Attention | Role |
+|---|---|---|---|---|
+| llama8 | meta-llama/Llama-3.1-8B-Instruct | 0e9e39f249a16976918f6564b8830bc894c89659 | sdpa | fresh family |
+| gemma9 | google/gemma-2-9b-it | 11c9b309abf73637e4b6f9a3fa1e92e615547819 | eager | fresh family |
+| qwen7 | Qwen/Qwen2.5-7B-Instruct | a09a35458c702b33eeacc393d103063234e8bc28 | sdpa | continuity; heads |
+| mistral7 | mistralai/Mistral-7B-Instruct-v0.3 | c170c708c41dac9275d15a8fff4eca08d52bab71 | sdpa | continuity; heads |
+| yi9 (fallback) | 01-ai/Yi-1.5-9B-Chat | 1a0fc698cf883c4f5c325f026ca79f0ebd9955a5 | sdpa | replaces llama8 or gemma9 |
+
+The fallback replaces llama8 or gemma9 only when its files fail verification (`s8_fetch` status 1), before any output of it exists, and at most once. Any other fetch failure (not enough disk, a manifest error) stops the run with its reason, and no fallback runs. A replacement is written to `FALLBACK.txt` in the results directory and holds for every later session there: the replaced model is not run again, even when its files later verify. Yi counts as a fresh family. Gemma-2 rejects a system turn; the wrapper merges it into the user turn and records this (WRAPPER_USED).
+
+#### Prompts, frames and rows
+
+**Formats** (user turn; system turn "You are a helpful assistant."; generation prompt with thinking disabled; assistant prefill "Answer:"; `ckeys.natural_formats.parts`). PRE = "Read the passage and answer the question.\n\n"; FREE = "Answer with the exact words from the passage."; MC = "Answer with exactly one of the options."; o1..o4 the options in the item's order.
+- NOM (no mention): PRE + "Passage: " + P + "\nQuestion: " + Q + "\n" + FREE.
+- OPTA (options after): PRE + "Passage: " + P + "\nQuestion: " + Q + "\nOptions: o1; o2; o3; o4\n" + MC.
+- OPTB (options before): PRE + "Options: o1; o2; o3; o4\n\nPassage: " + P + "\nQuestion: " + Q + "\n" + MC.
+- MENA (sentence after): PRE + "Passage: " + P + " Related articles mention o1, o2, o3 and o4.\nQuestion: " + Q + "\n" + FREE.
+- MENB (sentence before): PRE + "Passage: Related articles mention o1, o2, o3 and o4. " + P + "\nQuestion: " + Q + "\n" + FREE.
+- LETA (letters after): PRE + "Passage: " + P + "\nQuestion: " + Q + "\nOptions:\nA. o1\nB. o2\nC. o3\nD. o4\nAnswer with the letter of the correct option."
+- Closed book (no passage): CBOPT = "Answer the question.\n\nQuestion: " + Q + "\nOptions: o1; o2; o3; o4\n" + MC; CBLET = "Answer the question.\n\nQuestion: " + Q + "\nOptions:\nA. o1\n...\nD. o4\nAnswer with the letter of the correct option."
+
+**Answer frame** (per model, stage frames, before the factorial). Greedy generations of the unclamped B prompt (at most 16 new tokens, stopped and read as in pass 3 below, without its early stop) of the first 30 R items in NOM and OPTA. For each, the text before the first occurrence of e_B (case-sensitive) is counted if it is one of FRAMES = {"", " ", " **", "**", " The ", " the "}. The frame is the most frequent of these under which at least 80 % of the E items are valid in every format (ties: the order of FRAMES); " " if none. It is written to `frames/<key>.json`; every later file records that file's sha256, and the scorer checks it. Frame " " gives exactly the continuation tokens the items were built with (a unit test on every item with the Qwen tokenizer; checked once in all five tokenizers, see Seen before finalisation).
+
+**Decision tokens** (`decision_ids`). c_Y = the tokens of frame + e_Y after the prompt (prefix-stable); w = its leading tokens that lie inside the frame's characters (any frame characters left over must be whitespace merged into the next token); dec_Y = the next token, which must not be whitespace. w must be shared by B, S, X, Z and D, and the decision tokens pairwise distinct. LETA and CBLET: c_Y = frame + the letter of Y's option, which must be one token after w; Z has no letter. CBOPT: the four options only.
+
+**Rows** (`ckeys.natural_rows`). A row on the B prompt writes, at every position of P and in every layer from 0, the key of one donor run and the value of another (the captured K/V of the B, S, X or Z prompt; ckeys.clamp sites, pre-RoPE projection outputs).
+- Every format: ID = (B, B) (the in-batch reference; the identity), K_S = (S, B), V_S = (B, S), KV_S = (S, S), K_X = (X, B), V_X = (B, X), KV_X = (X, X).
+- NOM, OPTA and LETA also: K_Z = (Z, B), V_Z = (B, Z), KV_Z = (Z, Z); cue conflict KS_VX = (S, X) and KX_VS = (X, S); flag only KS_VZ = (S, Z); copy fallback KZ_VS = (Z, S).
+- Exploratory, NOM and OPTA: K_S@on and V_S@on (S's tables only from layer round(0.3 L), B's below); OPTA K_S^1 and K_S^r (S's key at the first span position only, or at the others only); NOM V_S^1 and V_S^r.
+
+**Passes per item and format** (`experiments/natural_factorial.py`, one forward each).
+1. Capture: the B, S, X and Z prompts + w in one batch: K and V at P in every layer, and each run's log-probabilities of the decision tokens.
+2. Scoring: every row on B prompt + c_S, teacher-forced: the decision log-probabilities lp_Y(r) for Y in {B, S, X, Z, D} (LETA: B, S, X, D), the four-option mass, the argmax, and the log-probability of every token of c_S after the decision token.
+3. Generation: greedy decoding with the KV cache (ckeys.generate.greedy), at most 16 new tokens; the clamps act in the prompt pass and decoding reads the clamped cache. A row stops at a token whose text contains a newline (not kept), at an EOS id of the generation config or the tokenizer, or at a chat end-of-turn token that the vocabulary has (`<end_of_turn>`, `<|im_end|>`, `<|eot_id|>`, `<|end|>`, `<|endoftext|>`, `</s>`, `<eos>`; `ckeys.generate.END_OF_TURN`). Rows: NOM, OPTA, LETA every row; OPTB, MENA, MENB ID, KV_S, KV_X; plus the unclamped S prompt. The answer is read up to the first special token of the tokenizer (its special tokens and the added tokens marked special). The end-of-turn stop and this reading rule exist because the generation configs of Gemma-2-9b-it and Yi-1.5-9B-Chat list only `<eos>` (id 1) and `<|endoftext|>` (id 2) as EOS, not the end of the chat turn (`<end_of_turn>`, `<|im_end|>`), whose text would otherwise be read as part of the answer. A row stops early once its answer class can no longer change: a special token; or the first line has at least W + 2 normalised words, W the most words of a candidate; or, in the letter formats, two characters after the skipped leading markdown, neither of them the replacement character of an incomplete multi-byte character. The answer class, g1 and the generated prefix are unchanged by this (tested on every item along many continuations).
+4. KIVI (NOM, OPTA, LETA): the S prompt with no quantization, with the keys, or with the values of every passage token fake-quantized at 2 bits in every layer (below), greedy as in 3.
+5. Closed book, once per item, before the formats: CBOPT and CBLET, the four options' decision log-probabilities after prompt + w and their argmax. When the decision tokens of a closed-book prompt are not valid (rule above), that prompt has no argmax for the item.
+
+**Order and deadline.** Formats run in the order NOM, OPTA, OPTB, MENA, LETA, MENB. The pipeline passes `--reserve-min` = the core minutes of the models after this one in the order llama8, gemma9, qwen7, mistral7 (`CORE_MIN`: llama8 32, gemma9 48, qwen7 58, mistral7 58; the fallback gets the reserve of the place it takes) plus 10, plus 20 for the same model's heads step at Qwen2.5-7B and Mistral-7B. Before LETA (MENB), the factorial projects that format's time as OPTA's (MENA's) measured time; if it would end later than the deadline minus the reserve, LETA runs with the rows ID, KV_S, KV_X, KV_Z, KS_VX, KX_VS only, and MENB is skipped. Each such decision is recorded in the file's provenance; lines that need the dropped rows are NOT EVALUABLE in that model. The step then exits with status 3, is listed in `SKIPPED.txt` and runs again in a later session. Exploratory passes are dropped before either: a model's explore step starts only when at least the reserve (without the heads minutes) plus 14 minutes remain, each of its parts is skipped once the deadline has passed, and so is the exploratory part of the heads step (ID_K and ID_V under N*).
+
+#### Measures
+
+- |P|: the number of prompt tokens that overlap e_B's characters (the span P), in the model's tokenizer and in the format the measure uses (OPTA for J-A1b).
+- Shifts: Δ_Y(r) = lp_Y(r) − lp_Y(ID).
+- ID_K = ½[(Δ_S(K_S) − Δ_S(K_X)) + (Δ_X(K_X) − Δ_X(K_S))]; ID_V the same with V_S and V_X. s_ID = mean ID_K / (mean ID_K + mean ID_V), a ratio of means over the population, recomputed in every resample.
+- who(r): the entity row r's generation names. Entity formats: the first of B, S, X, Z, D with match(g, e) (SQuAD normalisation of the generation's first line and of e: lowercase, punctuation and articles removed, whitespace collapsed; the first line equal to e, or starting with e followed by a space), else "other". Letter formats: the option whose letter the generation starts with (leading whitespace and `*`, `_`, backquote, brackets and quotes skipped; the letter not followed by another letter), else "other".
+- g1(r): the generated token after w, when the generation starts with w.
+- Competence: competent(i, f) holds when who(ID) = B, who(KV_S) = S and who(KV_X) = X in format f. C(F) = the items competent in every format of F.
+- Prior-free: prior-free(i, F) holds when, for every format of F, the closed-book argmax over the four options exists and is not B (CBOPT; CBLET for LETA), and who(KV_Z) ≠ B in every format of F with a KV_Z row. PF(F) = C(F) ∩ prior-free.
+- Cue conflict (format f): key-source rate = mean ½[1(who(KS_VX) = S) + 1(who(KX_VS) = X)]; value-source rate = mean ½[1(who(KS_VX) = X) + 1(who(KX_VS) = S)]. Flag only: S-rate of KS_VZ. Copy fallback: S-rate of KZ_VS.
+- KIVI (`ckeys/kvquant.py`): asymmetric uniform quantization with round-to-nearest, scale (max − min)/(2^b − 1), zero point min, at the passage token positions in every layer, on the k_proj / v_proj outputs (pre-RoPE). Keys per channel: positions in consecutive groups of 32, one scale per channel and group. Values per token: channels in consecutive groups of 32, one scale per position and group. A last shorter group is quantized as it is. acc_f(r) = 1(who = S) on the S prompt under r ∈ {none, K2, V2}; drop_f(C) = acc_f(none) − acc_f(C). DiD = [drop_NOM(V) − drop_OPTA(V)] − [drop_NOM(K) − drop_OPTA(K)], paired by item. The relative reconstruction errors ||x′ − x|| / ||x|| of K and V are reported per format (no strength matching).
+- Continuation (A8): L_S^cont(r) = the sum of the log-probabilities of the tokens c_S[t], t > j, with c_S[t] ≠ c_B[t] (index-aligned; t beyond c_B counts as differing). d_C^cont = mean[L_S^cont(C_S) − L_S^cont(ID)] and d_C^dec = mean[lp_S(C_S) − lp_S(ID)] for C ∈ {K, V, KV}. I_cont = (d_KV^cont − d_K^cont − d_V^cont)/d_KV^cont; I_dec likewise.
+- Hybrid rate: h(K_Z, f) = P(who(K_Z) ≠ B | g1(K_Z) = dec_B), a ratio of means.
+
+**Heads** (`experiments/natural_heads.py`; Qwen2.5-7B and Mistral-7B; eager attention, BF16, use_cache=False). Here an item is valid when it is valid in NOM and OPTA for the model's tokenizer and frame; the heads file records how many R and E items are valid (`n_valid`), and "the first 60 (80) valid items" means all of them when fewer are valid. HA3's prior-free populations come from the same model's factorial, whose items are valid in all six formats.
+- G = the token rows of the four option strings in OPTA's options line; G_Y those of option Y. The decision position is the last row of B prompt + w; m = lp_S − lp_B there. K_S = S's keys at every position of P in every layer (HeadSplice with span tables).
+- Q+ = every row whose first character follows the question's last character (in OPTA the options line, so Q+ contains G; then the instruction, the chat tokens, the prefill and the frame), plus every teacher-forced answer row. Q+ never contains P.
+- a3(l, h) = ½[(A^{K_S} − A^{ID})[G_S → P] + (A^{ID} − A^{K_S})[G_B → P]], where A[G_Y → P] is the mean over the rows of G_Y of the attention summed over P, and K_S is clamped from layer 0. It is averaged over the first 60 valid R items. N* = the top k* heads, k* = ceil(0.05 × heads) = 40 (Qwen) and 52 (Mistral).
+- T* = the first k* heads of `arms.P1.rankings.a3` in `results/gpu_stage6/heads/Qwen2.5-7B-Instruct.json` (sha256 ed828a9b…) and `Mistral-7B-Instruct-v0.3.json` (sha256 88ababd9…).
+- Random sets: the first k* heads of each of three successive permutations of all heads (in layer-major order) drawn from one `numpy.default_rng(2)` (stage 6). C* (exploratory): the top k* heads by direct logit attribution at the decision row in NOM on the same R items. A head's o_proj contribution is passed through the final RMSNorm, linearised at the run's own scale, and projected on W_U[dec_B] minus the mean of W_U over the other three options' decision tokens.
+- μ_f(l, h): the mean of head (l, h)'s o_proj input over the R items and the Q+ rows of format f (NOM, OPTA), in the clean B run on B prompt + c_B. It is saved with its sha256.
+- On the first 80 valid E items (OPTA): d_full = mean[m(full K_S clamp) − m(clean)], from two single passes (the B prompt + w unclamped, and with K_S clamped at P in every layer). For each of N*, T* and the random sets, the stage-6 sufficiency and knockout batches, in which each row names the heads that see K_S in the rows G. Sufficiency rows: the top-k heads of the set's full ranking for k in KS = {1, 2, 5, 10, 20, k*, 2k*}; none (no head); all_G (every head); all_T (every head in every row, the full clamp). Knockout rows: every head but the top-k, for k in KS; none_KO (no head); all_G,KO (every head). The full rankings are the a3 ranking for N*, the stage-6 ranking for T* and the permutation for a random set. d_G = mean[m(all_G) − m(none)] of N*'s batch. R(k) = mean[m(top-k) − m(none)] / mean[m(all_G) − m(none)] and KO(k) = 1 − mean[m(all but top-k) − m(none_KO)] / mean[m(all_G,KO) − m(none_KO)], each within the set's own batches (for N*, the first denominator is d_G). Random-set values are means over the three draws of these ratios.
+- Ablation, every valid E item, OPTA and NOM: one batch whose rows are the conditions none, N*, T*, rand0–2 and C*. Each row mean-ablates its condition's heads at Q+ with μ_f, under the KV_S clamp on B prompt + c_S. Recorded per row: the argmax chain over all of c_S, the decision argmax = dec_S, and the chain over c_S after the decision token. The same conditions on the clean B prompt + c_B give the option margin m_B = lp_B − max(lp_S, lp_X, lp_D) and the chain over c_B.
+
+#### Statistics
+
+- Per model and line, the population is fixed by the line (below), over the model's valid E items.
+- Two-stage cluster bootstrap: resample the population's articles with replacement, then the items within each drawn article with replacement. 10,000 resamples; seed 20261010; one fixed index set per population; every format of a line resampled jointly.
+- Every statistic is a function of item means (ratios and shares are ratios of means) and is recomputed in every resample. A resample in which the statistic is not a number (for example 0/0) is dropped, and the share dropped is printed with the interval. Intervals are 95 % percentile intervals of the remaining resamples.
+- Each interval criterion is a one-sided test of a named null at 2.5 %: "H0: θ ≤ t rejected" means the lower bound is > t; "H0: θ ≥ t rejected" means the upper bound is < t; "H0: θ outside (a, b) rejected" means the interval lies inside (a, b) (two one-sided tests).
+- A point condition (for example s_ID ≥ 0.5) is an effect-size condition on the point estimate. A point estimate that is not a number fails it.
+- **Combination.** A factorial line (J-A1 to J-A8d) holds "in every evaluable model". This is an intersection-union test at the 95 % intervals without correction, combined by the common rule (G3): the line is NOT MET as soon as one evaluable model does not meet it, whatever the number of evaluable models. Otherwise it is MET if there are at least 3 evaluable models, at least one of them a fresh family (Llama, Gemma, or Yi as fallback), and NOT EVALUABLE if not (`comb_models`). A head line is NOT MET if it is not met in Qwen2.5-7B or in Mistral-7B, MET if it is met in both, and NOT EVALUABLE otherwise (`comb_both`; the part requires both models). A model without a results file (not run) is not an evaluable model.
+- **Holm sensitivity** (reported; no verdict uses it). The family is every interval component (one bound of one statistic in one model; an interval-inside criterion gives two) of Part A's R-class lines, in every model where the line has a verdict (MET or NOT MET, including NOT MET by the rule on undefined quantities below). Each component's one-sided p is the normal approximation from its bootstrap standard error se (the standard deviation of the resamples): p = Φ(−(est − bound)/se) for H1 θ > bound and Φ((est − bound)/se) for H1 θ < bound (se 0 is taken as 1e-12, so p is 0, 1 or 0.5 by the side of the bound the estimate lies on). A component whose estimate or se is not a number is left out of the family and is not rejected. Holm's step-down at a familywise one-sided 0.025 is applied by `analysis/stage8_holm.py`, the helper shared by the four parts. The scorer prints, per R line, every component whose decision differs between the interval rule and Holm, and the line's combined verdict when the Holm decisions replace the interval decisions (the point conditions and the rule on undefined quantities unchanged).
+- **Size floors.** J-A-G2: at least 80 competent items per format. J-A1b: at least 40 items with |P| ≥ 3. J-A8: at least 40 items in its population. J-A8d: at least 40 items with g1(K_Z) = dec_B in each format. Lines on prior-free populations (J-A7, J-A7b, J-A-HA3a, J-A-HA3b): at least 30 items. Below a floor the line is NOT EVALUABLE in that model. The J-A8d floor counts items selected by the K_Z row under test; it is kept as a size floor (an exception to the common evaluability rule) because too few such items leave the hybrid rate unestimated rather than contradicted.
+- **Undefined by the arm itself** (the common rule). A J-A-G4 failure (s_ID's own denominator, mean ID_K + mean ID_V, below 2 nats in a format whose s_ID the line uses) and, for J-A8, d_KV^cont(NOM) below 2 nats (I_cont's denominator) count against the line: NOT MET in that model, with the reason printed, never NOT EVALUABLE. A line that is not evaluable in a model for another reason (a gate, rows not run, a size floor) is NOT EVALUABLE there even when its quantity is also undefined.
+- **Scorer checks that do not change verdicts.** A line that cannot be computed in a model (a missing record) is NOT EVALUABLE there, with the error printed. A provenance or population MISMATCH (results files from more than one commit; a frames, items, SQuAD, stage-6 or μ hash that differs; outside TEST_MODE a dtype other than BF16, or an attention other than sdpa, eager for Gemma-2 and for the heads; a model's valid and skipped items that do not make up E, or a population hash that differs; head ranking items that are not the first min(60, n_R) valid R items in rank order, or evaluation items that are not min(80, n_E) in number, where n_R and n_E are the numbers of valid R and E items the heads file records (`n_valid`; without that record, 60 and 80); a missing preflight.json or a TEST_MODE file outside TEST_MODE) is printed and makes the scorer exit with status 2; the verdicts are printed as computed.
+
+#### Gates
+
+- **J-A-G0, FP32 exactness** (CPU, Qwen2.5-0.5B-Instruct, 1e-4 in log-probabilities; `tests/test_natural_clamp.py`, 14 tests; `tests/test_kvquant.py`, 4 tests; all must pass, none skipped, none failing). The scorer reads the last pytest session in the pipeline's logs that ran these files; with no such log the gate is NOT EVALUABLE and counts as failed. The checks:
+  - The KV_S row equals the unclamped S run at the decision position and on every continuation token (decision log-probabilities, argmax, option mass, continuation log-probabilities), in NOM, OPTA and LETA, for a PERSON and a NUMBER item. The ID row equals the clean B run, and the capture batch's own log-probabilities equal the plain runs.
+  - A batch equals its rows run singly.
+  - The cue-conflict, Z, K_S, V_X, onset and piece rows equal clamps built by hand from separately captured runs.
+  - In NOM and LETA, greedy generation under KV_S equals greedy generation of the S prompt and the cache-free stepwise reference, and under K_S the cache path equals the stepwise reference. The argmax chain over the greedy tokens holds. The early stop never changes the answer class or g1 and only shortens the generation, in the model's own generations; and (tokenizer only) on every committed item, for many continuations of each candidate and letter, the answer class at the first token prefix where the stop fires equals the class of the whole continuation.
+  - With `<|im_end|>` removed from the generation config's EOS list (as Gemma-2's `<end_of_turn>` is missing from its own), the decoder still stops at it (the end-of-turn rule of pass 3), and the rows name B, S and X with the same tokens and g1 as with the full list. An answer followed by `<|im_end|>` and more text is read as B once cut at the first special token, and as "other" without the cut.
+  - Frame " " reproduces the build's continuation tokens on every item (Qwen tokenizer), and frame " **" separates cleanly on a test item (w ends inside the frame; five distinct decision tokens).
+  - KIVI: the quantizer equals an independent per-group reference; 16 bits is the identity; the hooked run equals a layer-by-layer reference built from captured tables, the reference quantizer and ckeys.clamp; the recorded relative errors are the reference's; a mixed batch equals its rows; decoding with the cache equals the stepwise reference.
+
+  J-A-G0 failing makes J-A1 to J-A8d, J-A-HA3a and J-A-HA3b NOT EVALUABLE in every model (J-A-HA1 and J-A-HA2 depend on J-A-HA-G0). A failing test also stops the pipeline before any model is loaded.
+- **J-A-G1, BF16 floor** (per model and format, all valid items): mean over items of max_Y |lp_Y(KV_S) − lp_Y(S run)| ≤ 0.3 nats, Y over the format's decision tokens and the S run the capture batch's S row; the same for ID against the B row; and the KV_S generation equals the S-prompt generation, token for token, in ≥ 97 % of items.
+- **J-A-G2, competence:** n_comp(f) ≥ 80.
+- **J-A-G3, emitted form** (competent items): median p(dec_B | ID) ≥ 0.5; and g1(ID) = dec_B, g1(KV_S) = dec_S and g1(KV_X) = dec_X each in ≥ 95 % of items.
+- **J-A-G4, s_ID defined** (per line and cell): mean ID_K + mean ID_V ≥ 2 nats on the line's population, in each format whose s_ID the line uses. A failure counts against the line (NOT MET, see Statistics), not against its evaluability.
+- **J-A-HA-G0:** `tests/test_natural_heads.py` (5 tests, all passing). The checks: every head in every row seeing K_S at the whole span equals the full K_S clamp; no head equals clean; every head in the rows G equals RowSplice(G) with the span table; a batch whose size equals |P| equals its rows (the span axis is never taken for the batch axis); ablation with each head's own o_proj input as its mean equals the clean run; ablation with a fixed mean equals an independent o_proj pre-hook; the argmax chain over greedy tokens holds and fails for a changed token; a3 of a self-clamp is 0; DLA equals o_proj applied to the head's slice alone; Q+ starts after the question, reaches the last answer row, contains G and does not contain P.
+- **J-A-HA-G1, BF16 floor** (the first 80 valid E items): mean |m(none) − m(clean pass)| and mean |m(all_T) − m(full clamp pass)| ≤ max(0.5 nats, 0.02 × d_full), with none and all_T from N*'s sufficiency batch.
+- **J-A-HA-G2, the option rows are the readers:** d_full ≥ 3 nats and d_G/d_full ≥ 0.6 (point estimates). If it fails, every head line is NOT EVALUABLE in that model.
+- **Evaluability.** A model is evaluable for a line when J-A-G0 passes; J-A-G1, G2 and G3 pass in every format the line uses; the rows the line needs were run (not reduced or skipped at the deadline); and the line's size floor is met. J-A-G4 and J-A8's d_KV^cont floor decide NOT MET, not evaluability. A head line in a model needs J-A-HA-G0 to G2 (and k* among KS); HA3a and HA3b also need that model's factorial, J-A-G0, and J-A-G1 to G3 in OPTA (HA3a) or NOM (HA3b).
+
+#### Confirmatory lines
+
+Classes follow G4 and the recorded prior, P(MET | evaluable) under the combination rule, recorded before any run: L = implied by data in hand on the same models and material, with prior ≥ 0.9; M = prior ≥ 0.8 (an extrapolation of a regularity seen in every model in hand); R = prior < 0.8. A line's class never disagrees with its prior (`tests/test_stage8a_score.py` checks this). J-A3 is derived from J-A1 and J-A2: it is reported with a verdict word but not counted.
+
+| Code | Class | Prior | Population | Criterion (all parts must hold in the model) | Prior's basis (data in hand) |
+|---|---|---|---|---|---|
+| J-A1 | M | 0.80 | C(OPTA) | s_ID ≥ 0.5 (point); H0: s_ID ≤ 0.35 rejected; H0: ID_K ≤ 0 rejected | templated OPTIONS-AFTER s_ID 0.79–0.87 at every 7–14B model in hand; natural 0.5B pilot 0.43, above templated 1.5B 0.36; simulated power 0.72–0.82 at a true 0.55 for four models |
+| J-A1b | R | 0.55 | C(OPTA), \|P\| ≥ 3 (n ≥ 40) | s_ID ≥ 0.4 (point); H0: s_ID ≤ 0.25 rejected | no data on long spans; smaller n |
+| J-A1c | M | 0.85 | C(LETA) | s_ID ≥ 0.5 (point); H0: s_ID ≤ 0.35 rejected | lettered formats are the most key-borne in hand (24B LETTERS-AFTER ψ_V 0.018; natural d_K 18.7 nats) |
+| J-A2 | M | 0.85 | C(NOM) | s_ID ≤ 0.2 (point); H0: s_ID ≥ 0.3 rejected; H0: ID_V ≤ 0 rejected | natural 0.5B pilot s_ID −0.01; templated NO-MENTION key read ≤ ~1 nat in every model |
+| J-A3 | derived | 0.70 | C(OPTA, NOM) | s_ID(OPTA) − s_ID(NOM) ≥ 0.4 (point); H0: difference ≤ 0 rejected | J-A1 and J-A2 together give ≥ 0.3; 0.4 needs more |
+| J-A4 | L | 0.90 | C(OPTA, OPTB) | ID_K(OPTB)/ID_K(OPTA) ≤ 0.15 (point); H0: ratio ≥ 0.25 rejected; H0: ID_K(OPTA) − ID_K(OPTB) ≤ 0 rejected | LIST-BEFORE key read −0.001 at 24B; OPTB pilot item −0.52 nats against ID_V 6.23 (the causal mask; the second-order route is the only open one) |
+| J-A5 | R | 0.50 | C(MENA, NOM) | s_ID(MENA) − s_ID(NOM) ≥ 0.10 (point); H0: difference ≤ 0 rejected; H0: ID_K(MENA) ≤ 0 rejected | templated sentence s_ID 0.19–0.45 at 7B+, natural MENA pilot item s_ID 0.09 |
+| J-A5B | M | 0.80 | C(MENA, MENB) | H0: ID_K(MENA) − ID_K(MENB) ≤ 0 rejected | before-arms are near 0 by the mask; the after-arm read was positive in every templated model |
+| J-A6a | R | 0.45 | C(OPTA) | key-source rate ≥ 0.6 (point); H0: rate ≤ 0.5 rejected; key − value ≥ 0.3 (point); H0: key − value ≤ 0 rejected | 0.5B OPT-A flips K_S 0.14 vs V_S 0.57 (value wins at 0.5B); 1.5B pilot: 1 competent item, both cue rows not key-source |
+| J-A6b | R | 0.60 | C(LETA) | as J-A6a, on letters | letters are key-borne in every templated model |
+| J-A6c | R | 0.45 | C(NOM) | value-source rate ≥ 0.6 (point); H0: rate ≤ 0.5 rejected; value − key ≥ 0.3 (point); H0: value − key ≤ 0 rejected | 0.5B NOM flips V_S 0.86 vs K_S 0.00 at the decision token, but full-match flips 0.43 (hybrids); the account predicts hybrid continuations when key and value disagree (J-A8) |
+| J-A6d | R | 0.45 | C(OPTA) for the OPTA half, C(NOM) for the NOM half | OPTA: S-rate of KS_VZ ≥ 0.6 (point), H0: ≤ 0.5 rejected; NOM: S-rate ≤ 0.2 (point), H0: ≥ 0.3 rejected | NOM half near-certain; OPTA half untested, and the B prior pulls against it (KS_VZ answered B in the 1.5B pilot item) |
+| J-A6e | R | 0.40 | C(OPTA) | S-rate of KZ_VS ≥ 0.5 (point); H0: S-rate ≤ 0.4 rejected | the account: a key that matches no option leaves the lookup silent and the value copy gives S; the prior says B; 1.5B pilot item: "other" |
+| J-A7 | R | 0.30 | PF(NOM, OPTA) (n ≥ 30) | DiD ≥ 0.10 (point); H0: DiD ≤ 0 rejected | no data in hand on cache quantization |
+| J-A7b | R | 0.35 | PF(NOM, OPTA) (n ≥ 30) | drop_NOM(V) − drop_OPTA(V) ≥ 0.10 (point); H0: ≤ 0 rejected | as J-A7 |
+| J-A8 | M | 0.80 | C(NOM, OPTA) ∩ leak-free PERSON/PLACE (FT) with ≥ 1 continuation token differing from c_B (n ≥ 40); d_KV^cont(NOM) < 2 nats counts as NOT MET (I_cont undefined) | (a) I_cont(NOM) ≥ 0.5 (point), H0: I_cont ≤ 0.3 rejected; (b) I_dec(NOM) ≤ 0.25 (point), H0: I_dec ≥ 0.35 rejected; (c) \|d_KV^cont(OPTA)/d_KV^cont(NOM)\| ≤ 0.2 (point), H0: ratio outside (−0.3, 0.3) rejected | 0.5B pilot: I_cont 1.41 vs I_dec 0.04; OPT-A continuation d_KV 0.00; induction-head theory |
+| J-A8d | R | 0.60 | C(NOM, OPTA) ∩ PERSON/PLACE with ≥ 2 tokens of c_B from the decision token (≥ 40 items with g1(K_Z) = dec_B per format) | h(K_Z, NOM) ≥ 0.2 (point), H0: ≤ 0.1 rejected; h(K_Z, OPTA) ≤ 0.05 (point), H0: ≥ 0.1 rejected | 0.5B hybrids seen under V_S ("Robert M. Newton"); memorised completions may lower h |
+| J-A-HA1 | R | 0.75 | first 80 valid E items, OPTA | R_N(k*) ≥ 0.7 (point), H0: ≤ 0.6 rejected; KO_N(k*) ≥ 0.7 (point), H0: ≤ 0.6 rejected; mean random R(k*) ≤ 0.15 and KO(k*) ≤ 0.15 (points) | stage 6 (templated, 7B): R 0.967/0.942, KO 0.977/0.971, random ≤ 0.011; multi-token options untested |
+| J-A-HA2 | R | 0.40 | as HA1 | R_T(k*) ≥ 0.5 (point), H0: ≤ 0.35 rejected; KO_T(k*) ≥ 0.5 (point), H0: ≤ 0.35 rejected | no data on transfer to natural text |
+| J-A-HA3a | R | 0.30 | PF(OPTA) among the ablated items (n ≥ 30) | drop(N*) = acc(none) − acc(N*) of the faithful argmax chain over c_S ≥ 0.3 (point), H0: ≤ 0 rejected; each random set's drop ≤ 0.1 (point) | stage 6 H3 kept the base answer in 0.87–1.00 of stories after the same ablation; stage 7 I6 lost part of the behaviour at 24B (t 0.55) |
+| J-A-HA3b | R | 0.65 | PF(NOM) among the ablated items (n ≥ 30) | Δ = acc(N*) − acc(none) of the decision argmax (= dec_S) and of the chain over c_S after the decision token: \|Δ\| ≤ 0.05 (points), H0: Δ outside (−0.1, 0.1) rejected, for each | N* is selected at the option rows, which NOM lacks; Q+ includes the answer rows, so the line is not true by construction |
+
+Class totals: L 1 line (sum of priors 0.90: J-A4), M 5 (4.10: J-A1, J-A1c, J-A2, J-A5B, J-A8), R 14 (6.75); J-A3 derived. Every line is an account line; Part A has no measurement-validity line.
+
+**Pre-written expectations, not thresholds.** s_ID(OPTA) 0.6–0.8; s_ID(NOM) ≤ 0.05; s_ID(MENA) 0.15–0.3; key-source rate in OPTA 0.6–0.8; value-source rate in NOM 0.5–0.7 (hybrids); KIVI relative error about 0.15 for keys and 0.4 for values (0.5B); prior-free n per model 30–60.
+
+**Copy fallback (J-A6e), read two-sided.** S-rate ≥ 0.5: the value copy answers when the key matches no option. B-rate ≥ 0.5: the question-and-options prior answers when the lookup is silent. "other" (including D or X) ≥ 0.5: neither. The scorer prints all rates.
+
+#### What each primary line means for the paper (pre-written)
+
+The title is "Looked Up or Copied? Later Mentions Decide Whether a Model Reads an In-Context Value Through Its Key or Its Value", with a templates-only fallback ("... on Templated Stories"). The main natural-data figure is Fig. N: (a) s_ID by format, with the templated values as ghost markers; (b) cue-conflict rates; (c) KIVI drops by channel and format; (d) d_K, d_V, d_KV at the decision token and on the continuation.
+
+| Line | MET | NOT MET |
+|---|---|---|
+| J-A1 (with J-A2; J-A3 derived) | Abstract: "On natural reading-comprehension passages with multi-token answers, in four model families including two not used before, a later options list makes the model read the passage entity through its cached keys (s_ID ...), and without it through its values (s_ID ...)." Title kept. Table 1 row "natural passages, options after: key read" marked supported. Fig. N(a). | Graded (A-12). If J-A3 is met and s_ID(OPTA) is in [0.35, 0.5) with lower bound > 0.2: "a substantial but not dominant key read on natural text"; the title is kept; Table 1 row "partly". Otherwise (J-A3 not met, or s_ID lower bound < 0.2): the key lookup is a property of templated prompts; the title takes the templates-only fallback; Table 1 row "not shown on natural text"; Fig. N(a) is kept as a boundary. J-A2 NOT MET: "the copy half of the dichotomy is withdrawn for natural text". |
+| J-A5 | Abstract: "... and so does a natural sentence that mentions the candidates after the passage." Table 1 row "natural mention sentence" supported. Fig. N(a), MENA bar. | The abstract says "a later options list" where it said "later mentions" for natural text; the templated sentence effect rests on Part B; Table 1 row "not shown on natural text". |
+| J-A6a and J-A6c (with J-A6b, d, e) | Abstract: "With the key from one entity and the value from another, the same cache answers the key's entity under a later options list and the value's entity in free form." Table 1 row "behaviour follows the channel" supported. Fig. N(b). | The channel attributions are not shown to decide behaviour on natural text. The behavioural sentence is dropped from the abstract; Fig. N(b) is reported as a boundary with the decision-token rates. If only J-A6c fails with high "other" rates, the text reports hybrids, as J-A8 predicts. |
+| J-A7 | Practitioner sentence: "Quantizing the cached values of a passage to 2 bits breaks free-form answers more than multiple-choice answers, beyond what the same quantization of the keys does; KV-cache methods evaluated in multiple-choice format can miss it." Fig. N(c). | "KV-cache methods" is deleted from the practitioner sentence; Fig. N(c) is reported with the reconstruction errors as an exploratory panel. |
+| J-A-HA3a (with HA1, HA2) | Table "natural readers": "the reader heads found at the option rows on natural passages are necessary for faithful multiple-choice answers; random sets are not". | "The natural readers can be removed without losing faithful MCQ answers: a copy route keeps them" (the H3 pattern). HA1 NOT MET: the natural readers are not a sparse 5 % set. HA2 NOT MET: the template readers do not transfer to natural text. |
+| J-A8 | Text only (no abstract clause): "a third regime, a channel-level replication of induction-head K-composition (Elhage et al. 2021; Olsson et al. 2022): the key addresses the next piece and the value supplies it". Fig. N(d). | "Multi-token continuations on natural text are not read by K-composition at the channel level"; Fig. N(d) is kept as a boundary. |
+
+Every verdict, including failures, enters the claim-status table. The abstract states the met rate among R lines.
+
+#### Reported (no verdict)
+
+- J-A3 (derived) and the A-12 graded reading of J-A1 (per model, from s_ID(OPTA) on C(OPTA) and its interval).
+- Every accuracy outcome on all competent items and on prior-free items: the accuracy for B under V_Z, K_Z and KV_Z, and the cue-conflict rates on PF.
+- The cue-conflict rates at the decision token (g1 = dec_S or dec_X).
+- The earlier A6 flips (φ_dec(K_S), φ_dec(V_S), and full matches) and the earlier A7 accuracies.
+- n_comp per format; P_CB(B) by closed-book format and type.
+- s_ID and the option mass on all valid items per format.
+- The KIVI relative errors and faithful accuracies on all competent items.
+- d_K^cont(NOM) on the J-A8 population: its sign is reported; Part D owns the sign account.
+- The heads: faithful and clean-B chain accuracies and the option margin m_B under every condition.
+
+#### Exploratory (no verdicts)
+
+- E1: onset K_S/V_S from round(0.3 L) as fractions of the full-depth effect (OPTA keys, NOM values), reported two-sided.
+- E2: piece rows (first span position against the rest).
+- E3: moderators of s_ID(OPTA) and s_ID(NOM): type, D_in (two-sided), and |P| in {1, 2, ≥ 3}.
+- E4: the YEAR stratum in NOM and OPTA, rows ID, K_S, V_S and KV_S at the first token where c_S differs from c_B. Written expectation: the decision digit is value-only in every tokenizer (I_dec ≈ 0), because the span tokens before it have identical K/V in the B and S runs.
+- LEAK stratum: ID_K, ID_V and s_ID in NOM and OPTA on its competent items (a natural in-passage re-mention).
+- E5: KIVI at 3 bits (K3, V3; NOM, OPTA) on the S prompt, and none/K2/V2 on the unmodified B prompt (benchmark accuracy; NOM, OPTA, LETA), on every valid E item.
+- E6: full-string s_ID from the decision token on, with the X-target batch.
+- Heads: the R/KO curves, the layer profile, C* (copy heads by DLA) ablated in OPTA and NOM, T* ablation, and ID_K/ID_V with N* ablated at Q+ (OPTA, 80 items).
+- The per-model s_ID(OPTA) with its unweighted mean across models; the Holm sensitivity analysis is printed with the summary.
+
+#### Seen before finalisation
+
+No GPU output of any part-A code. Every model run below was on this container's CPU (4 cores), with Qwen2.5-0.5B-Instruct or Qwen2.5-1.5B-Instruct.
+1. **Design pilots** (`pilots/stage8/partA/`):
+   - Data scan: 3,081 typed answers occur exactly once; an earlier build (v5, before the leak and place-class rules) had 706 FT items and 529 YEAR items. Its four-tokenizer check found 697 valid items, median prompt 207–255 tokens (maximum about 770), single-token spans 14 % (Qwen), 11 % (Mistral), 36 % (Llama), 16 % (Gemma), and E = 239 items (superseded by the current 185).
+   - Exactness at 0.5B FP32: KV_S reproduced the S run at the decision token within 1e-5 to 3e-5 nats (4 item-format checks).
+   - Effect pilot: 0.5B, passages windowed to ≤ 320 characters, 7 items in NOM and OPT-A and 1 item in OPT-B and MEN-A; 6 of the 7 items ran in BF16, a deviation from the FP32 pilot policy.
+     - NOM: ID_K −0.13 (sd 0.58), ID_V +11.01 (sd 4.94), s_ID −0.01; competent 5/7; median p(dec_B) 0.96.
+     - OPT-A: ID_K +2.64 (sd 1.78), ID_V +3.56 (sd 1.39), s_ID 0.43; competent 6/7; p(dec_B) 0.99; mass 0.996.
+     - The single item: OPT-B ID_K −0.52 against ID_V 6.23; MEN-A ID_K +0.61 against ID_V 5.89.
+     - Decision flips: NOM K_S 0.00 / V_S 0.86; OPT-A K_S 0.14 / V_S 0.57. Full-match flips: NOM V_S 0.43, with hybrids such as "Robert M. Newton".
+   - Continuation pilot: 0.5B FP32, 10 multi-token items from the first item file, including since-dropped ORG items.
+     - NOM decision token: d_K +1.07, d_V +13.90, d_KV +15.62, I 0.04.
+     - NOM continuation: d_K −10.24, d_V +3.95, d_KV +15.34, I 1.41.
+     - OPT-A decision token: d_K +9.21, d_V +8.49, d_KV +11.39. OPT-A continuation: |d| ≤ 0.31 in every row, d_KV 0.00.
+   - Power simulation (35 clusters, ICC 0.15): A1 power 0.92–0.95 per model and 0.72–0.82 for four models at a true 0.55.
+   - The stage-6 T* rankings were extracted, and the stage-1 GPU log shows about 10k prompt tokens/s at Qwen2.5-7B.
+2. **Critique pilots** (`pilots/stage8/critic_natural/`):
+   - Closed book: Qwen2.5-1.5B FP32 on the 239 E items of the v5 build.
+     - Options wording: B wins 65.3 % (PERSON 80.9 %, PLACE 81.8 %, NUMBER 20.6 %); the renormalised p(B) exceeds 0.9 in 49.4 %; mean four-option mass 0.985.
+     - Free-form wording: B wins 62.8 %; mass 0.260.
+   - Cue conflict: Qwen2.5-1.5B FP32, windowed, 2 PERSON/PLACE items; stopped at the 14-minute cap.
+     - Item 1, OPT-A (competent): KV_Z → B, K_S → B, V_S → B, KS_VX → B, KX_VS → "Myhill" (other), KZ_VS → other, KS_VZ → B.
+     - Item 1, NOM: KV_X → other, KS_VX → "Mike Myhill" (other), KX_VS → "Pierre André Grillet" (other).
+     - Item 2: not competent (KV_S → D in OPT-A; every NOM row "Germany").
+   - Item checks on the v5 build:
+     - 36 of 110 PERSON E items had a content word of e_B elsewhere in the passage (31 after the span; 73 after over all valid items). This led to the LEAK stratum.
+     - 8 of 66 E PLACE items had S and X of the question's place class. This led to the place classes.
+3. **This build:**
+   - Unit tests: `tests/test_natural_clamp.py` 14 passed, `tests/test_kvquant.py` 4, `tests/test_natural_heads.py` 5, `tests/test_stage8a_score.py` 15; the shared `tests/test_stage8_populations.py` 5 and `tests/test_stage8_holm.py` 7.
+   - Generation configs (official files, by their git blob ids in `scripts/stage8_models.json`): Gemma-2-9b-it lists EOS 1 only and Yi-1.5-9B-Chat EOS 2 only. At Qwen2.5-0.5B with `<|im_end|>` removed from the EOS list, the answers " Bing Crosby" and " 24" were followed by `<|im_end|>` and were parsed "other" before the special-token rule (the review fixes, commit c04b3eb, made the shared decoder also stop at the chat end-of-turn tokens; commit aa92bb6 updated the gate test to match).
+   - The 1.5B closed-book pilot covers 123 of the 185 E items: the options-wording argmax is not B in 59 of them (NUMBER 44 of 56, PERSON 11 of 49, PLACE 4 of 18), so the prior-free populations are mostly NUMBER items.
+   - The item rebuild check: byte-identical, about 6 CPU minutes.
+   - A tokenizer-only frame check on the 256 R and E items (no model):
+     - Frame " " equals the build in all five tokenizers.
+     - "**" (no space) is invalid for every item in every tokenizer (":" merges with "**").
+     - "" is invalid for 90 items (Qwen, Llama).
+     - " **" is invalid for 2 (Qwen, Llama), 18 (Mistral) and 12 (Yi) items.
+   - `TEST_MODE` plumbing runs at Qwen2.5-0.5B FP32 with windowed passages and 2 E items, both NUMBER items:
+     - Frame " " (4 of 4 R generations).
+     - s_ID: OPTA +0.337 (2 items), NOM −0.009, LETA +0.468, MENA +0.158, OPTB −0.023, MENB −0.018.
+     - Closed-book argmax never B.
+     - KIVI relative error: keys 0.15, values 0.43–0.44.
+     - The verdict lines of these runs are plumbing checks (size floors waived), not results.
+   - The final `TEST_MODE` run of `scripts/gpu_stage8a.sh` on commit 84e4f05, whose code is the finalised code (CPU, two threads, sharing the CPU with Part B's run; 73 minutes) completed with no failed or skipped step: pytest 67 passed in 25 minutes (J-A-G0 and J-A-HA-G0 MET); the preflight rebuild was byte-identical; the score read "2 MET, 10 NOT MET, 8 NOT EVALUABLE of 20 counted lines; provenance OK; population OK" (plumbing). An earlier run on the reviewed code (commit aa92bb6; CPU, two threads, the four keys all at Qwen2.5-0.5B; 75 minutes) completed with no failed or skipped step: pytest 50 passed in 25 minutes; the preflight rebuild was byte-identical; every frames, factorial, heads and explore step completed; the score read "2 MET, 10 NOT MET, 8 NOT EVALUABLE of 20 counted lines; provenance OK; population OK" (plumbing at n = 2, size floors waived). An earlier full run on the build before review (about 65 minutes) had also completed with no failed step:
+     - pytest: 45 tests passed in 15 minutes;
+     - the preflight rebuild was byte-identical;
+     - every frames, factorial, heads and explore step completed, and so did the score, the manifest and the archive.
+     - Its score file, a plumbing check: the four keys gave identical numbers. J-A2 and J-A4 MET; J-A1, J-A5 and the J-A6, J-A7 lines NOT MET on 1–2 items; the other lines NOT EVALUABLE.
+     - Heads at 0.5B with k* = 5: R_N(5) 0.66, KO_N(5) 0.82, R_T(5) −0.01; J-A-HA-G2 not met (d_full 2.34 nats < 3).
+     - With N* ablated at Q+: ID_K 1.26 → 0.19 nats, ID_V 2.48 → 1.34 nats.
+     - Exploratory, 2 items: OPTA key read at the first span position 0.02 of the full and at the rest 0.93; YEAR I_dec −0.01 (NOM).
+
+#### Compute (A100-80GB, BF16; estimated from token counts)
+
+Mean prompt lengths over R and E (Qwen tokenizer) are NOM 229, OPTA 246, OPTB 246, MENA 248, MENB 248 and LETA 255 tokens (maximum about 780; other tokenizers within ±10 %).
+- **Factorial, per item**, about 37.5k prompt-token passes:
+  - NOM, OPTA and LETA, about 8.3k–9.2k each: capture 4 rows, scoring 14 rows, generation 15 rows, KIVI 3 rows.
+  - OPTB, MENA and MENB, about 3.7k each: capture 4 rows, scoring 7 rows, generation 4 rows.
+  - About 144 greedy decode steps, before the early stop.
+- **Factorial, per model:** 185 items give about 6.9M prompt tokens (about 11.5 min at 10k tokens/s) and about 26k decode steps. At about 30 ms each and about 60 % remaining after the early stop, that is about 8 min. With closed book and hooks, about 22 min for Llama, Qwen and Mistral, and about 33 min for Gemma-2 (eager, 42 layers).
+- **Frames:** about 2 min per model.
+- **Heads, per model** (eager): rank about 1 min; curves on 80 items about 4.8M token passes (doubled layers in the splice), about 15 min; ablation about 0.7M tokens, about 3 min; explore about 1 min. About 20 min.
+- **Exploratory, per model:** about 12 min.
+- **Overhead:** pytest about 10 min; preflight about 6 min; fetches about 4 × 4 min; about 12 model loads at about 1 min.
+- **Total:** core about 3.3 GPU-h; with every exploratory pass about 4.1 h. DEADLINE_H defaults to 4.5. At about $2 per A100-hour, about $7–9.
+
+#### Commands
+
+```
+J=$(git log --format=%H -1 --grep='^Finalise preregistration J') && git checkout "$J"
+bash scripts/gpu_stage8a.sh                 # HF_TOKEN optional; SQUAD=<local dev-v1.1.json> optional
+TEST_MODE=1 bash scripts/gpu_stage8a.sh     # CPU plumbing run at Qwen2.5-0.5B (FP32, n = 2), outputs TEST_<key> in results/gpu_stage8a_test
+python analysis/stage8a_score.py --results results/gpu_stage8a     # re-score an archive
+```
+The pipeline runs:
+1. pytest (the J-A-G0 and J-A-HA-G0 files, the scorer's tests, `tests/test_generate.py`, `tests/test_clamp.py`, `tests/test_head_splice.py`, and the tests every part runs, `tests/test_stage8_populations.py` and `tests/test_stage8_holm.py`; 67 tests), run in every session (TESTS=0 skips them only after a pass at the same commit on the same host); a failure stops the script;
+2. preflight (the SQuAD download into `results/gpu_stage8a/squad/` unless SQUAD is set, and the item rebuild); a failure stops the script;
+3. for each key in llama8, gemma9, qwen7, mistral7: s8_fetch, frames, factorial, heads (qwen7 and mistral7), explore (when time allows), s8_drop; yi9 in the place of llama8 or gemma9 when that model's fetch returns status 1 (a verification failure) and no output of it exists, or when `FALLBACK.txt` records such a replacement from an earlier session;
+4. the score: `results/gpu_stage8a/STAGE8A_SCORE.txt`, `results/gpu_stage8a/MANIFEST.sha256` and the archive `gpu_stage8a_results.tgz` in the repository root.
+
+The step names (for `FORCE_STEPS`) are preflight, frames_<key>, factorial_<key>, heads_<key> and explore_<key>; pytest and the score run in every session.
+
+### Part B. Fresh samples and new families, scored on the forms the models emit
+
+**Code.** `ckeys/fresh.py` (populations F, C and S0; the second lexicon; the eight sentences and their null versions; the per-core candidate order; the prompt builders; the per-item answer pattern, stop rule, frame extraction and form sets), `experiments/fresh_factorial.py` (stages tokcheck, calib, g3, eval), `experiments/paper1_frames.py` (the flag `--score E`, with `--frames` and `--model-dir`, for J-B8; the default path is unchanged), `analysis/stage8b_score.py` with `analysis/stage8b_parts/` (`stats.py`, `data.py`, `lines.py`, `tables.py`), `scripts/gpu_stage8b.sh` (pipeline; it sources `scripts/stage8_common.sh`). Tests: `tests/test_fresh.py` and `tests/test_fresh_factorial.py` (Gate J-B-G0), `tests/test_stage8b_score.py` (the scorer on synthetic inputs), and the cross-part `tests/test_stage8_populations.py` (G6) and `tests/test_stage8_holm.py` (the Holm helper), which J-B-G0 also runs. Shared code used unchanged: `ckeys/surface.py`, `ckeys/generate.py`, `ckeys/clamp.py`, `ckeys/encoding.py`, `ckeys/story.py`, `experiments/format_factorial.py` (`row_specs`, `LABEL`, `run_item`, `provenance`), `experiments/stage7_link.py` (`release_check`, for J-B8), `analysis/stage8_holm.py` (the Holm helper of every part).
+
+**Purpose.** Part B answers four objections.
+- *Objection 5 (the sentence effect was confirmed on the cores and models where it was found).* The 2×2 and the no-mention arm are re-run on 150 story cores never used before, in the four models of stages 1 and 3b (P4, a replication) and in four model families never examined (N4, out of sample). The fresh population is new in wording and lexicon, not only in seed: eight new neutral sentences, a second six-word lexicon in half of the cores, and a per-core candidate order.
+- *Objection 4 (the free-form formats were scored on lower-case " w" tokens that carry 0.00–0.03 of the probability).* Every candidate is scored as the exact chain-rule probability summed over the surface forms the models emit (E), in the same forward pass as the published lower-case score (L) and the reviewer-named 12-form score (Σ). Coverage is measured on every row and gates every E-based criterion. A behavioural measure on greedy generations (β) is added, and the published scale-free results are re-measured under E on the original cores (J-B6).
+- *"7 of 10 models are Qwen".* Llama-3.1-8B-Instruct, Gemma-2-9B-it, Phi-4 and Falcon3-7B-Instruct are added, plus Gemma-2-2B-it for the scale side of the sentence claim (J-B-SMALL).
+- *Measurement validity in the sentence arm.* A null sentence of the same position, syntax and length that names no candidate (POST-NULL) separates "a re-mention opens the key" from "any intervening text opens it" (J-B-NULL), and a behavioural line tests whether the sentence read changes generated answers (J-B5b).
+
+Part B does not test natural text (Part A), interventions (Part C) or the mechanism of the negative reads (Part D). J-B9 of the design is dropped (B-1).
+
+#### Populations
+
+All populations are lists of story cores of `ckeys.story.make_cores` (fields agent, other, object, distractor, initial, distractor_location, base, source). A core is compared by its full tuple. U (common part, G6) contains every core of stages 1–7.
+
+| Population | Rule | Size | Hash (pinned in `ckeys/fresh.py`) |
+|---|---|---|---|
+| F (evaluation) | the first 150 cores of the stream make_cores(·, Random(20261013)) whose tuple is in neither U nor earlier in the stream | 150 | `pop_hash` e87047c9c877a21db89bf5081d082de748ea5d77b620e33135d178c3bf24b14f |
+| C (calibration only) | the first 30 cores of the stream make_cores(·, Random(20261014)) in neither U, F nor earlier in the stream | 30 | a625fd13d1dd67bc0c01c3a173807c7b71ee8347451c139d93ffc20f1c6486e9 |
+| S0 (discovery sample, JB6 and JB-G2) | make_cores(150, Random(0)), the cores of stages 1 and 3b, re-measured on purpose | 150 | 48bb0a3ad22463ee1831cabaef714d87b2a7cb7f721e23d877111f19ba0d6900 |
+
+- The hashes are `pop_hash` = sha256(json.dumps([[*tuple, lexicon, sentence, order], …])) in population order (sentence null for S0). The sha256 of S0's tuples alone is fdd1bf1b… (common part). U's hash abd1f053… is asserted by the tests.
+- The stream make_cores(n, rng) draws the same cores as n calls of make_cores(1, rng). F uses the first 151 draws of its stream (one draw is in U; 4 of the first 400 draws are). F covers all 30 ordered (base, source) pairs and all 20 objects. No pilot touched seeds 20261013 or 20261014.
+- **Lexicon.** In F and in C, the half of the cores with the smallest h = sha256(json.dumps(core tuple)) (ranks 0 … n/2 − 1 by h) use LEX2 = (bin, crate, tray, jar, bucket, chest); the rest use LEX1 = (box, basket, shelf, drawer, cabinet, closet). A core is drawn in LEX1 and rendered by index (LEX1[i] → LEX2[i]), so every rule of make_cores and of pick_x holds in either lexicon. F: 75 and 75; C: 15 and 15. Disjointness from U is checked on the LEX1 tuple, which is stricter than on the rendered one.
+- **Sentence.** SENTENCES[rank(h) mod 8]: F 19, 19, 19, 19, 19, 19, 18, 18 cores; C 4, 4, 4, 4, 4, 4, 3, 3. The same sentence is used in the core's POST and PRE arms, and its null version in POST-NULL.
+- **Order.** random.Random(int(h[:16], 16)).sample(range(6), 6): the order of the six candidates in the list and in the sentence, the same in every arm of the core. S0 keeps LEX1, the canonical order and the ROOM sentence.
+- **Clusters.** (lexicon, base, source): 55 of the 60 possible cells occur in F, with 1–8 cores each.
+- **X.** The third location of a core is `story.pick_x` of its LEX1 core, rendered in its lexicon.
+
+**The eight sentences** (slots filled with the core's six candidates in its order; each also used with NULL_NOUNS = (rug, clock, mirror, poster, radio, globe) in the same order for POST-NULL):
+1. "There is a {0}, a {1}, a {2}, a {3}, a {4} and a {5} in the house."
+2. "The hallway also has a {0}, a {1}, a {2}, a {3}, a {4} and a {5}."
+3. "In the kitchen there are a {0}, a {1}, a {2}, a {3}, a {4} and a {5}."
+4. "A {0}, a {1}, a {2}, a {3}, a {4} and a {5} stand along the wall."
+5. "The house contains a {0}, a {1}, a {2}, a {3}, a {4} and a {5}."
+6. "Nearby there are a {0}, a {1}, a {2}, a {3}, a {4} and a {5}."
+7. "The attic holds a {0}, a {1}, a {2}, a {3}, a {4} and a {5}."
+8. "Along one wall sit a {0}, a {1}, a {2}, a {3}, a {4} and a {5}."
+
+ROOM ("The room has a box, a basket, a shelf, a drawer, a cabinet and a closet.") is 21 tokens (with its leading space) in every Part-B tokenizer. The eight sentences are +2, +1, +2, +1, 0, 0, 0, +1 tokens longer in the Qwen, OLMo-2, Llama-3.1, Gemma-2, Phi-4 and Falcon3 tokenizers; +2, +1, +2, +1, 0, +1, +1, +1 in Mistral-7B; +2, +1, +2, +1, 0, +1, 0, +1 in Yi-1.5. The length is the same with either lexicon, with the null nouns and in any order, because each of the 18 words is one token after a space and before ",", "." and " and" in every tokenizer (checked by the tests on the cached tokenizers, and on each model's verified files by J-B-G0b). No null noun is a candidate of either lexicon or a story object.
+
+#### Models and sourcing
+
+As in the common part (`scripts/stage8_models.json`; files verified by `scripts/fetch_verified.py`; BF16, sdpa, eager for Gemma-2, transformers 5.18.0, `use_cache=False` in every pass of the trie scorer; the J-B-G3 fallback `score_cached` and the generation use the KV cache).
+- P4: `qwen7`, `qwen14`, `mistral7`, `olmo7` (F and S0).
+- N4: `llama8`, `gemma9`, `phi4`, `falcon7` (F). The fallback `yi9` takes the slot of a model whose files fail verification or whose tokenizer check (J-B-G0b) fails, before any output of that model exists; at most one slot is replaced (G2). The pipeline records the decision in `COMMIT.txt` ("fallback: yi9 replaces <key>"); a later session of the same run keeps it (the replaced model is not run again). The scorer takes the replaced slot from that record (without one: the first N4 model, in the order above, that `FETCH_FAILED.txt` lists as refused and that has no F results); `yi9` fills the slot only when it has F results, otherwise the slot keeps the replaced model, which has no results, and is not evaluable. A fetch that fails for another reason (disk, manifest) stops the run and triggers no fallback.
+- `gemma2b` (F; J-B-SMALL). `mistral24` (J-B8). `qwen1.5`, `qwen3b` (exploratory X2).
+- Gemma-2's chat template rejects a system turn; the system text is merged into the user turn and recorded (`WRAPPER_USED`).
+- Mistral-Small-24B's tokenizer is loaded with `fix_mistral_regex`, as in stages 2–7.
+
+#### Prompts, rows and scorings
+
+**Arms** (user turn; system turn "You are a helpful assistant."; generation prompt with thinking disabled; assistant prefill "Answer:"; `ckeys.fresh.raw_prompt`). With PREFIX = "Read the story and answer the question.\n\nStory: ", the story and question as `ckeys.story.record` renders them in the core's lexicon, L = "Choices: " + the six candidates in the core's order joined by ", ", and T = "\nAnswer with one word.\nAnswer:":
+- AFTER: PREFIX + story + "\nQuestion: " + question + "\n" + L + T;
+- BEFORE: "Read the story and answer the question.\n" + L + "\n\nStory: " + story + "\nQuestion: " + question + T;
+- NONE: PREFIX + story + "\nQuestion: " + question + T;
+- POST: PREFIX + story + " " + sentence + "\nQuestion: " + question + T;
+- PRE: PREFIX + sentence + " " + story + "\nQuestion: " + question + T;
+- POST-NULL: as POST with the null sentence;
+- P1 (S0 only): as AFTER with "\nAnswer with exactly one choice.\nAnswer:".
+With LEX1, the canonical order and ROOM, every builder equals `ckeys.encoding.raw_prompt` byte for byte (tested on S0, also LETTER, which no step runs: B-9). Arms run: F all six (AFTER, BEFORE, NONE, POST, PRE, POST-NULL); S0 P1, AFTER, BEFORE, POST, PRE, NONE; C the six F arms and P1.
+
+**Items.** The B, S and X prompts (moved-to location base, source, X) must have one length and differ at exactly one token p, the writing token; an item failing this in an arm is skipped and counted (0 of F, C and S0 in every arm and every Part-B tokenizer at the build). A population's statistics use the items valid in every arm run.
+
+**Rows** (`format_factorial.row_specs`, unchanged): the self-clamp ID; K_S, V_S, KV_S from l0 ∈ {0, round(0.0625 L), round(0.3 L)}; K_X, V_X, KV_X from 0, all on the B prompt; plus the clean B, S and X runs. A row clamps the key and/or value at p in every layer ≥ l0 to the captured value of the donor run (pre-RoPE projection outputs, `ckeys.clamp`; the fused qkv_proj slices at Phi-4).
+
+**Scorings** of candidate w in run Z, from one forward pass per batch row over the prompt and the token trie of every proper prefix of every form (`ckeys.surface.score`; 4D tree mask, explicit position ids):
+- L(w | Z) = log p(" w"), the published score;
+- Σ(w | Z) = logsumexp over the 12 forms φ + w and φ + W, φ ∈ {" ", "", " The ", " the ", "The ", "the "}, W = w capitalised;
+- E(w | Z) = logsumexp over the 32 fixed forms (Φ_Σ plus " In the ", " in the ", " On the ", " on the ", " At the ", " at the ", " Inside the ", " inside the ", " **", "**") and the model's discovered frames, instantiated with the item's names.
+A form's log-probability is the exact chain rule over its continuation tokens; identical token sequences are counted once and no sequence may be a proper prefix of another (`FormSet`). A discovered frame that breaks this rule for an item is dropped for that item (the last admitted frame first, until the set builds) and recorded (`frames_dropped`). An item has one form set, the same in every arm.
+
+**Frame discovery** (stage calib, on C, before any evaluation item of the model). Greedy generations (at most 16 new tokens; stop at a newline, at EOS or an end-of-turn token of the chat template, or once the decoded text names a candidate of the item's lexicon) of the clean B, S and X runs of the 30 C cores in the seven calibration arms (630 generations). The frame of a generation is the text before the first candidate of the item's lexicon, with the item's agent, other agent, object and distractor replaced by {a}, {b}, {o}, {d}; a generation without a candidate, or whose frame has a newline or is longer than 60 characters, gives no frame (it still counts in its arm's total). A frame not among the 16 fixed E frames is a candidate if it occurs in at least 2 % (and at least 2) of some arm's generations; at most 16 candidates, the most frequent over all arms first (ties by the string) (`ckeys.generate.discover_frames`). In that order a candidate is admitted only if the form set of every C item builds with the fixed frames, the frames admitted before it and it. The frames are written to `frames/<key>.json`; the evaluation prints its sha256 before the first item and records it; the scorer checks it.
+
+**Generation** (stage eval, every arm of F and S0): one batch of 8 rows per item and arm, the clean B, S and X runs and the rows ID, K_S, K_X, V_S, V_X at l0 = 0 (`ckeys.generate.greedy`: the prompt pass with the clamps active, then cached one-token steps; equal to cache-free stepwise argmax decoding under the clamps, J-B-G0), at most 16 new tokens with the stop rule above. a(Z) is the first candidate of the item's lexicon in the generated text ((?i)\b(w1|…|w6), plurals allowed), lower-cased, else "other".
+
+**Stages** (`experiments/fresh_factorial.py --stage`, one process each): tokcheck (J-B-G0b), calib, g3 (J-B-G3), eval (F; and S0 for P4, which also runs `format_factorial.run_item` itself on every S0 item and arm: the published path, for J-B-G2). The pipeline's steps per model, in the order of `KEYS` (qwen7, qwen14, mistral7, olmo7, llama8, gemma9, phi4, falcon7, gemma2b): `tok_<key>`, `calib_<key>`, `g3_<key>`, `evalF_<key>` and, for P4, `evalS0_<key>`. A failed `tok_<key>` stops that model (and, for an N4 model, triggers the fallback rule); the eval steps run only when the frames file and the G3 file exist. J-B8 (after the core, deadline-guarded; steps `jb8_release`, `tok_mistral24`, `calib_mistral24`, `jb8`): the release of Anonymous (2026) is checked with stage 7's `release_check` (the manifest and the RELEASE.json pin, the nine Mistral `original_1000` bases, the stories file) before the model; then tokcheck and calib at Mistral-Small-24B (`calib_mistral24` runs only after `tok_mistral24` succeeded, and `jb8` only after `calib_mistral24` succeeded and the frames file exists; a failed tokenizer check is listed in `SKIPPED.txt` as the reason jb8 did not run); then `experiments/paper1_frames.py --model mistral --p1-root <release> --score E --frames frames/mistral24.json --model-dir <verified directory>` on the release's native cores with the released bases, formats P1, NONE, BEFORE, POST, LETTER (a discovered frame that makes one form a proper prefix of another with a native core's names is dropped for that core, the last admitted first, and listed with the item). Then the exploratory steps `tok_`, `calib_`, `g3_` and `x2_<key>` for qwen1.5 and qwen3b, and `x1_fp32`, `x1_eager`; then the scorer, the manifest and the archive.
+
+#### Measures
+
+For an item in arm f under scoring σ ∈ {L, Σ, E}, with d_w(row) = σ(w | row) − σ(w | ID):
+- ID_K = ½[(d_S(K_S) − d_S(K_X)) + (d_X(K_X) − d_X(K_S))] at l0 = 0; ID_V likewise with V_S, V_X; ID_KV with KV_S, KV_X. Bars are means over items.
+- D(f) = mean ID_K(f) + mean ID_V(f); D_A = D(AFTER).
+- s_ID(f) = mean ID_K(f) / D(f), defined when D(f) > 0, D(f) ≥ 0.2 · max(D_A, 0) and mean ID_V(f) ≥ −0.05 · max(D_A, 0). (In hand, stage 3b: D(f)/D_A ≥ 0.49 in every arm and P4 model.)
+- r(f) = mean ID_K(f) / mean ID_K(AFTER) and δ(a, b) = [mean ID_K(a) − mean ID_K(b)] / mean ID_K(AFTER), defined when mean ID_K(AFTER) > 0 and ≥ 0.1 · D_A (the anchor; in hand 0.59–0.86 of D_A).
+- β_K = ½[(1[a(K_S) = S] − 1[a(K_X) = S]) + (1[a(K_X) = X] − 1[a(K_S) = X])] per item; β_V likewise; b_ID = β_K / (β_K + β_V). The behavioural counterpart of a statistic is the same formula with β_K and β_V in place of ID_K and ID_V, with the same definedness rules and thresholds.
+- Flip rate under f: ½[P̂(a(K_S) = S) + P̂(a(K_X) = X)].
+- Mass of a row under σ: Σ over the six candidates of exp σ(w | row). **Coverage** of a cell (model × arm): the minimum over its 16 rows (13 clamp rows, clean B, S, X) of the mean E mass.
+- **Floor** of a cell: mean |m^E(ID) − m^E(clean B)|, m = E(S) − E(B).
+- Generated accuracy acc_B(f) = P̂(a(clean B) = B); acc_S likewise; the "other" rate of clean B.
+- Agreement A of a cell: among the 8 generated rows of every item whose answer names a candidate, the share whose answer is that row's E-argmax over the six candidates.
+- Competent item in arm f: the E-argmax names B in the clean B run and S in the clean S run.
+
+#### Statistics
+
+- **Bootstrap.** Two-stage cluster bootstrap: resample the (lexicon, base, source) clusters with replacement, then, within each drawn cluster, as many items as it holds with replacement; 10,000 resamples, seed 20261013. The index set is fixed by the population's valid items and their clusters (so it is the same in every model with the same valid items) and is shared by every arm, scoring and β, so every contrast is paired. Every statistic is a function of item means and is recomputed from the resample's means in every resample. S0 has one lexicon, so its clusters are the ordered pairs. JB6 (c)'s original rules use the item bootstrap of their entries (same seed). J-B8 resamples the native cores (item bootstrap, same seed), separately in each format. A subset of items (J-B3's competent items) gets its own bootstrap of the same kind and seed.
+- **Levels.** P4f lines (every evaluable P4 model, an intersection-union test), the S0 lines J-B6a and J-B6b, and the single-model lines (J-B-SMALL, J-B8) use 95 % percentile intervals. N4 lines ("3 of 4") use 98.75 % intervals. The bounds are numpy percentiles (linear interpolation) of the defined resamples.
+- **Interval criteria** are one-sided tests of named nulls: "H0: θ ≤ t, rejected when the lower bound > t" (and the mirror for upper bounds); "inside (a, b)" is two one-sided tests, each at the interval's level (both bounds strictly inside). Point floors are effect-size conditions on the point estimate. In a model, a line is NOT EVALUABLE when any of its components is (a model-level gate, an arm not run, competence, the anchor, the floor, a cell without a counterpart, an anchor-undefined statistic); otherwise it is MET when every test rejects and every point condition holds, and NOT MET otherwise.
+- **Definedness.** A statistic undefined at the point, or in more than 5 % of the resamples: by the anchor rule (r, δ and their differences) → NOT EVALUABLE; otherwise by the arm's own rule (s_ID and its differences), or a point estimate that is not a number → the criterion is NOT MET. The anchor rule is checked first. Resamples where a statistic is undefined by either rule are dropped.
+- **Coverage switch (B-8).** On F, a statistic is computed under E when every cell it uses (its arms and AFTER, whose D_A or ID_K scales it) has coverage ≥ 0.8; otherwise its behavioural counterpart is used. J-B3's three competent-only points share one scoring, chosen over the cells POST, NONE, PRE and AFTER by the same rule (NOT EVALUABLE when none applies). J-B-LB has no counterpart and is NOT EVALUABLE in such a model. Under E, a cell whose floor exceeds 0.05 × mean ID_K^E(AFTER) makes the statistic NOT EVALUABLE (the floor is not checked under the counterpart). No switch applies to J-B5 and J-B5b (behavioural by definition) or to the S0 lines J-B6a–c (which use E and L as their rows state).
+- **Combination.** P4f, J-B6a and J-B6b: NOT MET as soon as an evaluable P4 model does not meet the line, whatever the number of evaluable models; otherwise NOT EVALUABLE if fewer than 3 P4 models are evaluable, else MET. N4: NOT EVALUABLE if fewer than 3 slots are evaluable; else MET iff at least 3 of the 4 slots meet it (a slot not evaluable counts as not meeting). J-B6c needs all four P4 models (see its row). J-B7: NOT MET if its P4 part (the P4f rule) or its N4 part (the N4 rule) is NOT MET; else NOT EVALUABLE if either part is; else MET. Single-model lines (J-B-SMALL, J-B8): the model's verdict. Part B defines no MET IN PART.
+- **Holm** (common part; `analysis/stage8_holm.py`, the same helper in every part): reported, no verdict uses it. The family is the one-sided interval components of this part's R-class account lines (J-B3-N4, J-B5b-P4f, J-B5b-N4, J-B-NULL-N4, J-B-LB-N4, J-B-SMALL) in the models where the line is evaluable; each component is given as its point estimate, its bootstrap SE (the SD of the defined resamples, n − 1 denominator), its bound and its direction, the helper takes one-sided p = Φ(−(est − bound)/SE) for "> bound" and Φ((est − bound)/SE) for "< bound" and steps down at familywise α = 0.025. The two-sided "inside" criteria, the point conditions and the components made NOT MET by their own undefinedness are not in the family and keep their decisions. Per line the scorer prints every component whose decision differs under Holm and the verdict the line would get, under the line's combination rule, with Holm's decisions in place of the interval decisions.
+- **TEST_MODE.** Outputs tagged TEST_ (or `--test`) are scored with the population sizes, J-B-G1, J-B-G2, the competence gate and the BF16 and attention checks of the provenance waived, with J-B3's competent-item floor at 2 instead of 30, and with a missing pytest log not failing J-B-G0; their verdicts are plumbing checks, not results.
+- **Per-family reporting (B-12).** For every N4 line the scorer names each slot's verdict and counts the slots that do not meet it (NOT MET or NOT EVALUABLE): none, exactly one, exactly two, or three or more, the count that selects the pre-written sentence.
+
+#### Gates
+
+- **J-B-G0, exactness** (FP32, CPU, before any model; 1e-4 nats). `tests/test_fresh.py`, `tests/test_fresh_factorial.py`, `tests/test_stage8b_score.py`, and the shared `tests/test_surface.py`, `tests/test_generate.py`, `tests/test_clamp_families.py`, `tests/test_stage8_populations.py`, `tests/test_stage8_holm.py` (24, 12, 20, 13, 5, 5, 5 and 7 tests). The scorer reads the last pytest session in `logs/` that ran these files (outside TEST, a results directory without a pytest log fails J-B-G0): in each file at least that many tests must pass or be allowed skips, none may fail or error, and a skip is allowed only for the tests that need a cached tokenizer (names containing "cached_tokenizer" or "study_tokenizers"), which J-B-G0b repeats on each model's verified files. The checks, each against an independently computed reference:
+  1. the trie score and score_cached equal one plain forward per form (`score_reference`) at Qwen2.5-0.5B under per-row K and V clamps, on F prompts of both lexicons; the identity row's answer position equals a plain pass;
+  2. run_item's clamp rows (K_S from 0, KV_S from 0.3 L) and clean run equal score_reference under a separately constructed single-row clamp;
+  3. run_item's 8-row generation batch equals cache-free stepwise argmax decoding of each row alone under its own clamp;
+  4. run_item's lower-case fields equal `format_factorial.run_item` on 2 S0 items (P1, POST); plain_item equals it; the J-B-G3 statistics pass in FP32 and fail on a perturbed record;
+  5. `paper1_frames.py --score E`: the lower-case vectors equal `lp_rows` in every run of `run_core` (locations and letters); the default path writes byte-identical output to the file before the flag existed (run as a subprocess); a discovered frame that breaks the prefix rule with a core's names is dropped for that core, not fatal;
+  6. score_cached equals score_reference on tiny random Gemma-2 (eager, sliding layers, soft-capping) and Phi-3 (fused qkv) models;
+  7. frame admission rejects a frame that breaks the disjointness rule; the tokenizer check (J-B-G0b) fails when a null sentence would not have the after-sentence's length;
+  8. F and C disjoint from U and from each other, deterministic, sizes and hashes pinned; the S0 and U hashes; the attributes; the prompts (byte-identical on S0); parsing with both lexicons; the token constraints above on every cached Part-B tokenizer;
+  9. the scorer on synthetic results with known answers (every line MET; NOT MET and NOT EVALUABLE paths; the coverage switch and the floor; own versus anchor undefinedness; the fallback slot, after a refused fetch and after a failed tokenizer check; the pytest gate, and a missing pytest log outside TEST; J-B8's model-level gates; J-B3's competent-only scoring over POST, NONE, PRE and AFTER and its definedness rules; J-B-G2 with an S0 file cut before AFTER; bootstrap determinism and two-stage structure; the combination rules; every line's class against its prior; the Holm family and the call of the shared helper; the pipeline's J-B-G0 file list, its J-B8 step chain and its disk figure);
+  10. the stage-8 populations disjoint across the parts and the shared Holm helper (common part, G6 and Holm).
+  J-B-G0 failing (outside TEST also: no pytest log) makes every line NOT EVALUABLE, J-B8 included.
+- **J-B-G0b, tokenizer check** (per model, before it loads; tokenizer only): the 18 words single-token and stable before ",", ".", " and"; every sentence within ±3 tokens of ROOM and of one length with either lexicon, the null nouns and three orders (so POST-NULL has POST's length); the form set of every F, C and S0 item builds and decodes back; 0 skipped items in every arm of F, C and S0. A failure stops that model; for an N4 model it is a pre-output technical failure and the fallback rule applies.
+- **J-B-G1, files**: `VERIFIED.json` of every model run (common part), copied by the pipeline to `verified/<key>.json` in the results. A model without that copy is not evaluable.
+- **J-B-G2, reproduction** (flagged, no verdict depends on it): per P4 model and S0 arm, the published-path pass against the committed files (stage 1 for P1, stage 3b's 2×2 otherwise): |Δs_ID^L| ≤ 0.03 and |Δr^L| ≤ 0.03 (E3's tolerance), with s_ID^L = mean ID_K^L / (mean ID_K^L + mean ID_V^L) and r^L = mean ID_K^L / mean ID_K^L(AFTER) computed in each pass (the committed AFTER is stage 3b's), without the definedness rules. An S0 file without the AFTER arm (an eval step stopped by the deadline) is reported as not evaluable for that model, and the other models are still compared. J-B6 is a same-pass comparison and is scored either way.
+- **J-B-G3, trie floor** (per model, on the first 30 F cores in NONE, POST and AFTER; BF16): the trie pass against the plain published path on the same prompts; per arm |s_ID^L(trie) − s_ID^L(plain)| ≤ 0.02 (ratios of item means, without the definedness rules) and mean |L(trie) − L(plain)| (all 16 rows, six candidates) ≤ 0.05 × mean ID_KV^L(plain) (B-10); all three arms must pass. Pass: the evaluation scores with the trie. Fail: it scores with score_cached, the exact per-node path (the prompt with the plain causal kernel and the KV cache, then every trie node as a cached continuation; its answer position is the plain path's). The scorer checks that each evaluation used the scorer its G3 chose; otherwise the model is not evaluable.
+- **J-B-G4, per cell**: coverage ≥ 0.8 for E (else the behavioural counterpart); floor ≤ 0.05 × mean ID_K^E(AFTER) (else the E statistic is NOT EVALUABLE).
+- **J-B-G5, per model**: competence, generated acc_B (over all F items) ≥ 0.8 under NONE and AFTER for every F line except J-B7 (J-B1 to J-B5, J-B5b, J-B-NULL, J-B-LB, J-B-SMALL), and also under POST (J-B3, J-B-SMALL), POST and POST-NULL (J-B-NULL), POST and PRE (J-B5b), BEFORE (J-B-LB); otherwise the line is NOT EVALUABLE in that model, and the model is not replaced. An arm the line uses that was not run makes it NOT EVALUABLE in that model ("arms not run (deadline)"). Anchor: mean ID_K(AFTER) ≥ 0.1 · D_A with lower bound (at the line's level) > 0 under the scoring used; otherwise the r- and δ-based components, and so the line, are NOT EVALUABLE in that model.
+- **Model-level**: J-B-G0, J-B-G0b, J-B-G1, a G3 file with J-B-G3's scorer choice used by every evaluation, and the frames file's sha256 must hold, else every line is NOT EVALUABLE in that model. The S0 lines also need every S0 arm run. J-B8 is gated the same way at Mistral-Small-24B (it has no J-B-G3): J-B-G0, its tokenizer check (`tokcheck/mistral24.json`), its verified file set (outside TEST) and the sha256 of `frames/mistral24.json` equal to the one its jb8 file recorded.
+- **Provenance and population** (reported, no verdict depends on them): the scorer checks one commit across the results files, BF16 and the fixed attention of every eval, g3 and frames file (X1's files excepted), no TEST_ file outside TEST, the pinned population hashes, and valid plus skipped items = 150 per population; a mismatch is printed (MISMATCH), the score file is still written and the scorer exits with status 2.
+
+#### Confirmatory lines
+
+Kind A = account line, V = measurement-validity line (tallied separately, G4). The class follows the recorded prior P(MET | evaluable) (G4): L = implied by data in hand on the same models and material, prior ≥ 0.9; M = prior ≥ 0.8; R = prior < 0.8 (the scorer's tests check every line). All lines use F and E (or the counterpart) unless stated. Priors were recorded before any stage-8 output; the in-hand numbers are lower-case L on S0, stage 3b, 95 % / 98.75 % (base, source) cluster intervals recomputed at the build (see Seen before finalisation).
+
+| Code | Class, kind, prior | Criterion (per model) | Justification of the prior |
+|---|---|---|---|
+| J-B1-P4f | L, A, 0.90 | s_ID(AFTER) ≥ 0.50 (point); H0: s_ID(AFTER) ≤ 0.40 rejected; H0: ID_K(AFTER) ≤ 0 rejected | s_ID(AFTER) 0.777 / 0.863 / 0.819 / 0.593, lower bounds ≥ 0.574; new lexicon and E untested |
+| J-B1-N4 | M, A, 0.85 | the same, 98.75 % | OPTIONS-AFTER s_ID 0.67–0.88 in all 9 models from 3B |
+| J-B2-P4f | L, A, 0.90 | H0: r(BEFORE) − r(NONE) ≥ 0.05 rejected; H0: r(PRE) − r(NONE) ≥ 0.05 rejected; H0: s_ID(BEFORE) ≥ 0.10 rejected; H0: s_ID(PRE) ≥ 0.10 rejected | r(BEFORE) − r(NONE) −0.057 / −0.033 / −0.035 / −0.079, r(PRE) − r(NONE) −0.052 / −0.031 / −0.036 / −0.070, upper bounds ≤ −0.023 |
+| J-B2-N4 | M, A, 0.85 | the same, 98.75 % | implied by J-B4 and the causal mask; at or below 0 in 10 of 10 models |
+| J-B3-P4f | M, A, 0.80 | r(POST) ≥ 0.15 and ≤ 0.75 (points); H0: r(POST) ≤ 0.10 rejected; H0: r(POST) ≥ 1.0 rejected; H0: δ(POST, PRE) ≤ 0 and H0: δ(POST, NONE) ≤ 0 rejected; H0: s_ID(POST) ≤ 0.10 rejected; H0: s_ID(POST) − s_ID(NONE) ≤ 0 rejected; on the items competent in POST, NONE, PRE and AFTER the points δ(POST, PRE), δ(POST, NONE) and s_ID(POST) − s_ID(NONE) > 0 (fewer than 30 such items: NOT EVALUABLE; one scoring for the three, chosen over POST, NONE, PRE and AFTER; each point under the definedness rules on those items, so an undefined anchor makes it NOT EVALUABLE and an own-undefined s_ID difference NOT MET) | r(POST) 0.268 / 0.337 / 0.506 / 0.233 and s_ID(POST) 0.317 / 0.396 / 0.407 / 0.189 with ROOM; eight new sentences and a second lexicon untested |
+| J-B3-N4 | R, A, 0.50 | the same, 98.75 % | never tested outside Qwen, Mistral and OLMo; the design's 0.6, lowered for the added s_ID and competence criteria |
+| J-B4-P4f | L, A, 0.90 | s_ID(NONE) ≤ 0.10 (point); H0: s_ID(NONE) ≥ 0.15 rejected; H0: ID_V(NONE) ≤ 0 rejected | s_ID(NONE) 0.059 / 0.052 / 0.039 / 0.033, upper bounds ≤ 0.071 |
+| J-B4-N4 | M, A, 0.85 | the same, 98.75 % | 0.03–0.06 in all 10 models in hand |
+| J-B5-P4f | M, A, 0.85 | β_K(AFTER) ≥ 0.50 and β_V(NONE) ≥ 0.50 (points); H0: β_K(AFTER) ≤ 0.40 and H0: β_V(NONE) ≤ 0.40 rejected; H0: β_K(f) ≥ 0.10 rejected for f = NONE, BEFORE, PRE; H0: β_K(AFTER) − β_V(AFTER) ≤ 0 rejected | 4-candidate argmax proxy: β_K(AFTER) 0.82–1.00, β_V(NONE) 0.92–1.00, β_K(NONE, BEFORE, PRE) 0.00; generation untested |
+| J-B5-N4 | M, A, 0.80 | the same, 98.75 % | as J-B1/J-B4 in N4 |
+| J-B5b-P4f | R, A, 0.45 | H0: β_K(POST) − β_K(PRE) ≤ 0 rejected | proxy β_K(POST) 0.05 [0.02, 0.08], 0.27, 0.30, 0.02 [0.00, 0.04] against 0.00 under PRE: OLMo is at the edge |
+| J-B5b-N4 | R, A, 0.40 | the same, 98.75 % | as J-B3-N4, and behaviour is a stronger requirement |
+| J-B-NULL-P4f | M, A, 0.80 | H0: r(POST-NULL) ≥ 0.10 rejected; H0: s_ID(POST-NULL) ≥ 0.10 rejected; H0: δ(POST, POST-NULL) ≤ 0 rejected | stage 5 (G9): a sentence naming B and two other candidates gave ID_K below NONE (−0.32 / −0.30 / −0.21 nats) at Qwen2.5-7B / 14B / Mistral-7B; r(NONE) 0.051 / 0.029 / 0.036 / 0.044 |
+| J-B-NULL-N4 | R, A, 0.55 | the same, 98.75 % | its δ half needs a sentence read in new families (J-B3-N4's risk, weaker) |
+| J-B-LB-N4 | R, A, 0.65 | H0: ID_K(BEFORE) − ID_K(NONE) ≥ 0 rejected (98.75 %); no behavioural counterpart | −1.18 / −1.18 / −0.55 / −0.68 nats at P4 under L (98.75 % upper bounds ≤ −0.34); 9 of 10 models in hand; under E the small NONE read is untested (0.5B pilot: E-scored ID_K(NONE) ≈ 0) |
+| J-B-SMALL | R, A, 0.40 | at Gemma-2-2B (95 %): H0: r(POST) ≥ 0.10 rejected | Qwen2.5-1.5B / 3B POST ID_K −0.47 / −0.04 nats (stage 1); competence at 2B uncertain (gated) |
+| J-B6a | R, V, 0.50 | S0, every evaluable P4 model (≥ 3; combination above): coverage ≥ 0.8 (point) in each of the 6 arms | 0.5B pilot E mass of clean B 0.87 (NONE), 0.91 (POST); Llama-3.2-1B 0.43–0.54 with fixed frames; the minimum over 16 rows is stricter |
+| J-B6b | R, V, 0.45 | S0, every evaluable P4 model (≥ 3; combination above), every arm with M^L(clean B) < 0.5 (the mean over items of the clean B run's L mass): H0: \|s^E − s^L\| ≥ 0.05 rejected and (except AFTER) H0: \|r^E − r^L\| ≥ 0.05 rejected (paired, 95 %, two one-sided tests); a model without such a cell is not evaluable | M^L(clean B) in hand: POST/PRE/NONE ≤ 0.03 at Qwen2.5-7B/14B and Mistral-7B, BEFORE 0.34 / 0.15 at 14B / Mistral; OLMo ≥ 0.84 everywhere; 0.5B pilot s_ID L vs E: +0.020 / −0.001 (NONE), −0.146 / −0.181 (POST) |
+| J-B6c | R, V, 0.75 | S0, P4, all four models (one without S0 results, with a failed model-level gate or with an S0 arm not run: NOT EVALUABLE): the verdicts of E1a, E1b, E1c (stage 3b), B2 (stage 1 prediction 2) and C4's BEFORE bound (stage 2), recomputed under E with their original rules, equal those under L in the same pass (primary JB6) | the lines are far from their bounds in hand except E1c's POST − PRE, which needs the sentence read to survive E |
+| J-B7 | R, V, 0.35 | F: in each of the six arms, A ≥ 0.95 (at least one answer naming a candidate), clean-B "other" rate ≤ 0.10 and coverage ≥ 0.80 (points; no competence gate; an arm not run: NOT EVALUABLE); MET iff every evaluable P4 model (≥ 3 evaluable) and ≥ 3 of the 4 N4 slots meet it (combination above) | 0.5B pilot A 0.97; verbose families (Llama-3.2-1B "On the shelf") threaten coverage |
+| J-B8 | R, V, 0.55 | Mistral-Small-24B, the native cores of Anonymous (2026)'s release (B, S, T distinct), in each of the formats P1, NONE, BEFORE, POST: H0: \|φ^E − φ^L\| ≥ 0.05, \|ψ_K^E − ψ_K^L\| ≥ 0.05 and \|ψ_V^E − ψ_V^L\| ≥ 0.05 rejected (paired core bootstrap, 95 %, two one-sided tests); the mean over cores of M^E of the natural B run ≥ 0.80 (point). LETTER reported. No jb8 results (not run: the deadline, a release that is absent or fails its check, or refused files; the reason from `SKIPPED.txt`), a file not scored with `--score E`, a failed model-level gate (J-B-G0; the tokenizer check of mistral24; its verified file set outside TEST; the sha256 of `frames/mistral24.json` differing from the one the jb8 file recorded), or one of the four formats not run → NOT EVALUABLE | the list formats change little under E; POST and NONE carry the risk |
+
+The original rules in J-B6c (per model; "CI excluding 0" is the lower bound of the 95 % interval > 0): E1a ID_K(AFTER) > 0 with CI excluding 0 in 4/4; E1b ID_K(BEFORE) ≤ 0.5 and ID_K(PRE) ≤ 0.5 nats (point means) each in ≥ 3/4; E1c paired ID_K(AFTER) − ID_K(BEFORE) > 0 (CI excluding 0) in 4/4 and paired ID_K(POST) − ID_K(PRE) > 0 (CI excluding 0) in ≥ 3/4; B2 paired ID_K(P1) − ID_K(NONE) > 0 (CI excluding 0) in ≥ 3 of the 4 P4 models (the original "≥ 4 of 5" at the P4 size); C4 ID_K(BEFORE) ≤ 0.5 nats (point mean) in all four. Intervals: 95 % item bootstrap, seed 20261013. J-B6c is MET iff each of the five line verdicts is the same under E as under L; the per-model components that change are printed.
+
+φ, ψ_K, ψ_V in J-B8 are stage 3b's with m = σ(T) − σ(S) and σ ∈ {L, E} from the same trie pass: φ = [m(M) − m(P)] / [m(T) − m(S)], ψ_K = [m(P + K_M) − m(P)] / [m(M) − m(P)], ψ_V = [m(P + V_M) − m(P)] / [m(M) − m(P)], with M, P, P + K_M and P + V_M averaged over the seeds 101–103 within a core, each ratio a ratio of means over the cores, and the E-minus-L difference recomputed in every resample. Its E uses Mistral-Small-24B's own frames (calibration on C) and, under LETTER, the forms " X", "X", " **X", "**X" of each letter.
+
+**Expected values** (the author's, not thresholds). N4: s_ID(AFTER) 0.6–0.9; r(POST) 0.2–0.5; r(BEFORE) − r(NONE) and r(PRE) − r(NONE) about −0.05; s_ID(NONE) 0.03–0.07; β_K(AFTER) ≥ 0.8; β_V(NONE) ≥ 0.8; r(POST-NULL) ≈ r(NONE). P4f: the S0 values within about 0.05 with ROOM replaced by the eight sentences.
+
+#### What each primary line means for the paper (pre-written)
+
+| Primary line | Abstract clause (MET) | NOT MET: replacement | Title | Table 1 row | Figure |
+|---|---|---|---|---|---|
+| J-B1-N4 | "In four model families never examined before, a list of the candidates after the story makes the writing token's key carry most of the value's identity (s_ID ≥ 0.5 in k of 4)." | "The key read after a list does not generalise beyond the families where it was found (k of 4 new families)." The list result stays as a property of Qwen, Mistral and OLMo. | No change (Part A decides the title). | "Later list, new families": s_ID(AFTER) per family, MET. NOT MET: the row reads "not general (k/4)". | Fig. "fresh": s_ID per arm and family. |
+| J-B3-N4 | "A neutral sentence naming the candidates after the story opens an intermediate key read (r = x–y of the list read) in k of 4 new families." | Exactly one family failing: "…in three of the four new families; not in F." Exactly two: "The sentence read is family-dependent: it appears in Qwen, Mistral, OLMo and in families A and B, not in C and D." Three or more: the sentence claim is restated as specific to Qwen, Mistral and OLMo; only the list result is called general. | No change. | "Later sentence, new families": r(POST) per family. | Fig. "fresh" (POST bars). |
+| J-B4-N4 | "Without a later mention, the identity is copied through the value in every family (s_ID(NONE) ≤ 0.1)." | "Keys carry part of the identity without later mentions in k families"; the word "copied" is qualified. | No change. | "No mention": s_ID(NONE) per family. | Fig. "fresh". |
+| J-B5-N4 (with J-B5-P4f) | "Clamping only the writing token's key changes the generated answer to the clamped value in x–y % of stories when the candidates are listed after it and in at most z % when they are not; clamping only its value does the reverse." | "The log-probability account does not carry over to generated answers in k families" (the β numbers are given). | No change. | "Generated answers": β_K(AFTER), β_V(NONE). | Fig. "crossover": β_K against β_V per arm and family (the main-text behavioural figure). |
+| J-B5b-P4f / J-B5b-N4 | "The sentence read changes generated answers too: the key alone moves the answer in x % of stories after a sentence and in y % before it." | "The sentence read is visible in log-probabilities but not in generated answers (flip rate x % after, y % before)." | No change. | "Sentence, generated": flip rate POST vs PRE. | Fig. "crossover" (POST, PRE points). |
+| J-B-NULL-N4 (with -P4f) | "A sentence of the same length naming no candidate opens no key read, so the read needs the re-mention." | "Intervening text alone opens part of the key read in k families"; J-B3's reading "a re-mention opens the key" is withdrawn in those families. | No change. | Note under "Later sentence": the null control. | Fig. "fresh" (POST-NULL bars). |
+| J-B6c (with J-B6a, J-B6b) | "Scored on the forms the models actually emit (coverage ≥ 0.8 in every cell), every published verdict on the original stories is unchanged, and s_ID moves by at most 0.05." | "Emitted-form scoring changes the published verdict of {line}; E-scored numbers replace the lower-case ones as primary throughout the paper, and the change is stated." J-B6b alone not met: "the key share moves by more than 0.05 under emitted forms in {cells}"; the numbers are reported. | No change. | Appendix table "invariance" (tab_invariance). | Appendix: mass per cell (tab_mass). |
+| J-B7 | (no abstract clause) | "The emitted-form score does not cover or agree with generation in {cells}; there the behavioural measures carry the claims." | No change. | Appendix. | Appendix. |
+
+The abstract's risk summary counts the R account lines of this part with the other parts' (common part).
+
+#### Reported (no verdict)
+
+r, s_ID, β_K, β_V, ID_K^E, ID_V^E and the flip rate per model and arm (the numbers behind the crossover figure, also written to `fig_crossover.csv`; the tables `tab_fresh.tex`, `tab_mass.tex` and `tab_invariance.tex` are written beside the score); the relative changes of ID_K and ID_V under E against L on S0 (tolerance 15 %, printed per cell, list cells marked); the J-B8 detail (φ, ψ_K, ψ_V under L and E, the mass); J-B-G2 per arm; the per-family verdicts with the count of slots not meeting each N4 line, which selects the pre-written sentence; LETTER in J-B8.
+
+#### Exploratory (no verdict)
+
+Σ and L versions of every statistic; the competent-only population; the key share per onset (0, 0.0625 L, 0.3 L); per-lexicon and per-sentence estimates of r(POST), s_ID(POST) and s_ID(AFTER) (wording and lexicon as fixed effects, B-2); the LIST-BEFORE sign in every model; b_ID under POST; the frame census and the uncovered first-token mass; the trie against the published path on S0 (all items); X1 (Qwen2.5-7B, first 60 S0 cores, AFTER, POST, NONE, FP32 sdpa and BF16 eager, against the BF16 sdpa run); X2 (Qwen2.5-1.5B and 3B on S0, P1, AFTER, POST, NONE, under L, Σ and E, with the competent-only breakdown). X3 (Gemma-2-27B) is dropped (B-13).
+
+#### Seen before finalisation
+
+No output of any study model on F, C or S0 under the stage-8 code has been seen; no model above 0.5B parameters was run by the build. Seeds 20261013 and 20261014 were touched only by the population construction (no model). The design and critique pilots (all CPU, FP32; scripts and logs kept with the stage-8 build notes):
+- **Part-B pilot 1, tokenizers** (`partB/tok_check.py`, `tok_check.json`; no model): Llama-3.1-8B (unsloth files), Gemma-2-9B, Phi-4 and Falcon3-7B have all six lower-case " w" and capitalised " W" single tokens and 0 of 150 cores of Random(8) skipped in any of the 7 arms; Mistral-7B's " Shelf", " Drawer", " Cabinet", " Closet" are multi-token (44 trie nodes for Σ); granite-3.1-8b (" shelf" two tokens, 145/150 skipped) and deepseek-llm-7b (" cabinet" two tokens) are infeasible; Yi-1.5-9B passes.
+- **Pilot 2, Hub metadata** (`partB/hf_manifest.py`, `hf_manifest.json`): the gated repositories' files have byte-identical ungated copies (common part).
+- **Pilot 3, populations**: seed 20261013 has 4 of its first 400 draws in U; its first 150 cover all 30 pairs and 20 objects; C (seed 20261014) is disjoint. (The design's hash e1f28077 was of the LEX1 cores alone with sorted keys; the pinned hash above includes the attributes.)
+- **Pilot 4, exactness of the trie** (`partB/test_surface_pilot.py`, `exact_pilot.log`, 1280 s): tiny random Qwen2, Mistral, Llama, OLMo2 (sdpa and eager), Gemma2 (eager) and Phi3: trie = separate passes to ≤ 3.8e-6 nats, answer position = plain to ≤ 1.9e-6; Qwen2.5-0.5B, clean and under K_S / V_S clamps: ≤ 4.7e-5.
+- **Pilot 5, mini factorial at Qwen2.5-0.5B** (`partB/mini_pilot.py`, `mini_qwen05.log`; 6 cores of seed 20261011): candidate mass L / Σ / E 0.135 / 0.694 / 0.873 (NONE) and 0.238 / 0.800 / 0.912 (POST); s_ID under L / Σ / E +0.020 / −0.002 / −0.001 (NONE) and −0.146 / −0.171 / −0.181 (POST); β_K / β_V 0.00 / 0.75 (NONE), 0.00 / 0.58 (POST); the Σ-argmax agreed with generation in 0.97 of 30 rows in each arm; first tokens " In" 0.11 and " On" 0.09 under NONE.
+- **Pilot 6, coverage at Llama-3.2-1B-Instruct** (`partB/coverage_pilot.py`, `cov_llama1b.log`; clean runs, n = 8 and 12): L / Σ / E mass NONE 0.017–0.025 / 0.25–0.29 / 0.43–0.47; POST 0.017–0.025 / 0.23–0.28 / 0.49–0.52; PRE 0.023 / 0.29 / 0.54; AFTER 0.85 / 0.93 / 0.93; BEFORE 0.32 / 0.85 / 0.86; generated accuracy 0.25–0.75.
+- **Pilot 7, in-hand statistics** (`partB/power_inhand.py`; stage-3b rows): r(POST) 0.268 / 0.337 / 0.506 / 0.233, s_ID(AFTER) 0.777 / 0.863 / 0.819 / 0.593, s_ID(NONE) 0.059 / 0.052 / 0.039 / 0.033 (Qwen2.5-7B / 14B / Mistral-7B / OLMo-2-7B); r(BEFORE), r(PRE) −0.035 to 0.000; cluster SDs 1.5–2× the core SDs.
+- **Pilot 8, behavioural proxy** (stage-3b 4-candidate argmax): β_K(AFTER) 0.82–1.00, β_V(AFTER) 0.00–0.19, β_V(NONE) 0.92–1.00, β_K(NONE, BEFORE, PRE) 0.00, β_K(POST) 0.02–0.30.
+- **Pilot 9, power** (`partB/power_sim.py`, `power_jb2.py`; 99.375 % cluster bootstrap): JB3 r(POST) met with probability 0.00 / 0.50 / 1.00 / 1.00 at true 0.12 / 0.15 / 0.18 / 0.22 (×1 noise); JB2 1.00 at true 0 or 0.05, 0.08–0.55 at 0.08; JB4 ≥ 0.91 at s_ID(NONE) ≤ 0.09, ≤ 0.06 at 0.11; JB1 0.18–0.54 at s_ID(AFTER) 0.50, 0.87–1.00 at ≥ 0.55.
+- **Critic pilots** (`critic_replication/`): `jb9_chance.py` (stage-3b rows): P(JB9 met | F and S0 exchangeable) ≈ 0.62, Mistral r(POST) cluster SD 0.033; `lexicon_check.py` (tokenizers): bin, crate, tray, jar, bucket, chest, trunk, bowl, barrel, bag, tin, pot, cart single-token and stable in the 8 Part-B tokenizers and Yi; an inline core-overlap count with seed 99: 150 of 150 location configurations and 148 of 150 with X occur in U, 109 of 150 (B, S, X) triples in S0; an inline β proxy (above).
+- **Build checks** (this entry's code; tokenizers, committed rows, and Qwen2.5-0.5B only):
+  - token counts of ROOM and the eight sentences in every Part-B tokenizer (above; Mistral-Small-24B as Mistral-7B); 28 candidate null nouns tested for single tokens (curtain, stool, vase, kettle and heater fail in Mistral-7B, Yi or Mistral-Small-24B and were not used);
+  - the tokenizer check (J-B-G0b, stage tokcheck) on the cached tokenizers of all 13 keys (Gemma-2-2B through the identical Gemma-2-9B files): every check passes; trie nodes per item 31–37 (Qwen, OLMo-2, Llama-3.1, Phi-4), 29–32 (Falcon3), 25 (Gemma-2), 83–116 (Mistral-7B), 72–97 (Yi-1.5), 79–88 (Mistral-Small-24B), with the fixed frames;
+  - the in-hand numbers of the prior table, recomputed from the committed stage-3b rows with this scorer's bootstrap (95 % / 98.75 %): r(NONE) 0.051 / 0.029 / 0.036 / 0.044; r(BEFORE) − r(NONE) −0.057 / −0.033 / −0.035 / −0.079; r(PRE) − r(NONE) −0.052 / −0.031 / −0.036 / −0.070; ID_K(BEFORE) − ID_K(NONE) −1.18 / −1.18 / −0.55 / −0.68 nats; s_ID(POST) − s_ID(NONE) +0.258 / +0.343 / +0.368 / +0.156; D(f)/D(AFTER) ≥ 0.49; ID_K(AFTER)/D(AFTER) 0.78 / 0.86 / 0.82 / 0.59; M^L(clean B) under POST/PRE/NONE 0.000–0.027 (Qwen, Mistral) and 0.84–0.88 (OLMo), BEFORE 0.999 / 0.338 / 0.147 / 0.982;
+  - the TEST_MODE run of `scripts/gpu_stage8b.sh` (Qwen2.5-0.5B, FP32, shared 4-core CPU; keys qwen7, llama8, gemma2b, then jb8, x2 at qwen1.5 and x1; n = 2 items of F and S0, 2 of C, 3 native cores for jb8 with random bases): pytest 66 passed; every step succeeded (a first session was stopped from outside during evalS0_qwen7; the second kept the four finished steps and completed the rest); the release check passed (RELEASE.json 2dea297d…, status PASS_EXCEPT_README, bases and stories equal to the pins); J-B-G3 met in every model (|Δs| < 1e-4, mean |ΔL| ≤ 1e-4); the score file's summary read "1 MET, 1 NOT MET, 19 NOT EVALUABLE of 21 lines; provenance OK; population OK" (plumbing only: one model per set, n = 2, random bases); about 60 min of runs after an 18-minute pytest; in a smoke run (`qwen7` tag), J-B-G3 gave |Δs| ≤ 7e-7 and mean |ΔL| ≤ 1e-5 (FP32), the frames census admitted no frame (" " 35 of 42 generations, " In the " 6, " On the " 1), and the trie's L equalled the published path on S0 to 1e-5;
+  - the unit tests (J-B-G0): 66 passed, 0 failed, 0 skipped (every Part-B tokenizer was cached) in the TEST_MODE run's pytest (18 min on a shared 4-core CPU); separately `tests/test_fresh_factorial.py` 10 passed in 8 min, `tests/test_stage8b_score.py` 10 passed, `tests/test_fresh.py` 24 passed.
+  - the final TEST_MODE run of `scripts/gpu_stage8b.sh` on commit 84e4f05, whose code is the finalised code (one session of 70 minutes, sharing the CPU with Part A's run): pytest 91 passed in 24 minutes (J-B-G0 MET, with the cross-part population and Holm tests); every step succeeded and none was skipped; the score read "1 MET, 8 NOT MET, 12 NOT EVALUABLE of 21 lines; provenance OK; population OK" (plumbing; the change from the earlier reading is the unified combination rule);
+  - an earlier TEST_MODE run on the reviewed code (commit aa92bb6; the same keys and sizes; one session of 73 minutes): pytest 73 passed in 25 minutes; every step succeeded and none was skipped; the score read "1 MET, 1 NOT MET, 19 NOT EVALUABLE of 21 lines; provenance OK; population OK" (plumbing only);
+  - a review of the build before finalisation (tokenizers and Qwen2.5-0.5B only; no study model): the eight sentences have one token length with LEX1, LEX2, the null nouns and seven orders in every cached Part-B tokenizer, in Mistral-Small-24B's and in Qwen2.5-1.5B/3B's; J-B8's letter form sets build in all of them; Mistral-Small-24B's tokenizer loaded from a local directory gets `fix_mistral_regex` applied; the unit tests of the reviewed code: `tests/test_fresh.py` 24, `tests/test_fresh_factorial.py` 12 and `tests/test_stage8b_score.py` 14 (the counts J-B-G0 then required);
+  - the fixes after the audit of this entry against the code (a missing pytest log fails J-B-G0 outside TEST; J-B8's model-level gates, and calib and jb8 at Mistral-Small-24B only after its tokenizer check passed; J-B3's competent-only scoring and definedness; J-B-G2 with an S0 file cut before AFTER; the P4f combination; the two cross-part test files in J-B-G0): `tests/test_stage8b_score.py` 20 passed, `tests/test_stage8_populations.py` 5 and `tests/test_stage8_holm.py` 7 passed; the TEST_MODE archive re-scored with `--test` exits 0 with provenance OK and population OK, and reads 0 MET, 0 NOT MET, 21 NOT EVALUABLE because its pytest log predates the new J-B-G0 file list and counts (the next TEST_MODE run writes a matching log); scored with J-B-G0 taken as passed (a check outside the archive), it reads 1 MET, 8 NOT MET, 12 NOT EVALUABLE: the seven lines that changed from NOT EVALUABLE to NOT MET have one evaluable model, which fails them, and J-B8 stays evaluable under its gates.
+
+#### Compute (A100-80GB, BF16; estimated from stage 3b's 24 s per 150-item arm at 7B)
+
+Per item and arm: the 3-row and 13-row trie passes (about 1.25× stage 3b's tokens) and one 8-row generation batch (on average 3–10 cached decode steps). About 60 s per F arm at 7–8B, 110 s at 14B, 100 s at Gemma-2-9B (eager); S0 adds the published-path pass (about 24 s per arm at 7B). Each step reloads the model (four loads per P4 model, three per N4 model).
+
+| Step | Minutes |
+|---|---|
+| pytest (J-B-G0, CPU) | 10 |
+| qwen7 / mistral7 / olmo7 (tokcheck, calib, G3, F, S0) | 22 each |
+| qwen14 | 40 |
+| llama8 / falcon7 | 12 each |
+| gemma9 / phi4 | 19 each |
+| gemma2b | 7 |
+| yi9 (only in a replaced slot) | 14 |
+| score, manifest, archive | 5 |
+| core total | about 3.2 h (the sum of the rows above without yi9; range 2.7–3.7) |
+| jb8 (47 GB, release check, calibration, frames in five formats) | about 40 |
+| x2 (each of qwen1.5, qwen3b), x1 | about 15 and 12 |
+
+The default deadline is DEADLINE_H = 4.5 h, so that the core (about 3.2 h) and then jb8 (it starts only with 45 minutes left), x2 and x1 (about 4.3 h in all) fit. Downloads (about 158 GB for the nine core models, 47 GB for jb8, 9 GB for x2) are prefetched one model ahead; weights are deleted after each model unless KEEP_CACHE=1; at most two models are on disk besides Qwen2.5-7B, which stays until x1 (≥ 140 GB free). Every eval step stops before an arm that would start inside the reserve the later models need (`--reserve-min`: the minutes of the later models' rows above plus 10; exit 3, redone by the next session; the scorer marks lines that need a missing arm NOT EVALUABLE with "arms not run (deadline)"); jb8 starts only if 45 minutes remain, each x2 model only if 15, x1 only if 12, and a step skipped for the deadline is listed in `SKIPPED.txt`. At about $2 per A100-hour, $7–9.
+
+#### Commands
+
+```bash
+J=$(git log --format=%H -1 --grep='^Finalise preregistration J$') && [ -n "$J" ] && git checkout "$J"
+bash scripts/gpu_stage8b.sh                    # HF_TOKEN optional; P1R=<the unpacked release of Anonymous (2026)> optional
+TEST_MODE=1 bash scripts/gpu_stage8b.sh        # CPU plumbing run at Qwen2.5-0.5B (FP32, n = 2): qwen7, llama8, gemma2b, jb8,
+                                               # qwen1.5, x1 (TEST_ALL=1: every key)
+python analysis/stage8b_score.py --results results/gpu_stage8b    # re-score an archive
+```
+
+### Part C. Independently obtained identity edits and the channel-ratio law
+
+**Code.** `ckeys/edits.py` (populations E, H, TSET, THOLD; prompts; prefix captures with a residual write; the edit
+vectors; the PAR / PERP and LEX / NONLEX components; clamp rows and their scoring), `ckeys/neutral.py` (the 24 frozen
+neutral sentences and their forms), `ckeys/sae.py` (the BatchTopK dictionaries, E3), `ckeys/das_at.py` (the rank-16 remap at
+the writing token, E4; imports `ckeys/das.py` unchanged), `experiments/stage8_edits.py` (stages preflight, calib, dasfit,
+eval, readers, explore), `experiments/stage8_overlap.py` (the overlap screen), `experiments/prakash_caa.py` (J-C6; extends
+`experiments/prakash_swap.py` by import), `analysis/stage8c_score.py` with `analysis/stage8c_parts/` (`stats.py`,
+`law.py`, `readers.py`, `prakash.py`), `scripts/gpu_stage8c.sh` (it sources `scripts/stage8_common.sh`). Tests:
+`tests/test_stage8_edits.py` and `tests/test_sae.py` (Gate J-C-G0), `tests/test_stage8c_score.py` (the scorer on
+synthetic inputs). Shared code used unchanged: `ckeys/surface.py`, `ckeys/clamp.py`, `ckeys/headsplice.py`,
+`ckeys/readerblind.py`, `ckeys/interventions.py`, `ckeys/das.py`, `ckeys/story.py`, `ckeys/encoding.py`,
+`ckeys/variants.py`, `ckeys/causaltom.py`, `experiments/prakash_swap.py`, and the helpers imported from
+`experiments/format_factorial.py`, `experiments/ioi_factorial.py`, `experiments/row_restricted_keys.py` and
+`experiments/stage6_heads.py`. `ckeys/generate.py` (greedy decoding, frame discovery) is used with the stage-8 review's
+change: the chat templates' end-of-turn tokens also end a generated answer (`tests/test_generate.py`, run in J-C-G0).
+
+**Purpose.** Part C answers objection 3 and parts of objections 1, 4, 5 and 8.
+- *Objection 3 (the intervention lesson rested on one remap family, and its out-of-sample test failed).* The lesson is
+  restated as a falsifiable law about any identity edit: an edit that writes a value at the writing token is read through
+  the key and the value channel in the same ratio as the model's own written value at the same depth (the
+  **channel-ratio law**, C-1). It is tested on five families obtained independently of the natural clamp: in-task
+  steering vectors (E1), steering vectors from unrelated neutral sentences (E2), the features of a third-party sparse
+  autoencoder (E3), a rank-16 DAS remap trained at the writing token with the released recipe of Anonymous (2026) (E4),
+  and steering vectors that write a non-English or synonym form of the value (E5).
+- *The H11 tautology.* A full-residual identity patch at p is exactly the natural clamp (the lemma below), so it cannot
+  test the law; it is kept as the equivalence control T. Out-of-sample status is defined functionally (C-3): an edit's
+  displacement is split into its projection on the story's natural displacement (PAR) and the rest (PERP), and into its
+  projection on the 5-dimensional English lexical span L_l and the rest (LEX / NONLEX). Only the risky families (E3, E4,
+  E5) and identity-carrying PERP / NONLEX components count as an out-of-sample test.
+- *The share statistic is compressed (the critique's F1).* κ = K / (K + V) cannot tell an edit read like the natural edit
+  from one whose channels are read 2× differently (`kappa_compress.py`: MAD 0.08 and maximum gap 0.16 pass the old rule at
+  c_K / c_V = 2). The law is therefore stated on log channel ratios, with an equivalence test (TOST) and a within-design
+  sensitivity gate (J-C-G8) that must classify synthetic 0.5× rows as departures.
+- *A predicted failure (C-4).* The paper's own token-form result predicts that a non-lexical identity edit is under-read by
+  the key channel. J-C-BOUND tests this as a confirmatory line, so the law has a stated boundary.
+- *Kind versus depth (the critique's F3).* J-C6 is relabelled: it only tests whether an identity edit at block 28 of
+  Qwen2.5-14B is key-flat. Whether a binding swap can be tested at a depth where the identity key route is still open is
+  decided by an overlap screen (J-C-SCREEN, J-C-WIN) on Prakash et al.'s material at Qwen2.5-7B and Llama-3.1-8B.
+- *Objection 8 (reliance on an anonymous submission).* Every family can be rebuilt from public material: mean differences,
+  a public sparse autoencoder at a pinned revision, and a public training recipe applied to public models.
+- *Objections 4 and 5.* All scores use the emitted-form score E (`ckeys/surface.py`, frames discovered on this part's own
+  calibration set; Part C reads no Part-B file) with a coverage gate; L is the robustness score. The populations use
+  seeds never used before (8101–8103), and Llama-3.1-8B is a family never examined in stages A–I.
+
+Part C does not test natural text (Part A), the fresh-sample replication (Part B) or the mechanism of the flag (Part D).
+It covers single-position identity edits on templated belief stories. Binding and ordering edits are outside the law;
+H7–H10 stand as failures and are not reinterpreted.
+
+#### The law and the lemma
+
+**Lemma** (unit-tested in J-C-G0). B and S differ only at the writing token p.
+1. An edit confined to (p, l), the output of 0-based block l at p, reaches every other position only through p's key and
+   value in blocks ≥ l + 1: under the causal mask p's residual reaches other tokens only through attention, and p's K/V in
+   blocks ≤ l are computed from block inputs that the edit does not change. So B with the edit's K/V written at p from
+   block l + 1 is exactly the edited run, and the key-only and value-only rows are exact.
+2. Writing h_S,l(p) gives S's K/V at p from l + 1: this edit is the natural clamp KV(S) with onset l + 1.
+
+Every edit is therefore applied as a clamp row whose tables are captured in a prefix pass (positions 0..p of the B prompt
+with the edit's vector written at (p, l)). The prefix through p is the same in all four formats (checked for every core
+in every Part-C tokenizer), so an edit's tables are the same tensors in every format; only the readers after p differ.
+The edit prefix passes run in forwards of the natural prefix pass's shape (five rows, B, S, X, π(S), π(X); the last
+forward padded), so an edit's tables are computed by the natural pass's kernels: a row's activations depend on the batch
+only through the kernels its shape selects, so T reproduces the natural tables bitwise in BF16 as in FP32, and an edit
+differs from the natural tables only through what it writes (one 66-row forward would differ from the five-row natural
+pass by the BF16 batch floor, about the size of J-C-G1's bound ν_T ≤ 0.02: review check below).
+
+**The channel-ratio law (C-1).** For an edit Z, channel C ∈ {K, V, KV}, format f and depth l:
+ψ_C^Z(f, l) = mean ID_C^Z / mean ID_C^nat. The law states that one scaling per edit holds for both channels and in every
+format: ψ_K^Z = ψ_V^Z. Its statistic is λ = log(ψ_K / ψ_V) (definitions below). The rivals: R1 copy-only (λ ≤ log 0.5,
+the key under-reads the edit), R3 key-flat (λ ≥ log 2), and graded departure (anything else that is not equivalent).
+
+#### Populations
+
+All populations are lists of story cores of `ckeys.story.make_cores`, compared by full tuple. A stream is make_cores(1,
+rng) drawn repeatedly from one Random(seed), which gives the same cores as one make_cores(n, rng) call. A population takes
+the first cores of its stream that are in none of the excluded sets, are not repeated, and satisfy its condition.
+
+| Population | Rule | Size | sha256 (pinned in `ckeys/edits.py`) |
+|---|---|---|---|
+| E (evaluation) | Random(8101); excluded U; π(S) ≠ B and π(X) ≠ B | 80 (136 draws; 24 ordered (B, S) clusters) | a23465a211577f4c6e9efe78d4c7a588b598c05437406001145a420fec9d8c1b |
+| H (calibration) | Random(8102); excluded U ∪ E; no condition | 200 (201 draws); H_fit = the first 150, H_cal = the last 50 | 8cc62cefc9865a475f51fd554ece829981b4b46dcdaa7ae66e9261cae3b6b584 |
+| TSET (E4 training) | Random(8103); excluded U ∪ E ∪ H; π(S) ≠ B | 1,000 | 06c56f93dce02d93a957a4e78556f4694ea3d994385a80212a2da1edd3bff16f |
+| THOLD (E4 held out) | the next 100 cores of the TSET stream that pass TSET's rule (TSET and THOLD: the first 1,100; 1,410 draws) | 100 | 136b7d940050222b1737d20df4aba78e1e327eac16ab86b50730b471d5e261f4 |
+
+- X = `story.pick_x(core)`, π = `story.PAIR_SWAP` (box ↔ basket, shelf ↔ drawer, cabinet ↔ closet).
+- The hashes are sha256(json.dumps([[*tuple] for each core in order])), with the tuple fields agent, other, object,
+  distractor, initial, distractor_location, base, source. U's hash abd1f053… (common part) is asserted by the tests.
+- The four populations are pairwise disjoint and disjoint from U (asserted by the preflight and the tests). No pilot drew
+  from seeds 8101–8104 (8104 seeds only the random directions of control R).
+- **Prakash et al.'s material** (J-C6, the screen): their template-2 stories, raw wrapper and seed-10 pool of 320 pairs
+  (`ckeys/causaltom.py`, release at 0579347 with every file hash and the pool hash 4451da1a… asserted). Per model the
+  population is the first 150 pairs that pass their LM filter under NO-MENTION (every passing pair if fewer, reported). At
+  Qwen2.5-14B the filter is re-run and compared with stage 6's population (recorded). J-C6's means use every pool pair
+  outside its population (170 when 150 pairs pass).
+
+#### Models, dictionaries and sourcing
+
+- Qwen2.5-7B-Instruct (`qwen7`): E1–E5. Mistral-7B-Instruct-v0.3 (`mistral7`): E1, E2, E4, E5. Llama-3.1-8B-Instruct
+  (`llama8`): E1, E2, E5. Depths l ∈ {3, 7, 11, 15} in every model (C-9 adds l = 15 at Mistral-7B and Llama-3.1-8B).
+  Qwen2.5-14B-Instruct (`qwen14`): J-C6 only.
+- Files and fallback as in the common part (`scripts/stage8_models.json`, `scripts/fetch_verified.py`). Llama-3.1-8B is the
+  new family; if its files fail verification or its preflight fails (a pre-output check), `yi9` takes its place (families
+  E1, E2, E5) before any output of it exists; the replacement is decided once and every later session keeps it
+  (COMMIT.txt). The scorer puts Yi-1.5-9B in Llama-3.1-8B's slot of every line on the E population when there is no eval
+  file of Llama-3.1-8B and there is one of Yi-1.5-9B. The overlap screen is then run at Qwen2.5-7B only (the Prakash
+  material is located only for the Qwen and Llama-3 tokenizers).
+- BF16, sdpa attention, transformers 5.18.0, `use_cache=False` in every scoring pass.
+- **The dictionary (E3).** andyrdt/saes-qwen2.5-7b-instruct at revision c37e53c4bb07127ad17ab88f28b93d4e87142e59 (the
+  repository head on 2026-10-10, last modified 2025-05-26), `resid_post_layer_{3,7,11,15}/trainer_1`: BatchTopK, k = 64,
+  131,072 latents, trained on the output of 0-based block l (config `io: "out"`). The sha256 of each file is asserted at
+  download:
+
+  | Layer | ae.pt (3,758,637,401 bytes) | config.json | eval_results.json | Published FVE |
+  |---|---|---|---|---|
+  | 3 | 93f70d8aac4976fa… | 5667fd2bd9c18892… | 1986b2b392dff5a0… | 0.931 |
+  | 7 | 94be36b5ba215103… | 19b6c408283063c1… | 4892e73fb50f0939… | 0.862 |
+  | 11 | 36bddbd229d59c11… | bd21d02ae9d119d2… | 9eb49624a999891a… | 0.827 |
+  | 15 | 2efefadd8d85ad1a… | 9fd2d432683dfb84… | 176ad5c35b2e098e… | 0.807 |
+
+  The full hashes are in `ckeys/sae.PINS`. The state dict (checked on the pinned file's pickle header) holds
+  encoder.weight [131072, 3584], encoder.bias, decoder.weight [3584, 131072], b_dec, threshold (one global value) and k.
+- **The reader heads (J-C-READ).** H*_{>7} = the stage-6 top-k* heads by a3 under OPTIONS-AFTER
+  (`results/gpu_stage6/heads/<model>.json`, committed, sha256 ed828a9b701d60f5… and 88ababd91bdb3155…; k* = 40 at
+  Qwen2.5-7B and 52 at Mistral-7B) that lie in blocks > 7: 32 and 43 heads. The three random sets have the same sizes and
+  are drawn from all heads of blocks > 7 (numpy default_rng(2), the first heads of three permutations). The file's sha256 is
+  recorded by every readers file.
+
+#### Prompts, edits, rows and scorings
+
+**Formats.** LETTERS-AFTER (LETTER), OPTIONS-AFTER (P1), SENTENCE-AFTER (POST) and NO-MENTION (NONE), as
+`ckeys.encoding.raw_prompt`, wrapped by `chat_text` (system turn "You are a helpful assistant.", generation prompt,
+assistant prefill "Answer:"). Every E core has prompts of one length per format for B, S, X, π(S) and π(X), which differ
+only at p; p and the prefix through p are the same in the four formats (asserted for every core in the preflight).
+
+**Edit vectors** (written at (p, l); t ∈ {S, X} the target, B the base value; means over H_fit; FP32):
+- **T** (equivalence control): h_t,l(p).
+- **R** (specificity control): h_B + ‖μ1(t) − μ1(B)‖ r_t, r_t a unit Gaussian direction per depth and value
+  (torch Generator seed 8104, drawn depth by depth).
+- **E1** (CAA-in): h_B + μ1(t) − μ1(B), μ1(x) = mean of h_x,l(p) over the 150 H_fit cores with x written at p.
+- **E2** (CAA-out): h_B + μ2(t) − μ2(B), μ2(x) = mean block-l output at the token " x" over the 24 neutral sentences
+  (`ckeys/neutral.py`, sha256 593ce65ce4eb5b468527c6447601cc6670f9576e6434398dc105fb6c21bcce2a; each sentence is the user
+  turn of the chat template with no prefill; every sentence places every form exactly once in all four Part-C
+  tokenizers).
+- **E3** (SAE, Qwen2.5-7B): with a(h) = relu(W_enc (h − b_dec) + b_enc) masked by the threshold and d_j = decoder.weight[:,
+  j]: h_B + Σ_{j∈F_t} (β ā_j(t) − a_j(h_B)) d_j − Σ_{j∈F_B∖F_t} a_j(h_B) d_j. Every other latent and the SAE error stay at
+  B's. ā_j(x) = mean a_j(h_x,l(p)) over H_fit; s_j(x) = ā_j(x) − max_{y≠x} ā_j(y); F_x = the top-k_F latents by s_j(x) with
+  s_j(x) > 0. **The k_F / β rule** (on H_cal under NONE, targets S and X): k_F is the smallest of {4, 8, 16, 32, 64} whose
+  flip-to-target rate (the share of (H_cal core, t) whose E-argmax in the edit's KV row is t) is ≥ 0.7 with β = 1; if
+  none, k_F = 64 and β is the smallest of {2, 4} that reaches 0.7; if none, k_F = 64, β = 4 and E3 is recorded as
+  "ineffective at calibration" at that layer (its rows still run; J-C-G5 decides).
+- **E4** (DAS at p, Qwen2.5-7B and Mistral-7B): h_B + Uᵀ U (h_π(t),l − h_B), U the rank-16 basis fitted at (p, l) with the
+  released recipe (`ckeys/das_at.py`): the pair-swap objective (base B′, source S′, target π(S′)) on TSET, six-way
+  cross-entropy over the candidate scores (each the logsumexp of the logits of its single-token forms " x" and " X"),
+  AdamW (lr 1e-3, weight decay 0, gradient clip 1.0), batch 1, one shuffled epoch (random.Random(seed)); NO-MENTION with the
+  "Answer:" prefill (the released recipe read at the reply start: a disclosed deviation). Seed 101 starts from the PCA basis
+  of h_S′ − h_B′ over TSET; seed 102 from a random orthonormal basis (C-7). π is an involution, so the source π(t) makes the
+  remap write t, and no natural run is in this state. The NONE flip rate on THOLD is reported per fit.
+- **E5** (the lexical boundary family, C-4): FR, DE and SYN: h_B + α (μ5(form(t)) − μ5(form(B))), μ5 as μ2 with the
+  French, German or synonym form of each value (`ckeys/variants.py _F`), read at the last token of the form, over the
+  neutral sentences in which all six forms of the sub-family occur exactly once as their own token sequence (all 24 in
+  every Part-C tokenizer at build; a sub-family clean in fewer than 20 sentences of a model's tokenizer is not run in that
+  model); NL: h_B + α NONLEX(μ1(t) − μ1(B)). α ∈ {1, 2} per sub-family and depth on H_cal under NONE only: α = 1 if
+  φ_Hcal(NONE) ≥ 0.3 at α = 1, else α = 2, where φ_Hcal is the sum over the 50 H_cal cores of the edit's ID_KV divided by
+  the sum of the natural ID_KV (E scores).
+- **Components** (C-3) of an edit's displacement d = h_Z − h_B against the story's natural displacement dn = h_t − h_B and
+  the lexical span L_l = span{μ2(x) − μ2(box) : x ≠ box} (5-dimensional, orthonormal basis Q_l by QR):
+  PAR = h_B + c dn with c = ⟨d, dn⟩ / ⟨dn, dn⟩; PERP = h_B + d − c dn; LEX = h_B + Q Qᵀ d; NONLEX = h_B + d − Q Qᵀ d; for
+  Z ∈ {E1, E2, E3, E4 (each seed)}, and LEX / NONLEX of the natural displacement itself.
+
+**Rows of a cell** (format f, depth l; every row on the B prompt; K/V at p replaced in blocks ≥ l + 1 by the tables of a
+donor run; "K row" = (K_Z, V_B), "V row" = (K_B, V_Z), "KV row" = (K_Z, V_Z)):
+- every format: the self row (B's own tables, the in-batch reference); the natural rows K, V, KV of S and X; T, E1, E2,
+  E3, E4 (two seeds), E5 (FR, DE, SYN, NL) K, V, KV toward S and X; R KV toward S and X;
+- the synthetic rows of J-C-G8 (C-2): SKλ = the natural K table interpolated toward B, K_B + λ (K_t − K_B) for λ ∈ {0.5,
+  0.8}, as its K row (with V_B) and its KV row (with V_t), its V row being the natural V row; SVλ likewise with V
+  interpolated and the natural K;
+- P1 and NONE: PERP and NONLEX of each Z, and NONLEX of the natural displacement, K, V, KV;
+- NONE: PAR and LEX of each Z and LEX of the natural displacement, KV.
+A cell holds 494 rows at Qwen2.5-7B (85 / 151 / 85 / 173 in LETTER / P1 / POST / NONE), 442 at Mistral-7B and 338 at
+Llama-3.1-8B, per depth and story. Rows are scored in forwards of 64 rows; each forward is led by its own self row, and
+every row is stored as its score minus that self row's.
+
+**Scorings.** E: `ckeys.surface.score`, the exact chain-rule log-probability summed over the 32 fixed forms
+(FRAMES_E_FIXED: " ", "", " The ", " the ", "The ", "the ", " In the ", " in the ", " On the ", " on the ", " At the ",
+" at the ", " Inside the ", " inside the ", " **", "**", each with w and W) plus the frames discovered on H; under LETTER
+the letters' forms " X", "X", " **X", "**X". L: log p(" w") (log p(" X") under LETTER). **Frame discovery** (calib, before
+any E item): greedy generations (≤ 16 new tokens, stop at a newline, EOS or a completed candidate) of the clean B, S and X
+runs of the 50 H_cal cores in P1, POST and NONE (450 generations); `ckeys.generate.discover_frames` (a frame in ≥ 2 % and
+≥ 2 of some format's generations, at most 16); a frame is admitted, in order, only if every H_cal and E form set still
+builds (no form a proper prefix of another). The frames are recorded in `calib/<key>.json`.
+
+#### Measures
+
+For an instance Z (an edit, a component, T, R or a synthetic row set), channel C ∈ {K, V, KV}, format f and depth l, with
+d_w(row) = score_w(row) − score_w(self row) (E unless stated; letters of S and X under LETTER):
+- ID_C^Z = ½ [(d_S(C(Z_S)) − d_S(C(Z_X))) + (d_X(C(Z_X)) − d_X(C(Z_S)))] per story; ID^nat with the natural rows.
+  For E4 the per-story value is the mean over the two seeds (the seed level of the bootstrap).
+- ψ_C^Z(f, l) = mean ID_C^Z / mean ID_C^nat; φ_Z = ψ_KV^Z; ι^Z = 1 − (mean ID_K^Z + mean ID_V^Z) / mean ID_KV^Z;
+  κ^Z = mean ID_K^Z / (mean ID_K^Z + mean ID_V^Z) and σ = κ^nat (descriptive only, C-1).
+- **Channel used** in (f, l): mean ID_C^nat ≥ 2 nats and ≥ 0.1 mean ID_KV^nat (point estimates).
+- **λ statistics** of Z at depth l (ψ floored at 0.01 before the log, so λ stays finite and a dead channel is a departure):
+  W(f, l) = log ψ_K(f, l) − log ψ_V(f, l) for f ∈ {P1, POST} with both channels used in (f, l);
+  A_L(l) = log ψ_K(LETTER, l) − log ψ_V(NONE, l) with K used under LETTER and V under NONE;
+  A_P(l) = log ψ_K(P1, l) − log ψ_V(NONE, l) with K used under P1 and V under NONE.
+  A statistic needs its cells evaluable (J-C-G4) and Z effective at l (J-C-G5; for components: carrying identity). If Z's
+  ι (point) exceeds 0.5 in one of its cells (the natural cell passing by J-C-G4), the statistic counts as a departure
+  ("interaction", C-9's ι rule: Z's KV effect against the sum of its K and V effects); the synthetic rows SK and SV have no
+  ι rule.
+- **Equivalence** of a statistic: H0: λ ≤ −log 1.25 and H0: λ ≥ log 1.25 both rejected, i.e. the 90 % interval lies inside
+  (−0.223, 0.223) (TOST at 5 % per side), with at most 5 % of resamples undefined.
+- **The law in a combo** (a model, an instance and a set of depths): MET iff it has ≥ 3 λ statistics and every one is
+  equivalent (an intersection-union test); NOT MET otherwise; NOT EVALUABLE with fewer than 3 statistics. Its **pattern**:
+  the pooled λ̄ (the mean of its statistics, recomputed per resample): equivalent if every statistic is; else R1 copy-only
+  if λ̄ ≤ log 0.5 (point); R3 key-flat if λ̄ ≥ log 2 (point); otherwise graded departure (λ̄ printed).
+- **Flip rate** of Z under f: the share of (story, t) whose E-argmax over the six candidates in the KV(Z_t) row is t (the
+  natural flip rate with the natural KV rows).
+- **Coverage** of a cell: the minimum over the natural rows (self, K / V / KV of S and X) of the mean E mass, a row's E
+  mass being Σ_w exp E_w over the six candidates.
+- **KO** (J-C-READ; OPTIONS-AFTER, l = 7, L scores; `experiments/stage8_edits.py` stage readers,
+  `analysis/stage8c_parts/readers.py`): every row is on the P1 B prompt with B's key and value at p pinned from block 8. In
+  a donor's row the donor's key at p from block 8 (natural: S's or X's; an edit: the key its prefix pass captured; E4: seed
+  101) is seen by every head of blocks ≥ 8 at every query position (spec "all", equal to the K-only clamp row), except,
+  for a set (H*_{>7}, or one of the three random sets), that the set's heads see B's key at the six option-word positions
+  of the "Choices:" list. ID_K^D[spec] is ID on these rows (each minus the in-batch self row, B's own tables), and
+  KO_D(set) = 1 − mean ID_K^D[set] / mean ID_K^D[all], recomputed per resample.
+- **On the binding-swap material** (J-C6, J-C-SCREEN, J-C-WIN; H's definitions, `analysis/stage8c_parts/prakash.py`):
+  per pair, arm and format the exchange rows r0 (B with B's K/V), r1 (the patched run M), r2 (B with M's keys), r3 (B
+  with M's values) and r4 (B with M's K/V) at the patched positions from block d + 1, with m = log p(target) − log p(s_q);
+  ψ_K = mean[m(r2) − m(r0)] / mean[m(r1) − m(r0)], ψ_V likewise with r3, κ = ψ_K / (ψ_K + ψ_V); Φ = mean[m(r1) − m(r0)];
+  IIA (for CAA: its flip rate) = the share of pairs whose r1 top token is the target word. The κ rule: ψ_K + ψ_V ≥ 0.5 and
+  ψ_K, ψ_V ≥ −0.1 (a resample that fails it is undefined). Gate b0: mean |m(r4) − m(r1)| and mean |m(r0) − m(B)| ≤ 0.3
+  nats; Gate b2: Φ ≥ 3 nats. An arm is usable in a format when Gates b0 and b2 and the κ rule (point) hold.
+  s_ID(f, l0) = mean ID_K / (mean ID_K + mean ID_V) of the natural clamp of S's or X's K/V at p from block l0, against the
+  self-clamp row. In the screen, Φ(l) and IIA(l) are those of BIND patched at block l under NO-MENTION (the BIND sweep).
+- **Table statistics** per story, depth, Z and t (pooled over blocks ≥ l + 1 and all KV heads): ν = ‖[K;V]_Z − [K;V]_t‖ /
+  ‖[K;V]_t − [K;V]_B‖ (one pooled ratio, C-3); the K and V cosines of the displacements and their norm ratios; the residual
+  cosine cos(d, dn) at (p, l); the projections ⟨Δ_Z, Δ_t⟩ / ⟨Δ_t, Δ_t⟩ of the K and V displacements (O1; the K projection
+  also over the KV groups of the reader heads H*).
+- **Story-level distance** D_Z = mean_s (|ID_K^Z − ID_K^nat| + |ID_V^Z − ID_V^nat|) / mean_s ID_KV^nat (reported).
+
+#### Statistics
+
+- **Bootstrap.** Hierarchical (C-13): resample the 24 ordered (base, source) clusters of E with replacement, then the
+  stories within each drawn cluster with replacement; 10,000 resamples, seed 20261012, one index set per model, shared by
+  every format, depth, row and scoring, so every contrast is paired. The E4 seeds are a further level: every resample also
+  draws two seeds with replacement from {101, 102}. Every ratio, log ratio and share is recomputed in every resample.
+  Prakash et al.'s pairs (J-C6, the screen) use the pair bootstrap with the same seed and size.
+- **Levels.** TOST at 90 % (5 % per side) for equivalence; every other interval criterion is a one-sided test at 2.5 % on
+  the 95 % interval ("H0: θ ≤ t rejected: lower bound > t"). Lines over several models are intersection-union tests on
+  these intervals (no correction; NOT MET as soon as one evaluable model or combo fails, see the combination rule).
+  Point floors are effect-size conditions.
+- **Holm** (common part, decision D2): reported, no verdict uses it. The family is the interval components of this part's
+  R-class account lines that have a verdict (J-C3, J-C4, J-C5, J-C-BOUND, J-C-READb, J-C-WIN; J-C-SCREEN has none): the
+  two one-sided components (H1: λ > −log 1.25 and H1: λ < log 1.25; own decision: the 90 % interval) of every λ statistic
+  of a J-C3 or J-C4 combo that has a verdict and of every identity-carrying component of J-C5, the upper bound of each
+  pooled λ̄_E5 that has a verdict (H1: λ̄_E5 < log 0.8), the lower bound of each counted KO_Z(H*) (H1: KO > 0.5) and the
+  window's H9 bound (H1: κ(OPTIONS-AFTER) − κ(NO-MENTION) > 0). A component whose estimate or SE is undefined is left out.
+  The shared helper `analysis/stage8_holm.py` computes one-sided p values from the bootstrap SE (Φ(−(est − bound)/se) for
+  '>', Φ((est − bound)/se) for '<') and Holm's step-down at familywise 0.025; the scorer prints, per R line, the components
+  whose decision changes and the verdict with Holm's decisions in place of the interval decisions (a MET line with a
+  component no longer rejected becomes NOT MET; every other verdict is unchanged).
+- **SUMMARY** (common part): the 11 lines are tallied by class (M: J-C1, J-C2, J-C-READa, J-C6; R: the other seven; no
+  class-L line; Part C defines no MET IN PART), with the observed against the expected met count and the Brier score over
+  the lines with a verdict, and the met rate among the R lines with a verdict.
+- **Evaluability.** Only the gates and rows the tested edit does not change decide evaluability. A model with no eval
+  results, or with fewer than 60 evaluated stories (a run cut by the deadline), is not evaluable. If a part of the scorer
+  raises, its lines are NOT EVALUABLE (traceback printed, exit status 1). TEST_MODE outputs (tag TEST_) are plumbing checks.
+- **Scorer checks that do not change verdicts.** A provenance or population MISMATCH (results files from more than one
+  commit; outside TEST_MODE a model revision other than the manifest's, a dtype other than BF16 or an attention other
+  than sdpa; an eval, readers or explore file that records a calibration sha256 other than the calibration file's; a
+  results file that is unreadable or has no provenance block; a preflight E hash other than the pin, or a skipped item;
+  eval stories not indexed 0..n−1 in order, or an eval file whose recorded E hash is not the pin) is printed and makes the
+  scorer exit with status 2, as do results without a passing J-C-G0; the verdicts are printed as computed.
+
+#### Gates
+
+- **J-C-G0, exactness** (FP32, CPU, Qwen2.5-0.5B, before any model; 1e-4 in the logits): `tests/test_stage8_edits.py`
+  (15 tests), `tests/test_sae.py` (7), `tests/test_stage8c_score.py` (19), the shared `tests/test_generate.py` (5; frame
+  discovery uses `ckeys/generate.py`, which the stage-8 review changed), `tests/test_stage8_populations.py` (5; rule G6
+  across the parts) and `tests/test_stage8_holm.py` (7; the Holm helper, D2), and the shared `tests/test_surface.py`,
+  `tests/test_clamp.py`, `tests/test_head_splice.py`, `tests/test_prakash.py` in the same run (95 tests). The scorer reads
+  the last pytest run in `logs/pytest.log`: J-C-G0 is MET when each of the six files named with a count has at least that
+  many passed tests (15, 7, 19, 5, 5 and 7) and none failed, errored or skipped, and no test of the run failed or errored (a
+  shared test of the other four files that skips because a study tokenizer is not available does not fail the gate);
+  without the log it is NOT EVALUABLE. The checks, each against an
+  independently computed reference:
+  1. (i) writing h_S,l(p) equals the natural KV(S) clamp from l + 1 (tables from the S run), l ∈ {0, 3, 10}, NONE and P1;
+  2. (ii) for random vectors, B with the edit's captured K/V from l + 1 equals the edited run (two rows, per-row tables);
+  3. (iii) prefix tables equal full-run tables (1e-5); (iv) the prefix and its tables are identical in the four formats
+     (exact);
+  4. the scored rows (E and L, minus the in-chunk self row) equal `score_reference` under a separately built clamp with
+     per-row tables, in P1 and LETTER; the self row's L equals a plain forward;
+  5. (viii) T through the pipeline: its tables equal the natural ones (1e-5), its rows the natural rows, so κ_T = σ; through
+     eval's own passes (66 edit rows in forwards of the natural pass's shape) T's tables equal the natural ones bitwise;
+     the row layout of every cell (synthetic rows interpolate exactly; components where stated);
+  6. the component algebra and the table statistics on synthetic tables with known answers;
+  7. (vii) the J-C-READ rows: the "all" row equals the plain K-only clamp row, the empty row equals clean B;
+  8. the dictionaries' io = "out" site: a forward hook on block l equals the output of `model.layers[l]` and
+     hidden_states[l + 1] (tiny random Qwen2, C-8);
+  9. the BatchTopK code against direct references (encoder, threshold mask, decoder orientation, the state-dict layout and
+     its hash, FVE, selectivity, the edit; an edit of every differing latent with zero error reproduces h_t);
+  10. the DAS-at-p code (forms, PCA and random inits, orthonormal fits, the identity when source = base, the eval map);
+  11. (ix) on Prakash et al.'s release, the CAA arm with μ(S) − μ(s_q) = h_S − h_B at [p, p+1] gives the ID arm's rows;
+  12. the populations (sizes, hashes, disjointness), the neutral sentences (hash, cleanliness), the no_grad guard, the
+      reader sets, the edit vectors from a calibration record;
+  13. the scorer on synthetic results with known answers (MET, NOT MET and NOT EVALUABLE paths of every line and gate;
+      the combination: NOT MET on any evaluable failure; E3 in J-C-READb only when layer 7 passes J-C-G3; J-C6's
+      evaluability with BIND usable; outcome (b) read only from evaluable models; the Holm family of the R lines, its
+      components and the verdicts under Holm through `analysis/stage8_holm.py`; J-C-G0's file list against the script's
+      pytest step, and no line computed and no outcome named without a passing J-C-G0);
+  14. greedy decoding under cache clamps equals cache-free stepwise argmax decoding with the clamps active (Qwen2.5-0.5B
+      and tiny random models), answer parsing and frame discovery, and a chat template's end-of-turn token ends a
+      generated answer (`tests/test_generate.py`);
+  15. the stage-8 populations of Parts B, C and D: U computed identically, the sizes, disjointness from U and from each
+      other, no pilot seed (`tests/test_stage8_populations.py`, rule G6);
+  16. the Holm helper: p values, degenerate and undefined components, hand-worked and brute-force step-down results
+      (`tests/test_stage8_holm.py`).
+  J-C-G0 failing or not run makes every line NOT EVALUABLE: no model counts in any line on the E population, and the
+  HEADLINE prints "J-C-G0 not passed: no outcome" (no Section-5 outcome is selected).
+- **J-C-G1, the equivalence control** (per model): at every depth and for each target t, the mean over stories of ν_T
+  ≤ 0.02; in every evaluable cell (J-C-G4), |ψ_C^T − 1| ≤ 0.05 (point) in each used channel C ∈ {K, V}, and
+  mean_s |ID_C^T − ID_C^nat| ≤ 0.25 nats for C ∈ {K, V}; at least one evaluable cell. Failing makes the model not
+  evaluable. Since the edit passes have the natural pass's shape, T's tables equal the natural tables bitwise unless the
+  pipeline is wrong, and T's rows are scored in the same forward as the natural rows: J-C-G1 checks the pipeline on the
+  GPU (as J-C-G0 does in FP32), not a BF16 floor.
+- **J-C-G2, the natural format effect** (per model): σ(LETTER, 3) − σ(NONE, 3) ≥ 0.5 (point) and H0: ≤ 0 rejected
+  (computed whether or not these two cells pass J-C-G4). Failing makes the model not evaluable.
+- **J-C-G3, the dictionary's alignment** (Qwen2.5-7B, per layer; C-8): FVE of the layer-l dictionary on the block-l outputs
+  ≥ published − 0.05 (0.881 / 0.812 / 0.777 / 0.757), and greater than its FVE on the outputs of blocks l − 1 and l + 1. FVE
+  is dictionary_learning's (1 − Σ var(h − ĥ) / Σ var(h)) over every prompt position ≥ 1 of the clean B NONE prompts of the
+  200 H cores (position 0, the attention sink, is left out). FVE at p (H_fit, six values) is reported. Failing makes E3 not
+  evaluable at that layer (in J-C3, in J-C5 and, at l = 7, in J-C-READb; a layer without a J-C-G3 record counts as
+  failing). (Layer 15 is expected to be marginal: its published FVE is 0.807.)
+- **J-C-G4, the cell** (per model, format, depth; point estimates): mean ID_KV^nat ≥ 2 nats; ι^nat ≤ 0.5; mean ID_K^nat
+  and mean ID_V^nat ≥ −0.1 mean ID_KV^nat; coverage ≥ 0.8. Otherwise the cell enters no statistic.
+- **J-C-G5, efficacy** (per model, family, depth; under NONE; C-11): flip rate ≥ 0.8 × the natural flip rate (point), and
+  φ ≥ 0.5 (point) with H0: φ ≤ 0.3 rejected (lower 95 % bound > 0.3). E5 sub-families (gated in) and components (carrying
+  identity): φ(NONE) ≥ 0.3 (point) with H0: φ ≤ 0 rejected (C-3, C-4). Otherwise the family is "ineffective at l"
+  (reported, not counted). The gate needs the NONE cell at l to pass J-C-G4; otherwise the family is not evaluable at l.
+  E4 uses the seed level (flip rate and φ of the two seeds together).
+- **J-C-G6, specificity** (per model, depth): |mean ID_KV^R| ≤ 0.1 mean ID_KV^nat under NONE. A failure flags the depth
+  in the report; no line depends on it.
+- **J-C-G7, the discrepancy anchor** (J-C6): BIND at block 28 reproduces stage 6 (point estimates): IIA under NO-MENTION
+  ≥ 0.95 and |κ_BIND(f) − κ_H(f)| ≤ 0.05 in every format f run, for κ_H = 0.618 / 0.906 / 0.864 (NO-MENTION / QNAMES /
+  OPTIONS-AFTER). Failing makes J-C6 NOT EVALUABLE.
+- **J-C-G8, sensitivity** (per model; C-2): over all depths, with the same statistics and no efficacy gate, T is
+  classified equivalent (every statistic equivalent), SK50 is a departure (some statistic not equivalent) with pooled
+  λ̄ < −log 1.25 (point), and SV50 is a departure with λ̄ > log 1.25 (point); each of the three needs at least one
+  statistic, so a model with none fails the gate. SK80 and SV80 are reported, and so is the design's old κ rule (MAD
+  ≤ 0.12 with upper bound ≤ 0.17, maximum gap ≤ 0.25) on the same rows. Failing makes the law lines (J-C1 to J-C5,
+  J-C-BOUND) NOT EVALUABLE in that model.
+
+#### Confirmatory lines
+
+All lines are account lines (kind A); Part C has no measurement-validity line. The prior is P(MET), given that the line
+is evaluable, recorded before any stage-8 output. The class follows the prior (decision D1: L = implied by data in hand on
+the same models and material with prior ≥ 0.9; M = prior ≥ 0.8; R = prior < 0.8), so no Part-C line is class L. Tiers per
+C-6: Tier 0 = E1 at every depth and E2 at l ∈ {3, 7} at Qwen2.5-7B and Mistral-7B (J-C1; C-6 labels it L, its prior
+0.80 makes it class M); Tier 1 = E2 at l ∈ {11, 15} and Llama-3.1-8B (J-C2, M); Tier 2 = E3, E4, PERP / NONLEX and E5
+(R).
+
+| Code | Class, prior | Criterion | Justification of the prior (data in hand) |
+|---|---|---|---|
+| J-C1 | M, 0.80 | The law MET in each evaluable combo of (Qwen2.5-7B, E1, l ∈ {3,7,11,15}), (Qwen2.5-7B, E2, {3,7}), (Mistral-7B, E1, all), (Mistral-7B, E2, {3,7}); NOT MET if any evaluable combo is NOT MET; MET needs ≥ 3 evaluable combos, else NOT EVALUABLE | 0.5B pilot: κ_E within 0.03 of σ in LETTER, P1, NONE; 1.5B pilot: φ 0.91–1.04 at blocks 1–9; the critic's 1.5B pilot: E2 transfer 0.94 at block 9. Power (below): the TOST passes at c_K/c_V = 0.9 and fails at 0.8 |
+| J-C2 | M, 0.80 | The law MET in each evaluable combo of (Qwen2.5-7B, E2, {11,15}), (Mistral-7B, E2, {11,15}), (Llama-3.1-8B, E1, all), (Llama-3.1-8B, E2, all); NOT MET if any evaluable combo is NOT MET; MET needs ≥ 2 evaluable combos, else NOT EVALUABLE | E2 at 1.5B block 13 under LETTER reached 0.50× (natural effect 0.35 nats, below the channel floor); E2's transfer at block 9 was 0.94; Llama never measured. The class is fixed by C-6; the prior is its floor |
+| J-C3 | R, 0.55 | The law MET in (Qwen2.5-7B, E3, the layers passing J-C-G3); NOT EVALUABLE with fewer than 3 statistics (also when no layer passes J-C-G3) | No data on E3; selective latents at p are likely the value's lexical features, which the readers read like the natural edit |
+| J-C4 | R, 0.35 | The law MET in each evaluable combo of (Qwen2.5-7B, E4, all), (Mistral-7B, E4, all) (seed level); ≥ 1 evaluable combo, else NOT EVALUABLE | The remap writes the projection of π(t)'s state to produce t; under the token-form account its key part points at π(t), a departure; no data at p |
+| J-C5 | R, 0.35 | In every model passing J-C-G1, J-C-G2 and J-C-G8, for every identity-carrying (φ(NONE) ≥ 0.3, H0: φ ≤ 0 rejected) PERP or NONLEX component of an E1–E4 effective at that depth (E3 at the layers passing J-C-G3; E4 at the seed level): each of its statistics W(P1, l) and A_P(l) equivalent (one pooled test over every statistic of every such component, with no minimum count); NOT EVALUABLE if no identity-carrying component has a λ statistic | The critic's 1.5B pilot: NONLEX(E1) φ 0.11–0.13, 0 flips; a carrying non-lexical component is predicted to be copy-read |
+| J-C-BOUND | R, 0.50 | For every E5 sub-family with λ statistics at the depths where it is gated in, in every model passing J-C-G1, J-C-G2 and J-C-G8: pooled λ̄_E5 over those statistics ≤ log 0.5 (point) with H0: λ̄_E5 ≥ log 0.8 rejected (upper 95 % bound < −0.223), and E2's pooled λ̄ over those of the same statistics (code and depth) that E2 has, where E2 is effective, ≥ log 0.8 (point). A sub-family whose statistics E2 has none of is not evaluable; ≥ 1 sub-family with a verdict, else NOT EVALUABLE (also when no sub-family is gated in) | The critic's 1.5B pilot (2 stories): French vectors φ(NONE) 0.34–0.39, transfer φ(LETTER)/φ(NONE) 0.05 at block 9 against 0.94 for E2; synonyms φ 0.06–0.08 |
+| J-C-READa | M, 0.85 | Qwen2.5-7B and Mistral-7B (each passing J-C-G1 and J-C-G2), P1, l = 7, the readers rows (L scores): the gate KO_nat(H*_{>7}) ≥ 0.7 and mean ID_K^nat[all] ≥ 2 nats (point; failing makes the model's families not evaluable); for E1 and E2 where effective at l = 7 (J-C-G5) and mean ID_K^Z[all] ≥ 2 nats: KO_Z(H*_{>7}) ≥ 0.7 (point) with H0: KO_Z ≤ 0.5 rejected, and the mean KO over the three random sets ≤ 0.25 (point); ≥ 1 counted (model, family), else NOT EVALUABLE | Stage 6: KO(k*) 0.977 / 0.971, random sets ≤ 0.011; E1 and E2 are aligned with the natural displacement (residual cosine 0.80–0.997 at 1.5B) |
+| J-C-READb | R, 0.60 | The same for E3 and E4 (the readers rows of seed 101; efficacy at the seed level); E3 is not evaluable, and not counted, when layer 7 fails J-C-G3 | E3 and E4 need not be aligned with the natural edit in the key-read subspace |
+| J-C6 | M, 0.85 | Qwen2.5-14B, block 28: in every evaluable format (NO-MENTION and OPTIONS-AFTER evaluable): κ_CAA ≤ 0.30 (point), κ_BIND − κ_CAA ≥ 0.30 (point) with H0: κ_BIND − κ_CAA ≤ 0 rejected (paired; a resample where either arm fails the κ rule is undefined, at most 5 % undefined); a format is evaluable when CAA and BIND are both usable there (Gates b0 and b2 with Φ ≥ 3 nats, the κ rule; BIND is the comparison arm, so its failure makes the format not evaluable, never NOT MET) and CAA's flip rate under NO-MENTION is ≥ 0.5; J-C-G7 passed | Stage 6: ID@28 κ 0.129 / 0.007 / 0.006 and s_ID(f, 29) 0.017 / −0.028 / −0.015 |
+| J-C-SCREEN | R, 0.50 | No overlap window in any evaluable screened model (Qwen2.5-7B, Llama-3.1-8B; point estimates): no block l with BIND Φ(l) ≥ 3 nats and IIA(l) ≥ 0.5 under NO-MENTION and s_ID(OPTIONS-AFTER, l + 1) ≥ 0.4 (onset l + 1 measured for every such block, besides the grid round(x n_L / 28), x ∈ {0, 3, …, 27}, for a model of n_L blocks). A screen is evaluable when BIND's IIA reaches 0.7 at some block and ≥ 50 pairs pass the filter; ≥ 1 evaluable screen, else NOT EVALUABLE | 14B: BIND IIA 0.00 at blocks 0–23 and 0.72 at 24 (0.5 L), s_ID(OPTIONS) 0.587 at 14, 0.218 at 18, 0.041 at 24; Llama-3-70B's released BIND band 25–44 of 80 (0.31 L) leaves room for a window at 8B |
+| J-C-WIN | R, 0.30 | In every evaluable screened model with a window, at l_w = the earliest window block: H's H7 (\|κ(f) − s_ID(f, l_w + 1)\| ≤ 0.25 in every usable f, Pearson r ≥ 0.9 over the three formats, which needs all three usable: otherwise H7 is not met) and H9 (κ(OPTIONS-AFTER) − κ(NO-MENTION) ≥ 0.4 (point), H0: ≤ 0 rejected (paired, at most 5 % undefined); κ(QNAMES) between the two when QNAMES is usable), with H's Gates b0, b2 and κ rule (BIND reproduces at l_w by the window's definition, IIA ≥ 0.5, in place of H's Gate b1 at 0.7) and s_ID(f, l_w + 1) defined for a usable f; NO-MENTION and OPTIONS-AFTER usable, else not evaluable in that model; ≥ 1 model with a verdict, else NOT EVALUABLE (also without a window) | 14B (block 28): BIND κ 0.62–0.91 against s_ID ≈ 0, gaps 0.60–0.93 |
+
+**Expected values** (the author's, not thresholds): λ within ±0.15 for E1 and E2 at l ≤ 7; E3 effective at l ≤ 7;
+E4 effective, with λ < 0 under LETTER; E5-FR gated in at some depth with λ̄ ≈ −1; E5-SYN and E5-NL not gated in; no window
+at Qwen2.5-7B.
+
+#### Feasibility (C-9; from data in hand)
+
+The number of λ statistics a combo can have is set by which channels the natural edit uses at each depth. Stage 1's
+committed per-story rows give the one-sided natural effects at onsets 0, 0.0625 L and 0.3 L; identity contrasts are about
+half of them where the effect is identity-specific (Qwen2.5-7B at onset 0: ID_K 20.4 against one-sided 40.2 under LETTER).
+
+| Model, depth (onset) | LETTER K | P1 K / V | POST K / V | NONE V | λ statistics expected |
+|---|---|---|---|---|---|
+| Qwen2.5-7B, l = 3 (4; stage 1 at 2: one-sided 40.2; 39.6 / 8.6; 11.0 / 23.1; 36.8) | used | used / used | used / used | used | 4 |
+| Qwen2.5-7B, l = 7 (8; stage 1 at 8: 23.2; 17.1 / 8.6, ι 0.38; 5.8 / 23.1; 36.8) | used | used / used | marginal / used | used | 3–4 |
+| Qwen2.5-7B, l = 11 (12; no data; at 14B s_ID(OPTIONS) is 0.22 at 0.38 L) | likely | marginal / used | no / used | used | 1–3 |
+| Qwen2.5-7B, l = 15 (16) | unlikely | no / used | no / used | used | 0–1 |
+| Mistral-7B, l = 3 (4; stage 1 at 2: 30.0; 26.3 / 2.5; 12.1 / 19.9; 28.8) | used | used / not (ID_V ≈ 1.2) | used / used | used | 3 |
+| Mistral-7B, l = 7 (8; stage 1 at 10: 4.2; 2.6 / 2.3; 1.5 / 21.2) | marginal | marginal / not | no / used | used | 0–2 |
+| Mistral-7B, l = 11, 15 | no | no | no | used | 0 |
+| Llama-3.1-8B | no data; Mistral-like expected | | | | 3–5 over l ≤ 7 |
+
+Consequences declared now: the Tier-1 combos of E2 at l ∈ {11, 15} are expected to be NOT EVALUABLE at both Qwen2.5-7B
+and Mistral-7B, so J-C2 is expected to rest on the two Llama-3.1-8B combos; the Mistral-7B combos of J-C1 are expected
+to have 3–5 statistics, so J-C1 may be NOT EVALUABLE (fewer than 3 evaluable combos, none of them NOT MET) if two of
+them fall short. Refined in review from the same data: stage 1's identity-to-margin ratios at onset 0 applied to its
+onset-2 margins give, at Mistral-7B, identity contrasts of about 14.6 (LETTER K), 14.0 / 2.2 (P1 K / V), 7.4 / 11.7
+(POST K / V) and 13.7 (NONE V) nats, and at onset 10 about 2.0, 1.4 / 2.0, 0.9 / 12.5 and 13.7; stage 6's three
+top-ranked reader heads at Mistral-7B lie in blocks 6–7 (18 of its 52 in blocks 4–9), so l = 3 (onset 4) keeps them and
+should resemble onset 2 (A_L, A_P and W(POST) used, W(P1) marginal: 3–4 statistics), while l = 7 (onset 8) loses them
+(1–3 statistics). Each Mistral-7B combo of J-C1 is then expected to have 4–7 statistics. Every A statistic and the
+efficacy gate need the NONE cell (coverage ≥ 0.8), so a model whose NONE coverage falls below 0.8 has no λ statistic at
+any depth; this risk is shared by all depths. The law at depth is therefore tested mainly through V-only cells (φ) and
+the reported κ against σ; this is a limit of the design.
+
+#### Combination and the headline rule (C-6)
+
+- J-C1, J-C2, J-C4, J-C-BOUND, J-C-READa, J-C-READb and J-C-WIN are intersection-union tests over their evaluable
+  sub-combos, with the minimum numbers stated in the table: such a line is NOT MET as soon as one evaluable sub-combo is
+  NOT MET, whatever the number evaluable; MET when every evaluable sub-combo is MET and at least the minimum number is
+  evaluable; NOT EVALUABLE only when none is NOT MET and fewer than the minimum are evaluable. J-C3, J-C5 and J-C6 are
+  single tests.
+- J-C-G0 failing or not run makes every line NOT EVALUABLE and the HEADLINE names no outcome; J-C-G1 or J-C-G2 failing
+  removes the model from every line on the E population (J-C1 to J-C5, J-C-BOUND, J-C-READa, J-C-READb); J-C-G8 failing
+  removes it from the law lines (J-C1 to J-C5, J-C-BOUND). The lines on the binding-swap material (J-C6, J-C-SCREEN,
+  J-C-WIN) have their own gates (J-C-G7, the screen's evaluability, Gates b0 and b2, the κ rule) and do not depend on
+  J-C-G1, J-C-G2 or J-C-G8.
+- **Headline** (printed by the scorer):
+  - "Supported out of sample" requires the law MET in E3 and E4 (J-C3 and J-C4 MET) or in the identity-carrying
+    components (J-C5 MET), and J-C-BOUND MET.
+  - Tier 0 alone (J-C1 MET without the above) supports at most "consistent for near-natural steering vectors".
+  - The design's JC4 (depth tracking) is a reported consistency check and never enters the headline (C-10).
+
+#### What each primary line means for the paper (pre-written; E-2)
+
+No outcome of Part C changes the title (common part). Table 1 row: "Attributing an intervention to a channel"
+(Section 5). Figure 4: (a) λ per family, depth and format with the ±log 1.25 band; (b) κ against σ (descriptive);
+(c) the decomposition (φ of PAR, PERP, LEX, NONLEX against the full edit); (d) KO per family beside the natural readers.
+
+| Primary line | Abstract clause (MET) | NOT MET: replacement | Table 1 row | Figure |
+|---|---|---|---|---|
+| J-C3 with J-C4 (Tier 2) | "Identity edits obtained without the natural clamp — features of a public sparse autoencoder and a remap trained at the writing token — are read through the key and the value in the same ratio as the model's own written value (\|λ\| < log 1.25 in every cell)." | Per pattern: R1 "Edits that change the value through dictionary features or a learned remap are read mainly through the value (λ̄ = x): the key channel does not read them as it reads the written word." R3 / graded: "… are read through the key x times more (less) than the natural value; channel attribution depends on the edit." | "Independent edits (E3, E4)": MET / the pattern | 4a |
+| J-C-BOUND | "Steering vectors that write the value as a French or German word, or without its English lexical component, are read by the value alone (λ ≤ log 0.5): the key channel reads only the token form of what an edit writes." | "Non-lexical identity edits are read like lexical ones (λ̄ = x); the token-form account of the key readers is contradicted for edits." Not evaluable: "No non-lexical identity edit was strong enough to test the boundary (φ < 0.3)." | "Boundary (E5)" | 4a, 4c |
+| J-C1 (Tier 0) | (Body only) "Steering vectors from held-out stories and from unrelated sentences follow the law in every format and depth where both channels are used." | "Even steering vectors close to the natural edit depart from the natural channel ratio (λ̄ = x): the format law does not transfer to edits as a channel-ratio law." | "Near-natural edits (E1, E2)" | 4a |
+| J-C-SCREEN | (Body only) "Binding forms only after the identity key route closes in every model screened (no block with a working binding swap and s_ID ≥ 0.4)." | "A binding swap works at block l_w, where the identity key route is open (s_ID = x); there the binding swap is read as the law predicts / is not (J-C-WIN)." | Note under row "Prakash et al.'s binding swap" | Appendix |
+
+The abstract's risk summary counts the R lines of this part with the other parts' (common part).
+
+#### Pre-committed Section-5 text per outcome (C-12)
+
+Section 5 is the intervention section of paper v5 (Section 4 of v4). Exactly one of these paragraphs replaces its general
+claim. The scorer's HEADLINE names the outcome, checked in the order (a), (a′), (c), (b), (e), (d), (f); the numbers x, a, b
+are filled from the score file. Without a passing J-C-G0 the HEADLINE prints "J-C-G0 not passed: no outcome" and no
+paragraph is selected.
+The phrases "30–70 % away" and "the law's boundary is the kind of edit, not its depth" are deleted from the paper.
+- **(a) Law met on Tier 2 and the boundary met** (J-C3 and J-C4, or J-C5, MET; J-C-BOUND MET): "Which cache channel an
+  identity edit appears to act through is predictable before the edit is run: an edit is read through the key in proportion
+  to the token-form part of what it writes. Edits from a public sparse autoencoder and a remap trained at the writing token
+  keep the natural channel ratio within 25 % in every cell where both channels are used, while steering vectors that write
+  the value in another language, or without its English lexical component, are read by the value alone."
+- **(a′) Law met on Tier 2, boundary not met** (J-C3 and J-C4, or J-C5, MET; J-C-BOUND NOT MET or not evaluable): "Identity
+  edits obtained without the natural clamp keep the natural channel ratio within 25 % in every cell where both channels are
+  used; the predicted boundary does not appear (non-lexical edits are read like lexical ones, λ̄ = x, or none was strong
+  enough to test it). Channel attribution follows the format, whatever the identity edit writes."
+- **(b) Acts only through the natural lexical code** (none of (a), (a′) and (c) applies; at least one effective family
+  is counted, and every effective family E1–E4 (E4 at the seed level), at every depth where it is effective, in every model
+  that passes J-C-G1, J-C-G2 and J-C-G8 (E3 at the layers passing J-C-G3), has φ(PAR) or φ(LEX) ≥ 0.8 φ of the edit under
+  NONE (point estimates); and no PERP or NONLEX component of those families carries identity, J-C5 not MET):
+  "The edits we could build act
+  through the same low-dimensional lexical code as the natural write; for them the channel ratio is a linear consequence
+  of that code and is not evidence that channel attribution is independent of the edit."
+- **(c) Boundary met without Tier-2 support** (J-C-BOUND MET; J-C3 and J-C4 not both MET, and J-C5 not MET): "The key
+  channel reads only the
+  token-form part of an edit: non-lexical identity edits are copy-read (λ ≤ log 0.5). Independent lexical edits do not keep
+  the natural ratio (λ̄ = x), so the ratio is not a property of the format alone."
+- **(d) Departure on Tier 2** (none of (a), (a′), (c), (b) and (e) applies, and a combo of J-C3 or J-C4 is NOT MET; the
+  pattern of each such combo, R1, R3 or graded departure with λ̄, is printed): for R1 and R3 the replacement texts of J-C3 / J-C4 in the table above; for a graded departure: "Independent
+  identity edits are read through the key x times as strongly as the natural value (95 % interval [a, b]); channel
+  attribution of an intervention is approximate, and we report the departure per family."
+- **(f) Tier 0 at most** (none of the above; printed as "consistent for near-natural steering vectors only" when J-C1 is
+  MET, else as "not supported or not evaluable"): "For steering vectors close to the
+  natural edit the channel ratio is kept; edits that differ from it could not be tested (reason), so we make no claim
+  beyond near-natural steering vectors." If J-C1 is also not evaluable, Section 5 keeps only the motivating case and states
+  that the law was not testable.
+- **(e) Failed** (none of (a), (a′), (c) and (b) applies; J-C1 NOT MET, which one evaluable Tier-0 combo NOT MET suffices
+  for): "Even steering vectors close to the natural edit depart from the natural channel ratio;
+  the format law describes the model's own written value and does not predict how an edit is attributed."
+- **The screen.** No window: "Binding forms only after the identity key route closes in every model screened, so a binding
+  swap cannot be compared with an identity edit at a depth where the key route is open; H7–H10 stand." Window, J-C-WIN MET:
+  "Inside the overlap window at block l_w, the binding swap is read as the law predicts." Window, J-C-WIN NOT MET: "Inside
+  the overlap window the binding swap departs from the natural read (gaps x); the law does not extend to binding edits."
+- **J-C6.** MET: "At block 28 of Qwen2.5-14B an identity edit is copy-read like the natural value (κ ≤ 0.30), while the
+  binding swap there is key-read; key-flat reading is not a property of depth for identity edits." It does not separate
+  kind from depth, because the natural read there is itself copy-only. NOT MET: "At block 28 even an identity edit is
+  key-read (κ = x)."
+
+#### Reported (no verdict)
+
+- The π(t) diagnostic (C-7), per model with E4 (Qwen2.5-7B, Mistral-7B) and depth: under LETTER in the K rows of E4,
+  d_π(t) − d_t averaged per story over the two seeds and both targets, its mean with its 95 % interval (story bootstrap). A
+  lower bound > 0 is read as "the key raises π(t)'s letter: a lexical-key departure"; an upper bound < 0 as "the key
+  raises t's letter".
+- The lexical-code reading (C-3c), per model, family E1–E4 and depth where effective: φ of PAR and LEX against φ of the
+  edit under NONE (point); "acts through the natural lexical code" if either is ≥ 0.8 of it.
+- JC4 as a consistency check (C-10): for every (model, family E1–E4, format) with Δσ = σ(f, 3) − σ(f, 15) ≥ 0.25 (point),
+  both cells evaluable and the family effective at both depths: Δκ ≥ 0.5 Δσ and |Δκ − Δσ| ≤ 0.2 (point); consistent if it
+  holds in ≥ 80 % of ≥ 3 qualifying pairs.
+- Printed with the lines and gates: the per-seed E4 laws (under J-C4) and J-C-G6 per depth (GATES). Printed in the
+  EXPLORATORY section: the κ / σ table; ν, the K / V and residual cosines per cell and family.
+
+#### Exploratory (no verdict)
+
+L-scored λ; O1 (the projections of each edit's K / V displacement on the natural one, all heads and the reader heads' KV
+groups, against the observed ψ); greedy-generation flip rates of the KV rows at l = 7 under NONE and P1 on the first 40
+stories (O4); D per cell; the frame census; the SAE's FVE at p; the E5 calibration table. Dropped (C-13): Gemma-2 with
+Gemma Scope, the α dose, BIND-p, LIST-BEFORE, the SAE-lexical / SAE-task split. In-hand context, stated as exploratory: at
+14B the binding swap has IIA 0.00 at blocks 0–23 and 0.72 at 24, while s_ID(OPTIONS-AFTER) is 0.218 at 18 and 0.041 at 24.
+
+#### Power (seen before finalisation)
+
+`power_lambda.py` (build notes; the committed stage-1 per-story identity contrasts at onset 0 of Qwen2.5-7B and
+Mistral-7B; 200 replicates of n = 80 stories with the two-stage (B, S) cluster bootstrap, 1,000 resamples; an edit's
+per-story contrasts are c_C × the natural ones × (1 + ε), ε ~ N(0, τ) per story and channel; two depths, 8 statistics):
+P(every statistic equivalent) at c_K / c_V = 1, 0.9, 0.85, 0.8, 0.7, 0.5 and 2:
+- τ = 0.1: 1.00, 1.00, 0.65 / 0.58, 0.00, 0.00, 0.00, 0.00 (Qwen / Mistral where they differ);
+- τ = 0.3: 0.90 / 0.85, 0.05 / 0.03, 0.00, 0.00, 0.00, 0.00, 0.00.
+The criterion therefore accepts imbalances up to about 0.9 and rejects 0.8 and beyond; per-story edit noise of 30 % costs
+10–15 % power at c = 1. The design's power check of the old rule (`power_c.py`) gave P(met) 1.00 at a 0.15 share
+under-read, which the new rule rejects.
+
+#### Seen before finalisation
+
+No output of any study model above 0.5B parameters on E, H, TSET or THOLD under the stage-8 code has been seen. The
+design and critique pilots (CPU, FP32; scripts and logs kept with the stage-8 build notes, `partC/` and
+`critic_intervention/`):
+- **Pilot A, Qwen2.5-1.5B-Instruct, 4 stories (seed 101), NONE and LETTER, blocks 1 / 5 / 9 / 13** (`pilot_c.py`,
+  `pilotA.json`, `pilotA_summary.txt`; planned for 8 stories, stopped at 4 after about 14 min). E1 (20 held-out cores,
+  seed 202) and E2 (12 neutral sentences) at α = 1: φ under NONE 1.00–1.02 and 0.97–1.02 at every block; under LETTER
+  0.91–1.04 while the natural effect is ≥ 2 nats (blocks ≤ 9). ν_KV of E1 0.04 / 0.16 / 0.26 / 0.33, of E2
+  0.12 / 0.32 / 0.62 / 0.70; residual cosine of E1 0.997 / 0.987 / 0.969 / 0.961 and of E2 0.968 / 0.916 / 0.839 / 0.803;
+  ν_T 1.7e-6. Natural LETTER effect 7.2 / 2.2 / 0.35 nats at blocks 5 / 9 / 13. R: no flip, non-specific shift of m_SB up to
+  1.5 nats. BIND-p: Φ ≤ 0.6 nats.
+- **Pilot B at 1.5B**: no data (killed twice by the memory limit; the first kill came from a clamp forward outside
+  no_grad, the reason for the no_grad guard).
+- **Pilot B, Qwen2.5-0.5B-Instruct, 6 stories, LETTER / P1 / NONE, blocks 1 and 9** (`pilotB05.json`,
+  `pilotB05_summary.txt`; about 9 min): key-only / value-only rows of each edit's own K/V from l + 1; exactness 0.0. κ
+  (T / E1 / E2): LETTER onset 2 0.77 / 0.77 / 0.78; P1 onset 2 0.24 / 0.23 / 0.23; P1 onset 10 0.09 / 0.07 / 0.06; NONE
+  0.01 at both onsets. LETTER at onset 10 not evaluable (0.26 nats). Story-level D ≤ 0.022 wherever the effect is ≥ 1.6
+  nats (0.19 / 0.29 under LETTER at onset 10). BIND-p Φ ≤ 0.07 nats.
+- **Smoke and memory runs**: `smoke.json` (Qwen2.5-1.5B, one story, NONE, block 1, the stage-A rows) and `memtest.json`
+  (Qwen2.5-0.5B, one story, NONE, blocks 1 and 9, the stage-B rows; its log shows the clamp forward outside no_grad that
+  the guard now prevents).
+- **Tokenizer and Hub checks** (design): 138 of 400 cores of make_cores(400, Random(8101)) met the π constraints with
+  single-position differences in Qwen2.5-7B, Mistral-7B, Llama-3.1-8B and Gemma-2-9B; the 12 pilot sentences were clean;
+  the dictionary repository's file listing (`andyrdt_tree.json`).
+- **Power of the old rule** (`power_c.py`, stage-1 rows): P(JC3 met) 1.00 under the law and under a 0.15 under-read, 0.01–
+  0.04 under a 0.25 under-read, 0.00 under copy-only and key-flat.
+- **The critic's κ compression** (`kappa_compress.py`, stage-1 summaries): at c_K / c_V = 2 or 0.5 the old rule passes
+  (MAD 0.077–0.081, maximum 0.139–0.172), Pearson r ≈ 0.99; JC2's crossover ≥ 0.82 for c between 1/3 and 3.
+- **The critic's non-lexical pilot** (`pilot_nonlex.py`, `pilot_nonlex_summary.txt`; Qwen2.5-1.5B, 2 of 4 planned stories,
+  blocks 9 / 13 / 17, NONE / P1 / LETTER; about 14 min): natural ID 10.45 / 10.24 / 10.17 (NONE), 6.13 / 4.87 / 3.91 (P1),
+  2.10 / 0.39 / 0.06 (LETTER). φ under NONE: E2 0.99 / 1.01 / 1.01; SYN 0.08 / 0.06 / 0.06; FR 0.39 / 0.36 / 0.34; E1
+  1.01 / 1.02 / 1.02; NONLEX(E1) 0.13 / 0.12 / 0.11; flips 0 for SYN, FR and NONLEX(E1). Transfer φ(LETTER)/φ(NONE) at block
+  9: E2 0.94, FR 0.05, E1 1.11, NONLEX(E1) 1.04. Residual cosines with the natural displacement: E2 0.83–0.84, SYN 0.16–0.18,
+  FR 0.38–0.42, E1 0.95–0.97, NONLEX(E1) 0.46–0.48 (norm 0.46–0.48×).
+- **In-hand results used for the priors and the feasibility table**: stage 1's per-story rows (above); stage 6's head
+  rankings (fixed sets of J-C-READ) and its Prakash outputs (the BIND sweep, ID@28, the s_ID onset sweep, the κ anchors);
+  stage 2's 24B onsets.
+- **Build checks** (this part's code; tokenizers, Hub metadata, and Qwen2.5-0.5B only):
+  - every E core (all formats, also π(S), π(X)) and every H core passes the single-position and shared-prefix rules in the
+    Qwen2.5-7B, Mistral-7B, Llama-3.1-8B (verified mirror files in the local cache) and Yi-1.5-9B tokenizers; p = 55, 54, 77,
+    57; P1 prompts 103 / 106 / 125 / 116 tokens; trie nodes of the E form set 37 / 116 / 37 / 97;
+  - the 24 sentences are clean for all four form families (EN, FR, DE, SYN) in Qwen2.5-0.5B / 7B / 14B, Mistral-7B and
+    Llama-3.1-8B (24 / 24 each); French and German forms are 2–4 tokens;
+  - the Hub metadata of the dictionaries at c37e53c4… (the sha256 of 3 files × 4 layers, the configs, the published FVE)
+    and the pickle header of layer 3's ae.pt (a 128 KB range request: the key names and shapes above);
+  - Prakash et al.'s material locates in the Qwen2.5-7B and Llama-3.1-8B tokenizers (lengths 180 / 186 / 196 / 203 and
+    181 / 187 / 197 / 204; state words at 154, 166 and 155, 167);
+  - the in-hand numbers of the feasibility table and the power table above;
+  - the T control's table floor (`bf16_nuT.py`, Qwen2.5-0.5B on the CPU, the first three E stories, depths 3 / 7 / 11 /
+    15): ν_T < 1e-5 at every depth in FP32 and in BF16 (the natural tables from a 5-row prefix batch, T's from a 66-row
+    batch); FP32 table differences ≤ 1.5e-5 at |K| up to 217;
+  - plumbing runs of every stage at Qwen2.5-0.5B (FP32, CPU, l = 7 only), on the first two E stories, the first two H_cal
+    cores, 20 TSET / 4 THOLD pairs and the first two Prakash pool pairs (all seen): no frame admitted; E5 φ on H_cal with
+    α = 1 / 2: FR 0.15 / 0.09, DE −0.06 / −0.09, SYN 0.14 / 0.10, NL 0.11 / 0.20; a random dictionary (d × 1024) flips
+    ≤ 0.25 at every k_F; the two E4 fits (20 pairs) flip 0.00 / 0.25 of THOLD. At l = 7 only the P1 and POST cells pass
+    J-C-G4 (LETTER ID_KV 0.52 nats; NONE coverage 0.77); σ(P1, 7) +0.05, σ(POST, 7) −0.07; κ under P1 / POST: E1 +0.03 /
+    −0.08, E2 +0.02 / −0.07, E3 −0.01 / +0.01, E4 (seed 101) −0.17 / +0.02; ν: E1 0.19, E2 0.32, E3 0.92, E4 0.91 / 0.78;
+    residual cosines E1 0.96, E2 0.86, E3 0.37, E4 0.56 / 0.55; D under P1: E1 0.15, E2 0.06, E3 0.46, E4 0.98; O1
+    predicted against observed ψ_K(P1): E1 0.97 / 0.63, E2 0.89 / 0.45, E3 0.62 / −0.08, E4 0.56 / −0.27; the π(t)
+    diagnostic +0.28 [+0.07, +0.50]; J-C-G2 0.45 (not met at 0.5B); readers at a pseudo-random head set: ID_K^nat(P1, all)
+    0.20 nats; greedy flips under NONE: natural 0.75, E1 0.50, E2 0.75, the others 0.00; the screen at 0.5B: BIND IIA 0.00
+    at every swept block (Φ ≤ 4.6 nats), s_ID(OPTIONS-AFTER) 0.37 / 0.36 / 0.27 / −0.02 at onsets 0 / 3 / 5 / 8; J-C6's
+    code at block 12 of 0.5B: CAA κ +0.01 / −0.08 (NO-MENTION / OPTIONS-AFTER), BIND κ +1.02 / +0.76, ν(CAA, ID) 0.18,
+    Gate b0 ≤ 1.2e-5;
+  - TEST_MODE plumbing runs at Qwen2.5-0.5B (FP32, CPU, two E stories, one depth l = 7, H_fit 3, H_cal 2, 4 sentences, a
+    random dictionary). The final run, on commit 84e4f05, whose code is the finalised code: pytest 95 passed (26 min;
+    J-C-G0 MET, with the decoder, cross-part population and Holm tests); release, preflight, calib, dasfit and eval in a
+    first session that this environment's three-hour limit stopped during the readers step; a second session (TESTS=0)
+    kept those steps and ran readers, overlap, explore, J-C6 and the score, exit 0, no step failed or skipped; the score
+    read "provenance OK; population OK; J-C-G0 MET" with HEADLINE outcome (f) (plumbing). An earlier whole-script run (`TEST_MODE=1 bash scripts/gpu_stage8c.sh`, 2026-10-10, one
+    session in a fresh OUT, 58 min on 2 CPU threads) ended with exit 0 and no step FAILED: release and pool hashes OK;
+    pytest 70 passed, 0 skipped (24 min); preflight, calib (the calibration file's sha256 792256ad… identical to the
+    earlier plumbing runs), dasfit, eval (2 stories, 8 min each), readers, overlap, explore, J-C6 and score all ran; the
+    scorer: provenance OK, population OK, J-C-G0 MET, J-C-G1 MET (2 cells), J-C-G2 NOT MET (σ(LETTER, 7) − σ(NONE, 7)
+    +0.45 [+0.29, +0.50]; TEST_MODE uses l = 7 for l = 3), J-C-G8 NOT MET (no λ statistic at 0.5B), J-C-G3 NOT MET (random
+    dictionary), every line NOT EVALUABLE, HEADLINE outcome (f); its PREDICTIONS and later sections are identical to the
+    previous whole-script run's. Calibration on H at 0.5B (seen):
+    no frame admitted; E5 φ on H_cal at l = 7 with α = 1 / 2: FR 0.15 / 0.09, DE −0.06 / −0.09, SYN 0.14 / 0.10, NL
+    0.11 / 0.20; the random dictionary's flip rate ≤ 0.25 at every k_F;
+  - the unit tests (J-C-G0), each file alone on 2 CPU threads: `tests/test_stage8_edits.py` 14 passed in 314 s (the
+    longest, the scored rows against the reference, 188 s), `tests/test_sae.py` 7 passed in 0.1 s,
+    `tests/test_stage8c_score.py` 12 passed in 41 s; with the shared files of the pytest step (surface 13, clamp 5,
+    head_splice 7, prakash 12), 70 passed and none skipped. The review then added one test to `tests/test_stage8_edits.py`
+    (`test_T_tables_bitwise_through_the_eval_passes`) and two to `tests/test_stage8c_score.py` (the Holm family and
+    verdicts; outcome (b) read only from evaluable models): 15, 7 and 14 tests, 73 in the pytest step;
+    `tests/test_stage8c_score.py` alone: 14 passed in 50 s on one CPU thread. The audit of the entry against the code
+    then changed the scorer and the pytest step (E3 counts in J-C-READb only when layer 7 passes J-C-G3; BIND's usability
+    decides J-C6's evaluability; a line over combos or models is NOT MET on any evaluable failure; no line is computed and
+    no outcome named without a passing J-C-G0; `tests/test_generate.py`, `tests/test_stage8_populations.py` and
+    `tests/test_stage8_holm.py` added to the step and to J-C-G0) and added five tests to `tests/test_stage8c_score.py`
+    (each fails on the code before the change): 19 passed in 50 s on 2 CPU threads; the three shared files 17 passed in
+    25 s; 95 tests in the pytest step. Re-scoring the TEST_MODE archive above with the changed scorer (`--test`) exits 0
+    with provenance OK and population OK; its pytest log is the 73-test step from before the audit, so J-C-G0 is NOT MET
+    there (the three shared files have no test in it), every line is NOT EVALUABLE as before and the HEADLINE reads
+    "J-C-G0 not passed: no outcome".
+- **Review checks** (CPU; Qwen2.5-0.5B FP32 / BF16 and the study tokenizers; no study model above 0.5B run):
+  - the BF16 floor of the tables: the natural tables of the first three E stories in one BF16 prefix pass against the
+    same pass in FP32 differ by a pooled ν of 0.020 / 0.019 / 0.017 / 0.015 at l = 3 / 7 / 11 / 15 (the natural
+    displacement is 0.20 / 0.19 / 0.60 / 0.69 of |[K;V]_B| there), so a T computed in a forward of another shape would sit
+    at J-C-G1's bound ν_T ≤ 0.02; in FP32 one 66-row edit forward differs from the 5-row natural pass by up to 7.7e-6 and
+    five-row forwards reproduce it bitwise, hence the edit passes in the natural pass's shape (test
+    `test_T_tables_bitwise_through_the_eval_passes`);
+  - the synthetic rows of J-C-G8 in the TEST run's eval file (0.5B, l = 7, two stories): ψ_K(SK50) 0.08 / 0.41 and
+    ψ_V(SV50) 0.40 / 0.47 in P1 / POST (a half-interpolated key is read sub-linearly);
+  - the feasibility refinement above (stage 1's Mistral-7B margins, stage 6's reader ranking);
+  - the 24 sentences clean for EN, FR, DE and SYN (24 / 24 each) and the DAS forms single-token in the Mistral-7B,
+    Llama-3.1-8B, Qwen2.5-7B and Yi-1.5-9B tokenizers; the E population's 136 draws and 24 clusters.
+
+#### Compute (A100-80GB, BF16)
+
+From stage 3b's 24 s per 150-item arm at 16 rows per item (about 0.010 s per 120-token row at 7B) scaled by the prompt
+plus trie length (about 140 tokens at Qwen2.5-7B and Llama-3.1-8B, 220 at Mistral-7B):
+
+| Step | Minutes |
+|---|---|
+| release, pytest (J-C-G0, CPU; 95 tests: 24–34 min on 2 shared CPU threads in the build environment for the 73 of the build, about 1 min more for the 22 added in the audit) | 20 |
+| qwen7: fetch, preflight, calib (incl. 4 × 3.76 GB dictionaries), dasfit (8 fits × 1,000 steps), eval (80 × 1,976 rows), readers | 80 |
+| mistral7: the same without E3 (eval 80 × 1,768 rows at 220 tokens) | 62 |
+| llama8: no dasfit, no readers (eval 80 × 1,352 rows) | 42 |
+| overlap screens (qwen7, llama8) | 2 × 15 |
+| jc6 (qwen14: filter, 3,910 mean passes, 150 × 3 formats × 3 arms) | 25 |
+| explore (three models) | 3 × 8 |
+| score, manifest, archive | 5 |
+| core total (release, pytest, the three models, score) | 209 (about 3.5 h) |
+| with the screens, J-C6 and the exploratory steps | 288 (about 4.8 h) |
+
+The default deadline is DEADLINE_H = 5.0 h, which holds every step in one session with about 12 minutes to spare. A
+model's reserve is the core minutes of the models after it (80 / 62 / 42 for Qwen2.5-7B / Mistral-7B / Llama-3.1-8B, 48
+for Yi-1.5-9B) plus 10. Every eval step reserves that plus 8 for its own readers step at Qwen2.5-7B and Mistral-7B, and
+stops between stories when the time left minus its reserve falls below 1.2 times its running time per story (exit 3;
+the next session resumes from the stories done). An overlap screen runs only if 15 minutes plus the model's reserve
+remain, an exploratory step only if 8 + 25 minutes (its own and J-C6's) plus the model's reserve remain, J-C6 only if 25
+minutes remain; so a slower host loses the exploratory steps first, then J-C6, then the overlap screens, and a second
+session (same OUT) runs what was dropped. Disk: ≥ 80 GB (two models and the four
+dictionaries). At about $2 per A100-hour, $7–10.
+
+#### Commands
+
+```bash
+J=$(git log --format=%H -1 --grep='^Finalise preregistration J$') && [ -n "$J" ] && git checkout "$J"
+bash scripts/gpu_stage8c.sh                    # HF_TOKEN optional; PRAKASH_REPO=<checkout of the release at 0579347> optional
+TEST_MODE=1 bash scripts/gpu_stage8c.sh        # CPU plumbing run at Qwen2.5-0.5B (FP32, n = 2, l = 7): every step of qwen7,
+                                               # the screen and J-C6 (TEST_ALL=1: mistral7 and llama8 too)
+python analysis/stage8c_score.py --results results/gpu_stage8c    # re-score an archive
+```
+
+### Part D. What the reader heads write, the sign of the key read, and the 1.5B / 3B route
+
+**Code.** `ckeys/flag.py` (the o_proj hooks OCap and Inject, the head decomposition, the flag algebra and its controls),
+`ckeys/questions.py` (the question arms Q_IN and Q_OUT, registered with `ckeys.encoding.register_arm`; the chat-wrapped
+in-sentence IOI arm INLINE_CHAT; the IOI row layout), `experiments/stage8_flag.py` (stages preflight, sets, fit, inject,
+ablate, bind, sign, diss, before, xtask), `analysis/stage8d_score.py` with `analysis/stage8d_parts/` (`stats.py`,
+`lines.py`), `scripts/gpu_stage8d.sh` (it sources `scripts/stage8_common.sh`). Tests: `tests/test_flag.py` and
+`tests/test_questions.py` (Gate J-D-G0), `tests/test_stage8d_score.py` (the scorer on synthetic inputs). Shared code used
+unchanged: `ckeys/headsplice.py` (HeadSplice, HopSplice), `ckeys/clamp.py`, `ckeys/interventions.py`, `ckeys/encoding.py`,
+`ckeys/story.py`, `ckeys/ioi.py`, `ckeys/knockout.py`, `ckeys/surface.py`, `ckeys/tasks.py`,
+`experiments/format_factorial.py` (`run_item`), `experiments/ioi_factorial.py` (`run_item`), `experiments/stage6_heads.py`
+(`Stage6.base_runs`, `configure_hop`), `experiments/row_restricted_keys.py` (`run`, RowSplice). No shared module was
+changed.
+
+**Purpose.** Part D answers the novelty objection ("QK/OV plus duplicate-token heads already imply it") and the sign
+questions of the reviews.
+- *What the readers write.* Hop 1 is a duplicate-token match: a later copy of a candidate word attends to the writing token
+  p. The account under test is that the matching heads H* write a flag into the matched word's own row, one vector per
+  layer, the same in every story, and identity-free (an address, not content). The answer then finds the flagged row by
+  key (hop 2) and outputs that row's own token. Part D tests sufficiency (J-D1), specificity against structured controls
+  (J-D2), necessity (J-D3), the hop-2 route (J-D4), identity-freeness (J-D-ADDR, J-D-KN) and whether the flag of an
+  initial-state sentence carries its binding (J-D5).
+- *The circularity of the a3 ranking.* H* was ranked by the attention change under the same key clamp. The injection and
+  ablation tests use no key clamp at evaluation, and the flag is fit on the ranking set R and evaluated on fresh stories.
+- *The sign of the key read.* The critique showed that under the "not mentioned" question Q_OUT the value read flips sign
+  too (1.5B pilot: ID_K −5.13, ID_V −8.24), so Q_OUT shows task semantics, not a polarity of the readers. The sign block
+  is therefore built around channel dissociation: in Q_OUT both channels are negative (J-D-SIGN-Q); in IOI's in-sentence
+  re-mention (INLINE) the key read is negative while the value read is positive (J-D-SIGN-IOI). The same frozen H* must
+  carry the negative IOI read (J-D8-IOI); the negative read must be applied at the answer row's key read of the listed
+  names (J-D-ROUTE-IOI); and the hop-2 heads that carry the flag's effect in belief lists must also carry it in Q_OUT and
+  IOI (J-D-HOP2).
+- *The 1.5B / 3B dissociation* ("attention present without the read"). J-D6 tests whether the flag written at the
+  sentence rows mediates the natural ratio of the sentence read to the list read at 1.5B, 3B and 7B; J-D6-ROUTE tests the
+  consequence of stage 5's G4 (at 1.5B hop-2 attention does not follow the key, d(ans → r_S) +0.015): a negative effect of
+  the injected flag must then be read by value.
+
+**What Part D does not claim (D-1, replacing the design's headline).** "Re-mentions of the clamped candidates after p
+open a large key read whose sign is set downstream. Without them, smaller reads of either sign occur (IOI BEFORE −2.0 /
+−3.8 nats at Qwen2.5-7B / 14B; LIST-BEFORE ≤ 0 in 9 of 10 models, about −2.0 at 72B). Part D does not explain these." The
+design's sentence "existence is decided by later mentions; sign by the reader" and its claim that LIST-BEFORE is about 0
+at 7B are withdrawn. IOI BEFORE at Qwen2.5-7B is tested exploratorily with a stated two-sided rule (Exploratory, E-BEFORE).
+
+#### Populations
+
+Belief cores are compared by their full tuple (agent, other, object, distractor, initial, distractor_location, base,
+source); U is the common part's union of make_cores(1000, Random(s)), s = 0–3 (sha256 abd1f053…). EXCL is the union of
+make_cores(1000, Random(s)) for the pilot seeds 7, 8, 9, 99, 101, 202, 20261011 and Part B's seeds 20261013 and 20261014,
+and of make_cores(3000, Random(s)) for Part C's seeds 8101–8104. Each is a superset of every population drawn from that
+seed, so a core outside EXCL is outside every other stage-8 population. A stream is make_cores(1, rng) drawn repeatedly
+from one Random(seed) (the same cores as one make_cores(n, rng) call); a stream population takes the first cores that are
+not excluded, not repeated, and satisfy its condition. Hashes are sha256(json.dumps([[*tuple] for each core in order])),
+with the belief tuple above, the IOI tuple (template, pattern, place, object, io_b, io_s, io_x, subj, order) and the task
+tuple (agent, object, distractor, initial, distractor_location, base, source), pinned in
+`experiments/stage8_flag.POP_SHA` and asserted by the preflight and the tests.
+
+| Population | Rule | Size | sha256 |
+|---|---|---|---|
+| R (fit) | make_cores(60, Random(0)): stage 6's ranking set. In U by design: the flags are fit in sample, where H* was ranked | 60 | 9036af1a838a12d58a7a7eb40f70dd800dd659bfd6e95ed1ab5a2ce10862f936 |
+| R' | the cores of R with distractor_location ≠ initial (the initial-state flags) | 45 | fe348ba40a19182a67cee382a3533c1af009273acb740c01d418662a570122a2 |
+| E8 (evaluation) | Random(81) stream, not in U ∪ EXCL | 100 (110 draws) | 2c198705c595d8068467a188d46e5c22793e079f837ba39bc1e0b43fb14b0f13 |
+| A (ablation) | the first 60 cores of E8; Qwen2.5-3B's dissociation uses the same 60 | 60 | (prefix of E8) |
+| BIND (J-D5) | Random(84) stream with distractor_location ≠ initial, not in U ∪ EXCL ∪ E8 | 100 (140 draws; 43 object-first, 57 distractor-first) | 495c14620cd22e38af0ac67c376441442c40264996db98872d2bae4009a7ee92 |
+| F_ioi candidates | `ckeys.ioi.make_cores(90, Random(82))`; F_ioi = the first 60 valid in INLINE for the model's tokenizer | 90 → 60 | d41e791a42cc3a833b32220c54f6aa5b129bfda79e904fb8bf5c382ebf0f8b9a |
+| E_ioi candidates | `ckeys.ioi.make_cores(150, Random(83))`; E_ioi = the first 100 valid in every IOI arm the model runs (INLINE, INLINE_CHAT; Qwen2.5-7B also AFTER, BEFORE) | 150 → 100 | 2b165365fc60e69af9bbe0d943bb9ea7fc30ec65a2747cd6f04630e58ddd0334 |
+| XFIT paint / schedule (exploratory) | Task.make_cores(1, rng) stream of Random(85) not in Task.make_cores(1000, Random(s)), s = 0–3 | 60 each | 9b9a320f… / 4a56ae02… |
+| XEVAL paint / schedule (exploratory) | the same with Random(86), also not in XFIT | 40 each | be234aaf… / 8b4c7c05… |
+
+- X = `story.pick_x(core)` (absent from the story and ≠ B, S). The K_N event word of a core is
+  N_WORDS[int(h[:8], 16) mod 6], h the hex sha256 of json.dumps(core, sort_keys=True), N_WORDS = (garage, kitchen,
+  pocket, desk, hallway, porch): one token after a
+  space in the Qwen2.5 and Mistral-7B-v0.3 tokenizers, not a candidate (checked). I' = the location absent from
+  {init, dloc, B, S, X} (exactly one exists when dloc ≠ init). The order stratum of a core is "object-first" when the
+  queried object's name sorts before the distractor's (`ckeys/story.py` sorts the two initial-state sentences by object
+  name), else "distractor-first".
+- Validity (IOI): `encode_runs` not None (B, S, X differ only at p), `check_occurrences`, the four listed names found in the
+  row groups of `ckeys.ioi.RowTask`. With the Qwen2.5 and the Mistral-7B-v0.3 tokenizers no candidate is skipped (F_ioi =
+  the first 60, E_ioi = the first 100); the per-model indices are recorded by the preflight and every IOI file.
+- Disjointness (asserted): E8 and BIND are disjoint from U, EXCL and each other, and from the critics' pilot cores
+  (Random(0) indices 16–46, inside U; Random(7); Random(9)); the IOI candidate lists are disjoint from each other and from
+  `ckeys.ioi.make_cores(1000, Random(s))` for s = 0, 1, 5, 6 (stage 5 and the pilots); the task lists from each other and
+  from stage 3's seeds. The test also checks E8 and BIND against Part B's F, C and Part C's E, H, TSET, THOLD themselves
+  when their modules are importable. No pilot drew from seeds 81–86.
+- In TEST_MODE every population is cut to its first 2 cores.
+
+#### Models and sourcing
+
+- **Qwen2.5-7B-Instruct (`qwen7`) and Mistral-7B-Instruct-v0.3 (`mistral7`)**: every line except the dissociation lines
+  J-D6a, J-D6 and J-D6-ROUTE. **Qwen2.5-1.5B-Instruct (`qwen1.5`), Qwen2.5-3B-Instruct (`qwen3b`) and Qwen2.5-7B**: J-D6a
+  and J-D6 (Mistral-7B runs no dissociation step). J-D6-ROUTE is scored at Qwen2.5-1.5B only. Files and revisions as in
+  the common part (`scripts/stage8_models.json`, `scripts/fetch_verified.py`; no token needed). Part D uses no fresh
+  family, so the fallback rule G2 does not apply: a model whose files are refused leaves its lines NOT EVALUABLE.
+- BF16, transformers 5.18.0, `use_cache=False` in every pass, sdpa attention except the ranking passes of `sets` (eager).
+- **The reader set H\*.** At 7B, frozen from `results/gpu_stage6/heads/<model>.json` (committed): `arms.P1.rankings.a3[:k*]`
+  with k* = 40 (Qwen2.5-7B, 18 layers) and 52 (Mistral-7B, 19 layers); the random sets are the first k* heads of the three
+  stored permutations; the active-at-G set is `sets.active_kstar`. The file sha256 (ed828a9b… / 88ababd9…), the revision
+  and k* recorded there, and the canonical hash of {H, rand, active, k*} (dea841d0… / 55a1b17b…) are asserted. At 1.5B and
+  3B, H* is ranked here with stage 6's code: `Stage6.base_runs` phase 1 (eager) on R under OPTIONS-AFTER (P1), a3 averaged
+  over R, k* = ceil(0.05 × the number of heads, layers × heads per layer) = 17 (1.5B, 28 × 12) and 29 (3B, 36 × 16), the
+  random sets from numpy default_rng(2) as stage 6, the
+  active-at-G set as stage 6 (top k* by mean o_proj-input norm at G outside the top 2k* by a3). L* = the layers holding an
+  H* head.
+- **The hop-2 ranking** (J-D-HOP2, both 7B models; eager, on R under P1): hop(l, h) = ½[(A^{K_S} − A^B)[END, r_S] +
+  (A^B − A^{K_S})[END, r_B]], the attention change from the answer position to the option rows of S and B under the key
+  clamp K_S, averaged over R; the top 10 heads; a control set of 10 random heads (numpy default_rng(15)). The same passes
+  give an in-run a3 whose top-k* overlap with the stored H* is reported.
+
+#### Prompts, rows and the flag
+
+- **Formats.** OPTIONS-AFTER (P1) and SENTENCE-AFTER (POST) as in the paper (`ckeys.encoding.raw_prompt`); Q_IN and Q_OUT
+  are P1 with the question line replaced by "Which of the choices is mentioned in the story?" / "… is not mentioned in the
+  story?"; every belief prompt is chat-wrapped (`chat_text`, the "Answer:" prefill). IOI (`ckeys/ioi.py`): INLINE (raw;
+  the four names as a spaced parenthetical after the IO mention), INLINE_CHAT (the same sentence inside AFTER's chat
+  wrapper and instruction: HEAD + "\n\nSentence: " + inline sentence + "\n" + INSTR + "\nAnswer:"), AFTER and BEFORE
+  (chat). BOS iff the tokenizer has one.
+- **Rows.** p = the writing token (the one position where the B and S runs differ). G = the six option rows (the location
+  words of the "Choices:" list, or of the room sentence under POST), in canonical order, all after p; r_w = the row of word
+  w. IOI: the four listed names (`RowTask.groups(...)["options"]`), r_{IO_B}, r_{IO_S}, r_{IO_X} named by token.
+- **Clamps.** The natural key clamp K_W (the stage-6 clamp): the pre-RoPE k_proj output at p, every layer, set to that of
+  the run in which W is written. Used for every flag fit. In the scored clamp rows (K_S, K_X, K_N, V_S, V_X), a key row
+  holds p's value at the base run's and a value row holds p's key at the base run's, every layer (as
+  `format_factorial.run_item`); Gate J-D-G0 checks these rows against `run_item`. The HeadSplice rows (transfer and
+  gate batches) swap only the key, as in stage 6, so their all-heads all-rows row equals the key-only natural clamp.
+- **The flag.** With z^B and z^K the o_proj inputs (concatenated head outputs) of the clean base run and of the run under
+  K_S, and W_O^{l,h} the o_proj columns of head h (no bias in either model):
+  δ_l(s) = ½ Σ_{h∈H*_l} W_O^{l,h} ([z^K_h(r_S) − z^B_h(r_S)] + [z^B_h(r_B) − z^K_h(r_B)]), Δ_l = mean_{s∈R} δ_l(s), l ∈ L*.
+  The fit batch per story is [B, B + K_S, S] (one forward). The same formula gives: Δ^KV (the natural S run instead of
+  K_S); the leave-one-word-out flags Δ^{−w} (the stories of R with B ≠ w and S ≠ w; 36–46 stories each); Δ^act (the
+  active-at-G heads instead of H*, at their own layers, rescaled by one factor to the total squared norm of Δ); Δ^POST
+  (POST rows on R); at 7B only, on R', Δ^init (the key at p_init from the run whose initial location is I'; rows r_I' and
+  r_init) and Δ^dloc (the key at p_dloc from the run whose distractor location is I'; rows r_I' and r_dloc), and on F_ioi
+  (INLINE) Δ^IOI (rows r_{IO_S}, r_{IO_B}). Δ, every other flag and every control (with the ablation directions and their
+  means μ) are saved in `fit/<tag>.pt`, whose sha256 every later file that uses them records; the per-story flags are not
+  saved (their summaries are in `fit/<tag>.json`).
+- **Injection** I(spec): add the listed vectors to the o_proj output y_l at the listed rows, every l of the vector's
+  layers, in the clean base run, with no key clamp; computed in FP32 inside the hook and cast back. "move(v, w)" = +v at
+  r_w and −v at r_B.
+- **Directional ablation** A(u, μ) at rows Rset: y_l[r] ← y_l[r] − (⟨y_l[r], u_l⟩ − μ_l) u_l for l ∈ L*, r ∈ Rset, in FP32;
+  μ_l = the mean over R and the absent-word option rows (words not in {B, init, dloc}) of ⟨y_l[r], u_l⟩ in the clean run.
+  Applied in every pass of `format_factorial.run_item` (its three clean passes and its 13-row batch), as stage 6's H3.
+- **Controls.** Isotropic directions (3 draws, torch seed 11) and head-span vectors Σ_{h∈H*_l} W_O^{l,h} z, z ~ N(0, I)
+  (3 draws, seed 12), each norm-matched to |Δ_l|; the layer-permuted flag (a fixed derangement of L*, random.Random(13),
+  rescaled); the story's own write δ(s) with its component along Δ̂_l removed, norm-matched (orth); the mean clean-run H*
+  output at the six option rows over R, as a unit direction, norm-matched (meanH); the active-set flag Δ^act; the top
+  principal direction of the clean attention output y_l at the option rows over R (pc1); three isotropic unit directions
+  for the ablation (seed 14).
+
+**Batches** (the rows each stage stores; candidate log-probabilities over the full vocabulary, at the last position):
+- *inject* (E8, P1; one forward of 29 rows): none, none2 (Gate J-D-G2), K_S, K_X, K_N (the key of the run whose event word
+  is the core's N word), add 0.5Δ / 1Δ / 2Δ at r_X, move(Δ, X), move(Δ, S), −Δ at r_B, move(Δ^{−S}, S), move(Δ^{−X}, X),
+  move(Δ^KV, S), move(Δ^KV, X), move with iso0–2, head-span 0–2, the layer-permuted flag, orth, meanH, Δ^act and the
+  story's own write, +Δ at the first row of the "Choices:" line and at the "Question" row, +Δ^POST at r_X. Then a capture
+  pass [none, move(Δ, X)] of the K and V at G and the hop-2 route batch (HopSplice over G, two passes in every layer)
+  [none, move, move + ans_K, move + ans_V, move + ans_KV, move + other_KV]: in ans_C only the answer row reads the clean
+  run's C at G; in other_KV every row but the answer reads the clean K and V at G.
+- *ablate* (A, P1): `run_item` under no ablation, A(Δ̂), A(pc1), A(meanH), A(iso0–2) at the six option rows; exploratory
+  (skipped when the deadline has passed before the step starts): A(Δ̂) at r_init and r_dloc only, and at r_B only.
+- *bind* (BIND, P1, queries direct (answer B), other_agent (answer init), irrelevant_object (answer dloc)): [none,
+  +ev, +init, +dloc, +iso, K_X], with ev = Δ^P1, init = Δ^init, dloc = Δ^dloc and iso = iso0 each rescaled per layer to the
+  mean of the three flags' norms, added at r_X.
+- *sign*, E8 in Q_IN and Q_OUT: `format_factorial.run_item` (ID_K, ID_V, the clean argmax and mass); the transfer batch
+  (HeadSplice, 24 rows: for K_S and for K_X, the sets ∅, H*, rand0–2 at G; every head at G (allG); every head but H* at G
+  (koH) and but rand0–2 (korand0–2); every head at the rows of B, S and X only (allGc); every head at every row (allT));
+  [none, none2, K_S, K_X, V_S, V_X, +Δ at r_X, iso0–2 at r_X]; and the hop-2 batch [none, inj, inj + top-10, inj + rand-10,
+  inj + every head], inj = +Δ at r_X, in which the listed heads at the answer row read the clean run's keys at G
+  (HeadSplice with the span G). P1 on E8: the hop-2 batch. E_ioi in INLINE: `ioi_factorial.run_item` with
+  `ckeys.ioi.identity_measures` (ID_K, ID_V; Gate e); the transfer batch at the listed names (Gc = the rows of IO_B, IO_S,
+  IO_X); [none, none2, K_S, K_X, +Δ^IOI at r_{IO_X}, move(Δ^IOI, IO_X), +Δ^P1 at r_{IO_X}, iso]; the IOI route batch
+  (HopSplice over the listed names; capture pass [none, K_S, inj]) [none, K_S, K_S + ans_K, K_S + ans_V, K_S + ans_KV,
+  K_S + other_KV, inj, inj + ans_K, inj + ans_V, inj + ans_KV, inj + other_KV], inj = +Δ^IOI at r_{IO_S} and −Δ^IOI at
+  r_{IO_B} (as K_S writes it); the hop-2 batch with inj = +Δ^IOI at r_{IO_X}. INLINE_CHAT (both models) and AFTER (Qwen2.5-7B
+  only; Mistral-7B failed stage 5's Gate e there): `run_item` and the transfer batch.
+- *diss* (qwen1.5, qwen3b, qwen7; E8, n = 100, 60 at 3B; P1 and POST): per format a pass [B, S, X] (case-marginalised
+  clean scores, keys and values at p), the write pass [B, B + K_S] (δ^f(s) at r_S, r_B), the batch [none, none2,
+  +Δ^P1 at r_X, +Δ^POST at r_X, iso0 at r_X, K_X, K_S]; under POST a capture pass [none, inj] of the K and V at G and the
+  route batch [none, inj, inj + ans_K, inj + ans_V, inj + ans_KV], inj = +Δ^P1 at r_X (HopSplice; the answer row and its
+  trie nodes read pass B); at 1.5B and 3B under P1 the gate batch (HeadSplice [∅, H*, allG] × {K_S, K_X}). Scores: the
+  case-marginalised log-probability of each location w, log Σ_f p(f) over the forms " w", " W", "w", "W"
+  (`ckeys.surface.FormSet` with frames " " and "", exact for multi-token forms through the trie; 5 nodes in the Qwen
+  tokenizer).
+
+#### Measures
+
+Six-way renormalised log-probabilities ℓ_w = log p(w) − log Σ_{c∈C} p(c) over the six candidates (lower-case list forms in
+the list formats; the case-marginalised scores in *diss*); four-way over IO_B, IO_S, IO_X and the subject in IOI.
+Δℓ_w(row) = ℓ_w(row) − ℓ_w(none) in the same batch; c = ℓ_S − ℓ_X (the normalisation cancels).
+- N_X = mean Δℓ_X(K_X); ι(row) = mean Δℓ_X(row) / N_X; π_X(row) = the fraction of stories whose argmax over C is X.
+- ID_K (in-batch) = ½[c(K_S) − c(K_X)]; ID_inj(v) = ½[c(move(v, S)) − c(move(v, X))]; ID_inj^LOO uses Δ^{−S} in the
+  S row and Δ^{−X} in the X row.
+- r_ans^inj(C) = 1 − mean Δℓ_X(move + ans_C) / mean Δℓ_X(move), C ∈ {K, V, KV}; r_other likewise.
+- ρ_K(u) = mean ID_K(A(u)) / mean ID_K(none), ID_K as in the paper (`run_item`: full-vocabulary log-probs of the lower-case
+  candidates, every layer from 0, the other channel held at the base run's).
+- J-D-KN: per story the Pearson correlation over the six candidates of Δℓ(K_N) with Δℓ(−Δ at r_B), averaged over stories
+  (a story where either vector is constant has no correlation and counts as 0; the scorer prints how many); the B-loss
+  ratio β = mean Δℓ_B(K_N) / mean Δℓ_B(−Δ at r_B); the specificity mean[Δℓ_S(K_N) − Δℓ_X(K_N)].
+- J-D-ADDR: the norm-weighted mean over L* of cos(Δ^K_l, Δ^KV_l), weights |Δ^K_l| (Δ^K = Δ^P1); ID_inj(Δ^KV) / ID_inj(Δ^K).
+- J-D5: Ψ_bind(s) = [Δℓ_X(init | other_agent) − Δℓ_X(init | irrelevant_object)] − [Δℓ_X(dloc | other_agent) −
+  Δℓ_X(dloc | irrelevant_object)], each Δ within its query's batch; pooled mean, stratum means, stratum difference
+  (object-first minus distractor-first). Secondary (role confounded with order): Ψ_ev(s) = [Δℓ_X(ev | direct) −
+  Δℓ_X(ev | other_agent)] − [Δℓ_X(init | direct) − Δℓ_X(init | other_agent)].
+- Transfer (Q and IOI cells): id(Set) = ½[(c(Set; K_S) − c(∅; K_S)) − (c(Set; K_X) − c(∅; K_X))], c = lp(S) − lp(X);
+  d_G = mean id(allG); R(H*) = mean id(H*) / d_G; KO(H*) = 1 − mean id(koH) / d_G; R_rand and KO_rand = the means of the
+  three random sets' values; ID_K^T = mean id(allT) (the full key clamp, key only, in batch); d_Gc / ID_K^T reported (a
+  cell counts as a re-mention read only if ≥ 0.5). Signed ratios of means, valid for negative reads.
+- IOI route: m = ℓ_{IO_S} − ℓ_{IO_B}; r(C) = 1 − mean[m(K_S + ans_C) − m(none)] / mean[m(K_S) − m(none)]; the injected-
+  flag rows likewise.
+- Hop-2 carry: carry(Set) = 1 − mean Δℓ_X(inj + Set) / mean Δℓ_X(inj), for Set = top-10, rand-10, every head.
+- D6, on the competent cores (case-marginalised argmax = B in the clean B run and = S in the clean S run, in both P1 and
+  POST): ρ = mean Δℓ_X(POST; +Δ^P1 at the sentence row of X) / mean Δℓ_X(P1; +Δ^P1 at the list row of X); ρ_nat = mean
+  N_X(POST) / mean N_X(P1), both in-run on the same cores and scorer. ω = mean_s Σ_l ⟨δ^POST_l(s), Δ̂^P1_l⟩ / mean_s Σ_l
+  ⟨δ^P1_l(s), Δ̂^P1_l⟩ on every E8 core of the run; κ = the norm-weighted mean over L* of cos(Δ^POST_l, Δ^P1_l), weights
+  |Δ^P1_l| (from the fit on R). D6b (reported, competent cores): mean Δℓ_X(P1; +Δ^POST at r_X) / mean Δℓ_X(P1; +Δ^P1 at
+  r_X). Route at POST (competent cores): r^inj(C) = 1 − mean Δℓ_X(inj + ans_C) / mean Δℓ_X(inj), each Δ against the route
+  batch's none row.
+
+#### Statistics
+
+- **Bootstrap.** Stories (cores) resampled with replacement, 10,000 resamples, numpy default_rng(20261010); one index set per
+  population size, shared by every row, arm and statistic computed on those stories, so contrasts between rows (and between
+  Q_IN and Q_OUT, which use the same E8 cores in the same order) are paired. Every ratio of means is recomputed in every
+  resample; strata means use the resampled stories of each stratum (a resample with none of a stratum is dropped).
+- **Interval criteria** are one-sided tests of named nulls at 2.5 %: "H0: θ ≤ t, rejected when the lower bound of the 95 %
+  interval is > t" and the mirror for upper bounds; "CI inside (a, b)" is two such tests (equivalence). Point floors are
+  effect-size conditions. A line is met in a model when every test rejects and every point condition holds.
+- **Combination.** Lines over Qwen2.5-7B and Mistral-7B ("2/2"): MET if met in both; NOT MET if not met in at least one
+  evaluable model, also when that model is the only evaluable one; NOT EVALUABLE otherwise (in particular with one
+  evaluable model that meets it). Lines over 1.5B, 3B and 7B: MET if met in every evaluable model and at least two are
+  evaluable; NOT MET if not met in one evaluable model, however many are evaluable; NOT EVALUABLE otherwise. J-D6-ROUTE is
+  a single-model line (1.5B). No interval is corrected for these combinations (intersection-union). A line whose
+  computation raises an error in the scorer is NOT EVALUABLE in that model, with the traceback printed under the line;
+  the error is recorded as "<code>/<model>", the SUMMARY prints "SCORER ERROR in [...]" and the scorer exits with status
+  1 (a failed score step, in TEST_MODE too). Part D defines no MET IN PART.
+- **Summary** (common part, G4): the 17 account lines are tallied by class (L 2, M 5, R 10), each class with its MET,
+  NOT MET and NOT EVALUABLE counts, the observed met count against the sum of the priors of the lines with a verdict, and
+  the Brier score; then the met rate among the R lines with a verdict.
+- **Holm** (sensitivity, no verdict uses it; common part, G3, identical in every part): the shared helper
+  `analysis/stage8_holm.py` runs Holm's step-down at familywise one-sided α = 0.025 over the interval components of the
+  R-class account lines of Part D that have a verdict (the family named by D-11), taking each line's components from the
+  models where it is evaluable. A component is one one-sided test {est, se, bound, direction}: the point estimate, the
+  bootstrap standard error (standard deviation of the defined resamples), the null's bound, and p = Φ(−(est − bound)/se)
+  for H1: θ > bound or Φ((est − bound)/se) for H1: θ < bound (an equivalence is two components). Every test of a line is
+  a component whatever its point conditions, so the family does not depend on them. A component whose estimate or se is
+  not finite is left out of the family (the scorer prints how many). The scorer prints, per R line, the components whose
+  decision changes under Holm and the verdict with Holm's decisions in place of the interval decisions: a MET line with a
+  component no longer rejected becomes NOT MET; a component that Holm rejects and the interval rule does not is listed
+  and changes no verdict (a NOT MET line stays NOT MET).
+- **TEST_MODE** outputs (tag TEST_, scorer option `--test`) are scored with the size checks, the revision, dtype,
+  attention and stage-6 sets checks and J-D-G6's count of 40 competent cores waived, and never give exit status 2 (a
+  scorer error still gives status 1); their verdicts are plumbing checks.
+
+#### Gates
+
+- **J-D-G0, exactness** (FP32, CPU, Qwen2.5-0.5B, before any model; 1e-4 in the log-probabilities unless stated).
+  `tests/test_flag.py` (13 tests), `tests/test_questions.py` (11), `tests/test_stage8d_score.py` (18), run in one pytest
+  step with the shared `tests/test_head_splice.py` (7; the HeadSplice / HopSplice the part's hooks compose with),
+  `tests/test_stage8_populations.py` (5; rule G6 across the parts) and `tests/test_stage8_holm.py` (7; the shared Holm
+  helper). The scorer reads the last pytest run in `logs/pytest.log`: the gate is met when the three part-D files and the
+  two shared population and Holm files have at least 13, 11, 18, 5 and 7 PASSED tests, and no test of the run (every
+  tests/ file, `tests/test_head_splice.py` included) FAILED, ERROR or SKIPPED. A skip is counted from the line pytest
+  prints for each skipped test and from its summary, which also lists a whole file skipped at import; a log whose last
+  run lacks the population or Holm file fails the gate. With no log the gate is NOT EVALUABLE. Each check compares a
+  hooked row with an independent reference:
+  1. a zero injection equals the clean run (1e-5);
+  2. an injection at layer l changes that layer's attention output by exactly the added vector at the row and nothing
+     else (1e-5), and leaves the final hidden states before the row unchanged;
+  3. a mixed batch (none, add, move, a key row, a value row with an add) equals each row run alone;
+  4. directional ablation with μ = the row's own projection equals clean, and after ablation with another μ the
+     projection equals μ while unmasked rows are untouched;
+  5. Σ_h head_out(z_h) from OCap's capture equals the o_proj output captured by a separate hook;
+  6. nonzero-add composition (D-11): Inject(v) with a no-op HopSplice (both passes read the injected run's own K/V at G),
+     with an empty-set HeadSplice, with HeadSplice "ablate" whose μ is its own o_proj input (three o_proj calls per masked
+     layer), and with a no-op all-heads HeadSplice splice, each equals Inject(v) alone (an add applied twice would differ);
+  7. the transfer batch's allT rows equal a separately constructed full key clamp, and its ∅ rows the clean run;
+  8. the scored batches' K_S, K_X and V_S rows equal `format_factorial.run_item`'s rows;
+  9. the INLINE_CHAT item code equals `ioi_factorial.run_item` on INLINE (1e-5), and an INLINE_CHAT item has floors < 1e-3;
+  10. the case-marginalised trie score with a no-op HopSplice equals the plain trie score, and equals the plain sum over
+      forms where every form is one token;
+  11. the flag from the run's write pass equals a flag computed from an independent o_proj pre-hook capture and a
+      separately constructed clamp;
+  12. the per-head hop-2 batch (J-D-HOP2): with every head listed, the answer row reading the clean run's keys at G
+      through HeadSplice equals HopSplice's ans_K row under the same injection (an independent two-pass path), its inj
+      row equals the injection alone and its none row the clean run;
+  13. the route batch of J-D6-ROUTE (an injected POST run whose answer row reads the clean run's K and V at G, HopSplice
+      mask extended over the trie nodes) scored through the trie equals plain causal forwards of prompt + each form in
+      which the answer row and every form position read the clean K and V (an independent reference);
+  and, tokenizer only (`tests/test_questions.py`, the tokenizers at the revisions pinned in `scripts/stage8_models.json`:
+  Qwen2.5-0.5B's, byte-identical to the 1.5B, 3B and 7B tokenizers at their pins, and Mistral-7B-v0.3's), on the first 50
+  cores of E8 and BIND, on every core of R' (all 45), and on the first 50 IOI candidates: B, S, X and N differ only at p
+  in P1, POST, Q_IN and Q_OUT; the six option rows lie after p; the BIND prompts are valid under the three queries; the
+  initial-state runs differ only at p_init / p_dloc; the IOI runs of INLINE, INLINE_CHAT, AFTER and BEFORE differ only at
+  p with the listed names after p (before p under BEFORE), valid in at least 80 % of the 200 candidate-arm pairs; the
+  question arms' text; the populations, their pins and disjointness; the K_N words; the case-marginalised forms; the task
+  prompts. The scorer's tests: bootstrap determinism and ratio recomputation, the one-sided tests and their Holm
+  components, the class of every line against its prior (G4), the Holm family handed to `analysis/stage8_holm.py` (R
+  lines with a verdict, evaluable models only, every component whatever the point conditions) and the shared helper
+  itself on this part's family, the combination rule, every line's statistic on rows built to a known value, the D6
+  decision table, an end-to-end scoring with MET, NOT MET and NOT EVALUABLE lines, a failed G0 making every line NOT
+  EVALUABLE, an exception in one line's per-model scoring giving that model NOT EVALUABLE, "SCORER ERROR" and exit
+  status 1, the J-D-G0 log rule (a skip in any file of the last run, a whole file skipped at import, the two shared files
+  required and listed in the script's pytest step), and the scorer's pinned hashes equal to those of
+  `experiments/stage8_flag.py`. J-D-G0 not met (failed or not run) makes every line NOT EVALUABLE.
+- **Per-model checks** (the scorer's PROVENANCE and POPULATION sections): one commit over every file; the manifest's
+  revision; BF16; sdpa (eager for sets); the sets hash and the flags hash recorded by every later file equal the sets
+  and fit files'; at 7B the stage-6 sets hash and source; the preflight's population hashes equal the pins, with no
+  overlap, and every later file records the same hashes; sizes: inject 100, ablate 60, bind 100, sign 100 in each of
+  Q_IN, Q_OUT, P1, INLINE and INLINE_CHAT (both 7B models), diss 100 / 60 / 100 (1.5B / 3B / 7B). Outside TEST_MODE a
+  MISMATCH, or results without a passing J-D-G0, makes the scorer exit with status 2 (a failed score step); the verdicts
+  are still computed and printed as defined here.
+- **J-D-G1, the natural effect** (per 7B model): N_X under P1 on E8 ≥ 3 nats with lower bound > 0. Otherwise J-D1–J-D4,
+  J-D-ADDR and J-D-KN are NOT EVALUABLE in that model (J-D3 also needs mean ID_K(none) ≥ 1 nat with lower bound > 0).
+- **J-D-G2, batch floor** (per batch type with a duplicated none row: inject, the Q and IOI six- and four-candidate
+  batches, diss): mean over stories of the mean |lp(none2) − lp(none)| over the candidates ≤ 0.05 nats (full-vocabulary
+  log-probabilities; in diss the case-marginalised scores, over P1 and POST together). A failing floor makes these lines
+  NOT EVALUABLE in that model (a check of the model's batched numerics in that cell): the inject floor
+  J-D1–J-D4, J-D-ADDR and J-D-KN (with J-D-G1); the Q_IN and Q_OUT floors J-D7, the Q_OUT floor also J-D-SIGN-Q and
+  J-D-HOP2; the INLINE floor J-D-SIGN-IOI, J-D-ROUTE-IOI and J-D-HOP2; the diss floor J-D6a and J-D6. It does not compare
+  against single passes (stage 6's Gate a2 failed on batch-shape offsets that cancel in in-batch differences).
+- **J-D-G3, competence** (per model × arm, clean B run): Q_IN argmax over C a mentioned location (B, init or dloc) in
+  ≥ 0.90 of stories; Q_OUT argmax an unmentioned location in ≥ 0.90; mean candidate mass ≥ 0.50; IOI arms: stage 5's
+  Gate e (two-way accuracy ≥ 0.75, four-way ≥ 0.50, mean LD > 0 with lower bound > 0). A failing cell is NOT EVALUABLE
+  for every line that reads it (J-D7, J-D-SIGN-Q, J-D-SIGN-IOI, J-D8-Q, J-D8-IOI, J-D-ROUTE-IOI, J-D-HOP2), and such a
+  line is NOT EVALUABLE in that model, except J-D8-Q, whose two cells combine as stated in its row.
+- **J-D-G4, transfer evaluable** (per Q or IOI cell): |d_G| ≥ 1 nat with the CI excluding 0, the same sign as ID_K^T, and
+  |d_G| / |ID_K^T| ≥ 0.5. A failing cell is NOT EVALUABLE for J-D8-Q (Q_IN, Q_OUT) or J-D8-IOI (INLINE).
+- **J-D-G5, binding queries** (per model): argmax over C = init under other_agent and = dloc under irrelevant_object in
+  ≥ 0.80 of BIND each; otherwise J-D5 is NOT EVALUABLE in that model.
+- **J-D-G6, dissociation population** (per model of D6): ≥ 40 competent cores; the P1 injection effect Δℓ_X(+Δ^P1) > 0 with
+  lower bound > 0 on them; at 1.5B and 3B, R(k*) of the in-run H* under P1 on the run's E8 cores ≥ 0.6 (point). Otherwise
+  J-D6 and J-D6-ROUTE are NOT EVALUABLE in that model (J-D6a does not use this gate).
+- **J-D-G7, ratio denominators** (per line): the denominator of a ratio line must have |mean| ≥ the stated size with its CI
+  excluding 0: Δℓ_X(move) in the route batch ≥ 1 nat (J-D4); Δm(K_S) ≥ 1 nat (J-D-ROUTE-IOI); Δℓ_X(inj) ≥ 0.5 nat in
+  Q_OUT and INLINE (J-D-HOP2); Δℓ_X(inj) under POST ≥ 0.2 nat (J-D6-ROUTE); for J-D3, mean ID_K(none) on A ≥ 1 nat
+  (signed) with lower bound > 0; otherwise the line is NOT EVALUABLE there.
+
+#### Confirmatory lines
+
+Kind A = account line; Part D has no measurement-validity lines (its floors and competence checks are gates). Priors were
+recorded before any stage-8 output; "in hand" means the stage 5 and 6 results and the disclosed pilots (Seen before
+finalisation). The class follows the recorded prior P(MET | evaluable) by the common rule: L = implied by data in hand on
+the same models and material, prior ≥ 0.9; M = prior ≥ 0.8; R = prior < 0.8 (so J-D4 and J-D8-Q, implied by stage 6 but
+at prior 0.85, are M). Models: 2/2 = Qwen2.5-7B and Mistral-7B; 3 = Qwen2.5-1.5B, 3B, 7B (≥ 2 evaluable).
+
+| Code | Class, kind, prior | Criterion (per model) | Models | Justification of the prior |
+|---|---|---|---|---|
+| J-D1 | R, A, 0.55 | ID_inj^LOO / ID_K ≥ 0.5 (point); H0: ID_inj^LOO / ID_K ≤ 0.35 rejected; π_X(move(Δ^{−X}, X)) ≥ 0.5 (point) | 2/2 | 0.5B critic pilot: ratio 1.05 with and without LOO; π_X untested above 0.5B (0.12 at 0.5B); no 7B data on a mean flag |
+| J-D2 | R, A, 0.55 | for each of orth, meanH and Δ^act: ι(move Δ) − ι(move c) ≥ 0.4 (point) and H0: ι(move Δ) − ι(move c) ≤ 0 rejected; ι(move c) / ι(move Δ) ≤ 0.3 (point) | 2/2 | 0.5B pilot: orth 0.17 against 0.96; meanH and the active-set flag untested |
+| J-D3 | R, A, 0.50 | ρ_K(Δ̂) ≤ 0.5 (point) and H0: ρ_K(Δ̂) ≥ 0.6 rejected; ρ_K(pc1) ≥ 0.7 and ρ_K(meanH) ≥ 0.7 (points) | 2/2 | 0.5B pilot ρ_K 0.08 (random 0.99); at 7B whole-head ablation of H* removed 0.76 / 0.94 (stage 6 H3); one direction per layer is a much smaller intervention |
+| J-D4 | M, A, 0.85 | r_ans^inj(KV) ≥ 0.6 (point) and H0: r_ans^inj(KV) ≤ 0.45 rejected; H0: r_ans^inj(K) − r_ans^inj(V) ≤ 0 rejected | 2/2 | implied by stage 6 H5 if the injection mimics the natural write: r_ans(KV) 0.899 / 0.859, r_ans(K) 0.797 / 0.683, r_ans(V) 0.080 / 0.023 |
+| J-D-ADDR | M, A, 0.80 | weighted cos(Δ^K, Δ^KV) ≥ 0.9 (point); ID_inj(Δ^KV) / ID_inj(Δ^K) in [0.8, 1.25] (point) with H0: ≤ 0.7 and H0: ≥ 1.4 both rejected | 2/2 | 0.5B critic pilot: cos 0.98–1.00 at the main layers, per-story 0.92–0.99, ι(KV flag) 0.99 against 0.96 |
+| J-D-KN | R, A, 0.40 | mean per-story Pearson ≥ 0.8 (point); β in [0.7, 1.3] (point); H0: mean[Δℓ_S − Δℓ_X](K_N) ≤ −0.1 \|ID_K\| and H0: ≥ +0.1 \|ID_K\| both rejected (ID_K the in-batch point estimate) | 2/2 | 1.5B critic pilot (P1, 'garage'): Δℓ_B −0.90 under K_N against −1.50 under K_S; Δℓ_S +1.76, Δℓ_X +1.87 (difference within 0.1 ID_K = 0.35 at the point, per-story \|Δℓ_S − Δℓ_X\| 1.16); the −Δ at r_B comparison was never run |
+| J-D5 | R, A, 0.25 | H0: mean Ψ_bind ≤ 0 rejected (pooled); the 95 % CI of the stratum difference includes 0 | 2/2 | no data in hand; the other_agent question may not use the option lookup |
+| J-D7 | M, A, 0.85 | mean ID_K(Q_OUT) ≤ −1 nat (point) and H0: ID_K(Q_OUT) ≥ 0 rejected; mean ID_K(Q_IN) ≥ 1 (point) and H0: ID_K(Q_IN) ≤ 0 rejected; H0: ID_K(Q_IN) − ID_K(Q_OUT) ≤ 0 rejected (paired) | 2/2 | 1.5B pilots: Q_OUT −4.17 (12/12 negative), −5.13; Q_IN +2.12, +3.20; extrapolated to 7B |
+| J-D-SIGN-Q | M, A, 0.85 | H0: ID_K(Q_OUT) ≥ 0 rejected and H0: ID_V(Q_OUT) ≥ 0 rejected | 2/2 | 1.5B critic pilot ID_K −5.13 (se 0.57), ID_V −8.24 (se 0.74) |
+| J-D-SIGN-IOI | L, A, 0.90 | H0: ID_K(INLINE) ≥ 0 rejected and H0: ID_V(INLINE) ≤ 0 rejected (fresh IOI cores) | 2/2 | stage 5: ID_K −3.26 [−3.47, −3.05] / −2.33 [−2.46, −2.19], ID_V +2.63 [+2.39, +2.88] / +1.27 [+1.14, +1.40] (n = 200 each, Gate e passed) |
+| J-D8-Q | M, A, 0.85 | in Q_IN and in Q_OUT (both cells): R(H*) ≥ 0.6 (point) and H0: R(H*) ≤ 0.45 rejected; KO(H*) ≥ 0.6 (point) and H0: KO(H*) ≤ 0.45 rejected; R_rand ≤ 0.15 and KO_rand ≤ 0.15 (points). Per model: MET if met in both cells, NOT MET if not met in an evaluable cell, NOT EVALUABLE otherwise | 2/2 | stage 6 H1/H2 under P1: R 0.967 / 0.942, KO 0.977 / 0.971, random ≤ 0.011; hop 1 precedes the question semantics |
+| J-D8-IOI | R, A, 0.55 | the same criteria in IOI INLINE | 2/2 | 0.5B pilot R 0.95, KO 0.97 (n = 24); untested at 7B and on a different task |
+| J-D-ROUTE-IOI | R, A, 0.40 | K_S rows: r(KV) ≥ 0.6 (point); H0: r(K) − r(V) ≤ 0 rejected | 2/2 | no data in hand; stage 5's AFTER row splice put the read on the listed names (1.05) but not on the clamped names alone (0.27) |
+| J-D-HOP2 | R, A, 0.25 | in Q_OUT and in INLINE: carry(top-10) ≥ 0.5 (point) and H0: carry(top-10) ≤ 0.2 rejected ("same reader, opposite sign"); the scorer prints "different reader" when both carries are ≤ 0.2 (points) with upper bounds < 0.5, else "intermediate" (both NOT MET) | 2/2 | no data in hand; ten heads may not carry a distributed hop 2 even in P1 |
+| J-D6a | L, A, 0.90 | ω ≥ 0.6 (point) and H0: ω ≤ 0.4 rejected; κ ≥ 0.7 (point) | 3 | implied by stage 5's G2 (hop-1 attention follows the clamped key one for one at 1.5B / 3B) and the shared prefix; 0.5B pilot ω 0.99, cos 0.72–1.00 |
+| J-D6 | R, A, 0.35 | sign(ρ) = sign(ρ_nat) (points) and the 95 % CI of ρ − ρ_nat inside ±max(0.1, 0.5\|ρ_nat\|) (two one-sided tests; the tolerance at the point estimate of ρ_nat) | 3 | ρ_nat in hand −0.20 (1.5B), ≈ 0 to +0.07 (3B), 0.23–0.26 (7B); 0.5B pilot: POST injection −0.46 against K_X −1.06; at 3B ρ_nat ≈ 0 makes the sign condition a coin flip |
+| J-D6-ROUTE | R, A, 0.35 | at 1.5B under POST: H0: r^inj(V) − r^inj(K) ≤ 0 rejected | 1.5B | no data in hand; follows from stage 5's G4 only if the injected sentence flag is read at all |
+
+**Expected values** (the author's, not thresholds): ID_inj^LOO / ID_K 0.6–1.0; ρ_K(Δ̂) 0.2–0.5; r_ans^inj(KV) ≈ 0.85;
+ID_K(Q_OUT) −3 to −8 nats; R(H*) in IOI INLINE 0.5–0.9; ρ ≈ ρ_nat within ±0.1 at 1.5B and 7B.
+
+#### Combination and the D6 decision table
+
+Every line above is combined over its models as stated under Statistics. The D6 outcome (printed by the scorer, fixed now;
+the first row whose condition holds, in this order):
+
+| Outcome | Condition |
+|---|---|
+| (a) Mediated, read by value at 1.5B | J-D6 MET and J-D6-ROUTE MET |
+| (b) Mediated; the 1.5B route not shown to be by value | J-D6 MET, J-D6-ROUTE not MET or not evaluable |
+| (c) Not mediated | in some model where J-D6 is evaluable, ρ_nat has upper bound < 0 while \|ρ\| ≤ 0.1 (point) with the 95 % CI of ρ inside (−0.2, 0.2): the natural negative read is not carried by the sentence-row flag |
+| (d) Mixed | anything else, reported as such |
+
+The design's branch "never written" is dropped (stage 5's G2 already excludes it; D-8).
+
+#### What each primary line means for the paper (pre-written; E-2)
+
+No Part-D outcome changes the title (the common part). The main text reports three numbers for the flag (D-13):
+ID_inj^LOO / ID_K, ρ_K and r_ans^inj(K); ι, ω, κ, ρ, Ψ, π, the gates and the controls go to the appendix.
+
+| Primary line | Abstract clause (MET) | NOT MET: replacement | Title | Table 1 row | Figure |
+|---|---|---|---|---|---|
+| J-D1 | "The reader heads write one vector per layer into the re-mentioned word's row. Injected with no key clamp into the row of an option absent from the story, a version fit without that word moves the answer there (x of the key read's identity effect; the answer changes in y % of stories)." | "A mean flag does not reproduce the key read as an injection at 7B (ID_inj^LOO / ID_K = x): the reader heads' write is story-specific or non-linear." The routing result stands without the flag. | No change. | "What the readers write": ID_inj^LOO / ID_K per model. NOT MET: "not sufficient as a rank-1 write". | Fig. "flag", panel (a): ι by dose with the structured controls. |
+| J-D3 | "Removing that one direction per layer at the option words removes the key read (ρ_K = x), while the top principal direction and the mean reader output do not." | "One direction per layer does not carry the key read (ρ_K = x): other carriers exist; the flag is sufficient but not necessary" (if J-D1 met), or the flag paragraph is withdrawn (if not). | No change. | Same row, ρ_K column. | Fig. "flag", panel (b). |
+| J-D4 | "The answer reads the injected flag by key, as it reads the natural one (r_ans(K) = x against r_ans(V) = y)." | "The injected flag acts by a route other than the answer's key read." | No change. | Same row, r_ans column. | Fig. "flag", panel (a) inset. |
+| J-D-SIGN-IOI with J-D8-IOI | "The same frozen reader heads that serve the belief lookup carry an opposite-sign key read in IOI's in-sentence re-mentions, while the value read keeps its positive sign (R(H*) = x, ID_K = y < 0 < ID_V = z)." | J-D-SIGN-IOI not met: "the in-sentence IOI read does not dissociate the channels at 7B". J-D8-IOI not met: "the negative IOI key read is carried by other heads; the reader heads are task-specific." | No change. | "Sign": ID_K, ID_V, R(H*) in P1, Q_OUT, IOI INLINE. | Fig. "flag", panel (c), the one main-text sign panel. |
+| J-D-ROUTE-IOI and J-D-HOP2 | (body only) "The negative IOI read is applied at the answer's key read of the listed names (r(KV) = x), by the same hop-2 heads that read the flag in lists (carry = y)." | ROUTE not met: "the negative IOI read is applied elsewhere (r_other = x)". HOP2 not met: "a different (or a distributed) reader applies the negative read"; the scorer's reading (different reader / intermediate) is quoted. Polarity is never presented as a discovery. | No change. | Appendix. | Appendix. |
+| J-D6 with J-D6-ROUTE | (body only) the D6 outcome sentence: (a) "At 1.5B the sentence re-mentions carry the same flag, the answer reads it by value, and its effect has the sign and size of the natural read." (b) as (a) without the route clause. (c) "At 1.5B the flag is written in sentences but does not mediate the small negative natural read." (d) "Mixed." | as the outcome table | No change. | "Scale": ω, ρ, ρ_nat at 1.5B, 3B, 7B. | Fig. "flag", panel (d). |
+| J-D5 | (body only) "The flag of an initial-state sentence carries which object it binds, in both sentence orders (Ψ_bind = x)." | "The initial-state flag does not carry binding in a way separable from order" (Ψ_bind ≤ 0, or the strata differ). | No change. | Appendix. | Appendix. |
+
+The novelty statement (D-13): (i) a key-only edit moves an identity-free address (J-D1 with the LOO flag, J-D-ADDR), which
+explains why identity edits look key-carried in list formats; (ii) the same frozen heads in one model serve belief MCQ and
+IOI with opposite key signs while the value keeps its sign (J-D-SIGN-IOI, J-D8-IOI); (iii) the scale-dependent route at
+1.5B (J-D6, J-D6-ROUTE). Wang et al. (2022) is cited for the duplicate-token signal and S-inhibition (a negative use of
+duplicate detection is known); Feng & Steinhardt (2023) for injectable additive binding vectors. The abstract's risk
+summary counts the R lines of this part with the other parts'.
+
+#### Reported (no verdict)
+
+ι for add 0.5Δ / 1Δ / 2Δ (dose response, monotone on the points), add-only ι(1Δ) ≥ 0.25 with lower bound > 0, ι(move),
+π_X(move), ID_inj with the full flag over ID_K, N_X; the sanity rows (isotropic, head-span, layer-permuted, +Δ at the
+"Choices" and "Question" rows: ι, and the π_X shift) and the rank-1 capture ι(move Δ) / ι(move δ(s)); r_other of J-D4; the
+B-identity share of the per-story flag's variance (against the null (groups − 1) / (n − 1)) and the logit-lens cosine
+max |cos(Δ_l, W_U[location])| against random token rows; ρ_K of the isotropic directions (sanity ≥ 0.85); Ψ_ev (role
+confounded with order); per Q and IOI cell ID_K, ID_V, R(H*), KO(H*), d_G / ID_K^T and d_Gc / ID_K^T; the Q-cell D9 rows
+(Δℓ_X(+Δ^P1 at r_X) against N_X(cfg), isotropic) and Δℓ_B under K_S (Q_OUT: > 0 expected); the injected IOI flag's route
+(r(C), r_other); the hop-2 carries under P1 (the ranking format), every head and random-10; D6b; the INLINE_CHAT and
+AFTER cells (Gate e, ID_K, ID_V, R, KO, d_Gc / ID_K^T).
+
+#### Exploratory (no verdict)
+
+- **E-BEFORE** (Qwen2.5-7B, the first 60 cores of E_ioi, BEFORE; D-1): ID_K with p's attention to the listed names' rows
+  knocked out (`ckeys.knockout`, the pairs {p} × rows, in the S, X and B runs) against no knockout; fraction of ID_K
+  removed f = 1 − mean ID_K^KO / mean ID_K. Two-sided rule: f ≥ 0.5 "p-as-re-mention" (under BEFORE p is itself a later
+  mention of the listed name); f ≤ 0.2 "a second-order read elsewhere"; else intermediate. The same with every list row
+  knocked out; and the RowSplice localisation (`row_restricted_keys.run` with `ckeys.ioi.RowTask`, groups self, sentence
+  tail, options, choices, tail): the fraction of the full key effect each group carries.
+- **E-XTASK** (D-10; both 7B models): the belief flag Δ^P1 against each task's own flag (fit on XFIT with H*) at the X
+  option row of the paint and schedule P1 tasks (`ckeys.tasks`), on XEVAL; ratio = mean Δℓ_X(Δ^P1) / mean Δℓ_X(own flag).
+  Two-sided: ≥ 0.6 "a shared pointer"; ≤ 0.3 "a task-specific flag"; no direction is predicted.
+- **E-QOUT** (D-12): the fraction of Q_OUT stories whose answer is the story's own word B under K_S and under V_S.
+- **E-RECON** (D-12): the H3 / G7b reconciliation, the base-answer and the initial-location answer rates under A(Δ̂) at
+  r_init and r_dloc only, at r_B only, and at all six rows.
+- **E-GEOM**: c_l, φ_l, the cross-layer cosines of Δ, the cosines between Δ^P1, Δ^KV, Δ^POST, Δ^init, Δ^dloc and Δ^IOI; the
+  hop-2 top-10 and the in-run a3 overlap with H*.
+- **E-IOIINJ**: Δ^IOI, move(Δ^IOI) and Δ^P1 at the listed IO_X row, isotropic, K_X (four-way).
+- **E6**: ι on the raw margin m_X = lp(X) − lp(B) for add, move and the LOO move.
+
+Not run (D-12): the story-duplicate projection pass and the eager hop-2 attention probe of the design; the design's IOI
+AFTER injection.
+
+#### Seen before finalisation
+
+No stage-8 output of any model above 0.5B parameters has been seen; the build ran no trained model larger than 0.5B. Seeds
+81–86 were touched only by population construction, the 0.5B TEST_MODE run (n = 2), the 0.5B gate tests (the first core
+of E8 and of the E_ioi candidates) and the review's 0.5B exactness probes (the first three cores of E8, random injected
+vectors; listed under Build checks). The design and critique pilots
+(all CPU, FP32, transformers 5.18.0; scripts and logs kept with the stage-8 build notes):
+- **Design pilot (1), flag fit and injection** (`partD/pilot_flag.py`, `pilot05_P1.log`, `pilot05b.log`; Qwen2.5-0.5B):
+  a3 ranking on 16 stories of Random(0) (k* = 17, layers 2–16); flag fit on the same 16; per-story consistency 0.84–0.97 at
+  the main layers (3, 7, 11, 13), 0.50–0.65 elsewhere; mean cross-layer cosine 0.07. On 16 Random(1) stories (m_X, against
+  K_X +3.25 nats): ι add 0.45, move 0.80, α 0.5 / 1 / 2 0.19 / 0.45 / 0.69, isotropic +0.01 / −0.05 / −0.16, "Choices"
+  −0.04, "Question" +0.04; clean accuracy 0.62, K_X made X the argmax in 6 %. Q_IN (n = 10): ι add 0.42, move 0.73;
+  Q_OUT (n = 10): clean argmax B 0.00, K_X effect on m_X −0.55, add −0.55.
+- **Design pilot (2), directional ablation** (`pilot_ablate.py`, `pilot_abl05.log`; 16 fit, 16 Random(1)): ID_K 1.29 → 0.10
+  (ρ_K 0.08); two random unit directions 0.99, 0.99; ID_V 3.26 → 3.00; base argmax 0.62 → 0.44.
+- **Design pilot (3), Q_IN / Q_OUT at 0.5B** (n = 10): Q_IN competence 1.00, ID_K +2.21; the P1 flag at r_X +2.26 (move
+  +2.80; K_X +3.31); random −0.41 to +0.08. Q_OUT weakly competent (30 % of argmaxes mentioned), ID_K −0.28 (se 0.22),
+  injection −0.15 / −0.38 against K_X −0.60.
+- **Design pilot (4), sign at Qwen2.5-1.5B** (`pilot_sign.py`, `pilot_sign15.log`; n = 12, Random(1)): Q_OUT competence
+  12/12, ID_K −4.17 (se 0.41), 12/12 negative, Δlp(B) under K_S +6.45, argmax B under K_S 3/12; Q_IN competence 12/12, ID_K
+  +2.12 (se 0.55), 12/12 positive. The only design pilot above 0.5B.
+- **Design pilot (5), dissociation at 0.5B** (`pilot_diss.py`, `pilot_diss05.log`; 16 fit, 16 eval, case-marginalised over
+  the single-token forms): ω 0.99, per-layer cos(Δ^POST, Δ^P1) 0.72–1.00; POST: case-marginalised mass 0.84, accuracy 0.56,
+  ID_K −0.74; the P1 flag at the sentence row of X −0.46 (move −0.75) against K_X −1.06, random +0.10; the POST flag at the P1
+  list row +1.63 against the P1 flag's +1.47.
+- **Design pilot (6), IOI INLINE reader transfer** (`pilot_ioi.py`, `pilot_ioi05.log`; n = 24, IOI Random(5)): ID_K
+  −2.75; the listed names carry 0.81; R(H*) 0.95, KO(H*) 0.97, random 0.00.
+- **Design pilot (7), IOI flag injection** (`pilot_ioi_inject.py`, `pilot_ioi_inj05.log`; IOI Random(6) fit, Random(5)
+  eval, n = 20): the IOI flag at the listed IO_X row −2.20 (se 0.25) against K_X −4.63; the belief flag −0.58 (se 0.13);
+  random −0.02; cos(Δ^IOI, Δ^belief) −0.03 to 0.86 per layer.
+- **Critic pilot `pilot_critic.py` / `pilot_critic2.py`** (`critic_mechanism/`, Qwen2.5-0.5B; flags fit on Random(0)
+  indices 16–39 / 16–45, evaluated on 24 Random(7) stories): cos(Δ^K, Δ^KV) 0.98–1.00 at the main layers (per story
+  0.92–0.99); B-identity share of the per-story flag 0.45–0.88 against a null of 0.17–0.22; max |cos(Δ, W_U[loc])| 0.06–0.11
+  against 0.025 for random tokens; ID_K (six-way) +1.28; ID_inj / ID_K 1.04–1.05, with the LOO flag 1.048 (fit sizes
+  15–23); ι(move) 0.96, ι(add) 0.75; the own write 1.18; its orthogonal part 0.13 / 0.15 (0.16 / 0.17 norm-matched); the KV
+  flag 0.99; K_S raises ℓ_X by +0.83 against N_X +2.25.
+- **Critic pilot `pilot_kv_inout.py`** (`pilot_kv_inout15.log`; Qwen2.5-1.5B, 16 Random(9) stories): Q_OUT mass 1.00,
+  ID_K −5.13 (se 0.57), ID_V −8.24 (se 0.74), all 16 negative; Q_IN ID_K +3.20, ID_V +9.37; P1 ID_K +3.53, ID_V +9.00. K_N
+  ('garage'): P1 Δℓ_B −0.90 (K_S −1.50), Δℓ_S +1.76, Δℓ_X +1.87; Q_OUT Δℓ_B +5.82 (K_S +5.98), Δℓ_S +0.17, Δℓ_X +0.60;
+  Q_IN Δℓ_B −3.55 (K_S −2.17).
+- **Critic's inline counts**: in make_cores(100, Random(81)) 74 cores have dloc ≠ init (36 object-first, 38
+  distractor-first). (E8 is now the Random(81) stream outside U and EXCL; see Deviations.)
+- **In-hand numbers quoted above** are from the committed stage-5 and stage-6 score files and the paper's tables.
+- **Build checks** (this part's code; tokenizers, committed files and Qwen2.5-0.5B only):
+  - make_cores(100, Random(81)) holds 3 cores of U (draws 7, 74, 90); the E8 stream therefore takes 110 draws to give 100
+    cores outside U and EXCL; the BIND stream 140 draws.
+  - the preflight on the Qwen2.5 and Mistral-7B-v0.3 tokenizers: every prompt of R, R', E8 (P1, POST, Q_IN, Q_OUT, with the
+    K_N runs) and BIND (three queries) valid; no IOI candidate skipped (F_ioi 60, E_ioi 100 in both); 5 trie nodes (Qwen) and
+    20 (Mistral) for the case-marginalised forms.
+  - the unit tests (J-D-G0) after the review: `tests/test_flag.py` 13, `tests/test_questions.py` 11,
+    `tests/test_stage8d_score.py` 15 (against the shared `analysis/stage8_holm.py`) and the shared
+    `tests/test_head_splice.py` 7, all passed (46 in 4.5 min on a shared CPU, 2 threads). One earlier run of the same set
+    failed test 1 alone (the session's first plain forward differed from the zero injection by 1.4e-3 in the log-probs,
+    while every later exactness test of that run passed); the cause was not found, and 18 fresh processes repeating that
+    comparison, some under CPU oversubscription, gave exactly 0. A J-D-G0 failure stops the pipeline before any model.
+    After the audit of this entry against the code (a per-model scorer exception now gives exit status 1, skips are
+    counted in every file of the run, and the step runs the shared population and Holm tests): `tests/test_stage8d_score.py`
+    18, with `tests/test_stage8_populations.py` 5 and `tests/test_stage8_holm.py` 7 added to the step; the six files
+    passed together (61 in 4.0 min, 2 threads).
+  - review probes (Qwen2.5-0.5B, FP32; code checks, no scientific quantity): the hop-2 batch with every head listed
+    against HopSplice ans_K on the first E8 core, max difference 3.8e-5 in the log-probs; the HopSplice mask over the trie
+    nodes in the POST route batch on the first three E8 cores with random injected vectors (answer row reading the clean
+    K/V moves the case-marginalised scores by 0.19–0.77 nats; giving the trie nodes pass A instead moves them by at most
+    2.4e-6, so the trie nodes' own reading is immaterial at this scale); `format_factorial.run_item`'s encoding equals
+    `prep`'s on every E8 and BIND core in P1, POST, Q_IN and Q_OUT for both tokenizers (0 mismatches).
+  - the TEST_MODE runs of `scripts/gpu_stage8d.sh` (Qwen2.5-0.5B, FP32, n = 2 per population, k* = 5 heads ranked in-run,
+    keys qwen7 and qwen1.5; a shared 4-core CPU; outputs in a scratch directory). First run: the pytest step with the
+    shared `tests/test_clamp.py` added, 46 passed in 22 min (its row_restricted regression alone took over 10 min under
+    load, which is why the gate leaves `tests/test_clamp.py` out); every step succeeded. Final
+    run before review: pytest 41 passed in 3.4 min; preflight, sets, fit, inject, ablate (3.2 min), bind, sign
+    (4.4 min), diss at qwen7, then the qwen1.5 steps, then the exploratory before and xtask steps, then the score; no step
+    failed or was skipped; a rerun kept every step. The score file read "provenance OK; population OK; J-D-G0 MET"; the
+    plumbing verdicts of 2 stories at 0.5B: J-D6a MET, J-D8-Q and J-D8-IOI NOT MET, every other line NOT EVALUABLE (J-D-G1
+    N_X +2.42 < 3 nats; Q_OUT and INLINE_CHAT fail J-D-G3 at 0.5B; no competent POST core). Numbers seen (2 stories, 0.5B,
+    k* = 5): ι(add 0.5 / 1 / 2Δ) 0.22 / 0.45 / 0.77, ι(move) 0.59, ID_inj(full flag)/ID_K 0.46, rank-1 capture 0.92;
+    isotropic ρ_K 1.00–1.01; Q_IN ID_K +3.72, Q_OUT +0.42; INLINE ID_K −2.58, ID_V +3.63, R(H*) 0.27; INLINE_CHAT ID_K
+    −3.51; AFTER −2.87; hop-2 carry under P1 0.29 (top 10), 1.02 (every head); the injected IOI flag's r(KV) 0.98; IOI
+    BEFORE knockout fraction −0.45; cross-task ratio 1.70 (paint), 0.29 (schedule). The final run, on commit 84e4f05, whose code is the
+    finalised code (19 min), passed pytest (61 tests in 4.2 min, J-D-G0 MET with the cross-part
+    population and Holm tests) and every step, none failed or skipped, with "provenance OK; population OK". An earlier run on
+    the reviewed code (commit c04b3eb, 22 min)
+    passed pytest (46 tests in 4.5 min) and every step, with no step failed or skipped; its score read "provenance OK;
+    population OK; J-D-G0 MET" and the same plumbing pattern (J-D-G1 N_X +2.42, below 3 nats, at 0.5B). These are plumbing values of the
+    0.5B stand-in; no confirmatory population of any study model was run. Re-scored after the audit fixes, that archive
+    gives exit status 0 with "provenance OK; population OK; J-D-G0 NOT MET", because its pytest run predates the two
+    shared files and the three added scorer tests; with the 61-test run appended to a copy of its pytest log, J-D-G0 is
+    MET and every other line of the score file is unchanged.
+
+#### Compute (A100-80GB, BF16)
+
+Calibrated on stage 6 (about 0.3 s per batched forward with hooks at 7B). Forward calls per story: fit 4 (P1 2, POST 2) +
+2 (R') + 2 (F_ioi); inject 5 (one with two attention passes); ablate 36 (9 conditions × `run_item`'s 4); bind 6; sign 9 per
+Q arm, 2 for P1, 11 for INLINE, 6 for INLINE_CHAT and AFTER; diss 8 (9 at 1.5B and 3B, with the gate batch). Each step
+but the preflight (tokenizer only) loads the model (about 1 min at 7B).
+
+| Step | Minutes (Qwen2.5-7B / Mistral-7B) |
+|---|---|
+| pytest (J-D-G0 and the shared tests, CPU) | 10 |
+| fetch (15 GB, prefetched one model ahead) | 5 |
+| preflight, sets (eager), fit | 2 + 3 + 4 |
+| inject | 4 |
+| ablate | 12 |
+| bind | 4 |
+| sign | 22 / 18 |
+| diss (qwen7 only) | 5 |
+| model loads (7 / 6 steps) | 7 / 6 |
+| per 7B model (without the fetch) | about 63 / 53 |
+| Qwen2.5-1.5B, 3B (preflight, sets, fit, diss) | about 10 and 12 |
+| exploratory (before and xtask at Qwen2.5-7B; xtask at Mistral-7B), loads included | about 6 / 6 |
+| score, manifest, archive | 3 |
+| **core total** | **about 2.3 GPU-h (the model steps and the score; about 2.6 h of wall-clock time with the pytest step and the first fetch); about 2.5 GPU-h with the exploratory steps** |
+
+The default deadline is DEADLINE_H = 3.5 h. The core steps of every model always run, in the order Qwen2.5-7B,
+Mistral-7B, Qwen2.5-1.5B, Qwen2.5-3B; the exploratory steps (before and xtask at Qwen2.5-7B, xtask at Mistral-7B) run
+after every core step, each only if at least 8 minutes remain before the deadline and the model's flags file exists
+(dropped first); the exploratory ablation conditions inside ablate are skipped when the deadline has passed before the
+ablate step starts. The two 7B models' weights stay on disk until their exploratory steps are done or skipped (no
+model is downloaded twice); the 1.5B and 3B weights are deleted after their steps, every model's at the end, unless
+KEEP_CACHE=1. Disk: ≥ 50 GB. Batch sizes: at most 29 rows per forward, 24 with a second attention pass, 11 with two
+passes; under 5 GB of activations beyond the weights. At about $2 per A100-hour, $5–6.
+
+#### Commands
+
+```bash
+J=$(git log --format=%H -1 --grep='^Finalise preregistration J$') && [ -n "$J" ] && git checkout "$J"
+bash scripts/gpu_stage8d.sh                    # no HF token needed
+TEST_MODE=1 bash scripts/gpu_stage8d.sh        # CPU plumbing run at Qwen2.5-0.5B (FP32, n = 2): qwen7 and qwen1.5
+                                               # (TEST_ALL=1: also mistral7 and qwen3b)
+python analysis/stage8d_score.py --results results/gpu_stage8d    # re-score an archive
+```
+
+#### Deviations from the design (docs/stage8_design/design_mechanism.md) as amended (docs/stage8_design/SYNTHESIS.md, section D), and the choices the amendments left open
+
+- E8 is the Random(81) stream outside U and EXCL (110 draws), not make_cores(100, Random(81)): the latter holds 3 cores of U,
+  which G6 forbids. BIND is the Random(84) stream with dloc ≠ init (100 eligible cores from 140 draws) rather than "~140
+  cores so that ~100 are eligible".
+- Gate tolerances: 1e-4 in the log-probabilities for the ablation check (the design's 1e-5 is below the FP32 rounding of
+  y − (c − μ)u, measured 1.1e-5); 1e-5 is kept for the zero injection and the exact added vector.
+- J-D-HOP2's per-head splice is a key splice (HeadSplice: the listed heads at the answer row read the clean run's keys at
+  G); per-head value splicing is not available in the shared hooks, and the account says the flag is read by key.
+- J-D-ROUTE-IOI's verdict uses the natural K_S rows; the injected-flag rows are reported with the same statistics.
+- J-D-KN's specificity condition is an equivalence test of the mean difference (95 % CI inside ±0.1 |ID_K|); the Pearson and
+  β conditions are point conditions.
+- J-D6's tolerance uses the point estimate of ρ_nat; J-D6 and J-D6a need two of the three models evaluable.
+- Ratio denominators are gated (J-D-G7) with the sizes stated there, which the amendments did not fix.
+- The scored K and V rows hold the other channel at the base run's value (run_item's convention); the flag fits use stage
+  6's key-only natural clamp, as the design defines K_W.
+- The two 7B models' weights are kept on disk until the exploratory steps at the end, so that no model is fetched twice.
+- Priors follow the critique's "implied by data in hand" column, and every class follows its prior by the common rule
+  (L ≥ 0.9, M ≥ 0.8, R < 0.8): J-D4 and J-D8-Q, which the critique called consistency checks implied by stage 6, have
+  priors 0.85 and are therefore M; J-D2 (structured controls) is class R, prior 0.55, which the amendments did not state.

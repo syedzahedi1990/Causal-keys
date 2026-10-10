@@ -1,0 +1,7 @@
+non-candidate word: garage
+[  290s] Qwen2.5-1.5B-Instruct OUT n=16 mass 1.00: ID_K -5.13 (se 0.57, frac>0 0.00); ID_V -8.24 (se 0.74, frac>0 0.00)
+      K_N: dl_B +5.82 (K_S: +5.98); dl_S +0.17; dl_X +0.60; |dl_S - dl_X| 1.74
+[  574s] Qwen2.5-1.5B-Instruct IN n=16 mass 0.99: ID_K +3.20 (se 0.48, frac>0 0.94); ID_V +9.37 (se 0.36, frac>0 1.00)
+      K_N: dl_B -3.55 (K_S: -2.17); dl_S +1.18; dl_X +0.95; |dl_S - dl_X| 1.47
+[  859s] Qwen2.5-1.5B-Instruct P1 n=16 mass 0.97: ID_K +3.53 (se 0.28, frac>0 1.00); ID_V +9.00 (se 0.28, frac>0 1.00)
+      K_N: dl_B -0.90 (K_S: -1.50); dl_S +1.76; dl_X +1.87; |dl_S - dl_X| 1.16

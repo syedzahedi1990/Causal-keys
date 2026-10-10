@@ -1,0 +1,9 @@
+Loading weights:   0%|          | 0/338 [00:00<?, ?it/s]Loading weights:   0%|          | 1/338 [00:01<10:15,  1.83s/it]Loading weights:  44%|████▍     | 148/338 [00:01<00:01, 105.34it/s]Loading weights:  64%|██████▍   | 218/338 [00:02<00:01, 92.95it/s] Loading weights:  77%|███████▋  | 260/338 [00:03<00:00, 80.15it/s]Loading weights:  85%|████████▌ | 288/338 [00:03<00:00, 82.48it/s]Loading weights:  91%|█████████▏| 309/338 [00:04<00:00, 70.73it/s]Loading weights:  96%|█████████▌| 325/338 [00:04<00:00, 69.95it/s]Loading weights: 100%|██████████| 338/338 [00:04<00:00, 64.41it/s]Loading weights: 100%|██████████| 338/338 [00:04<00:00, 69.07it/s]
+means 337s
+core 0 NONE 391s
+core 0 P1 453s
+core 0 LETTER 523s
+core 1 NONE 579s
+core 1 P1 642s
+core 1 LETTER 712s
+core 2 NONE 771s

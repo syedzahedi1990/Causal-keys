@@ -1,0 +1,21 @@
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:02<10:26,  2.17s/it]Loading weights:  92%|█████████▏| 268/290 [00:02<00:00, 164.29it/s]Loading weights: 100%|██████████| 290/290 [00:02<00:00, 126.15it/s]
+means done 0s
+  core 1 LETTER 35s
+  core 1 P1 65s
+  core 1 NONE 90s
+  core 2 LETTER 122s
+  core 2 P1 151s
+  core 2 NONE 175s
+  core 3 LETTER 207s
+  core 3 P1 234s
+  core 3 NONE 260s
+  core 4 LETTER 292s
+  core 4 P1 320s
+  core 4 NONE 344s
+  core 5 LETTER 377s
+  core 5 P1 406s
+  core 5 NONE 429s
+  core 6 LETTER 461s
+  core 6 P1 493s
+  core 6 NONE 518s
+done 517.951728105545

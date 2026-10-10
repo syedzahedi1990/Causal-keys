@@ -1,0 +1,25 @@
+level 0.9938, n=150, 100 replicates x 600 cluster-bootstrap resamples
+
+### noise inflation x1
+  template Qwen2.5-7B-Instruct
+   JB3 r(POST) true: 0.12->0.00  0.15->0.50  0.18->1.00  0.22->1.00
+   JB2 r(BEFORE) true: 0.00->1.00  0.05->0.10  0.08->0.00
+   JB4 s_ID(NONE) true: 0.06->1.00  0.09->1.00  0.11->0.00
+   JB1 s_ID(AFTER) true: 0.50->0.45  0.55->1.00  0.60->1.00
+  template OLMo-2-1124-7B-Instruct
+   JB3 r(POST) true: 0.12->0.00  0.15->0.51  0.18->1.00  0.22->1.00
+   JB2 r(BEFORE) true: 0.00->1.00  0.05->0.99  0.08->0.00
+   JB4 s_ID(NONE) true: 0.06->1.00  0.09->1.00  0.11->0.00
+   JB1 s_ID(AFTER) true: 0.50->0.54  0.55->1.00  0.60->1.00
+
+### noise inflation x2
+  template Qwen2.5-7B-Instruct
+   JB3 r(POST) true: 0.12->0.00  0.15->0.50  0.18->1.00  0.22->1.00
+   JB2 r(BEFORE) true: 0.00->1.00  0.05->0.00  0.08->0.00
+   JB4 s_ID(NONE) true: 0.06->1.00  0.09->0.94  0.11->0.05
+   JB1 s_ID(AFTER) true: 0.50->0.18  0.55->0.87  0.60->1.00
+  template OLMo-2-1124-7B-Instruct
+   JB3 r(POST) true: 0.12->0.00  0.15->0.14  0.18->0.60  0.22->0.86
+   JB2 r(BEFORE) true: 0.00->1.00  0.05->0.14  0.08->0.00
+   JB4 s_ID(NONE) true: 0.06->1.00  0.09->0.91  0.11->0.06
+   JB1 s_ID(AFTER) true: 0.50->0.50  0.55->1.00  0.60->1.00

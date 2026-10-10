@@ -1,0 +1,27 @@
+% Part E draft: Related Work for paper v5 (about 420 words, 0.45 page).
+% Every description below is supported by the cited work's abstract (checked 2026-10-10), except the existing keys
+% (cheng2026steering, oh2026rebinding, ma2025addressbook, wu2026record, makelov2024subspace), whose wording is kept from v4.
+\section{Related Work}\label{sec:related}
+
+\paragraph{Where attention looks and what it moves.}
+Every head factors into a QK circuit, which computes the attention pattern, and an OV circuit, which computes how each attended token affects the output \citep{elhage2021framework}; attention weights are only one of the two factors that determine a head's output \citep{kobayashi2020norm}.
+Duplicate-token and induction heads attend to earlier copies of the current token \citep{wang2022ioi,olsson2022context}, and a copy-suppression head attends to an earlier occurrence of a predicted token and suppresses it \citep{mcdougall2023copy}.
+Circuit components are reused across tasks \citep{merullo2024reuse}, and models route features between layers through low-rank subspaces, one of which inhibits items in context \citep{merullo2024talking}.
+We ask which of the two factors carries a written value's identity: duplicate-token matching is our first hop, and what reads it downstream sets whether and with which sign it counts.
+
+\paragraph{Binding and retrieval.}
+Bound entities are retrieved through binding IDs \citep{feng2023binding}, a low-rank subspace that encodes their order \citep{dai2024binding}, the position of the correct entity \citep{prakash2024finetuning}, lookbacks that move an address and a payload \citep{prakash2025lookbacks}, and a mix of positional, lexical and reflexive mechanisms whose balance depends on the context \citep{gurarieh2025mixing}.
+Retrieval tasks decompose into request processing in middle layers and retrieval in late layers at the last token \citep{variengien2023leap}, and factual attributes are extracted from the subject by attention heads \citep{geva2023dissecting}.
+These accounts locate retrieval in the residual stream; we separate the two cache channels of the token that states the value and find that a route through its key, a lexical match from later mentions of the candidates, exists only when such mentions follow it.
+The binding swap of \citet{prakash2025lookbacks} marks the boundary of our intervention result (\cref{sec:claim3}).
+
+\paragraph{Options and repetition.}
+Answering with option symbols requires binding options to symbols \citep{robinson2023mcsb}; specific heads select among options \citep{lieberum2023chinchilla,wiegreffe2025answer}, in middle layers by query--key alignment of the answer with the options \citep{tulchinskii2024wise}.
+Our second hop is this selection; the first hop shows where the alignment comes from when the correct option is defined by the context.
+Repeating an input lets later tokens of a causal model see all of it \citep{springer2024echo}; a later mention does this for one written value.
+
+\paragraph{Attributing interventions.}
+Interchange interventions \citep{geiger2021inducing,geiger2024finding} may act through pathways the model does not use naturally \citep{makelov2024subspace}, and steering vectors are added to activations rather than taken from a natural run \citep{turner2023actadd,panickssery2023caa}.
+Their effects are often credited to a cache channel: lookbacks move an address through QK and a payload through OV \citep{prakash2025lookbacks}, keys act as sparse routers and values as dense payloads \citep{ma2025addressbook}, binding can be edited on the key side \citep{oh2026rebinding}, and refusal steering acts mainly through OV \citep{cheng2026steering}.
+We show that for edits of a written value such credits are predicted by the unpatched model's own read in the same prompt and depth.
+KV-cache quantization already treats keys and values differently \citep{liu2024kivi}; our results suggest that which of them can be degraded depends on the answer format.

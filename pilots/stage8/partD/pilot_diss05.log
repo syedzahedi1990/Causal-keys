@@ -1,0 +1,34 @@
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<01:22,  3.52it/s]Loading weights:  59%|█████▉    | 171/290 [00:00<00:00, 544.50it/s]Loading weights:  89%|████████▉ | 259/290 [00:00<00:00, 470.22it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 444.62it/s]
+forms per word: [4, 4, 3, 4, 2, 2]
+[   299s] flags P1
+[   370s] flags POST
+/tmp/claude-0/-home-user-Causal-keys/7f2a5307-16d9-55d5-8797-c2900bcd44b4/scratchpad/s8design/partD/pilot_diss.py:86: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  wP1 = np.mean([float(f[l] @ u) for f in flags["P1"]])
+  layer  2 proj P1 +0.513 POST +0.641 ratio +1.25  |D_POST| 0.642 |D_P1| 0.513 cos +1.00
+  layer  3 proj P1 +1.653 POST +1.594 ratio +0.96  |D_POST| 1.618 |D_P1| 1.653 cos +0.99
+  layer  5 proj P1 +0.125 POST +0.062 ratio +0.49  |D_POST| 0.069 |D_P1| 0.125 cos +0.90
+  layer  6 proj P1 +0.188 POST +0.170 ratio +0.90  |D_POST| 0.234 |D_P1| 0.188 cos +0.72
+  layer  7 proj P1 +1.302 POST +1.018 ratio +0.78  |D_POST| 1.044 |D_P1| 1.302 cos +0.97
+  layer 11 proj P1 +1.047 POST +1.396 ratio +1.33  |D_POST| 1.476 |D_P1| 1.047 cos +0.95
+  layer 13 proj P1 +2.363 POST +2.266 ratio +0.96  |D_POST| 2.333 |D_P1| 2.363 cos +0.97
+  layer 14 proj P1 +0.170 POST +0.204 ratio +1.20  |D_POST| 0.235 |D_P1| 0.170 cos +0.87
+  layer 16 proj P1 +0.245 POST +0.187 ratio +0.77  |D_POST| 0.201 |D_P1| 0.245 cos +0.93
+  omega = W(POST)/W(P1) summed over layers = 0.991
+POST: case-marg cand mass 0.84; acc B 0.56; ID_K(case-marg) -0.74 (sd 0.41)
+   none       dm_X  +0.00  dl_X(renorm)  +0.00  argmax X 0.00 B 0.56
+   addX_P1    dm_X  -0.51  dl_X(renorm)  -0.46  argmax X 0.00 B 0.56
+   addX_POST  dm_X  -0.56  dl_X(renorm)  -0.50  argmax X 0.00 B 0.56
+   move_P1    dm_X  -1.03  dl_X(renorm)  -0.75  argmax X 0.00 B 0.62
+   rand       dm_X  +0.10  dl_X(renorm)  +0.10  argmax X 0.00 B 0.56
+   KX         dm_X  -1.13  dl_X(renorm)  -1.06  argmax X 0.00 B 0.62
+   KS         dm_X  +0.31  dl_X(renorm)  +0.19  argmax X 0.00 B 0.50
+P1: case-marg cand mass 0.99; acc B 0.62; ID_K(case-marg) +1.32 (sd 0.79)
+   none       dm_X  +0.00  dl_X(renorm)  +0.00  argmax X 0.06 B 0.62
+   addX_P1    dm_X  +1.45  dl_X(renorm)  +1.47  argmax X 0.12 B 0.69
+   addX_POST  dm_X  +1.61  dl_X(renorm)  +1.63  argmax X 0.12 B 0.69
+   move_P1    dm_X  +2.57  dl_X(renorm)  +1.93  argmax X 0.12 B 0.50
+   rand       dm_X  +0.02  dl_X(renorm)  +0.01  argmax X 0.00 B 0.69
+   KX         dm_X  +3.22  dl_X(renorm)  +1.89  argmax X 0.06 B 0.31
+   KS         dm_X  +2.50  dl_X(renorm)  +0.93  argmax X 0.06 B 0.38
+[   737s] done

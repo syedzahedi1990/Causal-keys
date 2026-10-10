@@ -1,0 +1,53 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+\usepackage{icml2026}
+\usepackage{amsmath,amssymb}
+\usepackage[capitalize,noabbrev]{cleveref}
+\newcommand{\nFamilies}{seven}\newcommand{\riskyMet}{NN}\newcommand{\riskyTotal}{MM}
+\begin{document}
+\icmltitlerunning{Looked Up or Copied?}
+\twocolumn[
+  \icmltitle{Looked Up or Copied? The Prompt, Not the Token, Decides Which Attention Channel Carries an In-Context Value}
+  \icmlsetsymbol{equal}{*}
+  \begin{icmlauthorlist}
+    \icmlauthor{Anonymous Authors}{anon}
+  \end{icmlauthorlist}
+  \icmlaffiliation{anon}{Anonymous Institution}
+  \icmlcorrespondingauthor{Anonymous Authors}{anon@example.com}
+  \vskip 0.3in
+]
+\printAffiliationsAndNotice{}
+\begin{abstract}
+A token that states a value in context, such as \emph{shelf} in ``the candle is moved to the shelf'', can reach a later answer in two ways: a later query can match the token's attention key, or the token's attention value can be copied.
+Clamping one channel at a time, exactly, we show that the prompt, not the token, decides which route a language model uses.
+When the candidate values are mentioned again after the writing token, as answer options or even in a neutral sentence, the value's identity is looked up: the later mentions, which already hold the candidates, match the writing token's key; otherwise the identity is copied from its value, and the same mention placed before the token opens no lookup.
+This holds on fresh stories in \nFamilies{} model families up to 72B parameters and on reading-comprehension passages with multi-token answers, where swapping only the answer span's cached keys changes multiple-choice answers and swapping only its values changes free-form ones.
+In the lookup, duplicate-token heads at each later mention match the writing token's key and write a low-rank flag that the answer then selects; in small models the match is present but does not reach the answer, and the question sets its sign, which explains why some re-mentions read negatively.
+Because the route depends on the prompt, so does the channel credited with an intervention: for steering vectors, sparse-autoencoder features and learned subspace edits that change the written value, the share carried by keys matches the unpatched model's own share in the same prompt at the same depth, whereas a binding swap departs from it; \riskyMet{} of \riskyTotal{} risky preregistered predictions held, and we report every failure.
+\end{abstract}
+\section{Introduction}\label{sec:claim1}\label{sec:claim2}\label{sec:claim3}
+\begin{table}[t]
+  \centering
+  \caption{\textbf{What QK/OV and the causal mask imply, and what we find.} ``Implied?'': does the answer follow from the architecture alone? Status: preregistered and risky (R), preregistered replication (L), exploratory (X).}
+  \label{tab:qkov}
+  \footnotesize\setlength{\tabcolsep}{3pt}
+  \begin{tabular}{@{}p{0.35\columnwidth}p{0.11\columnwidth}p{0.48\columnwidth}@{}}
+    \toprule
+    Question & Implied? & Finding (status; section) \\
+    \midrule
+    Can a mention \emph{before} the writing token read its key? & No & None, in every family and on passages (R; \cref{sec:claim1}) \\
+    With a later mention, is the key used instead of copying? & No & Key carries most of the identity; value without a mention (R; \cref{sec:claim1}) \\
+    Does the route change behaviour? & No & Key-only swaps flip MCQ answers, value-only swaps free-form (R; \cref{sec:claim1}) \\
+    Is a matching query sufficient? & Partly & No: match present, no read at 1.5B/3B (L, D-i: R; \cref{sec:claim2}) \\
+    What does the reader write? & No & A low-rank flag; injected alone, it moves the answer (D-i: R; \cref{sec:claim2}) \\
+    What sets the sign of a key read? & No & The question; same readers (D-ii: R; \cref{sec:claim2}) \\
+    Where does an intervention appear to act? & No & Where the natural read is, at matched depth; not for a binding swap (C: R; \cref{sec:claim3}) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+\end{document}

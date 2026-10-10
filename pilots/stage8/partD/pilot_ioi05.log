@@ -1,0 +1,10 @@
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:48,  6.00it/s]Loading weights:  51%|█████     | 148/290 [00:00<00:00, 668.03it/s]Loading weights:  80%|████████  | 232/290 [00:00<00:00, 663.54it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 600.52it/s]
+[224s] INLINE: n=24; clean LD(IO_B - S) mean +3.94, frac>0 1.00
+   ID_K[none ] +0.000 (se 0.000)
+   ID_K[H    ] -2.119 (se 0.116)
+   ID_K[r0   ] +0.002 (se 0.001)
+   ID_K[r1   ] -0.001 (se 0.002)
+   ID_K[allG ] -2.234 (se 0.127)
+   ID_K[koH  ] -0.074 (se 0.023)
+   ID_K[allT ] -2.750 (se 0.138)
+   R(H*) = +0.95; KO(H*) = +0.97; R(rand) = -0.00, +0.00; d_G/d_full = +0.81

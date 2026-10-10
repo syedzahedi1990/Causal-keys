@@ -1,0 +1,10 @@
+Loading weights:   0%|          | 0/338 [00:00<?, ?it/s]Loading weights:   0%|          | 1/338 [00:00<01:38,  3.43it/s]Loading weights:  29%|██▉       | 99/338 [00:00<00:00, 284.30it/s]Loading weights:  41%|████▏     | 140/338 [00:00<00:00, 277.29it/s]Loading weights:  52%|█████▏    | 175/338 [00:00<00:00, 281.46it/s]Loading weights:  62%|██████▏   | 208/338 [00:00<00:00, 265.99it/s]Loading weights:  70%|███████   | 238/338 [00:01<00:00, 122.15it/s]Loading weights:  77%|███████▋  | 259/338 [00:02<00:01, 69.07it/s] Loading weights:  81%|████████  | 274/338 [00:02<00:00, 71.96it/s]Loading weights:  86%|████████▌ | 291/338 [00:02<00:00, 82.50it/s]Loading weights:  91%|█████████ | 306/338 [00:02<00:00, 59.21it/s]Loading weights:  94%|█████████▍| 317/338 [00:03<00:00, 42.37it/s]Loading weights:  97%|█████████▋| 327/338 [00:03<00:00, 47.08it/s]Loading weights:  99%|█████████▉| 336/338 [00:03<00:00, 51.76it/s]Loading weights: 100%|██████████| 338/338 [00:03<00:00, 89.08it/s]
+means done 197s
+  core 1 NONE 234s
+  core 1 LETTER 283s
+  core 2 NONE 324s
+  core 2 LETTER 384s
+  core 3 NONE 422s
+  core 3 LETTER 464s
+  core 4 NONE 497s
+  core 4 LETTER 834s

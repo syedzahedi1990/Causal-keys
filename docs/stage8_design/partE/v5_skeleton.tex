@@ -1,0 +1,74 @@
+% Part E: skeleton of the v5 main text (8 pages). Budgets are words of running text (about 930 words per full page
+% in the ICML two-column format) plus float area in pages. Labels are the ones the other Part-E snippets reference.
+% Rules: no prediction codes in the main text; every result sentence ends with a status tag in words
+% ("preregistered, risky; met in 4/4 new families"); at most two numbers per paragraph; symbols limited to
+% ID_K, ID_V, s_ID (identity key share), kappa (an edit's identity key share); every number is a numbers.tex macro.
+
+% Title + abstract: v5_title_abstract.tex                                            [0.45 p, page 1]
+
+\section{Introduction}\label{sec:intro}                                               % [650 w + Fig 1 0.40 p + Table 1 0.20 p = 1.35 p]
+% P1 (120 w) Problem. Mechanistic claims credit components, often a cache channel (address vs payload, routers vs payloads,
+%    key-side edits, OV-mediated steering: cite as in v5_related.tex). Example sentence; the two routes defined plainly:
+%    LOOKED UP = a later token that already holds a candidate matches the writing token's key, so the identity reaches the
+%    answer from that token; COPIED = the identity is moved out of the writing token's value. (Pre-empts the sceptic's
+%    "the identity does not travel from p at all": that is the definition of a lookup.)
+% P2 (100 w) Method in one breath: exact single-channel clamps at the writing token (both channels from layer 0 = the
+%    source run), formats that vary whether and where candidates are mentioned; data = templated stories (discovery:
+%    10 models; fresh confirmation: 8 models, 4 new families), SQuAD passages with multi-token answers (4 families);
+%    every prediction preregistered with a risk label.
+% P3 (120 w) Claim 1 + one number (s_ID with vs without later mention) + behaviour sentence.
+% P4 (110 w) Claim 2: two hops, flag, small-model and sign facts.
+% P5 (110 w) Claim 3: the matched-depth law on independent edits; boundary = binding swap.
+% P6 (180 w) Novelty paragraph: v5_novelty.tex (+ Table 1 = tab:qkov).
+% Fig 1 (full width): (a) lookup vs copy with hop 1, flag, hop 2; (b) format strip: after / before / none, templated and
+%    passage example; (c) the attribution consequence: an edit's kappa follows the natural s_ID.
+
+\section{Reading a written value through its key or its value}\label{sec:setup}        % [800 w, no float]
+% Writing token, base/source/third value (B, S, X); formats (one sentence each; exact strings in App. B).
+% Clamp C_K, C_V, C_KV from layer l0; exactness one sentence (App. C proof).
+% ID_K, ID_V (double difference, displayed equation), s_ID; emitted-form scoring (surface-form logsumexp; App.) and
+%    generation-based key-flip / value-flip rates (words, no symbols).
+% Passages: SQuAD counterfactual spans (one paragraph; App. for item rules).
+% Models (by family), statistics (cluster bootstrap over stories or articles), preregistration + risk labels (one para).
+
+\section{Later mentions decide the route}\label{sec:claim1}                              % [800 w + Fig 2 0.45 p + Table 2 0.25 p]
+% P1 Discovery (templated, 10 models, discovery sample; sentence effect found post hoc - say so).
+% P2 Fresh-sample confirmation: 2x2 on new stories, 8 models incl. 4 new families, emitted forms (Table 2).
+% P3 Passages with multi-token answers: lookup with options after, copy without, no read before (Fig 2b).
+% P4 Behaviour: key-only swaps flip MCQ answers, value-only swaps flip free-form answers (Fig 2c); MCQ answers survive
+%    value corruption that breaks free form; multi-token continuation detail one sentence (App.).
+% P5 Scope sentence: paint/schedule tasks, role swap, onset (deeper onsets shrink the key read; App.).
+
+\section{A generic match, read downstream}\label{sec:claim2}                             % [800 w + Fig 3 0.40 p]
+% 4.1 Hop 1 (P1): 5% of heads recover / remove the option rows' read; random and D-ranked controls; their core is
+%     canonical duplicate-token heads (state the set-size dependence); natural-text readers and template-to-passage transfer.
+% 4.1 (P2) The flag: a low-rank direction in the readers' output at the matched mention; injected alone into an absent
+%     option's row it moves the answer there; random direction and non-option row do not.
+% 4.2 Hop 2 (P3): the answer reads the flagged mention (select-and-copy-like QK selection); MCQ readers are not needed
+%     for free-form answers.
+% 4.3 Where the match is not read, or read negatively (P4): 1.5B/3B (match present, flag written/not read);
+%     sign set by the question; IOI in-sentence re-mentions through the same readers; LIST-BEFORE residual sign.
+
+\section{Where an intervention appears to act}\label{sec:claim3}                         % [700 w + Fig 4 0.30 p]
+% 5.1 (P1) The law: kappa(edit, prompt, depth) = s_ID of the unpatched model in the same prompt from the next block on.
+%     The tautology lemma in one sentence: a full-residual patch of the writing token IS the natural clamp, so only edits
+%     whose cached K/V differ from the natural ones (nu >= 0.30) test the law.
+% 5.2 (P2-P3) Independent edits (steering from held-out stories, from unrelated sentences, third-party SAE features,
+%     DAS remaps trained here) across formats, depths, three families: Fig 4; same readers; depth tracking.
+% 5.3 (P4) Motivating case: the released remap of prior work (described in-paper; App. for details), its refit, 24B readers.
+% 5.3 (P5) Boundary: the binding swap departs (failed preregistered extension); at the same depth an identity edit
+%     follows the law, so the kind of edit, not depth, sets the boundary.
+
+% Related work: v5_related.tex                                                        [470 w = 0.5 p]
+
+\section{Discussion}\label{sec:discussion}                                              % [450 w + Table 3 0.15 p]
+% What to do differently (4 bullets): state where candidates are mentioned relative to the writing token; test channel
+%    claims with and without a later mention, with a before-the-token control; do not validate free-form mechanisms or
+%    KV-cache methods on MCQ formats only; predict an intervention's channel from the natural read at the same depth
+%    before attributing it.
+% Table 3: evidence status per claim (risky met/total, replication met/total, exploratory, failures named in words).
+% Limitations (in words, each one sentence): scoring and its invariance; single-channel clamps are off-distribution
+%    (interaction ~0 at onset 0); key read at onset 0 includes early token matching (onset results); readers' canonical
+%    core depends on set size; ablation vs knockout reconciled only on passages; binding swap flips no answer when
+%    candidates are named; values of one to four tokens; English only.
+% Conclusion (3 sentences).

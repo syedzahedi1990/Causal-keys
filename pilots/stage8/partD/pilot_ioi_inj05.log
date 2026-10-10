@@ -1,0 +1,19 @@
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:59,  4.83it/s]Loading weights:  57%|█████▋    | 165/290 [00:00<00:00, 670.67it/s]Loading weights:  90%|█████████ | 262/290 [00:00<00:00, 657.92it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 602.50it/s]
+/tmp/claude-0/-home-user-Causal-keys/7f2a5307-16d9-55d5-8797-c2900bcd44b4/scratchpad/s8design/partD/pilot_ioi_inject.py:76: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  print(f"  layer {l:2d} |D_ioi| {DI[l].norm():.3f} |D_belief| {DB[l].norm():.3f} cos {float(torch.nn.functional.cosine_similarity(DI[l], DB[l], dim=0)):+.2f}")
+  layer  2 |D_ioi| 0.514 |D_belief| 0.513 cos +0.86
+  layer  3 |D_ioi| 2.252 |D_belief| 1.653 cos +0.52
+  layer  5 |D_ioi| 0.095 |D_belief| 0.125 cos -0.01
+  layer  6 |D_ioi| 0.439 |D_belief| 0.188 cos +0.68
+  layer  7 |D_ioi| 2.196 |D_belief| 1.302 cos +0.45
+  layer 11 |D_ioi| 0.908 |D_belief| 1.047 cos +0.08
+  layer 13 |D_ioi| 1.842 |D_belief| 2.363 cos +0.30
+  layer 14 |D_ioi| 0.152 |D_belief| 0.170 cos -0.03
+  layer 16 |D_ioi| 0.218 |D_belief| 0.245 cos +0.10
+[38s] n=20
+   none         dl(IO_X, 4-way) +0.000 (se 0.000)
+   addX_ioi     dl(IO_X, 4-way) -2.203 (se 0.253)
+   addX_belief  dl(IO_X, 4-way) -0.583 (se 0.130)
+   rand         dl(IO_X, 4-way) -0.023 (se 0.068)
+   KX           dl(IO_X, 4-way) -4.627 (se 0.339)

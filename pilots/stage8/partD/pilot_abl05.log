@@ -1,0 +1,7 @@
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:52,  5.48it/s]Loading weights:  43%|████▎     | 125/290 [00:00<00:00, 517.99it/s]Loading weights:  66%|██████▌   | 190/290 [00:00<00:00, 520.00it/s]Loading weights:  91%|█████████ | 263/290 [00:00<00:00, 582.64it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 528.42it/s]
+[10s] mu fitted
+[357s] n=16
+   none   ID_K +1.29  rho_K +1.00  ID_V +3.26  base argmax 0.62
+   flag   ID_K +0.10  rho_K +0.08  ID_V +3.00  base argmax 0.44
+   rand0  ID_K +1.28  rho_K +0.99  ID_V +3.26  base argmax 0.62
+   rand1  ID_K +1.28  rho_K +0.99  ID_V +3.25  base argmax 0.62

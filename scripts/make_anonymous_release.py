@@ -18,7 +18,7 @@ import sys
 from pathlib import Path
 
 EXCLUDE = ("paper/BRIEF.md", "docs/PAPER2_PROPOSAL.md", "docs/GPU_RUNBOOK.md", "docs/V3_STAGE5_IMPLICATIONS.md", "docs/V3_PLAN.md", "paper/sections/old/", "notebooks/",
-           "scripts/make_anonymous_release.py")  # the script would scrub (and so expose) its own patterns
+           "scripts/make_anonymous_release.py", "docs/stage8_design/")  # the script would scrub (and so expose) its own patterns
 TRACKED_HISTORY = ["docs/PREREGISTRATION.md", "analysis/stage1_prereg.py", "analysis/stage2_score.py",
                    "analysis/stage3_score.py", "analysis/stage3b_score.py", "analysis/stage4_score.py",
                    "analysis/stage5_score.py", "analysis/stage5_parts", "analysis/stage6_score.py", "analysis/stage6_parts",

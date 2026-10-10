@@ -1,0 +1,10 @@
+law           n= 60  P(C3 met per model-family set of 12 cells) = 1.00   mean MAD 0.010  mean max 0.030  mean UB 0.019
+law           n=120  P(C3 met per model-family set of 12 cells) = 1.00   mean MAD 0.007  mean max 0.020  mean UB 0.014
+partial_0.15  n= 60  P(C3 met per model-family set of 12 cells) = 1.00   mean MAD 0.078  mean max 0.171  mean UB 0.086
+partial_0.15  n=120  P(C3 met per model-family set of 12 cells) = 1.00   mean MAD 0.077  mean max 0.164  mean UB 0.083
+partial_0.25  n= 60  P(C3 met per model-family set of 12 cells) = 0.01   mean MAD 0.123  mean max 0.270  mean UB 0.131
+partial_0.25  n=120  P(C3 met per model-family set of 12 cells) = 0.04   mean MAD 0.122  mean max 0.263  mean UB 0.128
+copy_only     n= 60  P(C3 met per model-family set of 12 cells) = 0.00   mean MAD 0.481  mean max 0.942  mean UB 0.488
+copy_only     n=120  P(C3 met per model-family set of 12 cells) = 0.00   mean MAD 0.480  mean max 0.941  mean UB 0.485
+key_flat      n= 60  P(C3 met per model-family set of 12 cells) = 0.00   mean MAD 0.243  mean max 0.618  mean UB 0.251
+key_flat      n=120  P(C3 met per model-family set of 12 cells) = 0.00   mean MAD 0.241  mean max 0.617  mean UB 0.247

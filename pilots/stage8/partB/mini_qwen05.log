@@ -1,0 +1,18 @@
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:52,  5.54it/s]Loading weights:  39%|███▊      | 112/290 [00:00<00:00, 470.70it/s]Loading weights:  59%|█████▉    | 172/290 [00:00<00:00, 487.51it/s]Loading weights:  79%|███████▊  | 228/290 [00:00<00:00, 439.11it/s]Loading weights:  96%|█████████▌| 277/290 [00:00<00:00, 424.51it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 419.72it/s]
+Qwen/Qwen2.5-0.5B-Instruct: SIGMA trie nodes 9, SIGMA+ nodes 33
+
+== NONE (n=6, 613s)  mass low 0.135  SIGMA 0.694  SIGMA+ 0.873  gen-acc(B) 1.00  gen-other 0.00
+   low : ID_K  +0.154  ID_V  +7.383  s_ID +0.020
+   sig : ID_K  -0.015  ID_V  +7.103  s_ID -0.002
+   plus: ID_K  -0.008  ID_V  +6.738  s_ID -0.001
+   behaviour: beta_K +0.00  beta_V +0.75;  SIGMA-argmax agrees with generation 0.97 (n=30)
+   top first tokens (clean B): ' Box':0.13, ' Cabinet':0.12, ' In':0.11, ' Closet':0.10, ' Basket':0.09, ' On':0.09
+   example generations clean B: [' On the shelf', ' Box', ' Cabinet', ' Closet']
+
+== POST (n=6, 796s)  mass low 0.238  SIGMA 0.800  SIGMA+ 0.912  gen-acc(B) 0.67  gen-other 0.00
+   low : ID_K  -0.459  ID_V  +3.593  s_ID -0.146
+   sig : ID_K  -0.508  ID_V  +3.476  s_ID -0.171
+   plus: ID_K  -0.489  ID_V  +3.194  s_ID -0.181
+   behaviour: beta_K +0.00  beta_V +0.58;  SIGMA-argmax agrees with generation 0.97 (n=30)
+   top first tokens (clean B): ' Cabinet':0.13, ' Drawer':0.12, ' Box':0.11, ' cabinet':0.09, ' Closet':0.09, ' In':0.08
+   example generations clean B: [' Drawer', ' Box', ' Cabinet', ' Closet']

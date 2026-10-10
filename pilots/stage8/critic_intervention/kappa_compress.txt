@@ -1,0 +1,14 @@
+== Qwen2.5-7B
+ c_K/c_V=0.33 gaps LETTER:-0.021 P1:-0.238 POST:-0.184 NONE:-0.039 | MAD 0.120 max 0.238 -> JC3 fail | JC2 crossover 0.95
+ c_K/c_V=0.50 gaps LETTER:-0.010 P1:-0.139 POST:-0.129 NONE:-0.029 | MAD 0.077 max 0.139 -> JC3 PASS | JC2 crossover 0.95
+ c_K/c_V=0.67 gaps LETTER:-0.005 P1:-0.075 POST:-0.080 NONE:-0.019 | MAD 0.045 max 0.080 -> JC3 PASS | JC2 crossover 0.94
+ c_K/c_V=1.50 gaps LETTER:+0.004 P1:+0.060 POST:+0.093 NONE:+0.027 | MAD 0.046 max 0.093 -> JC3 PASS | JC2 crossover 0.91
+ c_K/c_V=2.00 gaps LETTER:+0.005 P1:+0.094 POST:+0.164 NONE:+0.052 | MAD 0.079 max 0.164 -> JC3 PASS | JC2 crossover 0.88
+ c_K/c_V=3.00 gaps LETTER:+0.007 P1:+0.131 POST:+0.265 NONE:+0.099 | MAD 0.126 max 0.265 -> JC3 fail | JC2 crossover 0.84
+== Mistral-7B
+ c_K/c_V=0.33 gaps LETTER:-0.102 P1:-0.185 POST:-0.222 NONE:-0.026 | MAD 0.134 max 0.222 -> JC3 fail | JC2 crossover 0.82
+ c_K/c_V=0.50 gaps LETTER:-0.053 P1:-0.102 POST:-0.152 NONE:-0.019 | MAD 0.081 max 0.152 -> JC3 PASS | JC2 crossover 0.87
+ c_K/c_V=0.67 gaps LETTER:-0.027 P1:-0.054 POST:-0.092 NONE:-0.012 | MAD 0.046 max 0.092 -> JC3 PASS | JC2 crossover 0.89
+ c_K/c_V=1.50 gaps LETTER:+0.019 P1:+0.040 POST:+0.100 NONE:+0.018 | MAD 0.045 max 0.100 -> JC3 PASS | JC2 crossover 0.90
+ c_K/c_V=2.00 gaps LETTER:+0.029 P1:+0.062 POST:+0.172 NONE:+0.036 | MAD 0.075 max 0.172 -> JC3 PASS | JC2 crossover 0.89
+ c_K/c_V=3.00 gaps LETTER:+0.039 P1:+0.085 POST:+0.266 NONE:+0.069 | MAD 0.115 max 0.266 -> JC3 fail | JC2 crossover 0.87

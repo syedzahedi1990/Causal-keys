@@ -1,0 +1,31 @@
+n items 4
+
+===== scorer marg
+--- NONE  clean-B candidate mass 0.99
+l= 1 | T ID_KV  10.57 (x1.00) flip 0.50 | CI ID_KV  10.59 (x1.00) flip 0.50 | CO ID_KV  10.69 (x1.01) flip 0.50 | R dm_SB +1.50 flip 0.00 | BIND Phi -0.00 flip->init 0.00
+l= 5 | T ID_KV  10.59 (x1.00) flip 0.50 | CI ID_KV  10.74 (x1.01) flip 0.62 | CO ID_KV  10.83 (x1.02) flip 0.62 | R dm_SB +1.06 flip 0.00 | BIND Phi +0.03 flip->init 0.00
+l= 9 | T ID_KV  10.65 (x1.00) flip 0.50 | CI ID_KV  10.89 (x1.02) flip 0.62 | CO ID_KV  10.37 (x0.97) flip 0.50 | R dm_SB +1.25 flip 0.00 | BIND Phi +0.16 flip->init 0.00
+l=13 | T ID_KV  10.60 (x1.00) flip 0.50 | CI ID_KV  10.84 (x1.02) flip 0.50 | CO ID_KV  10.57 (x1.00) flip 0.50 | R dm_SB +0.83 flip 0.00 | BIND Phi +0.60 flip->init 0.25
+--- LETTER  clean-B candidate mass 1.00
+l= 1 | T ID_KV   7.21 (x1.00) flip 0.75 | CI ID_KV   7.21 (x1.00) flip 0.75 | CO ID_KV   7.22 (x1.00) flip 0.75 | R dm_SB -0.19 flip 0.00 | BIND Phi -0.00 flip->init 0.00
+l= 5 | T ID_KV   6.94 (x1.00) flip 0.75 | CI ID_KV   7.10 (x1.02) flip 0.75 | CO ID_KV   7.22 (x1.04) flip 0.75 | R dm_SB -0.20 flip 0.00 | BIND Phi +0.02 flip->init 0.00
+l= 9 | T ID_KV   2.20 (x1.00) flip 0.38 | CI ID_KV   2.29 (x1.04) flip 0.38 | CO ID_KV   2.01 (x0.91) flip 0.38 | R dm_SB -0.17 flip 0.00 | BIND Phi +0.03 flip->init 0.00
+l=13 | T ID_KV   0.35 (x1.00) flip 0.00 | CI ID_KV   0.34 (x0.97) flip 0.00 | CO ID_KV   0.17 (x0.50) flip 0.00 | R dm_SB +0.28 flip 0.25 | BIND Phi +0.44 flip->init 0.00
+
+===== scorer lower
+--- NONE  clean-B candidate mass 0.49
+l= 1 | T ID_KV  10.95 (x1.00) flip 0.50 | CI ID_KV  10.96 (x1.00) flip 0.50 | CO ID_KV  11.05 (x1.01) flip 0.50 | R dm_SB +1.50 flip 0.00 | BIND Phi -0.00 flip->init 0.25
+l= 5 | T ID_KV  10.97 (x1.00) flip 0.50 | CI ID_KV  11.16 (x1.02) flip 0.50 | CO ID_KV  11.17 (x1.02) flip 0.50 | R dm_SB +1.05 flip 0.00 | BIND Phi +0.04 flip->init 0.25
+l= 9 | T ID_KV  11.04 (x1.00) flip 0.50 | CI ID_KV  11.30 (x1.02) flip 0.50 | CO ID_KV  10.73 (x0.97) flip 0.50 | R dm_SB +1.42 flip 0.00 | BIND Phi +0.18 flip->init 0.25
+l=13 | T ID_KV  10.97 (x1.00) flip 0.50 | CI ID_KV  11.25 (x1.03) flip 0.50 | CO ID_KV  10.89 (x0.99) flip 0.50 | R dm_SB +1.13 flip 0.00 | BIND Phi +0.64 flip->init 0.75
+--- LETTER  clean-B candidate mass 1.00
+l= 1 | T ID_KV   7.21 (x1.00) flip 0.75 | CI ID_KV   7.21 (x1.00) flip 0.75 | CO ID_KV   7.22 (x1.00) flip 0.75 | R dm_SB -0.19 flip 0.00 | BIND Phi -0.00 flip->init 0.00
+l= 5 | T ID_KV   6.94 (x1.00) flip 0.75 | CI ID_KV   7.10 (x1.02) flip 0.75 | CO ID_KV   7.22 (x1.04) flip 0.75 | R dm_SB -0.20 flip 0.00 | BIND Phi +0.02 flip->init 0.00
+l= 9 | T ID_KV   2.20 (x1.00) flip 0.38 | CI ID_KV   2.29 (x1.04) flip 0.38 | CO ID_KV   2.01 (x0.91) flip 0.38 | R dm_SB -0.17 flip 0.00 | BIND Phi +0.03 flip->init 0.00
+l=13 | T ID_KV   0.35 (x1.00) flip 0.00 | CI ID_KV   0.34 (x0.97) flip 0.00 | CO ID_KV   0.17 (x0.50) flip 0.00 | R dm_SB +0.28 flip 0.25 | BIND Phi +0.44 flip->init 0.00
+
+===== non-equivalence (NONE arm; identical prefix in every arm)
+l= 1 CI.resid 0.072  CI.cos 0.997  CI.normratio 0.992  CI.kv 0.038  CO.resid 0.252  CO.cos 0.968  CO.normratio 1.002  CO.kv 0.120  T.kv 0.000
+l= 5 CI.resid 0.168  CI.cos 0.987  CI.normratio 0.943  CI.kv 0.160  CO.resid 0.420  CO.cos 0.916  CO.normratio 1.022  CO.kv 0.320  T.kv 0.000
+l= 9 CI.resid 0.256  CI.cos 0.969  CI.normratio 0.909  CI.kv 0.257  CO.resid 0.599  CO.cos 0.839  CO.normratio 1.102  CO.kv 0.622  T.kv 0.000
+l=13 CI.resid 0.285  CI.cos 0.961  CI.normratio 0.914  CI.kv 0.328  CO.resid 0.633  CO.cos 0.803  CO.normratio 1.067  CO.kv 0.703  T.kv 0.000

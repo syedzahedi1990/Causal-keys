@@ -1,0 +1,22 @@
+n stories 2
+
+=== block 9
+NONE   nat ID  10.45 | CO phi  0.99 fl 0.50 | SYN phi  0.08 fl 0.00 | FR phi  0.39 fl 0.00 | CI phi  1.01 fl 0.50 | CIperp phi  0.13 fl 0.00 | T flip 0.50
+P1     nat ID   6.13 | CO phi  0.95 fl 0.75 | SYN phi  0.04 fl 0.00 | FR phi  0.30 fl 0.00 | CI phi  1.00 fl 0.75 | CIperp phi  0.14 fl 0.00 | T flip 0.75
+LETTER nat ID   2.10 | CO phi  0.93 fl 0.25 | SYN phi  0.17 fl 0.00 | FR phi  0.02 fl 0.00 | CI phi  1.11 fl 0.25 | CIperp phi  0.13 fl 0.00 | T flip 0.25
+transfer phi(LETTER)/phi(NONE), phi(P1)/phi(NONE): CO  0.94, 0.96 | SYN  2.20, 0.59 | FR  0.05, 0.75 | CI  1.11, 1.00 | CIperp  1.04, 1.14 | 
+resid cos with natural: CO 0.84 (norm x1.08) SYN 0.18 (norm x1.12) FR 0.42 (norm x1.06) CI 0.97 (norm x0.91) CIperp 0.48 (norm x0.46)
+
+=== block 13
+NONE   nat ID  10.24 | CO phi  1.01 fl 0.50 | SYN phi  0.06 fl 0.00 | FR phi  0.36 fl 0.00 | CI phi  1.02 fl 0.50 | CIperp phi  0.12 fl 0.00 | T flip 0.50
+P1     nat ID   4.87 | CO phi  1.03 fl 0.75 | SYN phi  0.04 fl 0.00 | FR phi  0.25 fl 0.00 | CI phi  1.01 fl 0.50 | CIperp phi  0.11 fl 0.00 | T flip 0.75
+LETTER nat ID   0.39 | CO phi  0.34 fl 0.00 | SYN phi  0.30 fl 0.00 | FR phi  0.61 fl 0.00 | CI phi  1.06 fl 0.00 | CIperp phi  0.58 fl 0.00 | T flip 0.00
+transfer phi(LETTER)/phi(NONE), phi(P1)/phi(NONE): CO  0.34, 1.02 | SYN  5.00, 0.74 | FR  1.71, 0.70 | CI  1.04, 0.99 | CIperp  4.98, 0.98 | 
+resid cos with natural: CO 0.83 (norm x1.06) SYN 0.16 (norm x1.13) FR 0.39 (norm x0.99) CI 0.96 (norm x0.92) CIperp 0.48 (norm x0.48)
+
+=== block 17
+NONE   nat ID  10.17 | CO phi  1.01 fl 0.50 | SYN phi  0.06 fl 0.00 | FR phi  0.34 fl 0.00 | CI phi  1.02 fl 0.50 | CIperp phi  0.11 fl 0.00 | T flip 0.50
+P1     nat ID   3.91 | CO phi  1.21 fl 0.50 | SYN phi  0.03 fl 0.00 | FR phi  0.28 fl 0.00 | CI phi  1.09 fl 0.25 | CIperp phi  0.09 fl 0.00 | T flip 0.00
+LETTER nat ID   0.06 | CO phi  0.16 fl 0.00 | SYN phi  0.39 fl 0.00 | FR phi  0.76 fl 0.00 | CI phi  1.18 fl 0.00 | CIperp phi  1.07 fl 0.00 | T flip 0.00
+transfer phi(LETTER)/phi(NONE), phi(P1)/phi(NONE): CO  0.16, 1.20 | SYN  7.07, 0.61 | FR  2.20, 0.81 | CI  1.15, 1.07 | CIperp  9.31, 0.75 | 
+resid cos with natural: CO 0.83 (norm x1.07) SYN 0.16 (norm x1.14) FR 0.38 (norm x1.00) CI 0.95 (norm x0.92) CIperp 0.46 (norm x0.47)

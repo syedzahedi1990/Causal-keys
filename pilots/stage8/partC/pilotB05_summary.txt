@@ -1,0 +1,31 @@
+n items 6 max exact-check 0.0
+
+===== scorer marg
+--- LETTER
+l= 1 (onset  2) | T kID +0.77 (K  1.06 V  0.31 KV  1.65) | CI kID +0.77 (K  1.06 V  0.31 KV  1.66) | CO kID +0.78 (K  1.05 V  0.30 KV  1.63) | BIND Phi -0.02 psiK +0.44 psiV +0.55
+l= 9 (onset 10) | T kID +0.89 (K  0.24 V  0.03 KV  0.26) | CI kID +0.84 (K  0.20 V  0.04 KV  0.26) | CO kID +0.82 (K  0.17 V  0.04 KV  0.19) | BIND Phi -0.00 psiK +1.52 psiV -0.11
+--- P1
+l= 1 (onset  2) | T kID +0.24 (K  0.91 V  2.96 KV  4.23) | CI kID +0.23 (K  0.91 V  2.96 KV  4.23) | CO kID +0.23 (K  0.89 V  2.96 KV  4.22) | BIND Phi -0.02 psiK +1.00 psiV -0.00
+l= 9 (onset 10) | T kID +0.09 (K  0.24 V  2.55 KV  3.33) | CI kID +0.07 (K  0.20 V  2.47 KV  3.30) | CO kID +0.06 (K  0.18 V  2.62 KV  3.31) | BIND Phi +0.01 psiK -1.42 psiV +2.51
+--- NONE
+l= 1 (onset  2) | T kID +0.01 (K  0.04 V  6.13 KV  6.64) | CI kID +0.01 (K  0.04 V  6.14 KV  6.63) | CO kID +0.01 (K  0.05 V  6.17 KV  6.58) | BIND Phi -0.06 psiK +0.51 psiV +0.50
+l= 9 (onset 10) | T kID +0.01 (K  0.04 V  6.10 KV  6.64) | CI kID +0.01 (K  0.04 V  5.92 KV  6.65) | CO kID +0.01 (K  0.06 V  6.27 KV  6.54) | BIND Phi -0.06 psiK +1.00 psiV +0.05
+
+===== scorer lower
+--- LETTER
+l= 1 (onset  2) | T kID +0.77 (K  1.06 V  0.31 KV  1.65) | CI kID +0.77 (K  1.06 V  0.31 KV  1.66) | CO kID +0.78 (K  1.05 V  0.30 KV  1.63) | BIND Phi -0.02 psiK +0.44 psiV +0.55
+l= 9 (onset 10) | T kID +0.89 (K  0.24 V  0.03 KV  0.26) | CI kID +0.84 (K  0.20 V  0.04 KV  0.26) | CO kID +0.82 (K  0.17 V  0.04 KV  0.19) | BIND Phi -0.00 psiK +1.52 psiV -0.11
+--- P1
+l= 1 (onset  2) | T kID +0.24 (K  0.92 V  2.97 KV  4.24) | CI kID +0.24 (K  0.92 V  2.97 KV  4.25) | CO kID +0.23 (K  0.90 V  2.97 KV  4.23) | BIND Phi -0.02 psiK +1.01 psiV -0.01
+l= 9 (onset 10) | T kID +0.09 (K  0.24 V  2.56 KV  3.34) | CI kID +0.08 (K  0.20 V  2.48 KV  3.31) | CO kID +0.07 (K  0.18 V  2.63 KV  3.33) | BIND Phi +0.01 psiK -1.43 psiV +2.52
+--- NONE
+l= 1 (onset  2) | T kID +0.03 (K  0.20 V  6.41 KV  7.11) | CI kID +0.03 (K  0.20 V  6.42 KV  7.09) | CO kID +0.03 (K  0.20 V  6.45 KV  7.04) | BIND Phi -0.06 psiK +0.56 psiV +0.45
+l= 9 (onset 10) | T kID +0.03 (K  0.20 V  6.38 KV  7.10) | CI kID +0.03 (K  0.18 V  6.19 KV  7.11) | CO kID +0.03 (K  0.22 V  6.50 KV  6.97) | BIND Phi -0.06 psiK +1.18 psiV -0.14
+
+===== story-level discrimination D = mean|ID_K^E - ID_K^T| / mean ID_KV^T (scorer marg)
+LETTER l= 1 CI D 0.007  CO D 0.015
+LETTER l= 9 CI D 0.190  CO D 0.287
+P1     l= 1 CI D 0.002  CO D 0.010
+P1     l= 9 CI D 0.012  CO D 0.022
+NONE   l= 1 CI D 0.002  CO D 0.003
+NONE   l= 9 CI D 0.003  CO D 0.011

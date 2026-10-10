@@ -1,0 +1,34 @@
+[    94s] fit on 30 stories
+leave-one-word-out fit sizes {'box': 21, 'basket': 23, 'shelf': 23, 'drawer': 19, 'cabinet': 15, 'closet': 19}
+layer |Delta_K| |Delta_KV| cos(Delta_K,Delta_KV) mean_s cos(dK(s),dKV(s)) B-identity R^2 of dK  max|cos(Delta,W_U[loc])| mean|cos(Delta,W_U[rand])|
+   2  0.564  0.553  +0.999  +0.985  0.727  0.073  0.028
+   3  1.632  1.664  +0.997  +0.968  0.883  0.058  0.024
+   5  0.134  0.143  +0.943  +0.884  0.513  0.062  0.033
+   6  0.150  0.150  +0.894  +0.878  0.557  0.074  0.024
+   7  1.260  1.212  +0.992  +0.927  0.682  0.099  0.027
+  11  1.010  1.213  +0.987  +0.946  0.456  0.056  0.025
+  13  2.345  2.865  +0.979  +0.944  0.447  0.077  0.029
+  14  0.207  0.179  +0.745  +0.759  0.543  0.060  0.028
+  16  0.287  0.312  +0.976  +0.768  0.759  0.112  0.024
+  (B-identity R^2 under a null of 6 groups on n=30: expected ~0.17)
+[   135s] eval 4
+[   175s] eval 8
+[   216s] eval 12
+[   257s] eval 16
+[   297s] eval 20
+[   337s] eval 24
+n=24  ID_K (6-way renorm) +1.284 (sd 0.637)
+  ID_inj(move) +1.347  ratio +1.049;  ID_inj(add) +1.314 ratio +1.023
+  ID_inj(move, leave-one-word-out flag) +1.345 ratio +1.048
+  N_X = dl_X(K_X) +2.251;  dl_B(K_S) -1.170;  dl_X(K_S) +0.826 (non-specific gain of X when only B loses its flag)
+  moveX_loo    dl_X +2.117  iota +0.941   dl_B -0.364
+  addX_loo     dl_X +1.644  iota +0.730   dl_B -0.024
+  moveX        dl_X +2.164  iota +0.961   dl_B -0.353
+  addX         dl_X +1.679  iota +0.746   dl_B -0.014
+  moveX_own    dl_X +2.660  iota +1.182   dl_B -0.449
+  moveX_perp   dl_X +0.338  iota +0.150   dl_B +0.044
+  moveX_perpN  dl_X +0.377  iota +0.167   dl_B +0.034
+  moveX_KV     dl_X +2.223  iota +0.987   dl_B -0.335
+  moveS        dl_X +0.458  iota +0.204   dl_B -0.241
+  addS         dl_X -0.016  iota -0.007   dl_B +0.064
+[   337s] done

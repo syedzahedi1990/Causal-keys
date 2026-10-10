@@ -1,0 +1,36 @@
+% Part E draft: the novelty paragraph (last paragraph of the Introduction) and Table 1.
+% Bracketed clauses [D-i], [D-ii], [C] depend on parts D and C; delete or replace them per the contingency table if those parts fail.
+% New bib keys: elhage2021framework, dai2024binding, prakash2024finetuning, gurarieh2025mixing (see v5_bib_additions.py).
+
+\paragraph{What the QK/OV picture does not predict.}
+Every attention head factors into a QK circuit, which decides where it attends, and an OV circuit, which decides what it moves \citep{elhage2021framework}.
+With the causal mask this bounds what is possible: a writing token's key can carry which value it wrote only to a later token that already holds a candidate.
+Duplicate-token and induction heads attend from such tokens \citep{wang2022ioi,olsson2022context}, answers select options by query--key alignment \citep{lieberum2023chinchilla,wiegreffe2025answer,tulchinskii2024wise}, and bound entities are retrieved through binding or ordering IDs, positions, lookbacks, or a context-dependent mix of positional, lexical and reflexive routes \citep{feng2023binding,dai2024binding,prakash2024finetuning,prakash2025lookbacks,gurarieh2025mixing}.
+None of this says which channel a model uses, because the value route is open in every prompt: the answer can always attend to the writing token and copy.
+Measuring that choice, we find four regularities the framework allows but does not predict (\cref{tab:qkov}).
+The choice belongs to the prompt: with options listed after the story, where the answer word could simply be copied, the key carries most of the identity; without a later mention, almost none.
+A matching query is not enough: at 1.5B and 3B the duplicate-token match follows the clamped key one for one, yet does not reach the answer [D-i: the flag it writes is not read].
+The match has no sign of its own [D-ii]: asking for an option that was not written turns the same read negative, as in-sentence re-mentions in IOI do.
+And [C] the channel credited with an edit of the written value follows the unpatched model's own read at the same depth, which a binding swap does not.
+We claim no new head type; we show which channel is used, when, and what follows for interventions.
+
+% ---------------------------------------------------------------------------------------------
+\begin{table}[t]
+  \centering
+  \caption{\textbf{What QK/OV and the causal mask imply, and what we find.} ``Implied?'': does the answer follow from the architecture alone? Status: preregistered and risky (R), preregistered replication (L), exploratory (X).}
+  \label{tab:qkov}
+  \footnotesize\setlength{\tabcolsep}{3pt}
+  \begin{tabular}{@{}p{0.35\columnwidth}p{0.11\columnwidth}p{0.48\columnwidth}@{}}
+    \toprule
+    Question & Implied? & Finding (status; section) \\
+    \midrule
+    Can a mention \emph{before} the writing token read its key? & Yes (no) & And no later token reads it instead, in every family and on passages (R; \cref{sec:claim1}) \\
+    With a later mention, is the key used instead of copying? & No & Key carries most of the identity; value without a mention (R; \cref{sec:claim1}) \\
+    Does the route change behaviour? & No & Key-only swaps flip MCQ answers, value-only swaps free-form (R; \cref{sec:claim1}) \\
+    Is a matching query sufficient? & Partly & No: match present, no read at 1.5B/3B (L, D-i: R; \cref{sec:claim2}) \\
+    What does the reader write? & No & A low-rank flag; injected alone, it moves the answer (D-i: R; \cref{sec:claim2}) \\
+    What sets the sign of a key read? & No & The question; same readers (D-ii: R; \cref{sec:claim2}) \\
+    Where does an intervention appear to act? & No & Where the natural read is, at matched depth; not for a binding swap (C: R; \cref{sec:claim3}) \\
+    \bottomrule
+  \end{tabular}
+\end{table}

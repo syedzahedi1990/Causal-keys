@@ -1,0 +1,19 @@
+transformers 5.18.0 torch 2.14.1+cpu
+  tiny Qwen2 sdpa                          nodes= 27 max|trie-ref| over forms 3.81e-06  max|first-plain| 9.54e-07  OK
+  tiny Qwen2 eager                         nodes= 27 max|trie-ref| over forms 3.81e-06  max|first-plain| 0.00e+00  OK
+  tiny Mistral sdpa                        nodes= 27 max|trie-ref| over forms 3.81e-06  max|first-plain| 9.54e-07  OK
+  tiny Mistral eager                       nodes= 27 max|trie-ref| over forms 0.00e+00  max|first-plain| 0.00e+00  OK
+  tiny Llama sdpa                          nodes= 27 max|trie-ref| over forms 3.81e-06  max|first-plain| 9.54e-07  OK
+  tiny Llama eager                         nodes= 27 max|trie-ref| over forms 3.81e-06  max|first-plain| 0.00e+00  OK
+  tiny Olmo2 sdpa                          nodes= 27 max|trie-ref| over forms 3.81e-06  max|first-plain| 1.91e-06  OK
+  tiny Olmo2 eager                         nodes= 27 max|trie-ref| over forms 1.91e-06  max|first-plain| 0.00e+00  OK
+  tiny Gemma2 eager                        nodes= 27 max|trie-ref| over forms 3.81e-06  max|first-plain| 0.00e+00  OK
+  tiny Phi3 sdpa                           nodes= 27 max|trie-ref| over forms 3.81e-06  max|first-plain| 9.54e-07  OK
+  tiny Phi3 eager                          nodes= 27 max|trie-ref| over forms 1.91e-06  max|first-plain| 0.00e+00  OK
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:00<00:37,  7.64it/s]Loading weights:  53%|█████▎    | 153/290 [00:00<00:00, 783.60it/s]Loading weights:  83%|████████▎ | 240/290 [00:00<00:00, 727.06it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 681.15it/s]
+  Qwen0.5B sdpa POST plus=True clean       nodes= 24 max|trie-ref| over forms 4.67e-05  max|first-plain| 5.63e-05  OK
+  Qwen0.5B sdpa POST plus=True K_S/V_S     nodes= 24 max|trie-ref| over forms 3.81e-05  max|first-plain| nan  OK
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:02<12:06,  2.51s/it]Loading weights:  55%|█████▍    | 159/290 [00:02<00:01, 81.62it/s]Loading weights:  72%|███████▏  | 210/290 [00:03<00:01, 68.18it/s]Loading weights:  83%|████████▎ | 240/290 [00:04<00:00, 67.79it/s]Loading weights:  90%|█████████ | 261/290 [00:04<00:00, 66.53it/s]Loading weights:  96%|█████████▌| 277/290 [00:04<00:00, 64.62it/s]Loading weights: 100%|██████████| 290/290 [00:04<00:00, 67.59it/s]Loading weights: 100%|██████████| 290/290 [00:04<00:00, 58.69it/s]
+  Qwen0.5B eager NONE plus=False clean     nodes=  6 max|trie-ref| over forms 9.54e-06  max|first-plain| 0.00e+00  OK
+  Qwen0.5B eager NONE plus=False K_S/V_S   nodes=  6 max|trie-ref| over forms 1.14e-05  max|first-plain| nan  OK
+done in 1280s

@@ -1,0 +1,26 @@
+% Part E draft: title and abstract for paper v5 (assumes parts A-D come out as predicted).
+% New macros, written by the stage-8 scorer into paper/numbers.tex:
+%   \nFamilies   = number of model families (by developer) with a confirmatory result: Qwen, Mistral, OLMo, Llama, Gemma, Phi, Falcon -> "seven"
+%   \riskyMet, \riskyTotal = met / total over every preregistered prediction labelled RISKY (A-J), by the rule fixed in entry J
+% Numbers in the abstract (at most 4): \nFamilies, 72B, \riskyMet, \riskyTotal.
+
+% ---- Title (primary)
+\icmltitle{Looked Up or Copied? The Prompt, Not the Token, Decides Which Attention Channel Carries an In-Context Value}
+\icmltitlerunning{Looked Up or Copied?}
+
+% ---- Abstract (6 sentences; about 235 words)
+A token that states a value in context, such as \emph{shelf} in ``the candle is moved to the shelf'', can reach a later answer in two ways: a later query can match its attention key, or its attention value can be copied.
+Clamping one channel at a time, exactly, we show that the prompt, not the token, decides the route.
+When the candidates are mentioned again after the writing token, as answer options or even in a neutral sentence, the later mentions match its key and the value's identity is looked up; otherwise it is copied from the value, and the same mention placed before the token opens no lookup.
+This holds in \nFamilies{} model families up to 72B parameters, on fresh stories and on reading-comprehension passages with multi-token answers, where swapping only the answer span's cached keys changes multiple-choice answers and swapping only its values changes free-form ones.
+The match is made by duplicate-token heads, which write a low-rank flag that the answer then selects; small models make the match without using it, and the question sets its sign.
+Because the route depends on the prompt, so does the channel credited with an intervention: for steering vectors, sparse-autoencoder features and learned subspace edits that change the written value, the key share equals the unpatched model's own share in the same prompt and depth, while a binding swap departs from it; \riskyMet{} of \riskyTotal{} risky preregistered predictions held, and we report every failure.
+
+% ---- Replacement clauses if a part fails (use the preregistered reading of that part):
+% A1/A3 not met (natural lookup):      sentence 4 -> "This holds on templated stories, fresh ones included, in \nFamilies{} model families up to 72B parameters; on reading-comprehension passages with multi-token answers it [holds only with listed options | does not hold], which bounds it."
+%                                      title -> "Looked Up or Copied? Option Lists Decide Which Attention Channel Carries an In-Context Value"
+% A6/A7 not met (behaviour):           drop "where swapping only ... free-form ones"; keep JB5's templated generation result if met.
+% JB3 not met in >=2 new families:     sentence 3 -> "as answer options (and, in some families, in a neutral sentence)".
+% D(i) flag injection not met:         sentence 5 -> "The match is made by duplicate-token heads at the later mentions, which the answer then reads; small models make the match without using it."
+% D(ii) sign prediction not met:       drop ", and the question sets its sign"; add the negative reads to Limitations.
+% C "restricted to near-natural edits": sentence 6 -> "Because the route depends on the prompt, so does the channel credited with an edit of the written value, but only for edits close to the natural state: steering vectors and sparse-autoencoder features depart from the unpatched model's own share, as does a binding swap; ..."

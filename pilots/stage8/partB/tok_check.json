@@ -1,0 +1,168 @@
+{
+ "01-ai/Yi-1.5-9B-Chat": {
+  "lower_single": true,
+  "boundary_merged_forms": [
+   "... 0 total"
+  ],
+  "n_forms": 72,
+  "n_distinct_seqs": 72,
+  "n_prefixes": 36,
+  "prefixes": [
+   "B",
+   "B",
+   "C",
+   "Cl",
+   "Clos",
+   "Cl|os",
+   "C|ab",
+   "Draw",
+   "Draw",
+   "S",
+   "Shel",
+   "The",
+   "The",
+   "The|B",
+   "The|B",
+   "The|Clos",
+   "The|Clos",
+   "The|Draw",
+   "The|Draw",
+   "The|Shel",
+   "The|Shel",
+   "b",
+   "cab",
+   "clos",
+   "draw",
+   "s",
+   "the",
+   "the",
+   "the|B",
+   "the|B",
+   "the|Clos",
+   "the|Clos",
+   "the|Draw",
+   "the|Draw",
+   "the|Shel",
+   "the|Shel"
+  ],
+  "cap_space_single": false,
+  "cap_space_multi": [
+   "basket",
+   "shelf",
+   "drawer",
+   "closet"
+  ],
+  "shared_first_tokens": {
+   "The": [
+    "basket",
+    "box",
+    "cabinet",
+    "closet",
+    "drawer",
+    "shelf"
+   ],
+   "the": [
+    "basket",
+    "box",
+    "cabinet",
+    "closet",
+    "drawer",
+    "shelf"
+   ]
+  },
+  "skipped_items_per_arm": {
+   "AFTER": 0,
+   "BEFORE": 0,
+   "POST": 0,
+   "PRE": 0,
+   "NONE": 0,
+   "P1": 0,
+   "LETTER": 0
+  },
+  "prompt_len": {
+   "AFTER": 115,
+   "BEFORE": 115,
+   "POST": 121,
+   "PRE": 121,
+   "NONE": 100,
+   "P1": 116,
+   "LETTER": 127
+  },
+  "system_merged": false
+ },
+ "deepseek-ai/deepseek-llm-7b-chat": {
+  "lower_single": "candidate 'cabinet' is not a single token",
+  "boundary_merged_forms": [
+   "... 0 total"
+  ],
+  "n_forms": 72,
+  "n_distinct_seqs": 36,
+  "n_prefixes": 20,
+  "prefixes": [
+   "B",
+   "Cab",
+   "Clos",
+   "S",
+   "The",
+   "The|B",
+   "The|Cab",
+   "The|Clos",
+   "The|S",
+   "The|cab",
+   "The|clos",
+   "cab",
+   "clos",
+   "the",
+   "the|B",
+   "the|Cab",
+   "the|Clos",
+   "the|S",
+   "the|cab",
+   "the|clos"
+  ],
+  "cap_space_single": false,
+  "cap_space_multi": [
+   "basket",
+   "shelf",
+   "cabinet",
+   "closet"
+  ],
+  "shared_first_tokens": {
+   "The": [
+    "basket",
+    "box",
+    "cabinet",
+    "closet",
+    "drawer",
+    "shelf"
+   ],
+   "the": [
+    "basket",
+    "box",
+    "cabinet",
+    "closet",
+    "drawer",
+    "shelf"
+   ]
+  },
+  "skipped_items_per_arm": {
+   "AFTER": 150,
+   "BEFORE": 150,
+   "POST": 150,
+   "PRE": 150,
+   "NONE": 150,
+   "P1": 150,
+   "LETTER": 150
+  },
+  "prompt_len": {
+   "AFTER": 108,
+   "BEFORE": 108,
+   "POST": 115,
+   "PRE": 115,
+   "NONE": 92,
+   "P1": 110,
+   "LETTER": 120
+  },
+  "system_merged": false
+ }
+}

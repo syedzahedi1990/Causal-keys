@@ -1,0 +1,30 @@
+[    78s] fit on 24 stories
+layer |Delta_K| |Delta_KV| cos(Delta_K,Delta_KV) mean_s cos(dK(s),dKV(s)) B-identity R^2 of dK  max|cos(Delta,W_U[loc])| mean|cos(Delta,W_U[rand])|
+   2  0.587  0.575  +0.999  +0.987  0.763  0.073  0.028
+   3  1.646  1.671  +0.998  +0.971  0.875  0.059  0.024
+   5  0.135  0.145  +0.942  +0.882  0.510  0.060  0.032
+   6  0.158  0.149  +0.885  +0.867  0.577  0.071  0.024
+   7  1.241  1.185  +0.989  +0.924  0.681  0.099  0.027
+  11  0.950  1.139  +0.988  +0.946  0.531  0.056  0.025
+  13  2.360  2.885  +0.979  +0.945  0.476  0.079  0.029
+  14  0.212  0.182  +0.815  +0.773  0.517  0.058  0.029
+  16  0.287  0.314  +0.978  +0.786  0.754  0.111  0.024
+  (B-identity R^2 under a null of 6 groups on n=24: expected ~0.22)
+[   114s] eval 4
+[   150s] eval 8
+[   187s] eval 12
+[   225s] eval 16
+[   261s] eval 20
+[   299s] eval 24
+n=24  ID_K (6-way renorm) +1.284 (sd 0.637)
+  ID_inj(move) +1.340  ratio +1.043;  ID_inj(add) +1.307 ratio +1.018
+  N_X = dl_X(K_X) +2.251;  dl_B(K_S) -1.170;  dl_X(K_S) +0.826 (non-specific gain of X when only B loses its flag)
+  moveX        dl_X +2.168  iota +0.963   dl_B -0.357
+  addX         dl_X +1.677  iota +0.745   dl_B -0.014
+  moveX_own    dl_X +2.660  iota +1.182   dl_B -0.449
+  moveX_perp   dl_X +0.296  iota +0.132   dl_B +0.047
+  moveX_perpN  dl_X +0.365  iota +0.162   dl_B +0.035
+  moveX_KV     dl_X +2.228  iota +0.990   dl_B -0.341
+  moveS        dl_X +0.465  iota +0.207   dl_B -0.246
+  addS         dl_X -0.018  iota -0.008   dl_B +0.065
+[   299s] done

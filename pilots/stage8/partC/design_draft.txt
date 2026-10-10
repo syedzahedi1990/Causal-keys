@@ -1,0 +1,20 @@
+## Part C (preregistration J, part C): does the format law predict where independently obtained identity edits act? Predictions JC0-JC6, gates JC-G0-JC-G6
+
+### C.0 The claim, and the tautology that H11 fell into
+
+**Law under test (H_read at matched depth).** Let E write a vector into the residual stream at the writing token p, at the output of (0-based) block l, so that the model reports a different value. Its identity key share in format f is
+
+kappa_E(f,l) = mean_s ID_K^E(s) / [mean_s ID_K^E(s) + mean_s ID_V^E(s)],
+
+and the unpatched model's own identity key share at the same depth is
+
+sigma(f,l) = s_ID of the natural K/V clamp at p from block l+1 (the paper's s_ID with onset l0 = l+1).
+
+The law says kappa_E(f,l) = sigma(f,l): which cache channel an identity edit appears to act through is fixed by how that format's readers read the written value at that depth, not by the edit.
+
+**Lemma (stated in the entry, unit-tested in JC-G0).** B and S differ only at p.
+(i) An edit confined to (p,l) reaches every other position only through p's key and value in blocks >= l+1. Under the causal mask p's residual reaches others only through attention, and p's K/V in blocks <= l are computed from block inputs, which are unchanged. Hence B with E's K and V written at p in blocks >= l+1 is exactly E, and the key-only / value-only exchanges are exact, with an interaction term.
+(ii) If E writes h_S,l(p), its K/V at p in blocks >= l+1 are S's. So E = C_KV(S) from l+1, and kappa_E = sigma(f,l) identically in every format. H11 (ID at block 0) and every full-residual identity patch at p are of this kind. They can confirm the pipeline but cannot test the law.
+(iii) An edit is evidence for the law only to the extent that its cached K/V at p differ from the natural ones while it still changes the reported value. We measure this distance (nu) and count only the cells where it is large.
+
+**A pilot fact that shapes the design (disclosed; Qwen2.5-1.5B, FP32, CPU, 4 stories).** At block 1 even a steering vector built from unrelated sentences stays within nu = 0.12 of the natural K/V, because the residual at p in early blocks is dominated by the token's own embedding. From block 5 on it departs (nu = 0.32 at block 5, 0.62 at block 9, 0.70 at block 13) while changing the answer as much as the natural edit does (identity effect 0.97-1.02 times the natural one under NO-MENTION). An in-task steering vector stays closer (nu = 0.04, 0.16, 0.26, 0.33). So at shallow depth a non-natural identity edit has to change few dimensions (SAE latents, a rank-16 subspace), while steering vectors become non-natural only from mid-depth. The design covers both cases and spans depth.

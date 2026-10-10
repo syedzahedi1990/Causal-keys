@@ -1,0 +1,7 @@
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:   0%|          | 1/290 [00:05<27:06,  5.63s/it]Loading weights:  88%|████████▊ | 256/290 [00:05<00:00, 62.67it/s]Loading weights: 100%|██████████| 290/290 [00:06<00:00, 43.59it/s]
+means done 124s
+/tmp/claude-0/-home-user-Causal-keys/7f2a5307-16d9-55d5-8797-c2900bcd44b4/scratchpad/s8design/partC/pilot_c.py:273: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:820.)
+  res["exact_check"] = float((lp2[0] - lp[0]).abs().max())
+  core 1 NONE 161s
+done 160.82817196846008

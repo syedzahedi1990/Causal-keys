@@ -85,9 +85,9 @@ def main(out):
     (out / "PREREGISTRATION_HISTORY.txt").write_text(
         "== Commits that touched the preregistration log or a scoring script (with diffs)\n\n" + "\n".join(parts)
         + "\n\n== Commits that touched results, experiment code or GPU scripts (hash, commit time, subject)\n\n" + scrub(runs))
-    (out / "ANONYMISED_FILES.txt").write_text(
-        "Text files whose content was anonymised for this release (author-identifying names, paths and identifiers\n"
-        "replaced); their entries in the results' MANIFEST.sha256 files therefore do not verify:\n\n" + "\n".join(changed) + "\n")
+    (out / "EDITED_FILES.txt").write_text(
+        "Text files whose content was edited for this release (local paths and repository identifiers replaced);\n"
+        "their entries in the results' MANIFEST.sha256 files therefore do not verify:\n\n" + "\n".join(changed) + "\n")
     leaks = [str(p) for p in out.rglob("*") if p.is_file() and p.suffix in TEXT
              and re.search(r"Paper 1|paper1|predecessor|[Oo]ur\W+(?:own\W+)?prior work|claude-0|(?<![\w-])Causal-keys(?![\w-])|github\.com/[^<\s]*Causal",
                            p.read_text(errors="ignore"))]

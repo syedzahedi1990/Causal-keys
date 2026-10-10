@@ -2,7 +2,9 @@
 # output). Pass 1: every entity in the PERSON/PLACE substitute pools and every item entity outside them (answers,
 # distractors) of the first build; the entities below are not of their assigned type and are excluded everywhere
 # (as answers, substitutes and distractors; ckeys.squad_items.EXCLUDE). Pass 2: every R and E name item of the
-# rebuild (59 R, 168 E) was read again; no entity of a wrong type remained. NUMBER items are digit edits.
+# rebuild was read again; no entity of a wrong type remained. Pass 3 (granularity): place-pool entities whose
+# question's head noun names the wrong place class are reassigned (ckeys.squad_items.CLASS_FIX; rows 'class').
+# NUMBER items are digit edits.
 subtype	entity	reason
 PLACE	Baldwin	surname
 PLACE	Battle of Sainte-Foy	event
@@ -48,3 +50,12 @@ PERSON	San Diego Chargers	team
 PERSON	Science Magazine	journal
 PERSON	Seattle Seahawks	team
 PERSON	Westinghouse Electric	company
+class	Africa	place class continent
+class	Asia	place class continent
+class	Beirut	place class city
+class	Deabolis	place class city
+class	Japan	place class country
+class	Lindau	place class city
+class	North America	place class continent
+class	Samarkand	place class city
+class	Scandinavia	place class region

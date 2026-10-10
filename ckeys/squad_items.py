@@ -13,6 +13,12 @@ Rules (fixed in the entry; CPU only, no model):
     the passage and question and shares no word with e_B, the other substitutes or the distractor.
   * D (the fourth option): another majority answer of the same paragraph and subtype that occurs in the passage and
     not in the question (D_in), else an absent pool entity.
+  * No partial mentions: no content word of e_B (>= 3 characters, not a connector) occurs in the passage outside e_B's
+    span or in the question, and no content word of S, X, Z or D occurs in the passage or question (so no candidate is
+    re-mentioned inside the passage). Items whose e_B fails this form the LEAK stratum (exploratory; e.g. a surname
+    re-mentioned after the full name) and enter no primary population.
+  * PLACE items are typed by the question's head noun into a place class (PLACE_CLASSES); substitutes come from pool
+    entries of the same class. 'where' questions without a place head noun are dropped.
   * Per tokenizer: the S/X/Z passages have B's token count and differ only inside B's entity span; the first content
     tokens of B, S, X, Z and D are pairwise distinct (stratum FT; YEAR items form stratum SP without that rule).
 EXCLUDE is the outcome of the pre-finalisation type audit of every pool and item entity (data/stage8a_type_audit.tsv),
@@ -50,6 +56,45 @@ Center Centre Institution Committee Department Ministry Assembly Parliament Grou
 Christians Catholics Protestants Huguenots Mongols Normans Dynasty Officer President Minister Pope King Queen Emperor
 Catholic Roman Orthodox""".split())
 PERSONW = re.compile(r"^[A-Z][a-z]+(?:-[A-Z][a-z]+)?$|^[A-Z][a-z]*[A-Z][a-z]+$|^[A-Z]\.$")
+
+PLACE_CLASSES = {"country": "country", "nation": "country", "city": "city", "town": "city", "village": "city",
+                 "capital": "city", "state": "region", "province": "region", "county": "region", "region": "region",
+                 "district": "region", "area": "region", "river": "water", "lake": "water", "island": "island",
+                 "continent": "continent"}
+
+
+# The granularity audit (pre-finalisation, entity lists only): places whose question's head noun names the wrong class.
+CLASS_FIX = {"Beirut": "city", "Africa": "continent", "Asia": "continent", "North America": "continent",
+             "Scandinavia": "region", "Japan": "country", "Samarkand": "city", "Deabolis": "city", "Lindau": "city"}
+
+
+def place_class(q, a=None):
+    """The place class of answer ``a`` to question ``q``: the audited class of ``a`` if it has one, else the class named
+    by the question's head noun (None without a place head noun)."""
+    if a in CLASS_FIX:
+        return CLASS_FIX[a]
+    _, hd = wh_head(q)
+    if not hd:
+        return None
+    return PLACE_CLASSES.get(hd) or PLACE_CLASSES.get(hd.rstrip("s"))
+
+
+def content_words(e):
+    """The words of an entity that would identify it if mentioned alone: >= 3 characters, not a connector."""
+    return [w for w in re.findall(r"[\w'\-]+", e) if len(w) >= 3 and w.lower() not in CONNECT
+            and any(c.isalpha() for c in w)]
+
+
+def leaks(text, e, skip=None):
+    """Positions in ``text`` where a content word of ``e`` occurs (word-bounded, case-sensitive), outside the
+    character range ``skip``."""
+    out = []
+    for w in content_words(e):
+        for m in re.finditer(r"(?<![\w])" + re.escape(w) + r"(?![\w])", text):
+            if skip is None or m.end() <= skip[0] or m.start() >= skip[1]:
+                out.append(m.start())
+    return sorted(out)
+
 
 # The type audit (pre-finalisation; entity lists only, no model output): entities that are not of their assigned type.
 EXCLUDE = {
@@ -164,11 +209,10 @@ def base_and_pools(data):
                     continue
                 par_ans.append((a, st))
                 if t == "NAME" and n >= 2:
-                    if st == "PLACE":
-                        _, hd = wh_head(qa["question"])
-                        if not hd or (hd not in PLACE_HEADS and hd.rstrip("s") not in PLACE_HEADS):
-                            continue
-                    pool[(st, len(a.split()))].append((ai, a))
+                    cls = place_class(qa["question"], a) if st == "PLACE" else None
+                    if st == "PLACE" and cls is None:
+                        continue
+                    pool[(st, cls, len(a.split()))].append((ai, a))
             for qa in par["qas"]:
                 a, n = majority(qa)
                 t = etype(a)
@@ -180,8 +224,12 @@ def base_and_pools(data):
                 st = subtype(t, qa["question"], a)
                 if st is None or st == "ORG" or excluded(st, a):
                     continue
+                cls = place_class(qa["question"], a) if st == "PLACE" else None
+                if st == "PLACE" and cls is None:
+                    continue
+                leak = bool(leaks(ctx, a, (o[0], o[0] + len(a))) or leaks(qa["question"], a))
                 base.append(dict(id=qa["id"], art=ai, par=pi, title=art["title"], context=ctx, question=qa["question"],
-                                 answer=a, start=o[0], type=t, sub=st, par_answers=par_ans))
+                                 answer=a, start=o[0], type=t, sub=st, cls=cls, leak=leak, par_answers=par_ans))
     for k in pool:  # dedupe, keep the first article
         seen, out = set(), []
         for ai, a in pool[k]:
@@ -226,9 +274,11 @@ def build_items(path, toks: dict):
         a, t, st, ctx, q = it["answer"], it["type"], it["sub"], it["context"], it["question"]
         rng = random.Random(seed_of(it["id"]))
         cnt[f"cand_{st}"] += 1
-        absent = lambda s: s.lower() not in ctx.lower() and s.lower() not in q.lower()  # noqa: E731
+        absent = lambda s: (s.lower() not in ctx.lower() and s.lower() not in q.lower()  # noqa: E731
+                            and not leaks(ctx, s) and not leaks(q, s))
         if t == "NAME":
-            cands = [s for ai, s in pool[(st, len(a.split()))] if ai != it["art"] and absent(s) and not (words(s) & words(a))]
+            cands = [s for ai, s in pool[(st, it["cls"], len(a.split()))]
+                     if ai != it["art"] and absent(s) and not (words(s) & words(a))]
             rng.shuffle(cands)
         elif t == "NUMBER":
             digs = [d for d in "123456789" if d != a[0]]
@@ -284,7 +334,8 @@ def build_items(path, toks: dict):
         order = [a, S, X, Dopt]
         random.Random(seed_of(it["id"] + "order")).shuffle(order)
         rec = {k: v for k, v in it.items() if k != "par_answers"}
-        items.append(dict(rec, S=S, X=X, Z=Z, D=Dopt, D_in=D_in, options=order, stratum="FT" if need_ft else "SP"))
+        stratum = "SP" if not need_ft else "LEAK" if it["leak"] else "FT"
+        items.append(dict(rec, S=S, X=X, Z=Z, D=Dopt, D_in=D_in, options=order, stratum=stratum))
         cnt[f"keep_{st}"] += 1
     return items, cnt
 

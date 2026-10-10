@@ -21,8 +21,8 @@ from ckeys.squad_items import build_items, cap, split_articles  # noqa: E402
 
 TOKENIZERS = {"qwen": "Qwen/Qwen2.5-7B-Instruct", "mistral": "mistralai/Mistral-7B-Instruct-v0.3",
               "llama": "unsloth/Meta-Llama-3.1-8B-Instruct", "gemma": "unsloth/gemma-2-9b-it"}
-KEEP = ("id", "title", "art", "par", "question", "answer", "start", "type", "sub", "S", "X", "Z", "D", "D_in", "options",
-        "stratum")
+KEEP = ("id", "title", "art", "par", "question", "answer", "start", "type", "sub", "cls", "S", "X", "Z", "D", "D_in",
+        "options", "stratum")
 
 
 def build(path, tokenizers=TOKENIZERS):
@@ -40,9 +40,10 @@ def build(path, tokenizers=TOKENIZERS):
     R = cap([i for i in ft if i["title"] in R_titles], per_article=8, seed=1)
     E = cap([i for i in ft if i["title"] in E_titles], per_article=10, seed=2)
     Y = cap([i for i in valid if i["stratum"] == "SP" and i["title"] in E_titles], per_article=10, seed=3)[:80]
-    split = {i["id"]: "R" for i in R} | {i["id"]: "E" for i in E} | {i["id"]: "YEAR" for i in Y}
+    LK = cap([i for i in valid if i["stratum"] == "LEAK" and i["title"] in E_titles], per_article=10, seed=4)[:80]
+    split = {i["id"]: "R" for i in R} | {i["id"]: "E" for i in E} | {i["id"]: "YEAR" for i in Y} | {i["id"]: "LEAK" for i in LK}
     out = [dict({k: i[k] for k in KEEP}, split=split[i["id"]], rank=n)
-           for grp in (R, E, Y) for n, i in enumerate(grp)]
+           for grp in (R, E, Y, LK) for n, i in enumerate(grp)]
     return out, cnt, why, len(ft), sorted(R_titles)
 
 

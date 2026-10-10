@@ -14,8 +14,9 @@ with an independently computed reference: a plain forward, a separately construc
   ioi_factorial.run_item on INLINE; 10 the case-marginalised trie scoring with a HopSplice whose tables are the run's own
   K/V equals the plain trie scoring (no-op), and the trie equals the plain sum over one-token forms; 11 the flag of a story from write_pass
   equals the flag from an independent o_proj pre-hook capture; 12 the per-head hop-2 key splice with every head equals
-  HopSplice ans_K; 13 trie scoring under a non-trivial HopSplice equals plain per-form forwards. The pipeline treats a
-  skipped test as failing the gate."""
+  HopSplice ans_K; 13 trie scoring under a non-trivial HopSplice equals plain per-form forwards. A skipped test fails
+  the gate: the scorer (analysis/stage8d_score.py) counts skips in every tests/ file of the last pytest run, as it
+  counts FAILED and ERROR."""
 import types
 
 import pytest

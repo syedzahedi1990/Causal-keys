@@ -3,9 +3,10 @@ per-cell gates (coverage, floor, competence, anchor) and one function per line a
 
 Model sets: P4 = qwen7, qwen14, mistral7, olmo7 (the four models of stages 1 and 3b); N4 = llama8, gemma9, phi4,
 falcon7 (new families; yi9 takes the slot of a model whose files failed verification or whose tokenizer check failed,
-before any output of it existed); SMALL = gemma2b. P4f lines use 95 % intervals and need every evaluable P4 model (at
-least 3 evaluable); N4 lines use 98.75 % intervals and need 3 of the 4 N4 models (a model not evaluable counts as not
-meeting; fewer than 3 evaluable: NOT EVALUABLE).
+before any output of it existed); SMALL = gemma2b. P4f lines use 95 % intervals and need every evaluable P4 model
+(NOT MET as soon as one evaluable model fails, whatever the number evaluable; otherwise at least 3 evaluable); N4 lines
+use 98.75 % intervals and need 3 of the 4 N4 models (a model not evaluable counts as not meeting; fewer than 3
+evaluable: NOT EVALUABLE).
 Scoring of a statistic: E when every cell (model x arm) it uses has coverage >= 0.8 (minimum over the cell's 16 rows of
 the mean E mass); otherwise its behavioural counterpart (beta_K, beta_V in place of ID_K, ID_V in the same formula; the
 same thresholds), except for lines without one (J-B-LB), which are then NOT EVALUABLE. Under E, a cell whose BF16 floor
@@ -220,9 +221,14 @@ def line_b2(m, lv):
     return decide(cs, f"n={v.n}")
 
 
-def competent_direction(m, sg):
+def competent_direction(m):
     """J-B3: on the items competent in POST, NONE, PRE and AFTER, the point estimates of delta(POST - PRE),
-    delta(POST - NONE) and s_ID(POST) - s_ID(NONE) are > 0 (needs >= 30 such items outside TEST)."""
+    delta(POST - NONE) and s_ID(POST) - s_ID(NONE) are > 0 (needs >= 30 such items outside TEST). The scoring is chosen
+    over the cells POST, NONE, PRE and AFTER (none: NOT EVALUABLE); each point follows the definedness rules on the
+    competent items (anchor undefined: NOT EVALUABLE; own undefined: not met)."""
+    sg, note = m.sigma_for(["POST", "NONE", "PRE", "AFTER"])
+    if sg is None:
+        return [Comp("competent-only direction", False, ne=note)]
     pop = m.F
     keep = np.ones(len(pop.keys), bool)
     for a in ("POST", "NONE", "PRE", "AFTER"):
@@ -231,11 +237,14 @@ def competent_direction(m, sg):
     need = 2 if m.test else COMP_N_MIN
     if v.n < need:
         return [Comp("competent-only direction", False, ne=f"{v.n} competent items (< {need})")]
-    d1, d2 = delta_est(v, "POST", "PRE", sg), delta_est(v, "POST", "NONE", sg)
-    d3 = ds_est(v, "POST", "NONE", sg)
-    ok = d1.pt > 0 and d2.pt > 0 and d3.pt > 0
-    return [Comp(f"competent-only direction (n={v.n}): {nm(sg, 'delta')}(POST-PRE) {d1.pt:+.3f}, {nm(sg, 'delta')}(POST-NONE) "
-                 f"{d2.pt:+.3f}, {nm(sg, 's_ID')}(POST)-(NONE) {d3.pt:+.3f} all > 0 (point)", ok)]
+    cs = [point(f"competent-only (n={v.n}) {lab} {e.pt:+.3f} > 0", e.pt > 0, e) for lab, e in (
+        (f"{nm(sg, 'delta')}(POST - PRE)", delta_est(v, "POST", "PRE", sg)),
+        (f"{nm(sg, 'delta')}(POST - NONE)", delta_est(v, "POST", "NONE", sg)),
+        (f"{nm(sg, 's_ID')}(POST) - {nm(sg, 's_ID')}(NONE)", ds_est(v, "POST", "NONE", sg)))]
+    if note:
+        for c in cs:
+            c.label += f" [{note}]"
+    return cs
 
 
 def line_b3(m, lv):
@@ -253,11 +262,9 @@ def line_b3(m, lv):
         cs += stat_comps(m, lv, ["POST", b, "AFTER"], lambda sg, b=b: [lower(delta_est(v, "POST", b, sg), 0.0, lv,
                                                                        f"{nm(sg, 'delta')}(POST - {b})")], needs_anchor=True)[0]
     cs += stat_comps(m, lv, ["POST", "AFTER"], lambda sg: [lower(s_est(v, "POST", sg), 0.10, lv, f"{nm(sg, 's_ID')}(POST)")])[0]
-    c, sg = stat_comps(m, lv, ["POST", "NONE", "AFTER"], lambda sg: [lower(ds_est(v, "POST", "NONE", sg), 0.0, lv,
-                                                                     f"{nm(sg, 's_ID')}(POST) - {nm(sg, 's_ID')}(NONE)")])
-    cs += c
-    if sg is not None:
-        cs += competent_direction(m, sg)
+    cs += stat_comps(m, lv, ["POST", "NONE", "AFTER"], lambda sg: [lower(ds_est(v, "POST", "NONE", sg), 0.0, lv,
+                                                                         f"{nm(sg, 's_ID')}(POST) - {nm(sg, 's_ID')}(NONE)")])[0]
+    cs += competent_direction(m)
     return decide(cs, f"n={v.n}")
 
 

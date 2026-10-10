@@ -6,7 +6,9 @@
 # Qwen2.5-7B and Mistral-7B. Steps (scripts/stage8_common.sh: each kept once done, FORCE=1 / FORCE_STEPS=<names or globs>
 # redo, logs in $OUT/logs/<step>.log, a failed step goes to FAILED.txt and the pipeline goes on):
 #   pytest       before any model: the FP32 gates J-A-G0 (tests/test_natural_clamp.py, tests/test_kvquant.py) and
-#                J-A-HA-G0 (tests/test_natural_heads.py), the scorer's tests, and the shared modules part A calls
+#                J-A-HA-G0 (tests/test_natural_heads.py), the scorer's tests, the shared modules part A calls, the
+#                populations across the parts (tests/test_stage8_populations.py, G6) and the shared Holm helper
+#                (tests/test_stage8_holm.py)
 #   preflight    SQuAD v1.1 dev (downloaded once into $OUT/squad, or SQUAD=<a local copy>; sha256 asserted), the item
 #                rebuild with the build's tokenizers, byte-identical to data/stage8a_items.json; stops the run otherwise
 #   per model, in the order llama8, gemma9, qwen7, mistral7 (yi9 replaces llama8 or gemma9 when its files fail
@@ -25,7 +27,7 @@
 # Batch sizes (A100-80GB, prompts up to ~780 tokens): one forward per item and format for each of the capture batch
 # (4 rows), the scoring batch (<= 14 rows) and the generation batch (<= 15 rows; 16 new tokens at most); the heads'
 # splice batches have <= 10 rows (2 passes in masked layers), the ablation batches 7 rows; all well inside 80 GB at 9B.
-# Compute estimate (entry, Compute): about 3.4 GPU-h for the core, about 4.2 h with every exploratory pass.
+# Compute estimate (entry, Compute): about 3.3 GPU-h for the core, about 4.1 h with every exploratory pass.
 # Usage:
 #   J=$(git log --format=%H -1 --grep='^Finalise preregistration J') && git checkout "$J"
 #   bash scripts/gpu_stage8a.sh                  # HF_TOKEN optional (official repos for the gated models; else the
@@ -39,9 +41,11 @@ S8_DEADLINE_H_DEFAULT=4.5
 source scripts/stage8_common.sh
 s8_init
 
-# ---- FP32 gates before any model (J-A-G0, J-A-HA-G0), the scorer's tests, the shared modules part A calls
+# ---- FP32 gates before any model (J-A-G0, J-A-HA-G0), the scorer's tests, the shared modules part A calls, the
+# populations across the parts (G6) and the shared Holm helper
 s8_pytest tests/test_natural_clamp.py tests/test_kvquant.py tests/test_natural_heads.py tests/test_stage8a_score.py \
-  tests/test_generate.py tests/test_clamp.py tests/test_head_splice.py
+  tests/test_generate.py tests/test_clamp.py tests/test_head_splice.py tests/test_stage8_populations.py \
+  tests/test_stage8_holm.py
 
 # ---- SQuAD v1.1 dev and the item rebuild
 SQ=${SQUAD:-$OUT/squad/dev-v1.1.json}

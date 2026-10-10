@@ -13,18 +13,20 @@
 #   g3_<key>     J-B-G3: the trie against the plain path on the first 30 F cores (NONE, POST, AFTER); picks the scorer
 #   evalF_<key>  F, arms AFTER BEFORE NONE POST PRE POST-NULL (trie pass, 13 rows + clean runs, generation)
 #   evalS0_<key> P4 only: S0, arms P1 AFTER BEFORE POST PRE NONE, plus format_factorial.run_item (the published path)
-# Then, deadline-guarded and in this order: jb8 (J-B8: the release of Anonymous (2026) checked as in stage 7, calibration at
-# Mistral-Small-24B, then experiments/paper1_frames.py --model mistral --score E on the release's native cores, five
-# formats), x2 (exploratory: Qwen2.5-1.5B and 3B on S0 under E, arms P1 AFTER POST NONE), x1 (exploratory: Qwen2.5-7B on
-# the first 60 S0 cores, AFTER POST NONE, FP32 sdpa and BF16 eager); then the scorer (analysis/stage8b_score.py ->
-# $OUT/STAGE8B_SCORE.txt and the paper tables), MANIFEST.sha256 and the archive.
+# Then, deadline-guarded and in this order: jb8 (J-B8: the release of Anonymous (2026) checked as in stage 7, the tokenizer
+# check and the calibration at Mistral-Small-24B, then experiments/paper1_frames.py --model mistral --score E on the
+# release's native cores, five formats; each step only after the one before succeeded), x2 (exploratory: Qwen2.5-1.5B
+# and 3B on S0 under E, arms P1 AFTER POST NONE), x1 (exploratory: Qwen2.5-7B on the first 60 S0 cores, AFTER POST NONE,
+# FP32 sdpa and BF16 eager); then the scorer (analysis/stage8b_score.py -> $OUT/STAGE8B_SCORE.txt and the paper tables),
+# MANIFEST.sha256 and the archive.
 # Deadline (DEADLINE_H, default 4.5 h; STAGE8_DEADLINE): every eval step gets --reserve-min = the core minutes of the models
 # after it plus 10, and stops before an arm that would start inside that reserve (exit 3: partial, redone next session);
 # jb8 runs only if 45 min remain, x2 if 15, x1 if 12. The next model's weights are prefetched in the background.
 # Batch sizes (A100-80GB, prompts <= 160 tokens plus <= ~400 trie nodes): one 3-row and one 13-row scoring forward and one
 # 8-row generation batch (<= 16 new tokens) per item and arm; the JB-G3 fallback (score_cached) chunks node continuations
 # into 256 rows; under 10 GB beyond the weights at 14B. Compute estimate (entry, Compute): about 3.2 GPU-h for the core
-# (the sum of CORE_MIN, the pytest and the score), about 4.3 h with jb8, x2 and x1. Disk: >= 120 GB (two models at a time; 47 GB for jb8).
+# (the sum of CORE_MIN, the pytest and the score), about 4.3 h with jb8, x2 and x1. Disk: >= 140 GB (two models at a time
+# besides Qwen2.5-7B, kept until x1; 47 GB for J-B8).
 # Usage:
 #   J=$(git log --format=%H -1 --grep='^Finalise preregistration J$') && git checkout "$J"
 #   bash scripts/gpu_stage8b.sh                  # HF_TOKEN optional
@@ -40,9 +42,10 @@ S8_DEADLINE_H_DEFAULT=4.5
 source scripts/stage8_common.sh
 s8_init
 
-# ---- FP32 gates before any model (J-B-G0): part B's tests, the scorer's tests and the shared modules part B calls
+# ---- FP32 gates before any model (J-B-G0): part B's tests, the scorer's tests, the shared modules part B calls, the
+# populations across the parts (G6) and the shared Holm helper (the scorer's G0_FILES lists the same files)
 s8_pytest tests/test_fresh.py tests/test_fresh_factorial.py tests/test_stage8b_score.py tests/test_surface.py \
-  tests/test_generate.py tests/test_clamp_families.py
+  tests/test_generate.py tests/test_clamp_families.py tests/test_stage8_populations.py tests/test_stage8_holm.py
 
 TAGP=; on TEST_MODE && TAGP=TEST_
 FF=(experiments/fresh_factorial.py --out "$OUT")
@@ -128,13 +131,17 @@ if s8_done jb8 || s8_time_left "$JB8_MIN"; then
     { echo "==== $(s8_utc) the release of Anonymous (2026) at $P1R"; tail -n 1 "$OUT/logs/jb8_release.log"; } >> "$OUT/RELEASE.txt"
     if dir=$(s8_fetch mistral24); then
       t="${TAGP}mistral24"
-      S8_OUTPUTS="$OUT/tokcheck/$t.json" s8_step tok_mistral24 $PY "${FF[@]}" --stage tokcheck --model "$dir" --key mistral24
-      S8_OUTPUTS="$OUT/frames/$t.json" s8_step calib_mistral24 $PY "${FF[@]}" --stage calib --model "$dir" --key mistral24
       if on TEST_MODE; then J8=(--model-override "$dir" --bases-override 896 --n 3); J8OUT="$OUT/jb8/TEST_${dir##*/}.json"
       else J8=(--model-dir "$dir"); J8OUT="$OUT/jb8/mistral.json"; fi
       mkdir -p "$OUT/jb8"
-      [ -f "$OUT/frames/$t.json" ] && S8_OUTPUTS="$J8OUT" s8_step jb8 $PY experiments/paper1_frames.py --model mistral \
-        --p1-root "$P1R" --out "$OUT/jb8" --score E --frames "$OUT/frames/$t.json" "${J8[@]}"
+      # calib and jb8 only after the tokenizer check (J-B-G0b) passed, jb8 only with the frames file
+      if S8_OUTPUTS="$OUT/tokcheck/$t.json" s8_step tok_mistral24 $PY "${FF[@]}" --stage tokcheck --model "$dir" --key mistral24; then
+        S8_OUTPUTS="$OUT/frames/$t.json" s8_step calib_mistral24 $PY "${FF[@]}" --stage calib --model "$dir" --key mistral24 \
+          && [ -f "$OUT/frames/$t.json" ] && S8_OUTPUTS="$J8OUT" s8_step jb8 $PY experiments/paper1_frames.py --model mistral \
+            --p1-root "$P1R" --out "$OUT/jb8" --score E --frames "$OUT/frames/$t.json" "${J8[@]}"
+      else
+        s8_skip jb8 "the tokenizer check of mistral24 (tok_mistral24, J-B-G0b) failed"
+      fi
       s8_drop mistral24
     else
       s8_skip jb8 "the files of mistral24 were refused (FETCH_FAILED.txt)"

@@ -6,9 +6,9 @@ analysis/stage8b_parts/lines.py; the bootstrap and the criteria in analysis/stag
 Inputs under --results (default results/gpu_stage8b), as written by scripts/gpu_stage8b.sh and
 experiments/fresh_factorial.py: tokcheck/<tag>.json (J-B-G0b), frames/<tag>.json (the calibration), g3/<tag>.json
 (J-B-G3), eval/<tag>_F.json and eval/<tag>_S0.json (eval/<tag><suffix>_S0.json: the exploratory X1 runs), jb8/<tag>.json
-(experiments/paper1_frames.py --score E) and RELEASE.txt, verified/<key>.json (J-B-G1), the pytest log under logs/ (J-B-G0),
-COMMIT.txt, ENV.txt, REVISIONS.txt, SKIPPED.txt, FETCH_FAILED.txt; and the committed stage-1 and stage-3b result files
-(results/gpu_stage1, results/gpu_stage3b/format_2x2; J-B-G2).
+(experiments/paper1_frames.py --score E) and RELEASE.txt, verified/<key>.json (J-B-G1), the pytest log under logs/ (J-B-G0;
+outside TEST a missing log fails it), COMMIT.txt, ENV.txt, REVISIONS.txt, SKIPPED.txt, FETCH_FAILED.txt; and the committed
+stage-1 and stage-3b result files (results/gpu_stage1, results/gpu_stage3b/format_2x2; J-B-G2).
 Output (--out, default {results}/STAGE8B_SCORE.txt), in this order: PROVENANCE, POPULATION, GATES, PREDICTIONS (one line
 per confirmatory line: code, class, kind, prior, verdict; then per model the numbers, bounds and evaluability), REPORTED
 (per-family verdicts with the pre-written sentence that applies, J-B-G2 detail, the numbers behind the figure),
@@ -48,8 +48,9 @@ POP_SHA = {"F": "e87047c9c877a21db89bf5081d082de748ea5d77b620e33135d178c3bf24b14
            "S0": "48bb0a3ad22463ee1831cabaef714d87b2a7cb7f721e23d877111f19ba0d6900",
            "C": "a625fd13d1dd67bc0c01c3a173807c7b71ee8347451c139d93ffc20f1c6486e9"}
 N_POP = {"F": 150, "S0": 150, "C": 30}
-G0_FILES = {"tests/test_fresh.py": 24, "tests/test_fresh_factorial.py": 12, "tests/test_stage8b_score.py": 14,
-            "tests/test_surface.py": 13, "tests/test_generate.py": 5, "tests/test_clamp_families.py": 5}   # every test of each file
+G0_FILES = {"tests/test_fresh.py": 24, "tests/test_fresh_factorial.py": 12, "tests/test_stage8b_score.py": 20,
+            "tests/test_surface.py": 13, "tests/test_generate.py": 5, "tests/test_clamp_families.py": 5,
+            "tests/test_stage8_populations.py": 5, "tests/test_stage8_holm.py": 7}   # every test of each file
 G0_SKIP_OK = ("cached_tokenizer", "study_tokenizers")   # tokenizer tests that skip without a cache; JB-G0b repeats them
 MODEL_ORDER = ln.P4 + ln.N4 + (ln.FALLBACK, ln.SMALL, ln.JB8_KEY) + ln.X2
 
@@ -206,8 +207,8 @@ def build_models(root, F, g0, test, out):
     fetch_failed = (root / "FETCH_FAILED.txt").read_text() if (root / "FETCH_FAILED.txt").exists() else ""
     for k in keys:
         why = []
-        if g0 is False:
-            why.append("J-B-G0 failed")
+        if g0 is False or (g0 is None and not test):   # outside TEST a missing pytest log fails J-B-G0
+            why.append("J-B-G0 failed" if g0 is False else "J-B-G0: no pytest log")
         tc = F.get(f"tokcheck/{pref}{k}.json")
         if tc is None or "error" in tc:
             why.append("J-B-G0b: no tokenizer check")
@@ -294,6 +295,9 @@ def gate_g2(models, out, test):
             out(f"    {k}: committed reference files absent -> NOT EVALUABLE")
             continue
         new = {a: [r["plain"] for r in m.S0.recs(a) if "plain" in r] for a in ln.ARMS_S0 if m.S0.has(a)}
+        if "AFTER" not in new:   # r is scaled by AFTER: a deadline stop before it leaves nothing to compare
+            out(f"    {k}: AFTER not run -> NOT EVALUABLE")
+            continue
         sA_new, kA_new = g2_stats(new["AFTER"])
         sA_ref, kA_ref = g2_stats(refA)
         parts, okm = [], True
@@ -373,7 +377,10 @@ def jb8_rows(results, arm, score):
     return rows
 
 
-def line_jb8(F, root, out_, test):
+def line_jb8(F, root, out_, test, g0=None):
+    """J-B8 at mistral24. Its model-level gates as in build_models: J-B-G0 (outside TEST a missing pytest log fails it),
+    J-B-G0b (tokcheck), J-B-G1 (verified file set, waived in TEST) and the frames file's sha256 recorded by the jb8 file;
+    any failing makes the line NOT EVALUABLE."""
     J = next((v for k, v in F.items() if k.startswith("jb8/") and "results" in v), None)
     if J is None:
         sk = (root / "SKIPPED.txt").read_text() if (root / "SKIPPED.txt").exists() else ""
@@ -381,6 +388,21 @@ def line_jb8(F, root, out_, test):
         return st.Res(None, "", why=f"not run: {why.strip()}"), {}
     if J["provenance"].get("score") != "E":
         return st.Res(None, "", why="the jb8 file was not scored with --score E"), {}
+    pref, why = "TEST_" if test else "", []
+    if g0 is False or (g0 is None and not test):
+        why.append("J-B-G0 failed" if g0 is False else "J-B-G0: no pytest log")
+    tc = F.get(f"tokcheck/{pref}{ln.JB8_KEY}.json")
+    if tc is None or "error" in tc:
+        why.append("J-B-G0b: no tokenizer check")
+    elif not tc.get("pass"):
+        why.append(f"J-B-G0b failed: {tc.get('fails', [])[:2]}")
+    if not test and f"verified/{ln.JB8_KEY}.json" not in F:
+        why.append("J-B-G1: no verified file set")
+    ff = root / "frames" / f"{pref}{ln.JB8_KEY}.json"
+    if not ff.exists() or J["provenance"].get("frames_sha256") != sha_file(ff):
+        why.append("the frames file differs from the one jb8 used (or is absent)")
+    if why:
+        return st.Res(None, "", why="; ".join(why)), {}
     cs, rep = [], {}
     for arm in ("P1", "NONE", "BEFORE", "POST", "LETTER"):
         RL, RE = jb8_rows(J["results"], arm, "L"), jb8_rows(J["results"], arm, "E")
@@ -421,9 +443,10 @@ def models_for(code, models, slots):
     return {}
 
 
-def score_lines(models, slots, F, root, out, res, test):
+def score_lines(models, slots, F, root, out, res, test, g0=None):
     out("PREDICTIONS (code [class, kind (A account, V measurement validity), recorded prior P(met)] title -> verdict; then per "
-        "model: verdict, numbers and bounds; P4f: 95 % intervals, every evaluable model, >= 3 evaluable; N4: 98.75 %, 3 of 4)")
+        "model: verdict, numbers and bounds; P4f: 95 % intervals, every evaluable model (NOT MET if one fails, else >= 3 "
+        "evaluable); N4: 98.75 %, 3 of 4)")
     extra = {}
     for code in ln.ORDER:
         cls, kind, prior, sset, title = ln.LINES[code]
@@ -433,7 +456,7 @@ def score_lines(models, slots, F, root, out, res, test):
             per = {"P4": r}
             comb = r.ok
         elif code == "J-B8":
-            r, rep = line_jb8(F, root, out, test)
+            r, rep = line_jb8(F, root, out, test, g0)
             extra["jb8"] = rep
             per = {ln.JB8_KEY: r}
             comb = r.ok
@@ -693,6 +716,8 @@ def main(argv=None):
         out(x)
     if test and g0 is None:
         out("  (TEST: no pytest log; J-B-G0 treated as passed for the plumbing check)")
+    elif g0 is None:
+        out("  (no pytest log: outside TEST J-B-G0 fails, so every line is NOT EVALUABLE)")
     for lab, J in sorted(F.items()):
         if lab.startswith("tokcheck/"):
             out(f"  {keyof(Path(lab).stem):9s} J-B-G0b tokenizer check: {st.V(J.get('pass'))}"
@@ -709,7 +734,7 @@ def main(argv=None):
     out("")
     res, extra = {}, {}
     try:
-        extra = score_lines(models, slots, F, root, out, res, test)
+        extra = score_lines(models, slots, F, root, out, res, test, g0)
     except Exception:  # noqa: BLE001
         errors.append("lines")
         out("  SCORER ERROR; the lines are NOT EVALUABLE\n" + traceback.format_exc())

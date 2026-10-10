@@ -1,11 +1,13 @@
 """Part A of P-2026-10-10-J, the head lines on natural text (heads/<tag>.json of experiments/natural_heads.py): gates
 J-A-HA-G1 and J-A-HA-G2 (J-A-HA-G0 is the pytest gate), lines J-A-HA1 to J-A-HA3b, the reported and exploratory lines.
 
-  d_full = mean[m(full K_S clamp) - m(ID)], d_G = mean[m(all_G) - m(none)] of N*'s sufficiency batch (m = lp(dec_S) -
-  lp(dec_B) at the decision position); R(k) = mean[m(top-k) - m(none)] / d_G; KO(k) = 1 - mean[m(all but top-k) -
-  m(none_KO)] / mean[m(all_G, KO) - m(none_KO)] (stage 6); random-set values are means over the three draws, each ratio
-  recomputed in every resample. HA3: acc(c) = the share of items whose argmax chain over c_S holds under condition c
-  (KV_S clamp, condition's heads mean-ablated at Q+); drop(c) = acc(none) - acc(c), paired by item.
+  d_full = mean[m(full K_S clamp) - m(clean)] (two single passes, eval's mF and mB), d_G = mean[m(all_G) - m(none)] of
+  N*'s sufficiency batch (m = lp(dec_S) - lp(dec_B) at the decision position); for each set (N*, T*, each random set),
+  within that set's own sufficiency and knockout batches: R(k) = mean[m(top-k) - m(none)] / mean[m(all_G) - m(none)]
+  (for N* the denominator is d_G); KO(k) = 1 - mean[m(all but top-k) - m(none_KO)] / mean[m(all_G, KO) - m(none_KO)]
+  (stage 6); random-set values are means over the three draws, each ratio recomputed in every resample. HA3: acc(c) =
+  the share of items whose argmax chain over c_S holds under condition c (KV_S clamp, condition's heads mean-ablated at
+  Q+); drop(c) = acc(none) - acc(c), paired by item.
 """
 import math
 

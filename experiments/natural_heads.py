@@ -16,9 +16,11 @@ answer row.
            the run's own scale, on W_U[dec_B] minus the mean of W_U over the other three options' decision tokens).
            mu_f(l, h) = the mean of head (l, h)'s o_proj input over the R items and the Q+ rows of format f (NOM, OPTA)
            in the clean B run on B prompt + c_B (OUT/heads/mu_<tag>.pt, sha256 recorded).
-  eval     the first 80 E items: the clean pass and the full K_S clamp (d_full); the stage-6 sufficiency and knockout
-           batches (experiments/stage6_heads.Stage6.curves, HeadSplice "splice" with span tables) for N*, T* and the
-           random sets over KS = (1, 2, 5, 10, 20, k*, 2k*), with the none, all_G and all_T rows, and the layer profile.
+  eval     the first 80 E items: the clean pass and the full K_S clamp (d_full = mean[m(full K_S clamp) - m(clean)]);
+           the stage-6 sufficiency and knockout batches (experiments/stage6_heads.Stage6.curves, HeadSplice "splice"
+           with span tables) for N*, T* and the random sets over KS = (1, 2, 5, 10, 20, k*, 2k*), each set's batches
+           with their own none, all_G and all_T rows and knockout none and all_G rows (the denominators of that set's R(k)
+           and KO(k)), and the layer profile.
   ablate   every E item, OPTA and NOM: one batch whose rows are the conditions none, N*, T*, rand0, rand1, rand2, C*
            (HeadSplice "ablate" of the condition's heads at Q+ with mu_f), under the KV_S clamp on B prompt + c_S: the
            argmax chain over c_S, the decision argmax = dec_S, the chain over c_S after the decision token; and the same
@@ -26,6 +28,8 @@ answer row.
            chain over c_B.
   explore  the first 80 E items: the base rows ID, K_S, V_S, KV_S, K_X, V_X, KV_X with none and with N* ablated at Q+ in
            one batch (ID_K, ID_V under N*; exploratory).
+The R and E items are those valid in NOM and OPTA under the frame (ckeys.natural_rows.valid_all); provenance n_valid
+records how many of each there are, so rank and eval take min(60, n_valid R) and min(80, n_valid E) items.
 Output OUT/heads/<tag>.json (atomic; rewritten after each part). TEST_MODE (--test or TEST_MODE=1): Qwen2.5-0.5B FP32
 on the CPU, windowed passages, 2 items per part, k* fraction 0.012 (k* = 5), KS = (1, 2, 5, 10), T* = the first k* cells
 of the Qwen2.5-7B stage-6 ranking that exist in the small model.
@@ -233,7 +237,8 @@ def run(a):
     KS = sorted({k for k in a.KS if k <= nL * H} | {kstar, 2 * kstar}) if not a.test else sorted(set(a.KS) | {kstar})
     items = load_items(a)
     ok = lambda its, fmts: [i for i in its if valid_all(tok, i, fmts, frame) is None]  # noqa: E731
-    R = ok(split(items, "R"), ("NOM", "OPTA"))[:a.n_rank]
+    R_all = ok(split(items, "R"), ("NOM", "OPTA"))
+    R = R_all[:a.n_rank]
     E_all = ok(split(items, "E"), ("NOM", "OPTA"))
     E_eval, E_abl = E_all[:a.n_eval], (E_all[:a.n_ablate] if a.n_ablate else E_all)
     Trank, t6 = template_set(a, nL, H, kstar)
@@ -242,8 +247,8 @@ def run(a):
                             "dtype": str(next(model.parameters()).dtype), "attn_implementation": model.config._attn_implementation,
                             "device": device_name(dev), "test_mode": a.test, "n_layers": nL, "heads_per_layer": H,
                             "n_heads": nL * H, "head_dim": hd, "kstar": kstar, "KS": KS, "frame": frame, "frames_sha256": fsha,
-                            "stage6": t6, "items_sha256": sha_file(a.items), "n_rank": len(R), "n_eval": len(E_eval),
-                            "n_ablate": len(E_abl), "skipped_parts": [], "timings": {}}
+                            "stage6": t6, "items_sha256": sha_file(a.items), "n_valid": {"R": len(R_all), "E": len(E_all)},
+                            "n_rank": len(R), "n_eval": len(E_eval), "n_ablate": len(E_abl), "skipped_parts": [], "timings": {}}
     path = Path(a.out) / "heads" / f"{a.tag}.json"
     out, t0 = {"provenance": P}, time.time()
 

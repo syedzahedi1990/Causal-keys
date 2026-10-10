@@ -174,8 +174,9 @@ def V(ok):
 
 
 def comb_models(per, fresh=FRESH, min_models=3):
-    """A-lines: NOT MET if not met in any evaluable model; MET if met in every evaluable model with >= 3 evaluable
-    including >= 1 fresh family; else NOT EVALUABLE (an intersection-union test at the 95 % intervals)."""
+    """A-lines: NOT MET as soon as one evaluable model does not meet the line (whatever the number of evaluable models);
+    else MET with >= 3 evaluable including >= 1 fresh family; else NOT EVALUABLE (an intersection-union test at the 95 %
+    intervals)."""
     ev = {k: v for k, v in per.items() if v is not None}
     if any(v is False for v in ev.values()):
         return False

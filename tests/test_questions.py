@@ -4,7 +4,8 @@ the Qwen tokenizer). B, S, X (and the K_N run) differ only at the writing token 
 the initial-state runs differ only at p_init / p_dloc; the IOI runs differ only at p and the listed names lie after p
 (before p under BEFORE). Also the question arms' text, the populations (pinned hashes, disjointness, including the other
 stage-8 parts' populations when their modules are importable), the K_N words and the case-marginalised form set.
-A tokenizer that is neither cached nor downloadable makes its tests fail (the pipeline counts a skip as a failure)."""
+A tokenizer that is neither cached nor downloadable makes its tests fail (and the scorer counts a skip in any tests/
+file of the last pytest run as failing J-D-G0)."""
 import json
 import random
 

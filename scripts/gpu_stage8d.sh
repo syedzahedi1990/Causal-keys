@@ -6,8 +6,10 @@
 # NOT EVALUABLE. Steps (scripts/stage8_common.sh: each kept once done, FORCE=1 / FORCE_STEPS=<names or globs> redo, logs in
 # $OUT/logs/<step>.log, a failed step goes to FAILED.txt and the pipeline goes on), all experiments/stage8_flag.py:
 #   pytest            J-D-G0 before any model: tests/test_flag.py (FP32 hooks at Qwen2.5-0.5B), tests/test_questions.py
-#                     (prompt layouts, Qwen and Mistral tokenizers), tests/test_stage8d_score.py, and the tests of the
-#                     shared HeadSplice / HopSplice that part D composes with (tests/test_head_splice.py)
+#                     (prompt layouts, Qwen and Mistral tokenizers), tests/test_stage8d_score.py, the tests of the
+#                     shared HeadSplice / HopSplice that part D composes with (tests/test_head_splice.py), the populations
+#                     across the parts (tests/test_stage8_populations.py, rule G6) and the shared Holm helper
+#                     (tests/test_stage8_holm.py)
 #   the core steps per model, in the order qwen7, mistral7, qwen1.5, qwen3b (the next model's weights prefetched):
 #     preflight_<key> tokenizer only: populations, hashes, disjointness, every prompt layout, IOI validity, forms
 #     sets_<key>      eager: H* and the random / active sets (stage 6 at 7B; ranked at 1.5B / 3B), the hop-2 ranking
@@ -40,8 +42,11 @@ S8_DEADLINE_H_DEFAULT=3.5
 source scripts/stage8_common.sh
 s8_init
 
-# ---- FP32 gates before any model (J-D-G0): part D's tests, the scorer's tests, the shared HeadSplice / HopSplice tests
-s8_pytest tests/test_flag.py tests/test_questions.py tests/test_stage8d_score.py tests/test_head_splice.py
+# ---- FP32 gates before any model (J-D-G0): part D's tests, the scorer's tests, the shared HeadSplice / HopSplice tests,
+# the populations across the parts (G6) and the shared Holm helper (the scorer's G0_FILES lists every file but
+# tests/test_head_splice.py, whose failures and skips the scorer counts with the rest of the run)
+s8_pytest tests/test_flag.py tests/test_questions.py tests/test_stage8d_score.py tests/test_head_splice.py \
+  tests/test_stage8_populations.py tests/test_stage8_holm.py
 
 TAGP=; on TEST_MODE && TAGP=TEST_
 EX=(experiments/stage8_flag.py --out "$OUT")

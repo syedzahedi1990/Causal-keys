@@ -14,9 +14,10 @@ or attention other than the entry's), POPULATION, GATES, PREDICTIONS (one line p
 then each model's numbers, bounds and evaluability), REPORTED, SUMMARY (per class: lines, MET, NOT MET, NOT
 EVALUABLE with reasons, the observed met count against the sum of the priors of the lines with a verdict, the Brier
 score; the Holm sensitivity analysis of the R-class lines by analysis/stage8_holm.py, per line), EXPLORATORY.
-Combination: a J-A line is MET if met in every evaluable model with >= 3 evaluable including >= 1 fresh family (Llama,
-Gemma, or the Yi fallback), NOT MET if not met in any evaluable model, else NOT EVALUABLE; a head line is MET if met in
-both Qwen2.5-7B and Mistral-7B, NOT MET if not met in an evaluable one, else NOT EVALUABLE. J-A3 is derived and not counted.
+Combination (the entry's common rule): a J-A line is NOT MET as soon as one evaluable model does not meet it, whatever
+the number of evaluable models; else MET if >= 3 models are evaluable including >= 1 fresh family (Llama, Gemma, or the
+Yi fallback), else NOT EVALUABLE; a head line is NOT MET if not met in Qwen2.5-7B or in Mistral-7B, MET if met in both,
+else NOT EVALUABLE. J-A3 is derived and not counted.
 --test (TEST_MODE; also when every results file is tagged TEST_): the size floors are waived and the verdicts are
 plumbing checks, not results.
 Exit status 1 if a part raised (traceback in the report, its lines NOT EVALUABLE); 2 if, outside TEST, the provenance or
@@ -173,7 +174,8 @@ def provenance(root, F, out, test):
 
 def population(F, models, heads, out, test):
     out("POPULATION (" + ("TEST: sizes not checked; " if test else "") + "E items of data/stage8a_items.json valid for each model's "
-        "tokenizer and frame, the same items in every format; heads: the first 60 R / 80 E valid items)")
+        "tokenizer and frame, the same items in every format; heads: the first min(60, n) of the n valid R items and the "
+        "first min(80, n) of the n valid E items, valid in NOM and OPTA under the model's frame, n from provenance n_valid)")
     ok = True
     items = json.load(open(ITEMS))
     E = {i["id"] for i in items if i["split"] == "E"}
@@ -198,11 +200,14 @@ def population(F, models, heads, out, test):
     for k, h in heads.items():
         rk = [r["id"] for r in h.H.get("rank", {}).get("items", [])]
         inR = set(rk) <= set(Rr) and [i for i in Rr if i in set(rk)] == rk
-        n_ok = test or (len(rk) == 60 and len(h.E) == 80)
+        nv = h.P.get("n_valid", {})   # without the record: exactly 60 and 80
+        want = (min(60, nv.get("R", 60)), min(80, nv.get("E", 80)))
+        n_ok = test or (len(rk), len(h.E)) == want
         good = inR and n_ok and all(e["id"] in E for e in h.E)
         ok &= good
-        out(f"  heads {k}: ranking items {len(rk)} (R, in rank order: {'OK' if inR else 'MISMATCH'}), evaluation items {len(h.E)}, "
-            f"ablation items OPTA {len(h.abl['OPTA'])} NOM {len(h.abl['NOM'])}" + ("" if good else "  MISMATCH"))
+        out(f"  heads {k}: ranking items {len(rk)} (R, in rank order: {'OK' if inR else 'MISMATCH'}), evaluation items {len(h.E)} "
+            f"(expected {want[0]} and {want[1]}; " + (f"valid R {nv.get('R')}, valid E {nv.get('E')}" if nv else "no n_valid record")
+            + f"), ablation items OPTA {len(h.abl['OPTA'])} NOM {len(h.abl['NOM'])}" + ("" if good else "  MISMATCH"))
     out(f"  population: {'OK' if ok else 'MISMATCH'}")
     return ok
 

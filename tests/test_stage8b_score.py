@@ -1,8 +1,10 @@
 """analysis/stage8b_score.py (preregistration J, part B; gate JB-G0 items 8 and 9) on synthetic results with known
 answers: every line MET; NOT MET paths (per-family sentences); NOT EVALUABLE paths (competence, anchor, too few
 evaluable models, a model-level gate, the deadline); the coverage switch to the behavioural counterpart and the floor;
-own-arm undefinedness (NOT MET) against anchor undefinedness (NOT EVALUABLE); the N4 fallback slot; the pytest gate;
-the bootstrap's determinism and cluster structure; the combination rules and Holm.
+own-arm undefinedness (NOT MET) against anchor undefinedness (NOT EVALUABLE), also in J-B3's competent-only points and
+their scoring over POST, NONE, PRE and AFTER; the N4 fallback slot; the pytest gate (outside TEST a missing log fails
+it); J-B8's model-level gates; J-B-G2 with an S0 file cut before AFTER; the bootstrap's determinism and cluster
+structure; the combination rules and Holm; the pipeline's J-B-G0 files, its J-B8 step chain and its disk figure.
 
 The generator writes, per item, six-word vectors whose identity effects are known: rows K_S / K_X move the S / X word by
 the item's key effect K, rows V_S / V_X by its value effect V, the KV rows by K + V; every row and the clean B run give
@@ -12,6 +14,7 @@ S or X in a key row exactly when K > BONUS; base levels set the minimum row mass
 import hashlib
 import json
 import math
+import re
 import sys
 from pathlib import Path
 
@@ -23,6 +26,7 @@ sys.path.insert(0, str(ROOT / "analysis"))
 import stage8b_score as S  # noqa: E402
 from stage8b_parts import lines as ln  # noqa: E402
 from stage8b_parts import stats as st  # noqa: E402
+from stage8b_parts.data import Pop, item_index  # noqa: E402
 
 from ckeys import fresh  # noqa: E402
 from experiments.format_factorial import LABEL, row_specs  # noqa: E402
@@ -124,7 +128,15 @@ def write_model(root, key, rng, test=False, pops=("F",), scorer="trie", g3_score
 
 
 def write_jb8(root, mass=0.9, shift=0.0):
-    (root / "jb8").mkdir(parents=True, exist_ok=True)
+    """A jb8 file scored with --score E, and mistral24's gate files: tokcheck (J-B-G0b), frames (its sha256 recorded by
+    the jb8 file) and verified (J-B-G1)."""
+    for d in ("jb8", "tokcheck", "frames", "verified"):
+        (root / d).mkdir(parents=True, exist_ok=True)
+    prov0 = {"git_commit": "abc", "dtype": "torch.bfloat16", "attn_implementation": "sdpa", "model": ln.JB8_KEY,
+             "model_key": ln.JB8_KEY, "test_mode": False}
+    (root / "tokcheck" / f"{ln.JB8_KEY}.json").write_text(json.dumps({"pass": True, "fails": [], "provenance": prov0}))
+    (root / "frames" / f"{ln.JB8_KEY}.json").write_text(json.dumps({"frames": [], "counts": {}, "provenance": prov0}))
+    (root / "verified" / f"{ln.JB8_KEY}.json").write_text(json.dumps({"repo": ln.JB8_KEY, "revision": "r", "files": {}}))
     rng = np.random.default_rng(5)
     LOCS = list(fresh.LEX1)
     res = []
@@ -148,7 +160,8 @@ def write_jb8(root, mass=0.9, shift=0.0):
                 put(f"m3_{sd}", 4 + rng.normal()), put(f"pca_{sd}", -4 + rng.normal())
                 put(f"addition_{sd}", 0 + rng.normal()), put(f"addition_v_{sd}", 1 + rng.normal())
             res.append({"core": core, "arm": arm, "runs": runs})
-    (root / "jb8" / "mistral.json").write_text(json.dumps({"provenance": {"score": "E", "frames_sha256": None}, "results": res}))
+    (root / "jb8" / "mistral.json").write_text(json.dumps({"provenance": {"score": "E", "frames_sha256": sha(
+        root / "frames" / f"{ln.JB8_KEY}.json")}, "results": res}))
 
 
 def pytest_log(root, fail=None, skip=None):
@@ -310,6 +323,9 @@ def test_pytest_gate(tmp_path):
     assert S.gate_g0(tmp_path, out.append) is True
     pytest_log(tmp_path, fail="tests/test_surface.py::test_0")
     assert S.gate_g0(tmp_path, out.append) is False
+    for f in ("tests/test_stage8_populations.py", "tests/test_stage8_holm.py"):   # the cross-part files must pass too
+        pytest_log(tmp_path, fail=f"{f}::test_1")
+        assert S.gate_g0(tmp_path, out.append) is False
     assert S.gate_g0(tmp_path / "nothing", out.append) is None
 
 
@@ -319,6 +335,106 @@ def test_model_gate_failures_outside_test(tmp_path):
     rc, txt = score(tmp_path)
     assert "J-B-G0b failed" in per_model(txt, "J-B1-P4f", "qwen7") and "J-B-G1" in per_model(txt, "J-B1-P4f", "olmo7")
     assert verdict(txt, "J-B1-P4f") == "NOT EVALUABLE"         # two of four evaluable
+
+
+def test_missing_pytest_log_fails_g0_outside_test(tmp_path):
+    """Outside TEST a results directory without the pytest log fails J-B-G0: every line, J-B8 included, NOT EVALUABLE."""
+    full(tmp_path)
+    (tmp_path / "logs" / "pytest.log").unlink()
+    rc, txt = score(tmp_path)
+    for code in ln.ORDER:
+        assert verdict(txt, code) == "NOT EVALUABLE", code
+    assert "J-B-G0: no pytest log" in per_model(txt, "J-B1-P4f", "qwen7")
+    assert "J-B-G0: no pytest log" in per_model(txt, "J-B8", ln.JB8_KEY)
+    assert "outside TEST J-B-G0 fails" in txt
+
+
+def test_jb8_model_level_gates(tmp_path):
+    """J-B8 needs J-B-G0 (outside TEST a missing log fails it), mistral24's tokenizer check, its verified file set
+    (waived in TEST) and the frames file whose sha256 the jb8 file records; each failing gate: NOT EVALUABLE."""
+    write_jb8(tmp_path)
+    jb8 = lambda g0=True, test=False: S.line_jb8(S.load(tmp_path), tmp_path, None, test, g0)[0]  # noqa: E731
+    assert jb8().ok is True
+    assert jb8(g0=False).ok is None and "J-B-G0 failed" in jb8(g0=False).why
+    assert jb8(g0=None).ok is None and "J-B-G0: no pytest log" in jb8(g0=None).why
+    tc, fr, ve = (tmp_path / d / f"{ln.JB8_KEY}.json" for d in ("tokcheck", "frames", "verified"))
+    keep = {p: p.read_text() for p in (tc, fr, ve)}
+    ve.unlink()
+    assert jb8().ok is None and "J-B-G1" in jb8().why
+    for p in (tc, fr):   # TEST: the TEST_ files, no J-B-G1 and no pytest log needed
+        (p.parent / f"TEST_{p.name}").write_text(keep[p])
+    assert jb8(g0=None, test=True).ok is True
+    ve.write_text(keep[ve])
+    tc.write_text(json.dumps({"pass": False, "fails": ["x"]}))
+    assert jb8().ok is None and "J-B-G0b failed" in jb8().why
+    tc.unlink()
+    assert jb8().ok is None and "J-B-G0b: no tokenizer check" in jb8().why
+    tc.write_text(keep[tc])
+    fr.write_text(keep[fr].replace("[]", "[\" **\"]", 1))
+    assert jb8().ok is None and "frames file differs" in jb8().why
+    fr.unlink()
+    assert jb8().ok is None and "frames file differs" in jb8().why
+
+
+def _f_model(recs, key="qwen7"):
+    P = {"population": "F", "arms": list(F_ARMS), "arms_not_run": []}
+    return ln.Model(key, F=Pop({"provenance": P, "results": recs}, key))
+
+
+def _competent(m):
+    return [c for c in ln.line_b3(m, ln.LV_EVERY).comps if "competent-only" in c.label]
+
+
+def test_competent_only_direction_scored_over_pre_too():
+    """J-B3's competent-only points use the scoring chosen over POST, NONE, PRE and AFTER: PRE's coverage below 0.8
+    switches them to the behavioural counterpart (with E over POST, NONE and AFTER alone they would stay under E)."""
+    cc = _competent(_f_model(make_items("F", F_ARMS, np.random.default_rng(11))))
+    assert len(cc) == 3 and all(c.passed and c.ne is None and "^E" in c.label for c in cc)
+    cc = _competent(_f_model(make_items("F", F_ARMS, np.random.default_rng(11), cov={"PRE": 0.6})))
+    assert len(cc) == 3 and all("behavioural counterpart: coverage below 0.8 (PRE 0.60)" in c.label for c in cc)
+    assert "delta^beta(POST - PRE)" in cc[0].label and "b_ID(POST) - b_ID(NONE)" in cc[2].label
+
+
+def test_competent_only_direction_follows_the_definedness_rules():
+    """On the competent items: an undefined anchor (no key read under AFTER there) makes the delta points NOT
+    EVALUABLE although the anchor holds on all F items; an s_ID undefined by its own arm (D(POST) < 0.2 D_A there) makes
+    the s_ID difference not met although its point is positive."""
+    rng = np.random.default_rng(12)
+    base = make_items("F", F_ARMS, rng)
+    comp = set(sorted({r["key"] for r in base}, key=item_index)[:40])   # these 40 stay competent in every arm
+    low = {r["key"]: r for r in make_items("F", {"POST": (1.0, 0.5)}, rng)}
+
+    def recs(no_anchor, own):
+        out = []
+        for r in base:
+            r = json.loads(json.dumps(low[r["key"]] if own and r["key"] in comp and r["arm"] == "POST" else r))
+            if r["key"] not in comp and r["arm"] == "NONE":
+                r["clean"]["S"]["E"] = r["clean"]["B"]["E"]          # names B in the clean S run: not competent
+            if no_anchor and r["key"] in comp and r["arm"] == "AFTER":
+                for row in ("K_S@0", "K_X@0"):
+                    r["rows"][row]["E"] = r["rows"]["ID@0"]["E"]     # ID_K^E(AFTER) = 0 on the competent items
+            out.append(r)
+        return out
+    cc = _competent(_f_model(recs(True, False)))
+    assert len(cc) == 3 and all(c.ne and "anchor" in c.ne for c in cc[:2]) and "(n=40)" in cc[0].label
+    cc = _competent(_f_model(recs(False, True)))
+    assert cc[2].ne is None and not cc[2].passed and "not met: undefined by the arm itself" in cc[2].label
+    assert cc[0].passed and cc[0].ne is None
+
+
+def test_g2_reports_an_s0_file_cut_before_after():
+    """J-B-G2 (outside TEST): an S0 file whose eval stopped after P1 (deadline) is reported as not evaluable and the
+    other P4 models are still compared."""
+    rng = np.random.default_rng(13)
+
+    def s0_model(key, arms):
+        P = {"population": "S0", "arms": list(S0_ARMS), "arms_not_run": [a for a in S0_ARMS if a not in arms]}
+        return ln.Model(key, S0=Pop({"provenance": P, "results": make_items("S0", {a: S0_ARMS[a] for a in arms}, rng, n=20)}, key))
+    models = {"qwen7": s0_model("qwen7", ["P1"]), "qwen14": s0_model("qwen14", list(S0_ARMS))}
+    out = []
+    S.gate_g2(models, out.append, False)
+    assert "    qwen7: AFTER not run -> NOT EVALUABLE" in out
+    assert any(l.startswith("    qwen14: P1 s ") for l in out) and "    mistral7: no S0 results" in out
 
 
 def test_bootstrap_deterministic_and_two_stage():
@@ -342,6 +458,9 @@ def test_combination_rules():
     assert st.comb_every({"a": True, "b": True, "c": True, "d": None}) is True
     assert st.comb_every({"a": True, "b": False, "c": True, "d": True}) is False
     assert st.comb_every({"a": True, "b": True, "c": None, "d": None}) is None
+    assert st.comb_every({"a": True, "b": False, "c": None, "d": None}) is False     # NOT MET whatever the number evaluable
+    assert st.comb_every({"a": False, "b": None, "c": None, "d": None}) is False
+    assert st.comb_every({"a": None, "b": None, "c": None, "d": None}) is None
     assert st.comb_k_of({"a": True, "b": True, "c": True, "d": False}) is True
     assert st.comb_k_of({"a": True, "b": True, "c": False, "d": None}) is False
     assert st.comb_k_of({"a": True, "b": True, "c": None, "d": None}) is None
@@ -403,3 +522,19 @@ def test_holm_with_the_shared_helper():
     out = []
     S.holm_sensitivity(res, out.append)
     assert any(l.strip().startswith("J-B3-N4: 1 components") for l in out)
+
+
+def test_the_pipeline_runs_the_g0_files_and_gates_jb8_on_its_tokenizer_check():
+    """scripts/gpu_stage8b.sh: its s8_pytest call runs exactly J-B-G0's files (G0_FILES, whose count for this file is
+    its number of tests); calib_mistral24 and jb8 run only after tok_mistral24 succeeded; the disk figure is the entry's."""
+    sh = (ROOT / "scripts" / "gpu_stage8b.sh").read_text()
+    call = re.search(r"^s8_pytest ((?:.*\\\n)*.*)$", sh, re.M).group(1)
+    assert call.replace("\\\n", " ").split() == list(S.G0_FILES)
+    assert S.G0_FILES["tests/test_stage8b_score.py"] == len(re.findall(r"^def test_", Path(__file__).read_text(), re.M))
+    i = sh.index("s8_step tok_mistral24")
+    assert sh.rfind("if ", 0, i) > sh.rfind("\n", 0, i)                      # the tokenizer check is the if's condition
+    then = sh[i:sh.index("\n      else\n", i)]
+    assert "s8_step calib_mistral24" in then and '&& [ -f "$OUT/frames/$t.json" ] && S8_OUTPUTS="$J8OUT" s8_step jb8' in then
+    assert sh.count("s8_step calib_mistral24") == 1 and sh.count("s8_step jb8 ") == 1
+    head = " ".join(l[2:] for l in sh.splitlines()[1:] if l.startswith("# "))
+    assert "Disk: >= 140 GB (two models at a time besides Qwen2.5-7B, kept until x1; 47 GB for J-B8)" in head

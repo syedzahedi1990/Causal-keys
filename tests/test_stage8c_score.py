@@ -1,10 +1,12 @@
 """The part-C scorer of P-2026-10-10-J (analysis/stage8c_score.py, analysis/stage8c_parts) on synthetic results with known
 answers: the channel-ratio law (equivalence by TOST; R1 / R3 / graded departure patterns; fewer than 3 statistics ->
 NOT EVALUABLE), the cell gate J-C-G4 (coverage), the efficacy gate J-C-G5, the sensitivity gate J-C-G8 (and the old JC3
-rule passing the same synthetic rows), J-C1 ... J-C5, J-C-BOUND (MET, NOT MET, NOT EVALUABLE paths), the readers (KO),
-J-C6 with its anchor gate, the overlap screen with and without a window and J-C-WIN, the hierarchical bootstrap
-(determinism, the two stages, the E4 seed level), Holm, and the whole scorer on a results directory (sections, exit
-status). No model is loaded."""
+rule passing the same synthetic rows), J-C1 ... J-C5, J-C-BOUND (MET, NOT MET, NOT EVALUABLE paths), the combination
+over combos and models (NOT MET on any evaluable failure), the readers (KO; E3 needs layer 7 passing J-C-G3), J-C6 with
+its anchor gate (BIND's usability decides a format's evaluability), the overlap screen with and without a window and
+J-C-WIN, the hierarchical bootstrap (determinism, the two stages, the E4 seed level), Holm, J-C-G0 (the files it requires,
+the script runs them; without a pass no line is computed and the headline names no outcome), and the whole scorer on a
+results directory (sections, exit status). No model is loaded."""
 import json
 import math
 import sys
@@ -211,6 +213,43 @@ def test_lines_law_met_and_not_met(good):
     assert SC.lines_law(G4, I4)["J-C1"][0] is None                                       # 2 combos < 3
 
 
+def test_combination_not_met_on_any_evaluable_failure(good):
+    """A line over combos or models is NOT MET as soon as an evaluable one fails, whatever the number evaluable; NOT
+    EVALUABLE only when none fails and fewer than the minimum are evaluable."""
+    assert SC.combine({"a": True, "b": False, "c": None}, 3) is False
+    assert SC.combine({"a": True, "b": True, "c": None}, 3) is None
+    assert SC.combine({"a": True, "b": True, "c": True}, 3) is True
+    assert SC.combine({"a": None}, 1) is None and SC.combine({}, 1) is None
+    bad = LW.Model(make_eval(psi={"E2": (0.3, 1.0)}))
+    G, I = gates_for({"qwen7": bad})                    # J-C1: 2 evaluable combos (< 3), E2 at l in {3, 7} not met
+    v, per, _ = SC.lines_law(G, I)["J-C1"]
+    assert sorted(x for x in per.values() if x is not None) == [False, True] and v is False, per
+    assert SC.headline({"J-C1": (v, per, [])}).startswith("outcome (e):")
+
+
+def test_g0_not_passed_computes_no_line_and_no_outcome(good):
+    """J-C-G0 failing or not run (g0 False or None): no model is evaluable for any E line, so no pattern or carrier is
+    recorded, and the headline names no outcome whatever PATTERNS, CARRIERS and the lexical-code reading hold."""
+    carry = LW.Model(make_eval(psi={"E3": (3.0, 1.0)}, comps={"PERP:E1": (0.5, 0.5)}))
+    for g0 in (None, False):
+        SC.PATTERNS.clear()
+        SC.CARRIERS.clear()
+        G, I = gates_for({"qwen7": carry, "mistral7": good, "llama8": good})
+        G.g0 = g0
+        assert not G.ok("qwen7") and not G.ok("qwen7", law=False)
+        R = SC.lines_law(G, I)
+        assert all(R[c][0] is None for c in R) and len(R) == 6, {c: R[c][0] for c in R}
+        assert SC.PATTERNS == {} and SC.CARRIERS == []
+        assert SC.reported(G, I, lambda s: None) is None
+    SC.PATTERNS["J-C3"] = {"qwen7 E3": "R3 key-flat"}
+    SC.CARRIERS.append(("qwen7", "PERP:E1", 3))
+    R = {"J-C1": (False, {}, []), "J-C3": (None, {}, [])}
+    assert SC.headline(R, True, None) == SC.headline(R, False, False) == "J-C-G0 not passed: no outcome"
+    assert SC.headline(R, True, True).startswith("outcome (e):")
+    SC.PATTERNS.clear()
+    SC.CARRIERS.clear()
+
+
 def test_j_c5_and_bound():
     carry = LW.Model(make_eval(comps={"PERP:E1": (0.5, 0.5), "NONLEX:E1": (0.4, 0.4)}, e5={"E5FR": (0.2, 0.6)}))
     G, I = gates_for({"qwen7": carry})
@@ -256,6 +295,23 @@ def test_readers():
     assert RD.Readers(readers_json(idk=1.0)).family("E1")[0] is None                    # denominator gate
 
 
+def test_readers_e3_needs_layer_7_passing_g3(good):
+    """J-C-READb: E3 at l = 7 is NOT EVALUABLE when layer 7 fails J-C-G3 (or has no J-C-G3 record), and adds no Holm
+    component; E4 still counts."""
+    RJ = readers_json()
+    for g3, want in (({3: True, 7: True, 11: True, 15: True}, True), ({3: True, 7: False, 11: True, 15: True}, None),
+                     ({3: True}, None)):
+        SC.COMPONENTS.clear()
+        G, I = gates_for({"qwen7": good}, g3=g3)
+        I.get = lambda sub, k: RJ if sub == "readers" else None
+        (va, pa, lines), (vb, pb, _) = SC.j_readers(G, I)
+        assert pb["qwen7 E3"] is want and pb["qwen7 E4a"] is True and vb is True, (pb, lines)
+        e3 = [d["name"] for c, d, _ in SC.COMPONENTS if "E3" in d["name"]]
+        assert (e3 != []) is (want is True), e3
+        assert ("qwen7 E3: layer 7 fails J-C-G3: not evaluable" in "\n".join(lines)) is (want is None), lines
+    SC.COMPONENTS.clear()
+
+
 # --------------------------------------------------------------------------- Prakash et al.'s material
 def ex_cells(n, arm, fmt, pk, pv, phi=10.0, ok=True, nu=0.5, rng=None):
     rng = rng or np.random.default_rng(0)
@@ -282,6 +338,25 @@ def test_jc6_and_anchor():
     cells3 = [c for c in cells if c["arm"] != "BIND"] + [x for f in PK.ANCHOR for x in ex_cells(40, "BIND", f, 0.3, 0.7)]
     v3, g73, _ = PK.jc6({"formats": list(PK.ANCHOR), "lstar": 28, "cells": cells3}, False)
     assert g73 is False and v3 is None                                                     # anchor not reproduced
+
+
+def test_jc6_bind_usability_decides_evaluability():
+    """J-C6: a format is evaluable only when BIND is usable there too (Gates b0 and b2, the kappa rule); BIND failing
+    makes that format NOT EVALUABLE (a required format: the line NOT EVALUABLE), never NOT MET."""
+    def run(bind_nm):
+        cells = list(bind_nm)
+        for f, kb in PK.ANCHOR.items():
+            cells += ex_cells(40, "ID", f, 0.05, 0.9) + ex_cells(40, "CAA", f, 0.05, 0.9)
+            if f != PK.NM:
+                cells += ex_cells(40, "BIND", f, kb, 1 - kb)
+        return PK.jc6({"formats": list(PK.ANCHOR), "lstar": 28, "cells": cells}, False)
+    # BIND under NO-MENTION: kappa 0.617 (the anchor is reproduced) but psi_K + psi_V 0.32 < 0.5 (the kappa rule fails)
+    v, g7, lines = run(ex_cells(40, "BIND", PK.NM, 0.2, 0.124))
+    assert g7 is True and v is None, lines
+    assert any("not evaluable" in x and "BIND kappa rule" in x for x in lines), lines
+    v2, g72, lines2 = run(ex_cells(40, "BIND", PK.NM, 0.618, 0.382, phi=2.0))          # BIND Phi 2 < 3 nats (Gate b2)
+    assert g72 is True and v2 is None and any("BIND Phi >= 3" in x for x in lines2), lines2
+    assert run(ex_cells(40, "BIND", PK.NM, 0.618, 0.382))[0] is True                   # BIND usable: MET as before
 
 
 def clamp_cells(n, l0, s, fmt=None, scale=10.0):
@@ -381,6 +456,25 @@ def test_headline_outcomes():
 
 
 # --------------------------------------------------------------------------- the whole scorer on a results directory
+def test_g0_requires_the_shared_files_the_script_runs(tmp_path):
+    """J-C-G0 requires every test of tests/test_generate.py (frame discovery), tests/test_stage8_populations.py (G6
+    across the parts) and tests/test_stage8_holm.py (D2) besides the part's files, and the GPU script's pytest step runs
+    every file the gate requires."""
+    shared = {"tests/test_generate.py": 5, "tests/test_stage8_populations.py": 5, "tests/test_stage8_holm.py": 7}
+    assert all(SC.G0_FILES.get(f, 0) >= n for f, n in shared.items()), SC.G0_FILES
+    sh = (Path(__file__).resolve().parents[1] / "scripts" / "gpu_stage8c.sh").read_text()
+    call = re.search(r"^s8_pytest ((?:.*\\\n)*.*)$", sh, re.M).group(1)
+    assert set(SC.G0_FILES) <= set(call.replace("\\\n", " ").split()), call
+    (tmp_path / "logs").mkdir()
+    hd = "==== 2026-10-10T00:00:00Z python -m pytest tests/...\n"
+    full = hd + "".join(f"{fn}::test_{i} PASSED\n" for fn, n in SC.G0_FILES.items() for i in range(n))
+    old = hd + "".join(f"{fn}::test_{i} PASSED\n" for fn, n in SC.G0_FILES.items() if fn not in shared for i in range(n))
+    skip = full.replace("tests/test_generate.py::test_4 PASSED", "tests/test_generate.py::test_4 SKIPPED")
+    for log, want in ((full, True), (old, False), (skip, False)):
+        (tmp_path / "logs" / "pytest.log").write_text(log)
+        assert SC.gate_g0(tmp_path, lambda s: None) is want
+
+
 def test_main_on_results_dir(tmp_path, good):
     root = tmp_path / "res"
     J = make_eval(e5={"E5FR": (0.2, 0.6)}, comps={"PERP:E1": (0.1, 0.1), "NONLEX:E1": (0.1, 0.1)})
@@ -410,6 +504,11 @@ def test_main_on_results_dir(tmp_path, good):
     (root / "logs" / "pytest.log").write_text(log.replace("PASSED", "FAILED", 1))
     SC.main(["--results", str(root)])
     assert re.search(r"J-C1\s+M A prior 0.80\s+NOT EVALUABLE", (root / "STAGE8C_SCORE.txt").read_text())
+    (root / "logs" / "pytest.log").unlink()                     # J-C-G0 not run: no line computed, no outcome, exit 2
+    rc = SC.main(["--results", str(root)])
+    text = (root / "STAGE8C_SCORE.txt").read_text()
+    assert "HEADLINE (C-6, pre-committed; the Section-5 outcome of the entry): J-C-G0 not passed: no outcome\n" in text
+    assert re.search(r"J-C1\s+M A prior 0.80\s+NOT EVALUABLE", text) and SC.PATTERNS == {} and rc == 2, rc
 
 
 import re  # noqa: E402

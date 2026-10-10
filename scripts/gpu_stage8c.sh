@@ -12,7 +12,8 @@
 #   release        Prakash et al.'s release at the pinned commit (sparse fetch as gpu_stage6.sh; every file hash and the
 #                  pool hash asserted: python -m ckeys.causaltom); needed by the FP32 tests and the screen
 #   pytest         J-C-G0 before any model (tests/test_stage8_edits.py, tests/test_sae.py, tests/test_stage8c_score.py and
-#                  the shared modules part C calls: surface, clamp, head_splice, prakash)
+#                  the shared modules part C calls: surface, clamp, head_splice, prakash, generate; the population check
+#                  across the parts and the Holm helper: stage8_populations, stage8_holm)
 #   per model, in the order qwen7, mistral7, llama8:
 #     preflight_<key>  tokenizer only: populations, prompts, neutral sentences, form sets, the SAE pins on the Hub
 #     calib_<key>      frames, means, spans, random directions, the SAE gate J-C-G3 and k_F / beta rule, the E5 alpha rule
@@ -68,9 +69,10 @@ export PRAKASH_REPO=$REL
 echo "$(s8_utc) Prakash et al.'s release $URL at $SHA in $REL" >> "$OUT/COMMIT.txt"
 s8_run release $PY -m ckeys.causaltom || die "the release or pool hash check (see $OUT/logs/release.log)"
 
-# ---- FP32 gates before any model (J-C-G0): part C's tests, the scorer's tests, the shared modules part C calls
+# ---- FP32 gates before any model (J-C-G0): part C's tests, the scorer's tests, the shared modules part C calls, the
+# population check across the parts (G6) and the Holm helper (D2)
 s8_pytest tests/test_stage8_edits.py tests/test_sae.py tests/test_stage8c_score.py tests/test_surface.py tests/test_clamp.py \
-  tests/test_head_splice.py tests/test_prakash.py
+  tests/test_head_splice.py tests/test_prakash.py tests/test_generate.py tests/test_stage8_populations.py tests/test_stage8_holm.py
 
 TAGP=; on TEST_MODE && TAGP=TEST_
 EV=(experiments/stage8_edits.py --out "$OUT")

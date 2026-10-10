@@ -1,7 +1,8 @@
 """The part-D scorer of P-2026-10-10-J (analysis/stage8d_score.py, analysis/stage8d_parts) on synthetic inputs with known
 answers: the seeded story bootstrap and ratio recomputation, the one-sided tests and Holm, the 2/2 combination, each
-line's statistic from rows built to give a chosen value, the gates and NOT EVALUABLE paths, the D6 decision table, and an
-end-to-end scoring of a synthetic results directory."""
+line's statistic from rows built to give a chosen value, the gates and NOT EVALUABLE paths, a line's per-model exception
+as a scorer error (exit status 1), the J-D-G0 log rule (skips anywhere in the run; the shared population and Holm tests
+required), the D6 decision table, and an end-to-end scoring of a synthetic results directory."""
 import json
 import sys
 from pathlib import Path
@@ -143,9 +144,11 @@ def test_combine_rule():
     assert combine({"a": True, "b": True}, 2) is True
     assert combine({"a": True, "b": None}, 2) is None
     assert combine({"a": False, "b": None}, 2) is False
+    assert combine({"a": None, "b": False}, 2) is False          # NOT MET with one evaluable model, whichever fails
     assert combine({"a": None, "b": None}, 2) is None
     assert combine({"x": True, "y": True, "z": None}, 2) is True
     assert combine({"x": True, "y": None, "z": None}, 2) is None
+    assert combine({"x": None, "y": False, "z": None}, 2) is False
     assert combine({"x": True}, 1) is True
 
 
@@ -403,6 +406,73 @@ def test_gate_failures_make_lines_not_evaluable(tmp_path):
     SC.main(["--results", str(tmp_path), "--test"])
     v = verdicts((tmp_path / "STAGE8D_SCORE.txt").read_text())
     assert set(v.values()) == {"NOT EVALUABLE"}
+
+
+def test_line_exception_is_a_scorer_error(tmp_path, monkeypatch):
+    """An exception inside one line's per-model function: that model's verdict is NOT EVALUABLE with the traceback under
+    the line, "<code>/<model>" is recorded, the SUMMARY prints SCORER ERROR and the scorer exits with status 1; the other
+    lines are still scored."""
+    build(tmp_path, mistral_bind=False, qwen_ioi_v=-1.0)
+    real, calls = LN.Inject.addr, []
+
+    def addr(self):
+        calls.append(1)
+        if len(calls) == 1:                      # the first model scored (qwen7) only
+            raise RuntimeError("synthetic scorer bug")
+        return real(self)
+    monkeypatch.setattr(LN.Inject, "addr", addr)
+    rc = SC.main(["--results", str(tmp_path), "--test"])
+    text = (tmp_path / "STAGE8D_SCORE.txt").read_text()
+    assert rc == 1, text
+    v = verdicts(text)
+    assert v["J-D-ADDR"] == "NOT EVALUABLE" and v["J-D1"] == "MET" and v["J-D-KN"] == "MET"
+    assert "SCORER ERROR in ['J-D-ADDR/qwen7']" in text
+    assert "    qwen7    NOT EVALUABLE scorer error:" in text and "RuntimeError: synthetic scorer bug" in text
+
+
+def g0_log(root, files=None, extra=(), before=()):
+    """logs/pytest.log: the ``before`` lines, then one pytest run in which every file of ``files`` (default the scorer's
+    G0_FILES) has its pinned number of PASSED lines, then the ``extra`` lines of that run."""
+    files = SC.G0_FILES if files is None else files
+    lines = list(before) + ["==== 2026-10-10T00:00:00Z python -m pytest tests/test_flag.py -v -rA"]
+    lines += [f"{fn}::t{i} PASSED" for fn, n in files.items() for i in range(n)]
+    (root / "logs").mkdir(parents=True, exist_ok=True)
+    (root / "logs" / "pytest.log").write_text("\n".join(lines + list(extra)) + "\n")
+
+
+def test_g0_counts_skips_in_every_file_of_the_run(tmp_path):
+    """J-D-G0 fails on a skipped test in any tests/ file of the last pytest run, the shared files included, as it does on
+    a FAILED or ERROR test: the -v line of each skipped test, and the -rA summary line of a whole file skipped at import
+    (which has no -v line). A skip in an earlier run does not count."""
+    out = []
+    g0_log(tmp_path, extra=["tests/test_head_splice.py::t0 PASSED"])
+    assert SC.gate_g0(tmp_path, out.append) is True and "skips in the run 0" in out[-1]
+    g0_log(tmp_path, extra=["tests/test_head_splice.py::t0 SKIPPED (no cache)", "SKIPPED [1] tests/test_head_splice.py:9: no cache"])
+    assert SC.gate_g0(tmp_path, out.append) is False and "skips in the run 1" in out[-1]
+    g0_log(tmp_path, extra=["SKIPPED [2] tests/test_head_splice.py:3: whole file"])
+    assert SC.gate_g0(tmp_path, out.append) is False and "skips in the run 2" in out[-1]
+    g0_log(tmp_path, before=["==== 2026-10-09T00:00:00Z python -m pytest tests/test_flag.py -v -rA",
+                             "tests/test_head_splice.py::t0 SKIPPED (no cache)"])
+    assert SC.gate_g0(tmp_path, out.append) is True and "last of 2 run(s)" in out[-1]
+
+
+def test_g0_requires_the_shared_population_and_holm_tests(tmp_path):
+    """The pytest step runs tests/test_stage8_populations.py (rule G6 across the parts) and tests/test_stage8_holm.py (the
+    shared Holm helper) with the part's files, and J-D-G0 requires every test of each: the scorer's G0_FILES are the
+    files of scripts/gpu_stage8d.sh's s8_pytest call (with the shared tests/test_head_splice.py, not counted per file), the
+    two shared files pinned at their number of tests, and a run without them fails the gate."""
+    import re
+    sh = (ROOT / "scripts" / "gpu_stage8d.sh").read_text()
+    call = re.search(r"^s8_pytest ((?:.*\\\n)*.*)$", sh, re.M).group(1).replace("\\\n", " ").split()
+    assert set(call) == set(SC.G0_FILES) | {"tests/test_head_splice.py"} and len(call) == len(set(call))
+    shared = ("tests/test_stage8_populations.py", "tests/test_stage8_holm.py")
+    for fn in shared:
+        assert SC.G0_FILES[fn] == len(re.findall(r"^def test_", (ROOT / fn).read_text(), re.M)), fn
+    out = []
+    g0_log(tmp_path, files={f: n for f, n in SC.G0_FILES.items() if f not in shared})
+    assert SC.gate_g0(tmp_path, out.append) is False and "tests/test_stage8_holm.py 0 passed" in out[-1]
+    g0_log(tmp_path)
+    assert SC.gate_g0(tmp_path, out.append) is True
 
 
 def test_d6_table_branches():

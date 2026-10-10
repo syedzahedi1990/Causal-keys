@@ -223,12 +223,14 @@ def V(ok):
 
 
 def comb_every(per: dict, min_ev: int = 3):
-    """P4f (intersection-union): NOT EVALUABLE if fewer than min_ev models are evaluable; else MET iff every evaluable
-    model meets the line."""
+    """P4f (intersection-union): NOT MET as soon as an evaluable model does not meet the line, whatever the number of
+    evaluable models; else NOT EVALUABLE if fewer than min_ev models are evaluable; else MET."""
     ev = [v for v in per.values() if v is not None]
+    if not all(ev):
+        return False
     if len(ev) < min_ev:
         return None
-    return all(ev)
+    return True
 
 
 def comb_k_of(per: dict, k: int = 3):

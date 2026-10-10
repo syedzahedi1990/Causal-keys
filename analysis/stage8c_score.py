@@ -36,7 +36,10 @@ MODELS = ("qwen7", "mistral7", "llama8")
 FAMILIES = {"qwen7": ("E1", "E2", "E3", "E4", "E5"), "mistral7": ("E1", "E2", "E4", "E5"), "llama8": ("E1", "E2", "E5")}
 E5_SUB = ("E5FR", "E5DE", "E5SYN", "E5NL")
 MIN_STORIES = 60
-G0_FILES = {"tests/test_stage8_edits.py": 15, "tests/test_sae.py": 7, "tests/test_stage8c_score.py": 14}
+G0_FILES = {"tests/test_stage8_edits.py": 15, "tests/test_sae.py": 7, "tests/test_stage8c_score.py": 19,
+            # the shared modules part C relies on: generate.py (frame discovery; changed in the stage-8 review), the G6
+            # population check across the parts, the Holm helper (D2); every test of each file
+            "tests/test_generate.py": 5, "tests/test_stage8_populations.py": 5, "tests/test_stage8_holm.py": 7}
 POP_E = "a23465a211577f4c6e9efe78d4c7a588b598c05437406001145a420fec9d8c1b"
 # code -> (class, kind, prior, title); the priors were recorded in the entry before any stage-8 output. The class follows the
 # prior (decision D1: L = implied by data in hand and prior >= 0.9; M = prior >= 0.8; R = prior < 0.8), so J-C1 (Tier 0,
@@ -259,18 +262,18 @@ class Gates:
         return [x for x in z if m is None or any(m.has("NONE", l, LW.probe(x) + "|KV|S") for l in m.depths)]
 
     def ok(self, k, law=True):
-        base = self.g0 is not False and self.model_ok.get(k) is True
+        base = self.g0 is True and self.model_ok.get(k) is True     # J-C-G0 failing or not run: no line is computed
         return base and (self.g8.get(k) is True if law else True)
 
 
 # --------------------------------------------------------------------------- lines
 def combine(per, need):
-    """per: {label: True/False/None}; MET iff >= need evaluable and every evaluable met; NOT MET if an evaluable one fails
-    (and >= need evaluable); else NOT EVALUABLE."""
+    """per: {label: True/False/None}; NOT MET as soon as an evaluable one fails (whatever the number evaluable); MET iff
+    >= need evaluable and every evaluable met; else (none fails, fewer than need evaluable) NOT EVALUABLE."""
     ev = [v for v in per.values() if v is not None]
-    if len(ev) < need:
-        return None
-    return all(ev)
+    if not all(ev):
+        return False
+    return True if len(ev) >= need else None
 
 
 def law_line(G: Gates, I: Inputs, combos, need, out_lines, code=""):
@@ -402,6 +405,10 @@ def j_readers(G: Gates, I: Inputs):
             grp = "a" if D in ("E1", "E2") else "b"
             if not g:
                 out[grp][f"{k} {D}"] = None
+                continue
+            if D == "E3" and G.g3.get(7) is not True:          # J-C-G3 failing makes E3 not evaluable at that layer
+                out[grp][f"{k} {D}"] = None
+                lines.append(f"    {k} {D}: layer 7 fails J-C-G3: not evaluable")
                 continue
             if not eff:
                 out[grp][f"{k} {D}"] = None
@@ -640,11 +647,14 @@ def holm_sensitivity(R, out):
 
 
 # --------------------------------------------------------------------------- main
-def headline(R, lexical_all=None):
+def headline(R, lexical_all=None, g0=True):
     """The pre-committed headline reading (C-6) and the Section-5 outcome of the entry (C-12), checked in this order:
     (a) the law met on Tier 2 and J-C-BOUND met; (a') Tier 2 met, J-C-BOUND not met; (c) J-C-BOUND met without Tier 2;
     (b) every effective family acts through the natural lexical code and no PERP / NONLEX component carries identity;
-    (e) J-C1 NOT MET; (d) a Tier-2 combo NOT MET (its pattern printed); (f) otherwise (Tier 0 at most)."""
+    (e) J-C1 NOT MET; (d) a Tier-2 combo NOT MET (its pattern printed); (f) otherwise (Tier 0 at most). Without a passing
+    J-C-G0 (g0 not True) there is no outcome, and PATTERNS and CARRIERS are not read."""
+    if g0 is not True:
+        return "J-C-G0 not passed: no outcome"
     v = {k: x[0] for k, x in R.items()}
     tier2 = (v.get("J-C3") is True and v.get("J-C4") is True) or v.get("J-C5") is True
     bound = v.get("J-C-BOUND") is True
@@ -720,7 +730,7 @@ def main(argv=None):
         lex_all = reported(G, I, rep.append)
     except Exception:
         rep.append("  reported lines failed:\n" + traceback.format_exc())
-    out("\nHEADLINE (C-6, pre-committed; the Section-5 outcome of the entry): " + headline(R, lex_all))
+    out("\nHEADLINE (C-6, pre-committed; the Section-5 outcome of the entry): " + headline(R, lex_all, g0))
     for x in rep:
         out(x)
     out("\nSUMMARY")

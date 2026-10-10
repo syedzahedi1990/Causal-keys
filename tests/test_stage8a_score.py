@@ -2,8 +2,11 @@
 the two-stage cluster bootstrap (reproducible, articles then items), the interval criteria and their p-values, the
 cross-model combination (>= 3 evaluable with a fresh family; IUT), every J-A line MET on data built to meet it, the NOT MET
 and NOT EVALUABLE paths (a failing model, too few models, no fresh family, a failed gate, too few competent or
-prior-free items, a format skipped at the deadline), Holm, the pytest gate parser and the full report."""
+prior-free items, a format skipped at the deadline), Holm, the pytest gate parser and the full report; the heads
+population check, the pytest step of scripts/gpu_stage8a.sh, and the script's and the runbook's statements that the code
+decides (compute, network hosts, download tries, the GPU check)."""
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -234,6 +237,53 @@ def test_head_lines(four):
     assert hd.overlap(h)[0] == 20
 
 
+def test_heads_ratios_use_each_sets_own_batch():
+    """R(k) and KO(k) of a set divide by that set's own all_G - none (knockout: all_G,KO - none_KO), not by N*'s d_G;
+    d_full is m(full K_S clamp) - m(clean), eval's mF - mB. The docstrings of the scorer part and of the experiment say so."""
+    J = heads_json()
+    for e in J["eval"]:
+        c = e["curves"]["T"]
+        c.update(none=1.0, allG=c["allG"] / 2, ko_none=2.0, ko_allG=c["ko_allG"] / 2)
+    h = hd.Heads("qwen7", J)
+    i, T = h.ik, [e["curves"]["T"] for e in J["eval"]]
+    r = np.mean([c["suff"][i] - c["none"] for c in T]) / np.mean([c["allG"] - c["none"] for c in T])
+    ko = 1 - np.mean([c["ko"][i] - c["ko_none"] for c in T]) / np.mean([c["ko_allG"] - c["ko_none"] for c in T])
+    assert abs(h.R("T", i).pt - r) < 1e-9 and abs(h.KO("T", i).pt - ko) < 1e-9
+    dG = np.mean([e["curves"]["N"]["allG"] - e["curves"]["N"]["none"] for e in J["eval"]])
+    assert abs(r - np.mean([c["suff"][i] - c["none"] for c in T]) / dG) > 0.1
+    assert f"d_full {cm.est(h.arts, cm.mean, h.v(lambda e: e['mF'] - e['mB']))} " in h.gate2()[1]
+    doc = " ".join(hd.__doc__.split())
+    assert "d_full = mean[m(full K_S clamp) - m(clean)]" in doc and "m(ID)" not in doc
+    assert "within that set's own sufficiency and knockout batches" in doc
+    ex = " ".join((ROOT / "experiments" / "natural_heads.py").read_text().split('"""')[1].split())
+    assert "d_full = mean[m(full K_S clamp) - m(clean)]" in ex and "the denominators of that set's R(k) and KO(k)" in ex
+
+
+def test_heads_population_takes_the_first_valid_items():
+    """The heads population check: the ranking items are the first min(60, n) of the n R items valid in NOM and OPTA
+    under the model's frame, the evaluation items the first min(80, n) of the n valid E items (n from the heads file's
+    provenance n_valid; exactly 60 and 80 without it). Fewer valid items under a frame other than ' ' is no MISMATCH."""
+    items = json.load(open(sc.ITEMS))
+    Rr = [i["id"] for i in sorted(items, key=lambda i: i["rank"]) if i["split"] == "R"]
+    Ee = [i["id"] for i in items if i["split"] == "E"]
+
+    def check(n_rank, n_eval, n_valid=None):
+        J = heads_json(n=n_eval)
+        for e, i in zip(J["eval"], Ee):
+            e["id"] = i
+        J["rank"] = {"items": [{"id": i} for i in Rr[:n_rank]]}
+        if n_valid:
+            J["provenance"]["n_valid"] = dict(zip("RE", n_valid))
+        lines = []
+        ok = sc.population({}, {}, {"qwen7": hd.Heads("qwen7", J)}, lines.append, test=False)
+        assert ("MISMATCH" in lines[-1]) is not ok
+        return ok
+
+    assert check(60, 80, (71, 185)) and check(60, 80)              # the usual case, with and without the record
+    assert check(55, 80, (55, 185)) and check(60, 70, (66, 70))    # fewer than 60 valid R items or 80 valid E items
+    assert not check(55, 80) and not check(50, 80, (55, 185)) and not check(60, 70, (66, 80))
+
+
 def test_pytest_gate_parser(tmp_path):
     (tmp_path / "logs").mkdir()
     good = "".join(f"tests/test_natural_clamp.py::t{i} PASSED\n" for i in range(14)) + "".join(f"tests/test_kvquant.py::k{i} PASSED\n" for i in range(4))
@@ -244,6 +294,24 @@ def test_pytest_gate_parser(tmp_path):
     (tmp_path / "logs" / "pytest.log").write_text("==== test session starts ====\n" + good.replace("t3 PASSED", "t3 SKIPPED"))
     assert sc.gate_tests(tmp_path, sc.A_G0, "J-A-G0", lines.append) is False
     assert sc.gate_tests(tmp_path, sc.HA_G0, "J-A-HA-G0", lines.append) is None
+
+
+def test_pytest_step_runs_the_gates_and_the_shared_tests(tmp_path):
+    """scripts/gpu_stage8a.sh: its s8_pytest call runs J-A-G0's and J-A-HA-G0's files, the scorer's tests and the tests
+    every part runs before any model (tests/test_stage8_populations.py, rule G6; tests/test_stage8_holm.py, the shared
+    Holm helper); the gate parser reads J-A-G0 and J-A-HA-G0 from a log of that whole session."""
+    sh = (ROOT / "scripts" / "gpu_stage8a.sh").read_text()
+    call = re.search(r"^s8_pytest ((?:.*\\\n)*.*)$", sh, re.M).group(1).replace("\\\n", " ").split()
+    shared = {"tests/test_stage8_populations.py", "tests/test_stage8_holm.py"}
+    assert set(sc.A_G0) | set(sc.HA_G0) | {"tests/test_stage8a_score.py"} | shared <= set(call), call
+    assert len(call) == len(set(call)) and all((ROOT / f).is_file() for f in call)
+    need = sc.A_G0 | sc.HA_G0
+    (tmp_path / "logs").mkdir()
+    (tmp_path / "logs" / "pytest.log").write_text("==== test session starts ====\n" + "".join(
+        f"{f}::test_{i} PASSED\n" for f in call for i in range(need.get(f, 3))))
+    lines = []
+    assert sc.gate_tests(tmp_path, sc.A_G0, "J-A-G0", lines.append) is True
+    assert sc.gate_tests(tmp_path, sc.HA_G0, "J-A-HA-G0", lines.append) is True
 
 
 def test_full_report(tmp_path, four):
@@ -291,3 +359,32 @@ def test_holm_family_is_the_r_lines_interval_components(four):
     text = "\n".join(lines)
     assert "J-A6a: 1 component decision(s) change under Holm: llama8: key-source rate > 0.5" in text
     assert "verdict MET -> NOT MET under Holm" in text
+
+
+def test_compute_estimate_agrees_with_the_runbook():
+    """The script header's compute estimate is the runbook's Part A row (the entry's Compute): about 3.3 GPU-h for the
+    core, about 4.1 h with every exploratory pass."""
+    sh = (ROOT / "scripts" / "gpu_stage8a.sh").read_text()
+    core, total = re.search(r"Compute estimate \(entry, Compute\): about ([\d.]+) GPU-h for the core, about ([\d.]+) h", sh).groups()
+    rb = (ROOT / "docs" / "GPU_RUNBOOK.md").read_text().splitlines()
+    row = next(x for x in rb if x.startswith("| A | `scripts/gpu_stage8a.sh`"))
+    assert f"about {core} h core, {total} h in all" in row and (core, total) == ("3.3", "4.1")
+
+
+def test_runbook_stage8_names_what_the_code_does():
+    """docs/GPU_RUNBOOK.md, Stage 8: every host the stage-8 code downloads from (the GPU scripts' curl lines, the
+    fetcher's Hub URL, Part C's release) is named under What to rent; a download is tried up to three times per source
+    (the fetcher's default tries); the GPU check reads the first device against 75 GiB (MINGIB)."""
+    rb = (ROOT / "docs" / "GPU_RUNBOOK.md").read_text()
+    s8 = rb[rb.index("## Stage 8"):]
+    rent = next(x for x in s8.split("\n\n") if x.startswith("**What to rent.**"))
+    fv = (ROOT / "scripts" / "fetch_verified.py").read_text()
+    common = (ROOT / "scripts" / "stage8_common.sh").read_text()
+    code = "".join((ROOT / "scripts" / f"gpu_stage8{x}.sh").read_text() for x in "abcd") + fv
+    code += re.search(r'^RELEASE_URL = "(.*)"$', (ROOT / "ckeys" / "causaltom.py").read_text(), re.M).group(1) + "/"
+    hosts = set(re.findall(r"https://([a-z0-9.-]+)/", code))
+    assert {"huggingface.co", "rajpurkar.github.io", "github.com", "anonymous.4open.science"} <= hosts
+    assert all(h in rent for h in hosts), sorted(h for h in hosts if h not in rent)
+    assert re.search(r"def fetch\(.*?tries=3\b", fv, re.S) and "tried up to three times per source" in s8
+    assert "get_device_properties(0)" in common and "MINGIB=${MINGIB:-75}" in common
+    assert "the first GPU has less than 75 GiB" in s8 and "no GPU with ≥ 75 GiB is visible" not in s8

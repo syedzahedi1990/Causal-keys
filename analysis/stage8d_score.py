@@ -7,9 +7,11 @@ Inputs under --results (default results/gpu_stage8d), as written by scripts/gpu_
 stages preflight, sets, fit, inject, ablate, bind, sign, diss, before, xtask of experiments/stage8_flag.py (tags qwen7,
 mistral7, qwen1.5, qwen3b; TEST_<key> with --test), logs/pytest.log (J-D-G0: its last pytest run), COMMIT.txt, ENV.txt,
 REVISIONS.txt, SKIPPED.txt. Output STAGE8D_SCORE.txt (also --out) with the sections PROVENANCE, POPULATION, GATES,
-PREDICTIONS, REPORTED, SUMMARY, EXPLORATORY. Exit status 1 if a part of the scorer raised (its lines NOT EVALUABLE, the
-traceback printed); 2 if, outside --test, the provenance or population check reports MISMATCH, or results exist without
-a passing J-D-G0.
+PREDICTIONS, REPORTED, SUMMARY, EXPLORATORY. Exit status 1 if the scorer raised in the gates or the lines (every line
+NOT EVALUABLE) or in one line's per-model function (that line NOT EVALUABLE in that model), the traceback printed and
+the SUMMARY naming each as "SCORER ERROR in [...]" (gates/lines, or <code>/<model>); a failure in the REPORTED or
+EXPLORATORY section is printed and does not change the status. Otherwise 2 if, outside --test, the provenance or
+population check reports MISMATCH, or results exist without a passing J-D-G0.
 """
 from __future__ import annotations
 
@@ -36,7 +38,8 @@ STEPS_OF = {"qwen7": ("preflight", "sets", "fit", "inject", "ablate", "bind", "s
             "mistral7": ("preflight", "sets", "fit", "inject", "ablate", "bind", "sign"),
             "qwen1.5": ("preflight", "sets", "fit", "diss"), "qwen3b": ("preflight", "sets", "fit", "diss")}
 SIZES = {"inject": 100, "ablate": 60, "bind": 100, "Q": 100, "IOI": 100, "diss": {"qwen1.5": 100, "qwen3b": 60, "qwen7": 100}}
-G0_FILES = {"tests/test_flag.py": 13, "tests/test_questions.py": 11, "tests/test_stage8d_score.py": 15}
+G0_FILES = {"tests/test_flag.py": 13, "tests/test_questions.py": 11, "tests/test_stage8d_score.py": 18,   # every test of each file
+            "tests/test_stage8_populations.py": 5, "tests/test_stage8_holm.py": 7}     # shared: G6 across the parts, Holm
 POP_SHA = {  # = experiments/stage8_flag.POP_SHA (tests/test_stage8d_score.py checks the copy)
     "R": "9036af1a838a12d58a7a7eb40f70dd800dd659bfd6e95ed1ab5a2ce10862f936",
     "R'": "fe348ba40a19182a67cee382a3533c1af009273acb740c01d418662a570122a2",
@@ -220,8 +223,13 @@ def gate_g0(root, out):
         ok &= good
         res.append(f"{fn} {p} passed, {x} failed, {s} skipped")
     other = len(re.findall(r"^tests/\S+::\S+ (?:FAILED|ERROR)", t, re.M))
-    ok &= other == 0
-    out(f"  J-D-G0  FP32 unit tests (last of {len(hd)} run(s)): {'; '.join(res)}; failures in the run {other} -> {V(ok)}")
+    # skips in every tests/ file of the run: the -v line of each skipped test; the -rA summary also counts a whole file
+    # skipped at import, which has no -v line
+    skips = max(len(re.findall(r"^tests/\S+::\S+ SKIPPED", t, re.M)),
+                sum(int(n) for n in re.findall(r"^SKIPPED \[(\d+)\] tests/", t, re.M)))
+    ok &= other == 0 and skips == 0
+    out(f"  J-D-G0  FP32 unit tests (last of {len(hd)} run(s)): {'; '.join(res)}; failures in the run {other}, skips in the "
+        f"run {skips} -> {V(ok)}")
     return ok
 
 
@@ -309,7 +317,9 @@ def denom_ok(q, need):
 
 
 # --------------------------------------------------------------------------- the lines
-def lines_all(G: Gates, I: Inputs):
+def lines_all(G: Gates, I: Inputs, errors: list):
+    """Every line in each of its models; an exception in a line's per-model function makes that model's verdict NOT
+    EVALUABLE (traceback under the line) and is recorded in ``errors`` as "<code>/<model>" (exit status 1)."""
     R = {}
     T = lambda code: Tests(code, COMPONENTS)  # noqa: E731
 
@@ -321,6 +331,7 @@ def lines_all(G: Gates, I: Inputs):
                 v, txt = fn(k)
             except Exception:  # noqa: BLE001
                 v, txt = None, "scorer error:\n" + traceback.format_exc()
+                errors.append(f"{code}/{k}")
             if v is None:          # the Holm family holds the components of the models where the line is evaluable
                 del COMPONENTS[n0:]
             per[k] = v
@@ -753,7 +764,7 @@ def main(argv=None):
     R, RHO, G = {}, {}, None
     try:
         G = Gates(I, out, g0)
-        R, RHO = lines_all(G, I)
+        R, RHO = lines_all(G, I, errors)
     except Exception:  # noqa: BLE001
         errors.append("gates/lines")
         out("  SCORER ERROR; every line NOT EVALUABLE\n" + traceback.format_exc())

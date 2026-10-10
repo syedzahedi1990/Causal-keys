@@ -104,13 +104,14 @@ def jc6(J, test, comps=None):
     for f in fm:
         caa, bind = E[("CAA", f)], E[("BIND", f)]
         lines.append(f"  {f}: CAA {caa.txt()}; BIND {bind.txt()}; ID {E[('ID', f)].txt()}")
-        if not (caa.usable() and flip >= J6_FLIP):
+        if not (caa.usable() and bind.usable() and flip >= J6_FLIP):   # both arms usable (b0, b2, kappa rule) decide evaluability
             per[f] = None
-            lines.append(f"    not evaluable: " + ", ".join(x for x, ok in (("Gate b0", caa.b0), ("Phi >= 3", caa.b2), ("kappa rule", caa.rule),
-                                                                        ("flip >= 0.5", flip >= J6_FLIP)) if not ok))
+            lines.append(f"    not evaluable: " + ", ".join(x for x, ok in (
+                ("CAA Gate b0", caa.b0), ("CAA Phi >= 3", caa.b2), ("CAA kappa rule", caa.rule), ("BIND Gate b0", bind.b0),
+                ("BIND Phi >= 3", bind.b2), ("BIND kappa rule", bind.rule), ("flip >= 0.5", flip >= J6_FLIP)) if not ok))
             continue
         dk = kdiff(bind, caa)
-        ok = bool(caa.kappa.pt <= J6_KAPPA and dk.pt >= J6_DIFF and dk.lower() > 0 and dk.drop <= 0.05 and bind.rule)
+        ok = bool(caa.kappa.pt <= J6_KAPPA and dk.pt >= J6_DIFF and dk.lower() > 0 and dk.drop <= 0.05)
         per[f] = ok
         if comps is not None:
             comps.append(component("J-C6", f"{f} H0: kappa_BIND - kappa_CAA <= 0", dk, 0.0, ">", dk.lower() > 0))

@@ -2,7 +2,8 @@
 Qwen2/Mistral/Llama (eager or sdpa attention; every pass with use_cache=False).
 
 HeadSplice wraps every ``self_attn.forward``. Mode "splice": a layer whose mask is non-empty runs twice on the same
-hidden states, once with the run's own key at ``pos`` and once with ``ks[l]`` there (k_proj hook, all KV groups); the
+hidden states, once with the run's own key at ``pos`` and once with ``ks[l]`` there (k_proj hook, all KV groups; ``pos``
+an int takes ``ks[l]`` [D] or [B, D], ``pos`` a list/tuple/range of span positions takes [|P|, D] or [B, |P|, D]); the
 o_proj input (head h = columns h*hd:(h+1)*hd) takes head h's slice in row t of batch row b from the second pass where
 ``masks[l][b, t, h]`` and from the first elsewhere, and o_proj runs once on the spliced tensor. Head h's slice depends
 on the key at ``pos`` only through head h's own attention, so this is "the swapped key is visible to query head h only,
@@ -52,7 +53,12 @@ class HeadSplice:
             if not (self.active and self._src):
                 return out
             out, k = out.clone(), self.ks[l].to(out.device, out.dtype)
-            out[:, self.pos] = k if k.dim() == 1 else _bcast(k, out.shape[0])
+            if isinstance(self.pos, (list, tuple, range)):   # a span: [|P|, D] shared, or [B, |P|, D] per batch row
+                pos = list(self.pos)
+                assert k.dim() in (2, 3) and k.shape[-2] == len(pos), (tuple(k.shape), len(pos))
+                out[:, pos] = k[None].expand(out.shape[0], -1, -1) if k.dim() == 2 else _bcast(k, out.shape[0])
+            else:
+                out[:, self.pos] = k if k.dim() == 1 else _bcast(k, out.shape[0])
             return out
         return hk
 

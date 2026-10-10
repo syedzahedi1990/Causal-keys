@@ -144,7 +144,7 @@ class RowSplice:
                 else:
                     sl = slice(self.group * self.head_dim, (self.group + 1) * self.head_dim)
                     off = ksl.start or 0
-                    out[:, self.pos, off + sl.start:off + sl.stop] = self.ks[l][sl].to(out.device, out.dtype)
+                    out[:, self.pos, off + sl.start:off + sl.stop] = self.ks[l][..., sl].to(out.device, out.dtype)
             return out
         return hk
 

@@ -1,5 +1,6 @@
 """Position-set key/value clamps: the format_factorial hooks at one position p, generalised to any position set
-and to per-batch-row tables, for Qwen2/Qwen3/Mistral/Llama/OLMo-2 (k_proj / v_proj) and GPT-2 (fused c_attn).
+and to per-batch-row tables, for Qwen2/Qwen3/Mistral/Llama/OLMo-2/Gemma-2/Falcon3 (k_proj / v_proj), GPT-2 (fused
+c_attn) and Phi-3/Phi-4 (fused qkv_proj).
 
 Sites are the pre-RoPE projection outputs: later positions see a clamped position only through its per-layer
 K and V, so clamping every layer from a captured run reproduces that run's logits exactly (FP32).
@@ -23,6 +24,11 @@ def kv_sites(model, layer: int) -> tuple[tuple[torch.nn.Module, slice], tuple[to
         D = blk.attn.split_size
         return (blk.attn.c_attn, slice(D, 2 * D)), (blk.attn.c_attn, slice(2 * D, 3 * D))
     at = blk.self_attn
+    if hasattr(at, "qkv_proj"):  # Phi-3/Phi-4: qkv_proj -> (q [H*hd], k [KVH*hd], v [KVH*hd])
+        cfg = model.config
+        hd = getattr(cfg, "head_dim", None) or cfg.hidden_size // cfg.num_attention_heads
+        q, kv = cfg.num_attention_heads * hd, cfg.num_key_value_heads * hd
+        return (at.qkv_proj, slice(q, q + kv)), (at.qkv_proj, slice(q + kv, q + 2 * kv))
     return (at.k_proj, slice(None)), (at.v_proj, slice(None))
 
 

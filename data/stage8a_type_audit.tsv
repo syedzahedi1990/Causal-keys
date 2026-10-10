@@ -1,0 +1,50 @@
+# Type audit of stage 8 part A (preregistration J), done before finalisation by reading entity lists only (no model
+# output). Pass 1: every entity in the PERSON/PLACE substitute pools and every item entity outside them (answers,
+# distractors) of the first build; the entities below are not of their assigned type and are excluded everywhere
+# (as answers, substitutes and distractors; ckeys.squad_items.EXCLUDE). Pass 2: every R and E name item of the
+# rebuild (59 R, 168 E) was read again; no entity of a wrong type remained. NUMBER items are digit edits.
+subtype	entity	reason
+PLACE	Baldwin	surname
+PLACE	Battle of Sainte-Foy	event
+PLACE	Book of Discipline	book
+PLACE	Centrum	not a place name
+PLACE	Charles	reads as a person (the Charles River)
+PLACE	Conservation	common noun
+PLACE	Edison Machine Works	company
+PLACE	Germany and Scandinavia	two places
+PLACE	Orange	ambiguous (fruit, colour)
+PLACE	Political	adjective
+PLACE	Portuguese	demonym
+PLACE	Somalia and Ethiopia	two places
+PLACE	Southern	adjective
+PLACE	U.S	truncated abbreviation
+PLACE	Wardenclyffe Tower	building
+PERSON	Archangel Michael	angel
+PERSON	Arizona Cardinals	team
+PERSON	Chicago Bears	team
+PERSON	Cisco Systems	company
+PERSON	Cosgrove Hall	studio
+PERSON	Death Wish Coffee	company
+PERSON	Denver Broncos	team
+PERSON	Digital Spy	website
+PERSON	District Superintendents	office
+PERSON	Doctor Who	television series
+PERSON	Economist Intelligence Unit	organisation
+PERSON	English Heritage	organisation
+PERSON	General Electric	company
+PERSON	General Sejm	assembly
+PERSON	Han Chinese	ethnic group
+PERSON	Joseph Thompsons	plural surname
+PERSON	Knaurs Lexikon	encyclopedia
+PERSON	Knight Ridder	company
+PERSON	Paramount Pictures	company
+PERSON	Pittard Sullivan	company
+PERSON	Pittsburgh Steelers	team
+PERSON	Polonia Warsaw	team
+PERSON	Prospect Park	park
+PERSON	Red Guards	movement
+PERSON	Saint Nicolas	church name
+PERSON	San Diego Chargers	team
+PERSON	Science Magazine	journal
+PERSON	Seattle Seahawks	team
+PERSON	Westinghouse Electric	company

@@ -171,3 +171,71 @@ The script:
 To re-score an archive off the box: `PYTHONPATH=. python analysis/stage7_score.py --root results/gpu_stage7` (no copy of the predecessor's release is needed; the stage-3b reference is the committed `results/gpu_stage3b/paper1_frames_v/mistral.json`).
 
 **CPU plumbing test.** `TEST_MODE=1 P1R=<local copy of the release> bash scripts/gpu_stage7.sh` runs pytest, then every step at Qwen2.5-0.5B-Instruct in FP32 on the CPU with random bases (two ranking stories, two evaluation cores) into a scratch directory, then the scorer with the tag `TEST_` (I-G1 (a) has no reference there and is NOT EVALUABLE, so every verdict is NOT EVALUABLE). It takes about 20 min of pytest plus about 15 min of runs on a 4-core box (peak host RAM about 10 GB). Its verdict lines are plumbing checks, not results.
+
+## Stage 8: four independent parts (preregistered P-2026-10-10-J; paper v5)
+
+Stage 8 has four parts. Each part has its own script, results directory, archive and score, and needs nothing from the others:
+
+| Part | Script | What it tests | Models | Runtime (1× A100 80GB) | Archive |
+|---|---|---|---|---|---|
+| A | `scripts/gpu_stage8a.sh` | <<A>> | <<A>> | <<A>> | `gpu_stage8a_results.tgz` |
+| B | `scripts/gpu_stage8b.sh` | <<B>> | <<B>> | <<B>> | `gpu_stage8b_results.tgz` |
+| C | `scripts/gpu_stage8c.sh` | <<C>> | <<C>> | <<C>> | `gpu_stage8c_results.tgz` |
+| D | `scripts/gpu_stage8d.sh` | <<D>> | <<D>> | <<D>> | `gpu_stage8d_results.tgz` |
+
+**Order.** Any order. The parts may run one after another on one box, or at the same time on different boxes. Do not run two parts at the same time on one GPU: each needs the whole card. If one box runs several parts, run them one after another in the same clone; each part writes its own `results/gpu_stage8<part>/` and its own archive.
+
+**What to rent.** 1× 80GB GPU (1× A100 80GB ≈ $1.5–2/h on Vast, or 1× H100), PyTorch template, host RAM ≥ 64 GB, disk ≥ 250 GB. The box needs outbound network to huggingface.co (model files), rajpurkar.github.io (the SQuAD v1.1 dev file from which part A rebuilds its items) and github.com (the clone). The per-part cost is <<A>> / <<B>> / <<C>> / <<D>>.
+
+**Model files.** Every part loads its models from a local directory that `scripts/fetch_verified.py` assembles and checks before any model is loaded. `scripts/stage8_models.json` pins, for each model, the official repository, its commit (the revision current on 2026-10-10, which equals the revision earlier stages pinned where one did) and the hash and size of every file: sha256 for the files stored in LFS (the weights and some tokenizer files), the git blob id for the others, as the Hugging Face API reports them. The fetcher checks every byte against these hashes, writes `VERIFIED.json` into the directory only when all files match, and refuses the model otherwise. A refused model is listed in `FETCH_FAILED.txt`; where the entry allows it, the script then runs 01-ai/Yi-1.5-9B-Chat in its place (the one fallback of the entry, used only before any output of the refused model exists). A download error is retried three times per source before the next source is tried. Too little free disk for a model's files is not a refusal: the script stops with `FAILED fetch of <key>: exit 4 (not enough disk at <dir>)`. Free some disk, or set `S8_MODELS` to a larger disk, then rerun. The directories live in `~/stage8_models/<key>` (`S8_MODELS=<dir>` moves them); a model already in the box's Hugging Face cache at the pinned revision is linked from there, not downloaded again.
+
+Three models are gated on the Hub: Llama-3.1-8B-Instruct, Gemma-2-9B-it and Gemma-2-2B-it.
+- Without a token (the default), their files come from public, ungated copies whose files have the official hashes. The manifest lists at least two such copies for every file, and the fetcher checks every byte against the official hash, so the result is byte-identical to the official release. The paper describes these weights as "official weights (sha256-verified)".
+- With a token, the official repositories are used first. A token is optional. If you use one, it must come from an account that has accepted the Llama 3.1 and Gemma licences, and you set it **only in the box's own terminal**:
+  ```bash
+  read -rs HF_TOKEN && export HF_TOKEN   # paste the token, then Enter; not echoed, not saved in the history
+  ```
+  Never paste the token anywhere else: not into a chat, a file in the repository, a notebook cell that is saved, or the Vast on-start command. The scripts never ask for it, never print it and record only whether it was set (`ENV.txt`).
+
+**Disk.** The weights of all fourteen models in the manifest total about 233 GB, of which a part needs only its own models (<<A>> / <<B>> / <<C>> / <<D>> GB). After a model's steps, the script deletes its directory, unless `KEEP_CACHE=1` is set or the model was already verified there before the run. Use `KEEP_CACHE=1` only when the disk holds every model the parts on this box need, for example to run several parts back to back without downloading a model twice.
+
+**Run it** in the instance's **Jupyter → Terminal**. Clone the repository with the same `git clone` line as in the sections above and `cd` into it, then:
+```bash
+J=$(git log --format=%H -1 --grep='^Finalise preregistration J$') && [ -n "$J" ] && git checkout "$J"
+bash scripts/gpu_stage8a.sh      # and/or gpu_stage8b.sh, gpu_stage8c.sh, gpu_stage8d.sh, one after another
+```
+The first line checks out the commit that finalises preregistration P-2026-10-10-J. That commit holds the entry, the four scorers, the stage-8 code and the scripts. Every script refuses to start if any of these holds:
+- the J entry is still marked DRAFT;
+- tracked files have local changes;
+- the history of HEAD has no commit with the subject "Finalise preregistration J";
+- the code at HEAD (`ckeys experiments analysis scripts tests data`) differs from that commit;
+- the J entry's own section of `docs/PREREGISTRATION.md` differs from its text at that commit (an outcome section added after it is allowed);
+- no GPU with ≥ 75 GiB is visible (`MINGIB=<GiB>` lowers the floor).
+
+**What every script does** (the shared steps are in `scripts/stage8_common.sh`):
+- pins transformers 5.18.0 (it runs pip only when the installed version or a needed package differs) and records the environment and the commit: `COMMIT.txt`, `ENV.txt`, `PIP_FREEZE.txt`.
+- runs the part's FP32 unit tests on the CPU before it loads any model (`logs/pytest.log`). These tests are the part's exactness gate. Any failure stops the script.
+- fetches and verifies each model before its steps. It records each model's repository, revision, attention implementation and the sources of its bytes in `REVISIONS.txt`, and copies `VERIFIED.json` to `verified/<key>.json`.
+- runs the part's steps, each logged to `logs/<step>.log`. A step that finished in an earlier run with the same `OUT` is kept (`steps/<step>.done`), so a second run resumes where the first stopped. A failed step is listed in `FAILED.txt`, and the other steps still run.
+- stops starting new optional work at a deadline: `DEADLINE_H` hours after the start (default <<A>> / <<B>> / <<C>> / <<D>> h; a positive number). Steps it does not start, and steps it finishes only in part, are listed in `SKIPPED.txt`. The score marks the lines that need them as not run, and a later run fills them in.
+- scores the part with `analysis/stage8<part>_score.py` into `STAGE8<PART>_SCORE.txt` and prints its GATES and SUMMARY blocks.
+- writes `MANIFEST.sha256` (the sha256 of every file in the results directory) and the archive `gpu_stage8<part>_results.tgz` in the repository root (results, logs and score; no model weights).
+
+**What to upload.** Put each `gpu_stage8<part>_results.tgz` in the Google Drive folder `causal-keys-results` and say so in the chat. Then destroy the instance (destroy, do not just stop it: a stopped instance keeps its disk).
+
+**Reading the result.** A step failed if the script prints a line starting with `FAILED <step>` (the same lines are in `FAILED.txt`). The other steps still run, the archive is still written, and the script exits with status 1. Upload the archive anyway: the logs are inside it. A failure of an exploratory step goes to `FAILED_EXPLORATORY.txt` and does not fail the run. A model refused by the verification (`FETCH REFUSED`, in `FETCH_FAILED.txt`) is not a step failure either: the score names the model that ran in its place, or marks its lines NOT EVALUABLE. `NOT MET`, `NOT EVALUABLE` or a failed gate in the score are results, not step failures. A scorer exit status other than 0 (for example a provenance or population MISMATCH) makes the score step fail; the score file is still written.
+
+**Options** (each switch takes 0 or 1 only):
+- `TEST_MODE=1`: the CPU plumbing test (below).
+- `DEADLINE_H=<hours>`: moves the deadline.
+- `FORCE=1` redoes every step. `FORCE_STEPS=<names>` redoes only the named steps: a comma-separated list of step names or shell patterns such as `r2_*`. The step names are in `steps/` and `logs/`.
+- `KEEP_CACHE=1`: keeps the verified model directories (see Disk).
+- `TESTS=0`: skips pytest. Outside `TEST_MODE`, this is accepted only after a passing pytest of the same commit on the same host in the same `OUT` (`PYTEST_OK.txt`).
+- `MINGIB=<GiB>`: lowers the GPU memory floor.
+- `OUT=<dir>`: moves the results directory. `S8_MODELS=<dir>`: moves the model directories. `PY=<python>`: chooses the Python.
+
+**Reruns.** To redo failed steps on the same box, run the same script again with the same `OUT` and `TESTS=0`. Steps that finished are kept, failed and skipped ones run again, and everything is re-scored. On a new box, clone and check out the same commit, then unpack the earlier archive first (`tar xzf gpu_stage8<part>_results.tgz`) so that the finished steps are kept. Outside `TEST_MODE`, set `KEEP_CACHE=1` for any invocation on a machine other than the rented box.
+
+To re-score an archive off the box: `PYTHONPATH=. python analysis/stage8<part>_score.py --results results/gpu_stage8<part>`.
+
+**CPU plumbing test.** `TEST_MODE=1 bash scripts/gpu_stage8<part>.sh` runs without the guards and without pip. It runs the pytest step, then every step of the part at Qwen2.5-0.5B-Instruct in FP32 on the CPU, with n = 2–3 items, wherever the part names a model. It writes to `results/gpu_stage8<part>_test/` and `gpu_stage8<part>_test_results.tgz`, and every output carries the tag `TEST_`. Its verdict lines are plumbing checks, not results. It takes <<A>> / <<B>> / <<C>> / <<D>> on a 4-core box.

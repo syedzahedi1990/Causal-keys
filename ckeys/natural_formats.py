@@ -149,3 +149,109 @@ def check_item(tok, it, formats=FORMATS):
         if it["stratum"] == "FT" and len({c[j] for c, j in decs}) != 5:
             return f"{f}: decision tokens not distinct"
     return None
+
+
+# --------------------------------------------------------------------------- additions for the stage-8 part-A run
+# Closed-book prompts (the prior controls of J-A-2): the OPTA / LETA question, options and instruction without the
+# passage, with the critic pilot's lead sentence. Answer frames (A-8): the per-model text between the "Answer:" prefill
+# and the entity, fixed before the factorial from greedy ID generations on R items; every continuation is then scored
+# after prompt + frame. Frame " " reproduces cont_ids (tests/test_natural_clamp.py).
+CB_PRE = "Answer the question.\n\n"
+CB_FORMATS = ("CBOPT", "CBLET")
+LETTER_FORMATS = ("LETA", "CBLET")
+FRAMES = ("", " ", " **", "**", " The ", " the ")
+LETTER_INSTR = "Answer with the letter of the correct option."
+
+
+def cb_raw(fmt, it):
+    """The closed-book raw prompt: CBOPT (OPTA's options line and instruction) or CBLET (LETA's lettered list)."""
+    q, opts = it["question"].strip(), it["options"]
+    if fmt == "CBOPT":
+        return CB_PRE + "Question: " + q + "\nOptions: " + "; ".join(opts) + "\n" + MC
+    if fmt == "CBLET":
+        lo = "\n".join(f"{L}. {o}" for L, o in zip("ABCD", opts))
+        return CB_PRE + "Question: " + q + "\nOptions:\n" + lo + "\n" + LETTER_INSTR
+    raise ValueError(fmt)
+
+
+def encode_cb(tok, it, fmt):
+    """(chat text, ids) of a closed-book prompt."""
+    text = chat_text(tok, cb_raw(fmt, it))
+    return text, tok(text, add_special_tokens=False).input_ids
+
+
+def frame_cont(tok, text, ids, ent, frame=" "):
+    """(c, j): the continuation ids of ``frame + ent`` after the prompt (prefix-stable) and j, the number of leading
+    tokens of c that lie inside the frame's characters (character offsets). The frame characters c[:j] leave uncovered
+    must be whitespace (merged into the decision token c[j]), and c[j] must not decode to whitespace; AssertionError
+    otherwise (the item is then not valid under that frame)."""
+    enc = tok(text + frame + ent, add_special_tokens=False, return_offsets_mapping=True)
+    full, off = enc.input_ids, enc.offset_mapping
+    assert full[:len(ids)] == list(ids), "prefix not stable"
+    c, oc = full[len(ids):], off[len(ids):]
+    f1 = len(text) + len(frame)
+    j = 0
+    while j < len(c) and oc[j][1] <= f1:
+        j += 1
+    assert j < len(c), "no entity token after the frame"
+    covered = max([len(text)] + [e for _, e in oc[:j]])
+    assert (text + frame)[covered:f1].strip() == "", f"frame {frame!r} is not separable from the entity"
+    assert tok.decode([c[j]]).strip(), "the decision token is whitespace"
+    return c, j
+
+
+def decision_ids(tok, text, ids, it, fmt, frame=" ", strict=True):
+    """Frame-aware decision tokens of one prompt: {"w": tokens before the decision (shared), "j": len(w), "c": {Y:
+    continuation}, "dec": {Y: decision token id}}. Entity formats: Y in B, S, X, Z, D (closed-book CBOPT: the four
+    options B, S, X, D), the continuation of frame + entity. Letter formats (LETA, CBLET): Y in B, S, X, D, the
+    continuation of frame + the letter of Y's option, which must be one token after w. AssertionError when w is not
+    shared, a letter is not one token, or (strict) the decision tokens are not pairwise distinct."""
+    ents = {Y: it[k] for Y, k in (("B", "answer"), ("S", "S"), ("X", "X"), ("Z", "Z"), ("D", "D"))}
+    if fmt in CB_FORMATS or fmt in LETTER_FORMATS:
+        ents = {Y: e for Y, e in ents.items() if e in it["options"]}
+    if fmt in LETTER_FORMATS:
+        ents = {Y: "ABCD"[it["options"].index(e)] for Y, e in ents.items()}
+    cj = {Y: frame_cont(tok, text, ids, e, frame) for Y, e in ents.items()}
+    ws = {tuple(c[:j]) for c, j in cj.values()}
+    assert len(ws) == 1, "w not shared"
+    j = next(iter(cj.values()))[1]
+    if fmt in LETTER_FORMATS:
+        assert all(len(c) == j + 1 for c, _ in cj.values()), "a letter is not one token after w"
+    dec = {Y: c[j] for Y, (c, _) in cj.items()}
+    if strict:
+        assert len(set(dec.values())) == len(dec), "decision tokens not distinct"
+    return {"w": list(next(iter(ws))), "j": j, "c": {Y: c for Y, (c, _) in cj.items()}, "dec": dec}
+
+
+def letter_of(gen):
+    """The option letter a generation starts with (leading whitespace and markdown/brackets skipped; the letter must
+    not be followed by another letter), else None."""
+    s = gen.lstrip().lstrip("*_`([\"' ")
+    return s[0] if s and s[0] in "ABCD" and (len(s) == 1 or not s[1].isalpha()) else None
+
+
+def answer_of(gen, it, fmt):
+    """Which entity a generation gives: "B", "S", "X", "Z", "D" (``matches`` on the entity; letter formats: the option
+    of the letter it starts with) or "other"."""
+    ents = {"B": it["answer"], "S": it["S"], "X": it["X"], "Z": it["Z"], "D": it["D"]}
+    if fmt in LETTER_FORMATS:
+        L = letter_of(gen)
+        if L is None:
+            return "other"
+        e = it["options"]["ABCD".index(L)]
+        return next(Y for Y, x in ents.items() if x == e)
+    return next((Y for Y, e in ents.items() if matches(gen, e)), "other")
+
+
+def frame_of(gen, ent):
+    """The text a generation puts before the entity (case-sensitive first occurrence), or None."""
+    i = gen.find(ent)
+    return gen[:i] if i >= 0 else None
+
+
+def choose_frame(prefixes):
+    """The most frequent of FRAMES among ``prefixes`` (ties: the earlier in FRAMES); " " when none is one of FRAMES.
+    Returns (frame, {frame: count})."""
+    counts = {f: sum(p == f for p in prefixes) for f in FRAMES}
+    best = max(FRAMES, key=lambda f: (counts[f], -FRAMES.index(f)))
+    return (best if counts[best] else " "), counts

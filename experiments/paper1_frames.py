@@ -17,6 +17,16 @@ before. --prefill sets the assistant prefill (default "Answer:").
 
 Outputs per item: candidate log-probs, global argmax token id, for every run. Paper 1 reproduction is checked
 afterwards against data/mechanism/native_*.jsonl.gz (analysis/stage2_score.py).
+
+Stage 8 (P-2026-10-10-J, part B, JB8): --score E routes every scoring pass through the emitted-form trie scorer
+(ckeys.surface.score: one forward over the prompt and the token trie of every form of the six candidates; in FP32 its
+lower-case L equals lp_rows, tests/test_fresh_factorial.py). Each run then also stores "E" and "sig" (the six candidates'
+emitted-form and 12-form log-sums) and "mass" ({"L", "sig", "E"}: the sums of the six probabilities); "cand" stays the
+lower-case log-probs and "argmax" the global argmax at the answer position. E's frames are FRAMES_E_FIXED plus the
+discovered frames of --frames (a frames file of experiments/fresh_factorial.py --stage calib), instantiated per core;
+under LETTER the letters' forms are " X", "X", " **X" and "**X". --model-dir loads a verified local directory
+(scripts/fetch_verified.py) in place of the profile's Hub repository. Without --score E (the default) nothing changes:
+the same passes, the same fields and the same provenance as before.
 """
 from __future__ import annotations
 
@@ -164,6 +174,43 @@ def lp_rows(model, ids, cid):
     return lp[:, cid].cpu(), lp.argmax(-1).cpu()
 
 
+SCORE = {"mode": "L", "frames": (), "fs": None}   # --score; "E": the trie scorer with the core's FormSet in "fs"
+LETTER_FRAMES = {"sigma": (" ", ""), "E": (" ", "", " **", "**")}
+
+
+def score_formset(tok, arm, core):
+    """The FormSet of the arm's alphabet for --score E (locations: sigma and E with the discovered frames and the core's
+    names; letters: LETTER_FRAMES)."""
+    from ckeys.surface import FRAMES_E_FIXED, FRAMES_SIGMA, FormSet
+    if alphabet(arm) != tuple(LOCATIONS):
+        return FormSet(tok, alphabet(arm), LETTER_FRAMES)
+    frames = {"sigma": FRAMES_SIGMA, "E": tuple(FRAMES_E_FIXED) + tuple(f for f in SCORE["frames"] if f not in FRAMES_E_FIXED)}
+    names = {"a": core["agent"], "b": core["other"], "o": core["object"], "d": core["distractor"]}
+    return FormSet(tok, alphabet(arm), frames, names=names)
+
+
+def rows_of(model, ids, cid):
+    """lp_rows, and with --score E the same rows from the trie pass plus each row's E, sig and mass (else None)."""
+    if SCORE["mode"] != "E":
+        c, g = lp_rows(model, ids, cid)
+        return c, g, None
+    from ckeys.surface import score
+    fs = SCORE["fs"]
+    r = score(model, ids, fs)
+    c = torch.stack([r["L"][w] for w in fs.words], 1).cpu()
+    assert all(fs.lower[w] == (i,) for w, i in zip(fs.words, cid)), "the lower-case forms are the candidate ids"
+    ex = []
+    for i in range(c.shape[0]):
+        e = {k: [float(r[k][w][i]) for w in fs.words] for k in ("E", "sigma")}
+        ex.append({"E": e["E"], "sig": e["sigma"], "mass": {"L": float(c[i].exp().sum()), "sig": float(np.exp(e["sigma"]).sum()),
+                                                            "E": float(np.exp(e["E"]).sum())}})
+    return c, r["first"].argmax(-1).cpu(), ex
+
+
+def extra(ex, i):
+    return {} if ex is None else ex[i]
+
+
 @torch.no_grad()
 def run_family(model, ib, cid, nL, h, span, vpos, bases, keys, fam, res):
     # materialise patches exactly as Paper 1 (BF16 basis, base + (delta @ U^T) @ U)
@@ -184,13 +231,13 @@ def run_family(model, ib, cid, nL, h, span, vpos, bases, keys, fam, res):
     hdl = blocks(model)[FIT_LAYER0].register_forward_hook(patch_hook)
     try:
         with capture(model, range(FIRST_EXCHANGE0, nL), "k") as K, capture(model, range(FIRST_EXCHANGE0, nL), "v") as V:
-            c, g = lp_rows(model, ib.expand(len(keys), -1), cid)
+            c, g, ex = rows_of(model, ib.expand(len(keys), -1), cid)
         kcrit = {l: K[l][:, vpos].clone() for l in range(FIRST_EXCHANGE0, nL)}  # [n_bases, kv_dim]
         vcrit = {l: V[l][:, vpos].clone() for l in range(FIRST_EXCHANGE0, nL)}
     finally:
         hdl.remove()
     for i, k in enumerate(keys):
-        res["runs"][f"{k[0]}_{k[1]}"] = {"cand": c[i].tolist(), "argmax": int(g[i])}
+        res["runs"][f"{k[0]}_{k[1]}"] = {"cand": c[i].tolist(), "argmax": int(g[i])} | extra(ex, i)
     # key-only exchange between m3 (M) and pca (P) of the same seed; Q/V evolve (Paper 1 native design)
     rows, swaps = [], []
     for s in SEEDS:
@@ -218,10 +265,10 @@ def run_family(model, ib, cid, nL, h, span, vpos, bases, keys, fam, res):
                 return out
             hs_.append(getattr(blocks(model)[l].self_attn, chan).register_forward_hook(xhook))
         with hooks(hs_):
-            c, g = lp_rows(model, ib.expand(len(rows), -1), cid)
+            c, g, ex = rows_of(model, ib.expand(len(rows), -1), cid)
         for j, s in enumerate(SEEDS):
-            res["runs"][f"{fam}addition{tag}_{s}"] = {"cand": c[2 * j].tolist(), "argmax": int(g[2 * j])}
-            res["runs"][f"{fam}removal{tag}_{s}"] = {"cand": c[2 * j + 1].tolist(), "argmax": int(g[2 * j + 1])}
+            res["runs"][f"{fam}addition{tag}_{s}"] = {"cand": c[2 * j].tolist(), "argmax": int(g[2 * j])} | extra(ex, 2 * j)
+            res["runs"][f"{fam}removal{tag}_{s}"] = {"cand": c[2 * j + 1].tolist(), "argmax": int(g[2 * j + 1])} | extra(ex, 2 * j + 1)
 
 
 @torch.no_grad()
@@ -234,14 +281,16 @@ def run_core(model, tok, core, arm, bases, dev, prefill="Answer:"):
     ib = ids["B"].to(dev)
     cid = candidate_ids(tok, arm)
     nL = len(blocks(model))
+    if SCORE["mode"] == "E":
+        SCORE["fs"] = score_formset(tok, arm, core)
     res = {"core": core, "arm": arm, "span": [span[0], span[-1] + 1], "vpos": vpos, "runs": {}}
     # natural runs + event-span residuals at the fit layer
     h = {}
     for name in ("B", "S", "T"):
         with capture(model, [FIT_LAYER0], "resid") as st:
-            c, g = lp_rows(model, ids[name].to(dev), cid)
+            c, g, ex = rows_of(model, ids[name].to(dev), cid)
         h[name] = st[FIT_LAYER0][0, span[0]:span[-1] + 1]
-        res["runs"][name] = {"cand": c[0].tolist(), "argmax": int(g[0])}
+        res["runs"][name] = {"cand": c[0].tolist(), "argmax": int(g[0])} | extra(ex, 0)
     fams = {}
     for k in bases:
         fams.setdefault(k[0][: k[0].rfind("/") + 1], []).append(k)
@@ -262,10 +311,19 @@ def main():
     ap.add_argument("--refit", action="append", default=[], metavar="FAM=DIR",
                     help="stage 4: bases of a refit_remap.py run directory (DIR/bases/{obj}_ts{seed}.npz) as family FAM/")
     ap.add_argument("--prefill", default="Answer:", help="assistant prefill (stage 4 exploratory: '')")
+    ap.add_argument("--score", default="L", choices=["L", "E"], help="stage 8 (JB8): E adds the emitted-form scores (trie pass)")
+    ap.add_argument("--frames", default=None, help="--score E: a frames file of experiments/fresh_factorial.py --stage calib")
+    ap.add_argument("--model-dir", default=None, help="--score E: a verified local model directory (scripts/fetch_verified.py)")
     a = ap.parse_args()
+    assert a.score == "E" or not (a.frames or a.model_dir), "--frames and --model-dir need --score E"
     repo, rev = PROFILES[a.model]
+    if a.model_dir:
+        repo, rev = a.model_dir, None
     if a.model_override:
         repo, rev = a.model_override, None
+    if a.score == "E":
+        SCORE["mode"] = "E"
+        SCORE["frames"] = tuple(json.load(open(a.frames))["frames"]) if a.frames else ()
     dev = "cuda" if torch.cuda.is_available() else "cpu"
     tok = AutoTokenizer.from_pretrained(repo, revision=rev)
     kw = dict(dtype=torch.bfloat16 if dev == "cuda" else torch.float32, revision=rev, attn_implementation="sdpa")
@@ -314,11 +372,19 @@ def main():
                 res.append(r)
         print(f"  {arm} done: {sum(r['arm'] == arm for r in res)} items ({time.time() - t0:.0f}s)", flush=True)
     Path(a.out).mkdir(parents=True, exist_ok=True)
-    prov = {"args": vars(a), "repo": repo, "revision": rev, "torch": torch.__version__,
+    args = vars(a) if a.score == "E" else {k: v for k, v in vars(a).items() if k not in ("score", "frames", "model_dir")}
+    prov = {"args": args, "repo": repo, "revision": rev, "torch": torch.__version__,
             "transformers": transformers.__version__,
             "device": torch.cuda.get_device_name(0) if dev == "cuda" else "cpu",
             "n_gpus": torch.cuda.device_count(), "alphabet": {arm: list(alphabet(arm)) for arm in a.arms.split(",")},
             "prefill": a.prefill, "tokenizer_check": tok_check, "bases": basis_prov, "refits": refits}
+    if a.score == "E":   # stage 8 (JB8) only; the default provenance is unchanged
+        ver = Path(a.model_dir) / "VERIFIED.json" if a.model_dir else None
+        prov |= {"score": "E", "frames_file": a.frames, "frames_sha256": sha(a.frames) if a.frames else None,
+                 "frames": list(SCORE["frames"]), "letter_frames": LETTER_FRAMES, "dtype": str(next(model.parameters()).dtype),
+                 "attn_implementation": model.config._attn_implementation,
+                 "verified": {"sha256": sha(ver), **{k: json.load(open(ver)).get(k) for k in ("repo", "revision", "key")}}
+                 if ver is not None and ver.exists() else None}
     tag = a.model if not a.model_override else "TEST_" + repo.split("/")[-1]
     json.dump({"provenance": prov, "results": res}, open(f"{a.out}/{tag}.json", "w"))
     print(json.dumps(prov))

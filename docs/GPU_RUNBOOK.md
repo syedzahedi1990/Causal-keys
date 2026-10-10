@@ -199,7 +199,7 @@ Three models are gated on the Hub: Llama-3.1-8B-Instruct, Gemma-2-9B-it and Gemm
   ```
   Never paste the token anywhere else: not into a chat, a file in the repository, a notebook cell that is saved, or the Vast on-start command. The scripts never ask for it, never print it and record only whether it was set (`ENV.txt`).
 
-**Disk.** The weights of all fourteen models in the manifest total about 233 GB, of which a part needs only its own models (free disk: A <<A>>; B ≥ 120 GB; C ≥ 80 GB; D ≥ 50 GB). After a model's steps, the script deletes its directory, unless `KEEP_CACHE=1` is set or the model was already verified there before the run. Use `KEEP_CACHE=1` only when the disk holds every model the parts on this box need, for example to run several parts back to back without downloading a model twice.
+**Disk.** The weights of all fourteen models in the manifest total about 233 GB, of which a part needs only its own models (free disk: A ≥ 60 GB; B ≥ 140 GB; C ≥ 80 GB; D ≥ 50 GB). After a model's steps, the script deletes its directory, unless `KEEP_CACHE=1` is set or the model was already verified there before the run. Use `KEEP_CACHE=1` only when the disk holds every model the parts on this box need, for example to run several parts back to back without downloading a model twice.
 
 **Run it** in the instance's **Jupyter → Terminal**. Clone the repository with the same `git clone` line as in the sections above and `cd` into it, then:
 ```bash

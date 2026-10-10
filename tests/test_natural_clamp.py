@@ -21,7 +21,7 @@ from ckeys.interventions import blocks
 from ckeys.natural_formats import (FRAMES, answer_of, cb_raw, choose_frame, cont_ids, decision_ids, encode_item,
                                    frame_cont, frame_of, letter_of, passage_range)
 from ckeys.natural_rows import (BASE, CUE, LETA_REDUCED, ZROWS, Row, capture, core_rows, decided_stop, explore_rows,
-                                gen_text, generate_rows, passage_positions, prep, score_rows, tables)
+                                cut, end_ids, gen_text, generate_rows, passage_positions, prep, score_rows, tables)
 
 NAME = "Qwen/Qwen2.5-0.5B-Instruct"
 TOL = 1e-4
@@ -164,24 +164,28 @@ def test_generation_under_kv_s_is_greedy_on_the_s_prompt(qwen, fmt):
 
 
 def test_answer_ends_at_a_special_token_missing_from_the_eos_list(qwen):
-    """Gemma-2-9b-it's generation config lists only <eos>, not <end_of_turn> (Yi-1.5-9B-Chat: not <|im_end|>), so greedy
-    decoding goes on past the end of the turn. Here <|im_end|> is removed from the EOS list: the model then writes it
-    after the answer, and the rows must still name the same entities (the answer is read up to the special token)."""
+    """Gemma-2-9b-it's generation config lists only <eos>, not <end_of_turn> (Yi-1.5-9B-Chat: not <|im_end|>). The shared
+    decoder (ckeys.generate) now stops at the chat end-of-turn tokens too; Part A also reads each answer only up to the
+    first special token. Here <|im_end|> is removed from the EOS list: the rows must name the same entities, and an
+    answer that runs past the end of the turn is still read correctly once cut, though not without the cut."""
     model, tok, nL = qwen
     it = item(list(CTX)[0])
     d = prep(tok, it, "NOM", " ")
     kv, _ = capture(model, d, range(nL), "cpu")
     rows = {n: BASE[n] for n in ("ID", "KV_S", "KV_X")}
     ref = generate_rows(model, tok, it, d, kv, rows, nL, 12)
+    im_end = tok.convert_tokens_to_ids("<|im_end|>")
     eos = model.generation_config.eos_token_id
-    model.generation_config.eos_token_id = [t for t in eos if t != tok.convert_tokens_to_ids("<|im_end|>")]
+    model.generation_config.eos_token_id = [t for t in eos if t != im_end]
     try:
         got = generate_rows(model, tok, it, d, kv, rows, nL, 12)
         raw = greedy_reference(model, tok, torch.tensor([d["ids"]["B"]]), max_new=12)[0]
     finally:
         model.generation_config.eos_token_id = eos
-    assert tok.convert_tokens_to_ids("<|im_end|>") in raw, "the model must write <|im_end|> after its answer"
-    assert answer_of(gen_text(tok, d["ids"]["B"], raw), it, "NOM") == "other"     # read with the special token's text
+    assert im_end not in raw                                       # the shared decoder stops at the end of the turn
+    past = ref["ID"]["ids"] + [im_end] + tok("\nuser\nmore", add_special_tokens=False).input_ids
+    assert answer_of(gen_text(tok, d["ids"]["B"], past), it, "NOM") == "other"     # read with the special token's text
+    assert answer_of(gen_text(tok, d["ids"]["B"], cut(past, end_ids(tok))), it, "NOM") == "B"
     assert {n: (g["who"], g["ids"], g["g1"]) for n, g in got.items()} == {n: (g["who"], g["ids"], g["g1"]) for n, g in ref.items()}
     assert [g["who"] for g in got.values()] == ["B", "S", "X"]
 

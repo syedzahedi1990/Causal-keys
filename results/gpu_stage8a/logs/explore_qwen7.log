@@ -1,0 +1,7 @@
+==== 2026-10-12T14:56:12Z python experiments/natural_factorial.py --stage explore --model /root/stage8_models/qwen7 --key qwen7 --squad results/gpu_stage8a/squad/dev-v1.1.json --out results/gpu_stage8a
+[qwen7] explore onset_piece (83s)
+[qwen7] explore x_target (83s)
+[qwen7] explore year (29s)
+[qwen7] explore leak (51s)
+[qwen7] explore quant_extra (211s)
+wrote results/gpu_stage8a/explore/qwen7.json (457s)

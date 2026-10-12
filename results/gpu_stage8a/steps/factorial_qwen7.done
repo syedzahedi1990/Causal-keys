@@ -1,0 +1,2 @@
+2026-10-12T14:47:10Z HEAD 8b74b79b76e06b27bedc0d841c7b1e4a5f671649
+python experiments/natural_factorial.py --stage factorial --model /root/stage8_models/qwen7 --key qwen7 --squad results/gpu_stage8a/squad/dev-v1.1.json --out results/gpu_stage8a --reserve-min 88 

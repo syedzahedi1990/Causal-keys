@@ -1,0 +1,7 @@
+==== 2026-10-12T15:33:54Z python experiments/natural_factorial.py --stage explore --model /root/stage8_models/mistral7 --key mistral7 --squad results/gpu_stage8a/squad/dev-v1.1.json --out results/gpu_stage8a
+[mistral7] explore onset_piece (97s)
+[mistral7] explore x_target (97s)
+[mistral7] explore year (33s)
+[mistral7] explore leak (62s)
+[mistral7] explore quant_extra (313s)
+wrote results/gpu_stage8a/explore/mistral7.json (602s)

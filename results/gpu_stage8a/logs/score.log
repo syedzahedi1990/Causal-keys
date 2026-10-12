@@ -1,0 +1,489 @@
+==== 2026-10-12T15:44:11Z python analysis/stage8a_score.py --results results/gpu_stage8a
+Stage 8 part A scoring, preregistration P-2026-10-10-J part A; results results/gpu_stage8a
+
+PROVENANCE (the pipeline's COMMIT.txt, ENV.txt, REVISIONS.txt, SKIPPED.txt, every line; every results file)
+  COMMIT.txt:
+    ==== 2026-10-12T13:13:25Z stage 8 part a TEST_MODE=0 FORCE=0 FORCE_STEPS= DEADLINE_H=4.5 TESTS=1 KEEP_CACHE=0
+    8b74b79b76e06b27bedc0d841c7b1e4a5f671649
+    ?? results/gpu_stage8a/
+    preregistration P-2026-10-10-J final at 8b74b79b76e06b27bedc0d841c7b1e4a5f671649; HEAD 8b74b79b76e06b27bedc0d841c7b1e4a5f671649
+  ENV.txt:
+    ==== 2026-10-12T13:13:28Z part a TEST_MODE=0 OUT=results/gpu_stage8a DEV=cuda DTYPE=bfloat16 deadline 2026-10-12T17:43:25Z (DEADLINE_H=4.5)
+    HEAD 8b74b79b76e06b27bedc0d841c7b1e4a5f671649 finalising commit 8b74b79b76e06b27bedc0d841c7b1e4a5f671649
+    manifest scripts/stage8_models.json sha256 b840b71ea644d3f01e634c67ef2c2b9bdb26cdf53d3fe6b45d34c5e78c0cb707; model store /root/stage8_models; HF_TOKEN set: no (the token itself is never recorded)
+    disk at the model store: 142G free of 200G
+    python 3.12.14 torch 2.11.0+cu128 transformers 5.18.0 numpy 2.5.3 huggingface_hub 2.2.0 gpus 1 NVIDIA A100 80GB PCIe
+    name, memory.total [MiB], driver_version
+    NVIDIA A100 80GB PCIe, 81920 MiB, 580.126.20
+    2026-10-12T13:47:08Z llama8 removed from /root/stage8_models/llama8
+    2026-10-12T14:31:38Z gemma9 removed from /root/stage8_models/gemma9
+    2026-10-12T15:04:06Z qwen7 removed from /root/stage8_models/qwen7
+    2026-10-12T15:44:11Z mistral7 removed from /root/stage8_models/mistral7
+  REVISIONS.txt:
+    # <repo> <revision> key=<key> attn=<impl> token=<used> sources=<where the verified bytes came from>; pins: scripts/stage8_models.json sha256 b840b71ea644d3f01e634c67ef2c2b9bdb26cdf53d3fe6b45d34c5e78c0cb707
+    meta-llama/Llama-3.1-8B-Instruct 0e9e39f249a16976918f6564b8830bc894c89659 key=llama8 attn=sdpa token=no sources=NousResearch/Meta-Llama-3.1-8B-Instruct@d10aef7999,modularai/Llama-3.1-8B-Instruct-GGUF@9666945084
+    google/gemma-2-9b-it 11c9b309abf73637e4b6f9a3fa1e92e615547819 key=gemma9 attn=eager token=no sources=dnhkng/RYS-Gemma-2-9b-it@dd19021a5b,thr3a/gemma-2-9b-it@e99c393fd7,unsloth/gemma-2-9b-it@fc7d4737cd
+    Qwen/Qwen2.5-7B-Instruct a09a35458c702b33eeacc393d103063234e8bc28 key=qwen7 attn=sdpa token=no sources=Qwen/Qwen2.5-7B-Instruct@a09a35458c
+    mistralai/Mistral-7B-Instruct-v0.3 c170c708c41dac9275d15a8fff4eca08d52bab71 key=mistral7 attn=sdpa token=no sources=mistralai/Mistral-7B-Instruct-v0.3@c170c708c4
+  SKIPPED.txt: absent
+  FETCH_FAILED.txt: absent
+  preflight.json: SQuAD sha256 95aa6a52d5d6, rebuild identical True, items sha256 40874aa1033d (committed 40874aa1033d)
+  explore/gemma9.json: commit 8b74b79b76, model /root/stage8_models/gemma9 (key gemma9), revision 11c9b309abf73637e4b6f9a3fa1e92e615547819, dtype torch.bfloat16, attn eager, device NVIDIA A100 80GB PCIe, transformers 5.18.0, torch 2.11.0+cu128, frame ' ', wrapper {'system_merged': True}, test_mode False
+  explore/llama8.json: commit 8b74b79b76, model /root/stage8_models/llama8 (key llama8), revision 0e9e39f249a16976918f6564b8830bc894c89659, dtype torch.bfloat16, attn sdpa, device NVIDIA A100 80GB PCIe, transformers 5.18.0, torch 2.11.0+cu128, frame ' ', wrapper {'system_merged': False}, test_mode False
+  explore/mistral7.json: commit 8b74b79b76, model /root/stage8_models/mistral7 (key mistral7), revision c170c708c41dac9275d15a8fff4eca08d52bab71, dtype torch.bfloat16, attn sdpa, device NVIDIA A100 80GB PCIe, transformers 5.18.0, torch 2.11.0+cu128, frame ' ', wrapper {'system_merged': False}, test_mode False
+  explore/qwen7.json: commit 8b74b79b76, model /root/stage8_models/qwen7 (key qwen7), revision a09a35458c702b33eeacc393d103063234e8bc28, dtype torch.bfloat16, attn sdpa, device NVIDIA A100 80GB PCIe, transformers 5.18.0, torch 2.11.0+cu128, frame ' ', wrapper {'system_merged': False}, test_mode False
+  factorial/gemma9.json: commit 8b74b79b76, model /root/stage8_models/gemma9 (key gemma9), revision 11c9b309abf73637e4b6f9a3fa1e92e615547819, dtype torch.bfloat16, attn eager, device NVIDIA A100 80GB PCIe, transformers 5.18.0, torch 2.11.0+cu128, frame ' ', wrapper {'system_merged': True}, test_mode False
+  factorial/llama8.json: commit 8b74b79b76, model /root/stage8_models/llama8 (key llama8), revision 0e9e39f249a16976918f6564b8830bc894c89659, dtype torch.bfloat16, attn sdpa, device NVIDIA A100 80GB PCIe, transformers 5.18.0, torch 2.11.0+cu128, frame ' ', wrapper {'system_merged': False}, test_mode False
+  factorial/mistral7.json: commit 8b74b79b76, model /root/stage8_models/mistral7 (key mistral7), revision c170c708c41dac9275d15a8fff4eca08d52bab71, dtype torch.bfloat16, attn sdpa, device NVIDIA A100 80GB PCIe, transformers 5.18.0, torch 2.11.0+cu128, frame ' ', wrapper {'system_merged': False}, test_mode False
+  factorial/qwen7.json: commit 8b74b79b76, model /root/stage8_models/qwen7 (key qwen7), revision a09a35458c702b33eeacc393d103063234e8bc28, dtype torch.bfloat16, attn sdpa, device NVIDIA A100 80GB PCIe, transformers 5.18.0, torch 2.11.0+cu128, frame ' ', wrapper {'system_merged': False}, test_mode False
+  frames/gemma9.json: commit 8b74b79b76, model /root/stage8_models/gemma9 (key gemma9), revision 11c9b309abf73637e4b6f9a3fa1e92e615547819, dtype torch.bfloat16, attn eager, device NVIDIA A100 80GB PCIe, transformers 5.18.0, torch 2.11.0+cu128, frame ' ', wrapper {'system_merged': True}, test_mode False
+  frames/llama8.json: commit 8b74b79b76, model /root/stage8_models/llama8 (key llama8), revision 0e9e39f249a16976918f6564b8830bc894c89659, dtype torch.bfloat16, attn sdpa, device NVIDIA A100 80GB PCIe, transformers 5.18.0, torch 2.11.0+cu128, frame ' ', wrapper {'system_merged': False}, test_mode False
+  frames/mistral7.json: commit 8b74b79b76, model /root/stage8_models/mistral7 (key mistral7), revision c170c708c41dac9275d15a8fff4eca08d52bab71, dtype torch.bfloat16, attn sdpa, device NVIDIA A100 80GB PCIe, transformers 5.18.0, torch 2.11.0+cu128, frame ' ', wrapper {'system_merged': False}, test_mode False
+  frames/qwen7.json: commit 8b74b79b76, model /root/stage8_models/qwen7 (key qwen7), revision a09a35458c702b33eeacc393d103063234e8bc28, dtype torch.bfloat16, attn sdpa, device NVIDIA A100 80GB PCIe, transformers 5.18.0, torch 2.11.0+cu128, frame ' ', wrapper {'system_merged': False}, test_mode False
+  heads/mistral7.json: commit 8b74b79b76, model /root/stage8_models/mistral7 (key mistral7), revision c170c708c41dac9275d15a8fff4eca08d52bab71, dtype torch.bfloat16, attn eager, device NVIDIA A100 80GB PCIe, transformers 5.18.0, torch 2.11.0+cu128, frame ' ', wrapper {'system_merged': False}, test_mode False
+  heads/qwen7.json: commit 8b74b79b76, model /root/stage8_models/qwen7 (key qwen7), revision a09a35458c702b33eeacc393d103063234e8bc28, dtype torch.bfloat16, attn eager, device NVIDIA A100 80GB PCIe, transformers 5.18.0, torch 2.11.0+cu128, frame ' ', wrapper {'system_merged': False}, test_mode False
+  commits: ['8b74b79b76']
+
+POPULATION (E items of data/stage8a_items.json valid for each model's tokenizer and frame, the same items in every format; heads: the first min(60, n) of the n valid R items and the first min(80, n) of the n valid E items, valid in NOM and OPTA under the model's frame, n from provenance n_valid)
+  gemma9: 185 valid E items, 0 skipped (); formats ['LETA', 'MENA', 'MENB', 'NOM', 'OPTA', 'OPTB']; same items in every format OK; all from E OK; valid + skipped = |E| OK; population sha256 OK
+  llama8: 185 valid E items, 0 skipped (); formats ['LETA', 'MENA', 'MENB', 'NOM', 'OPTA', 'OPTB']; same items in every format OK; all from E OK; valid + skipped = |E| OK; population sha256 OK
+  mistral7: 185 valid E items, 0 skipped (); formats ['LETA', 'MENA', 'MENB', 'NOM', 'OPTA', 'OPTB']; same items in every format OK; all from E OK; valid + skipped = |E| OK; population sha256 OK
+  qwen7: 185 valid E items, 0 skipped (); formats ['LETA', 'MENA', 'MENB', 'NOM', 'OPTA', 'OPTB']; same items in every format OK; all from E OK; valid + skipped = |E| OK; population sha256 OK
+  heads mistral7: ranking items 60 (R, in rank order: OK), evaluation items 80 (expected 60 and 80; valid R 71, valid E 185), ablation items OPTA 185 NOM 185
+  heads qwen7: ranking items 60 (R, in rank order: OK), evaluation items 80 (expected 60 and 80; valid R 71, valid E 185), ablation items OPTA 185 NOM 185
+  population: OK
+
+GATES (J-A-G0 and J-A-HA-G0 before any model; J-A-G1 BF16 floor, J-A-G2 competence, J-A-G3 emitted form per model and format; J-A-G4 per line and cell, printed with the line; J-A-HA-G1 floor, J-A-HA-G2 option rows are the readers)
+  J-A-G0  FP32 exactness (pytest.log, its last session that ran them): tests/test_natural_clamp.py 14 passed, 0 failed, 0 skipped (>= 14, none failing or skipped); tests/test_kvquant.py 4 passed, 0 failed, 0 skipped (>= 4, none failing or skipped) -> MET
+  J-A-HA-G0  FP32 exactness (pytest.log, its last session that ran them): tests/test_natural_heads.py 5 passed, 0 failed, 0 skipped (>= 5, none failing or skipped) -> MET
+  llama8   NOM  J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.088, mean max|lp(ID) - lp(B run)| 0.086 (<= 0.3); g(KV_S) = g(S run) in 0.984 (>= 0.97) of 185 items -> MET
+  llama8   NOM  J-A-G2 n_comp 86 (>= 80) -> MET
+  llama8   NOM  J-A-G3 median p(dec_B | ID) 0.898 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  llama8   OPTA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.191, mean max|lp(ID) - lp(B run)| 0.146 (<= 0.3); g(KV_S) = g(S run) in 0.968 (>= 0.97) of 185 items -> NOT MET
+  llama8   OPTA J-A-G2 n_comp 148 (>= 80) -> MET
+  llama8   OPTA J-A-G3 median p(dec_B | ID) 0.997 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  llama8   OPTB J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.161, mean max|lp(ID) - lp(B run)| 0.138 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 185 items -> MET
+  llama8   OPTB J-A-G2 n_comp 164 (>= 80) -> MET
+  llama8   OPTB J-A-G3 median p(dec_B | ID) 0.993 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  llama8   MENA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.111, mean max|lp(ID) - lp(B run)| 0.104 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 185 items -> MET
+  llama8   MENA J-A-G2 n_comp 70 (>= 80) -> NOT MET
+  llama8   MENA J-A-G3 median p(dec_B | ID) 0.888 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  llama8   LETA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.147, mean max|lp(ID) - lp(B run)| 0.152 (<= 0.3); g(KV_S) = g(S run) in 0.995 (>= 0.97) of 185 items -> MET
+  llama8   LETA J-A-G2 n_comp 156 (>= 80) -> MET
+  llama8   LETA J-A-G3 median p(dec_B | ID) 0.993 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  llama8   MENB J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.111, mean max|lp(ID) - lp(B run)| 0.112 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 185 items -> MET
+  llama8   MENB J-A-G2 n_comp 69 (>= 80) -> NOT MET
+  llama8   MENB J-A-G3 median p(dec_B | ID) 0.855 (>= 0.5); g1 = dec in ID 0.986, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  gemma9   NOM  J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.091, mean max|lp(ID) - lp(B run)| 0.105 (<= 0.3); g(KV_S) = g(S run) in 0.995 (>= 0.97) of 185 items -> MET
+  gemma9   NOM  J-A-G2 n_comp 109 (>= 80) -> MET
+  gemma9   NOM  J-A-G3 median p(dec_B | ID) 0.994 (>= 0.5); g1 = dec in ID 0.991, KV_S 0.991, KV_X 1.000 (>= 0.95) -> MET
+  gemma9   OPTA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.113, mean max|lp(ID) - lp(B run)| 0.103 (<= 0.3); g(KV_S) = g(S run) in 0.989 (>= 0.97) of 185 items -> MET
+  gemma9   OPTA J-A-G2 n_comp 158 (>= 80) -> MET
+  gemma9   OPTA J-A-G3 median p(dec_B | ID) 0.999 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  gemma9   OPTB J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.109, mean max|lp(ID) - lp(B run)| 0.105 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 185 items -> MET
+  gemma9   OPTB J-A-G2 n_comp 167 (>= 80) -> MET
+  gemma9   OPTB J-A-G3 median p(dec_B | ID) 0.999 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  gemma9   MENA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.113, mean max|lp(ID) - lp(B run)| 0.102 (<= 0.3); g(KV_S) = g(S run) in 0.978 (>= 0.97) of 185 items -> MET
+  gemma9   MENA J-A-G2 n_comp 107 (>= 80) -> MET
+  gemma9   MENA J-A-G3 median p(dec_B | ID) 0.993 (>= 0.5); g1 = dec in ID 0.981, KV_S 0.981, KV_X 0.991 (>= 0.95) -> MET
+  gemma9   LETA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.087, mean max|lp(ID) - lp(B run)| 0.077 (<= 0.3); g(KV_S) = g(S run) in 0.995 (>= 0.97) of 185 items -> MET
+  gemma9   LETA J-A-G2 n_comp 158 (>= 80) -> MET
+  gemma9   LETA J-A-G3 median p(dec_B | ID) 0.948 (>= 0.5); g1 = dec in ID 1.000, KV_S 0.994, KV_X 1.000 (>= 0.95) -> MET
+  gemma9   MENB J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.112, mean max|lp(ID) - lp(B run)| 0.105 (<= 0.3); g(KV_S) = g(S run) in 0.995 (>= 0.97) of 185 items -> MET
+  gemma9   MENB J-A-G2 n_comp 117 (>= 80) -> MET
+  gemma9   MENB J-A-G3 median p(dec_B | ID) 0.995 (>= 0.5); g1 = dec in ID 0.983, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  qwen7    NOM  J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.170, mean max|lp(ID) - lp(B run)| 0.170 (<= 0.3); g(KV_S) = g(S run) in 0.995 (>= 0.97) of 185 items -> MET
+  qwen7    NOM  J-A-G2 n_comp 104 (>= 80) -> MET
+  qwen7    NOM  J-A-G3 median p(dec_B | ID) 1.000 (>= 0.5); g1 = dec in ID 0.990, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  qwen7    OPTA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.227, mean max|lp(ID) - lp(B run)| 0.230 (<= 0.3); g(KV_S) = g(S run) in 0.995 (>= 0.97) of 185 items -> MET
+  qwen7    OPTA J-A-G2 n_comp 162 (>= 80) -> MET
+  qwen7    OPTA J-A-G3 median p(dec_B | ID) 1.000 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  qwen7    OPTB J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.205, mean max|lp(ID) - lp(B run)| 0.203 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 185 items -> MET
+  qwen7    OPTB J-A-G2 n_comp 166 (>= 80) -> MET
+  qwen7    OPTB J-A-G3 median p(dec_B | ID) 1.000 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  qwen7    MENA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.170, mean max|lp(ID) - lp(B run)| 0.162 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 185 items -> MET
+  qwen7    MENA J-A-G2 n_comp 106 (>= 80) -> MET
+  qwen7    MENA J-A-G3 median p(dec_B | ID) 1.000 (>= 0.5); g1 = dec in ID 0.991, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  qwen7    LETA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.208, mean max|lp(ID) - lp(B run)| 0.173 (<= 0.3); g(KV_S) = g(S run) in 0.989 (>= 0.97) of 185 items -> MET
+  qwen7    LETA J-A-G2 n_comp 163 (>= 80) -> MET
+  qwen7    LETA J-A-G3 median p(dec_B | ID) 1.000 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  qwen7    MENB J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.188, mean max|lp(ID) - lp(B run)| 0.159 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 185 items -> MET
+  qwen7    MENB J-A-G2 n_comp 99 (>= 80) -> MET
+  qwen7    MENB J-A-G3 median p(dec_B | ID) 1.000 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  mistral7 NOM  J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.091, mean max|lp(ID) - lp(B run)| 0.090 (<= 0.3); g(KV_S) = g(S run) in 0.973 (>= 0.97) of 185 items -> MET
+  mistral7 NOM  J-A-G2 n_comp 43 (>= 80) -> NOT MET
+  mistral7 NOM  J-A-G3 median p(dec_B | ID) 0.978 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  mistral7 OPTA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.145, mean max|lp(ID) - lp(B run)| 0.122 (<= 0.3); g(KV_S) = g(S run) in 0.989 (>= 0.97) of 185 items -> MET
+  mistral7 OPTA J-A-G2 n_comp 157 (>= 80) -> MET
+  mistral7 OPTA J-A-G3 median p(dec_B | ID) 1.000 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  mistral7 OPTB J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.151, mean max|lp(ID) - lp(B run)| 0.152 (<= 0.3); g(KV_S) = g(S run) in 0.995 (>= 0.97) of 185 items -> MET
+  mistral7 OPTB J-A-G2 n_comp 150 (>= 80) -> MET
+  mistral7 OPTB J-A-G3 median p(dec_B | ID) 1.000 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  mistral7 MENA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.117, mean max|lp(ID) - lp(B run)| 0.107 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 185 items -> MET
+  mistral7 MENA J-A-G2 n_comp 43 (>= 80) -> NOT MET
+  mistral7 MENA J-A-G3 median p(dec_B | ID) 0.970 (>= 0.5); g1 = dec in ID 0.977, KV_S 0.977, KV_X 0.977 (>= 0.95) -> MET
+  mistral7 LETA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.144, mean max|lp(ID) - lp(B run)| 0.119 (<= 0.3); g(KV_S) = g(S run) in 0.995 (>= 0.97) of 185 items -> MET
+  mistral7 LETA J-A-G2 n_comp 155 (>= 80) -> MET
+  mistral7 LETA J-A-G3 median p(dec_B | ID) 1.000 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  mistral7 MENB J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.120, mean max|lp(ID) - lp(B run)| 0.104 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 185 items -> MET
+  mistral7 MENB J-A-G2 n_comp 44 (>= 80) -> NOT MET
+  mistral7 MENB J-A-G3 median p(dec_B | ID) 0.984 (>= 0.5); g1 = dec in ID 0.977, KV_S 0.977, KV_X 0.977 (>= 0.95) -> MET
+  qwen7    J-A-HA-G1 mean |m(none) - m(clean)| 0.829, mean |m(all_T) - m(full clamp)| 0.759 (<= max(0.5, 0.02 x d_full) = 0.500) -> NOT MET
+  qwen7    J-A-HA-G2 d_full +24.221 [+19.823,+28.251] (>= 3 nats); d_G/d_full +0.914 [+0.843,+0.999] (>= 0.6); n=80 -> MET
+  mistral7 J-A-HA-G1 mean |m(none) - m(clean)| 0.104, mean |m(all_T) - m(full clamp)| 0.296 (<= max(0.5, 0.02 x d_full) = 0.500) -> MET
+  mistral7 J-A-HA-G2 d_full +15.766 [+12.234,+18.993] (>= 3 nats); d_G/d_full +0.945 [+0.859,+1.032] (>= 0.6); n=80 -> MET
+
+PREDICTIONS (code [class, recorded prior P(met)] title -> verdict; then per model: numbers, bounds, verdict)
+  J-A1      [M, prior 0.80] a key read with later options on natural passages (OPTA) -> MET (3 of 3 evaluable models met; 4 run)
+      llama8: n=148 (34 articles): s_ID +0.524 [+0.473,+0.568]; ID_K +6.859 [+5.903,+7.829]; ID_V +6.237 [+5.702,+6.805]; J-A-G4 mean ID_K + ID_V 13.10 >= 2.0: yes -> NOT EVALUABLE  [not evaluable: J-A-G1 OPTA]
+      gemma9: n=158 (34 articles): s_ID +0.627 [+0.599,+0.653]; ID_K +9.868 [+9.073,+10.596]; ID_V +5.869 [+5.379,+6.389]; J-A-G4 mean ID_K + ID_V 15.74 >= 2.0: yes -> MET
+          s_ID >= 0.5 (point): yes; H0 s_ID <= 0.35 rejected (lower bound +0.599 > 0.35): yes; H0 ID_K <= 0 rejected (lower bound +9.073 > 0): yes
+      qwen7: n=162 (34 articles): s_ID +0.677 [+0.639,+0.715]; ID_K +15.491 [+13.983,+16.966]; ID_V +7.385 [+6.287,+8.550]; J-A-G4 mean ID_K + ID_V 22.88 >= 2.0: yes -> MET
+          s_ID >= 0.5 (point): yes; H0 s_ID <= 0.35 rejected (lower bound +0.639 > 0.35): yes; H0 ID_K <= 0 rejected (lower bound +13.983 > 0): yes
+      mistral7: n=157 (34 articles): s_ID +0.550 [+0.503,+0.593]; ID_K +9.817 [+8.568,+11.071]; ID_V +8.029 [+7.187,+8.907]; J-A-G4 mean ID_K + ID_V 17.85 >= 2.0: yes -> MET
+          s_ID >= 0.5 (point): yes; H0 s_ID <= 0.35 rejected (lower bound +0.503 > 0.35): yes; H0 ID_K <= 0 rejected (lower bound +8.568 > 0): yes
+  J-A1b     [R, prior 0.55] the key read on spans of >= 3 tokens (OPTA) -> MET (3 of 3 evaluable models met; 4 run)
+      llama8: |P| >= 3: n=38 (21 articles): s_ID +0.688 [+0.640,+0.729]; ID_K +11.454 [+10.273,+12.515]; ID_V +5.201 [+4.374,+6.192]; J-A-G4 mean ID_K + ID_V 16.65 >= 2.0: yes -> NOT EVALUABLE  [not evaluable: J-A-G1 OPTA]
+      gemma9: |P| >= 3: n=57 (24 articles): s_ID +0.661 [+0.623,+0.699]; ID_K +10.472 [+9.643,+11.218]; ID_V +5.373 [+4.580,+6.213]; J-A-G4 mean ID_K + ID_V 15.85 >= 2.0: yes -> MET
+          s_ID >= 0.4 (point): yes; H0 s_ID <= 0.25 rejected (lower bound +0.623 > 0.25): yes
+      qwen7: |P| >= 3: n=63 (25 articles): s_ID +0.726 [+0.680,+0.771]; ID_K +17.163 [+15.312,+18.845]; ID_V +6.490 [+5.119,+7.992]; J-A-G4 mean ID_K + ID_V 23.65 >= 2.0: yes -> MET
+          s_ID >= 0.4 (point): yes; H0 s_ID <= 0.25 rejected (lower bound +0.680 > 0.25): yes
+      mistral7: |P| >= 3: n=77 (28 articles): s_ID +0.587 [+0.533,+0.635]; ID_K +10.557 [+8.898,+12.354]; ID_V +7.436 [+6.491,+8.450]; J-A-G4 mean ID_K + ID_V 17.99 >= 2.0: yes -> MET
+          s_ID >= 0.4 (point): yes; H0 s_ID <= 0.25 rejected (lower bound +0.533 > 0.25): yes
+  J-A1c     [M, prior 0.85] the key read with lettered options (LETA) -> MET (4 of 4 evaluable models met; 4 run)
+      llama8: n=156 (34 articles): s_ID +0.739 [+0.675,+0.794]; ID_K +6.726 [+5.873,+7.572]; ID_V +2.371 [+1.805,+3.080]; J-A-G4 mean ID_K + ID_V 9.10 >= 2.0: yes -> MET
+          s_ID >= 0.5 (point): yes; H0 s_ID <= 0.35 rejected (lower bound +0.675 > 0.35): yes
+      gemma9: n=158 (34 articles): s_ID +0.963 [+0.927,+0.987]; ID_K +9.676 [+9.121,+10.128]; ID_V +0.375 [+0.132,+0.750]; J-A-G4 mean ID_K + ID_V 10.05 >= 2.0: yes -> MET
+          s_ID >= 0.5 (point): yes; H0 s_ID <= 0.35 rejected (lower bound +0.927 > 0.35): yes
+      qwen7: n=163 (34 articles): s_ID +0.935 [+0.885,+0.972]; ID_K +19.782 [+18.416,+20.972]; ID_V +1.366 [+0.591,+2.438]; J-A-G4 mean ID_K + ID_V 21.15 >= 2.0: yes -> MET
+          s_ID >= 0.5 (point): yes; H0 s_ID <= 0.35 rejected (lower bound +0.885 > 0.35): yes
+      mistral7: n=155 (34 articles): s_ID +0.786 [+0.701,+0.864]; ID_K +7.424 [+6.211,+8.638]; ID_V +2.016 [+1.219,+2.987]; J-A-G4 mean ID_K + ID_V 9.44 >= 2.0: yes -> MET
+          s_ID >= 0.5 (point): yes; H0 s_ID <= 0.35 rejected (lower bound +0.701 > 0.35): yes
+  J-A2      [M, prior 0.85] a value copy without a later mention (NOM) -> MET (3 of 3 evaluable models met; 4 run)
+      llama8: n=86 (30 articles): s_ID +0.045 [+0.026,+0.063]; ID_K +0.552 [+0.315,+0.794]; ID_V +11.786 [+11.122,+12.434]; J-A-G4 mean ID_K + ID_V 12.34 >= 2.0: yes -> MET
+          s_ID <= 0.2 (point): yes; H0 s_ID >= 0.3 rejected (upper bound +0.063 < 0.3): yes; H0 ID_V <= 0 rejected (lower bound +11.122 > 0): yes
+      gemma9: n=109 (33 articles): s_ID -0.003 [-0.010,+0.002]; ID_K -0.057 [-0.164,+0.037]; ID_V +16.900 [+16.204,+17.582]; J-A-G4 mean ID_K + ID_V 16.84 >= 2.0: yes -> MET
+          s_ID <= 0.2 (point): yes; H0 s_ID >= 0.3 rejected (upper bound +0.002 < 0.3): yes; H0 ID_V <= 0 rejected (lower bound +16.204 > 0): yes
+      qwen7: n=104 (33 articles): s_ID +0.014 [+0.004,+0.025]; ID_K +0.311 [+0.081,+0.548]; ID_V +21.430 [+20.006,+22.911]; J-A-G4 mean ID_K + ID_V 21.74 >= 2.0: yes -> MET
+          s_ID <= 0.2 (point): yes; H0 s_ID >= 0.3 rejected (upper bound +0.025 < 0.3): yes; H0 ID_V <= 0 rejected (lower bound +20.006 > 0): yes
+      mistral7: n=43 (21 articles): s_ID +0.001 [-0.011,+0.015]; ID_K +0.019 [-0.184,+0.257]; ID_V +16.426 [+15.215,+17.516]; J-A-G4 mean ID_K + ID_V 16.45 >= 2.0: yes -> NOT EVALUABLE  [not evaluable: J-A-G2 NOM]
+  J-A3      [D, prior 0.70] crossover OPTA - NOM (derived from J-A1 and J-A2; not counted) -> NOT EVALUABLE (derived; not counted) (2 of 2 evaluable models met; 4 run)
+      llama8: n=76: s_ID(OPTA) - s_ID(NOM) +0.480 [+0.418,+0.538] -> NOT EVALUABLE  [not evaluable: J-A-G1 OPTA]
+      gemma9: n=100: s_ID(OPTA) - s_ID(NOM) +0.634 [+0.603,+0.663] -> MET
+          s_ID(OPTA) - s_ID(NOM) >= 0.4 (point): yes; H0 s_ID(OPTA) - s_ID(NOM) <= 0 rejected (lower bound +0.603 > 0): yes
+      qwen7: n=97: s_ID(OPTA) - s_ID(NOM) +0.670 [+0.629,+0.708] -> MET
+          s_ID(OPTA) - s_ID(NOM) >= 0.4 (point): yes; H0 s_ID(OPTA) - s_ID(NOM) <= 0 rejected (lower bound +0.629 > 0): yes
+      mistral7: n=36: s_ID(OPTA) - s_ID(NOM) +0.523 [+0.451,+0.590] -> NOT EVALUABLE  [not evaluable: J-A-G2 NOM]
+  J-A4      [L, prior 0.90] position: options before the passage give no key read (OPTB) -> MET (3 of 3 evaluable models met; 4 run)
+      llama8: n=146: ratio -0.038 [-0.058,-0.018]; ID_K(OPTA) - ID_K(OPTB) +7.165 [+6.161,+8.164]; ID_K(OPTB) -0.264 [-0.405,-0.124] -> NOT EVALUABLE  [not evaluable: J-A-G1 OPTA]
+      gemma9: n=156: ratio -0.018 [-0.025,-0.012]; ID_K(OPTA) - ID_K(OPTB) +10.132 [+9.336,+10.859]; ID_K(OPTB) -0.180 [-0.250,-0.125] -> MET
+          ID_K(OPTB) / ID_K(OPTA) <= 0.15 (point): yes; H0 ID_K(OPTB)/ID_K(OPTA) >= 0.25 rejected (upper bound -0.012 < 0.25): yes; H0 ID_K(OPTA) - ID_K(OPTB) <= 0 rejected (lower bound +9.336 > 0): yes
+      qwen7: n=159: ratio -0.058 [-0.072,-0.045]; ID_K(OPTA) - ID_K(OPTB) +16.460 [+14.927,+18.035]; ID_K(OPTB) -0.900 [-1.105,-0.701] -> MET
+          ID_K(OPTB) / ID_K(OPTA) <= 0.15 (point): yes; H0 ID_K(OPTB)/ID_K(OPTA) >= 0.25 rejected (upper bound -0.045 < 0.25): yes; H0 ID_K(OPTA) - ID_K(OPTB) <= 0 rejected (lower bound +14.927 > 0): yes
+      mistral7: n=139: ratio -0.038 [-0.056,-0.023]; ID_K(OPTA) - ID_K(OPTB) +10.386 [+9.091,+11.670]; ID_K(OPTB) -0.384 [-0.548,-0.225] -> MET
+          ID_K(OPTB) / ID_K(OPTA) <= 0.15 (point): yes; H0 ID_K(OPTB)/ID_K(OPTA) >= 0.25 rejected (upper bound -0.023 < 0.25): yes; H0 ID_K(OPTA) - ID_K(OPTB) <= 0 rejected (lower bound +9.091 > 0): yes
+  J-A5      [R, prior 0.50] a natural mention sentence after the passage opens a key read (MENA vs NOM) -> NOT MET (0 of 2 evaluable models met; 4 run)
+      llama8: n=69: s_ID(MENA) - s_ID(NOM) +0.028 [-0.002,+0.060]; ID_K(MENA) +0.902 [+0.514,+1.329]; s_ID(MENA) +0.074 [+0.044,+0.105] -> NOT EVALUABLE  [not evaluable: J-A-G2 MENA]
+      gemma9: n=103: s_ID(MENA) - s_ID(NOM) +0.070 [+0.045,+0.097]; ID_K(MENA) +1.069 [+0.665,+1.538]; s_ID(MENA) +0.067 [+0.043,+0.094] -> NOT MET
+          s_ID(MENA) - s_ID(NOM) >= 0.10 (point): no; H0 s_ID(MENA) - s_ID(NOM) <= 0 rejected (lower bound +0.045 > 0): yes; H0 ID_K(MENA) <= 0 rejected (lower bound +0.665 > 0): yes
+      qwen7: n=98: s_ID(MENA) - s_ID(NOM) +0.042 [+0.007,+0.077]; ID_K(MENA) +1.192 [+0.384,+2.026]; s_ID(MENA) +0.055 [+0.018,+0.091] -> NOT MET
+          s_ID(MENA) - s_ID(NOM) >= 0.10 (point): no; H0 s_ID(MENA) - s_ID(NOM) <= 0 rejected (lower bound +0.007 > 0): yes; H0 ID_K(MENA) <= 0 rejected (lower bound +0.384 > 0): yes
+      mistral7: n=37: s_ID(MENA) - s_ID(NOM) +0.102 [+0.012,+0.180]; ID_K(MENA) +1.815 [+0.198,+3.479]; s_ID(MENA) +0.104 [+0.012,+0.184] -> NOT EVALUABLE  [not evaluable: J-A-G2 MENA, J-A-G2 NOM]
+  J-A5B     [M, prior 0.80] the same sentence before the passage does not (MENA vs MENB) -> NOT EVALUABLE (2 of 2 evaluable models met; 4 run)
+      llama8: MENA / MENB not both run -> NOT EVALUABLE  [not evaluable: J-A-G2 MENA, J-A-G2 MENB]
+      gemma9: n=104: ID_K(MENA) - ID_K(MENB) +1.334 [+0.914,+1.820]; ID_K(MENB) -0.260 [-0.346,-0.178] -> MET
+          H0 ID_K(MENA) - ID_K(MENB) <= 0 rejected (lower bound +0.914 > 0): yes
+      qwen7: n=90: ID_K(MENA) - ID_K(MENB) +2.215 [+1.286,+3.181]; ID_K(MENB) -0.720 [-1.015,-0.419] -> MET
+          H0 ID_K(MENA) - ID_K(MENB) <= 0 rejected (lower bound +1.286 > 0): yes
+      mistral7: MENA / MENB not both run -> NOT EVALUABLE  [not evaluable: J-A-G2 MENA, J-A-G2 MENB]
+  J-A6a     [R, prior 0.45] cue conflict, OPTA: the key's entity is answered -> NOT MET (2 of 3 evaluable models met; 4 run)
+      llama8: OPTA n=148: key-source +0.267 [+0.188,+0.350]; value-source +0.456 [+0.362,+0.564]; difference -0.189 [-0.348,-0.042]; other answers B 0.074, Z 0.000, D 0.003, other 0.199 -> NOT EVALUABLE  [not evaluable: J-A-G1 OPTA]
+      gemma9: OPTA n=158: key-source +0.734 [+0.654,+0.809]; value-source +0.180 [+0.123,+0.249]; difference +0.554 [+0.412,+0.680]; other answers B 0.025, Z 0.000, D 0.000, other 0.060 -> MET
+          key-source rate >= 0.6 (point): yes; H0 key-source rate <= 0.5 rejected (lower bound +0.654 > 0.5): yes; key - value >= 0.3 (point): yes; H0 key - value <= 0 rejected (lower bound +0.412 > 0): yes
+      qwen7: OPTA n=162: key-source +0.778 [+0.702,+0.848]; value-source +0.176 [+0.114,+0.243]; difference +0.602 [+0.462,+0.730]; other answers B 0.028, Z 0.000, D 0.000, other 0.019 -> MET
+          key-source rate >= 0.6 (point): yes; H0 key-source rate <= 0.5 rejected (lower bound +0.702 > 0.5): yes; key - value >= 0.3 (point): yes; H0 key - value <= 0 rejected (lower bound +0.462 > 0): yes
+      mistral7: OPTA n=157: key-source +0.408 [+0.325,+0.488]; value-source +0.379 [+0.307,+0.461]; difference +0.029 [-0.119,+0.166]; other answers B 0.073, Z 0.000, D 0.016, other 0.124 -> NOT MET
+          key-source rate >= 0.6 (point): no; H0 key-source rate <= 0.5 rejected (lower bound +0.325 > 0.5): no; key - value >= 0.3 (point): no; H0 key - value <= 0 rejected (lower bound -0.119 > 0): no
+  J-A6b     [R, prior 0.60] cue conflict, LETA: the key's entity's letter is answered -> MET (4 of 4 evaluable models met; 4 run)
+      llama8: LETA n=156: key-source +0.750 [+0.667,+0.820]; value-source +0.176 [+0.116,+0.252]; difference +0.574 [+0.424,+0.695]; other answers B 0.071, Z 0.000, D 0.003, other 0.000 -> MET
+          key-source rate >= 0.6 (point): yes; H0 key-source rate <= 0.5 rejected (lower bound +0.667 > 0.5): yes; key - value >= 0.3 (point): yes; H0 key - value <= 0 rejected (lower bound +0.424 > 0): yes
+      gemma9: LETA n=158: key-source +0.978 [+0.950,+0.997]; value-source +0.009 [+0.000,+0.027]; difference +0.968 [+0.929,+0.996]; other answers B 0.013, Z 0.000, D 0.000, other 0.000 -> MET
+          key-source rate >= 0.6 (point): yes; H0 key-source rate <= 0.5 rejected (lower bound +0.950 > 0.5): yes; key - value >= 0.3 (point): yes; H0 key - value <= 0 rejected (lower bound +0.929 > 0): yes
+      qwen7: LETA n=163: key-source +0.923 [+0.871,+0.965]; value-source +0.055 [+0.022,+0.103]; difference +0.868 [+0.772,+0.940]; other answers B 0.015, Z 0.000, D 0.006, other 0.000 -> MET
+          key-source rate >= 0.6 (point): yes; H0 key-source rate <= 0.5 rejected (lower bound +0.871 > 0.5): yes; key - value >= 0.3 (point): yes; H0 key - value <= 0 rejected (lower bound +0.772 > 0): yes
+      mistral7: LETA n=155: key-source +0.629 [+0.538,+0.721]; value-source +0.187 [+0.121,+0.263]; difference +0.442 [+0.292,+0.585]; other answers B 0.123, Z 0.000, D 0.061, other 0.000 -> MET
+          key-source rate >= 0.6 (point): yes; H0 key-source rate <= 0.5 rejected (lower bound +0.538 > 0.5): yes; key - value >= 0.3 (point): yes; H0 key - value <= 0 rejected (lower bound +0.292 > 0): yes
+  J-A6c     [R, prior 0.45] cue conflict, NOM: the value's entity is answered -> NOT MET (1 of 3 evaluable models met; 4 run)
+      llama8: NOM n=86: key-source +0.000 [+0.000,+0.000]; value-source +0.506 [+0.366,+0.649]; difference +0.506 [+0.366,+0.649]; other answers B 0.000, Z 0.000, D 0.000, other 0.494 -> NOT MET
+          value-source rate >= 0.6 (point): no; H0 value-source rate <= 0.5 rejected (lower bound +0.366 > 0.5): no; value - key >= 0.3 (point): yes; H0 value - key <= 0 rejected (lower bound +0.366 > 0): yes
+      gemma9: NOM n=109: key-source +0.000 [+0.000,+0.000]; value-source +0.789 [+0.693,+0.879]; difference +0.789 [+0.693,+0.879]; other answers B 0.000, Z 0.000, D 0.000, other 0.211 -> MET
+          value-source rate >= 0.6 (point): yes; H0 value-source rate <= 0.5 rejected (lower bound +0.693 > 0.5): yes; value - key >= 0.3 (point): yes; H0 value - key <= 0 rejected (lower bound +0.693 > 0): yes
+      qwen7: NOM n=104: key-source +0.000 [+0.000,+0.000]; value-source +0.438 [+0.317,+0.571]; difference +0.438 [+0.317,+0.571]; other answers B 0.000, Z 0.000, D 0.010, other 0.553 -> NOT MET
+          value-source rate >= 0.6 (point): no; H0 value-source rate <= 0.5 rejected (lower bound +0.317 > 0.5): no; value - key >= 0.3 (point): yes; H0 value - key <= 0 rejected (lower bound +0.317 > 0): yes
+      mistral7: NOM n=43: key-source +0.000 [+0.000,+0.000]; value-source +0.244 [+0.132,+0.403]; difference +0.244 [+0.132,+0.403]; other answers B 0.000, Z 0.000, D 0.012, other 0.744 -> NOT EVALUABLE  [not evaluable: J-A-G2 NOM]
+  J-A6d     [R, prior 0.45] flag only (K_S, V_Z): S in OPTA, not in NOM -> NOT EVALUABLE (2 of 2 evaluable models met; 4 run)
+      llama8: OPTA n=148 S-rate +0.541 [+0.434,+0.646] (B-rate 0.128); NOM n=86 S-rate +0.000 [+0.000,+0.000] (Z-rate 0.465) -> NOT EVALUABLE  [not evaluable: J-A-G1 OPTA]
+      gemma9: OPTA n=158 S-rate +0.842 [+0.739,+0.934] (B-rate 0.025); NOM n=109 S-rate +0.000 [+0.000,+0.000] (Z-rate 0.743) -> MET
+          OPTA S-rate >= 0.6 (point): yes; H0 OPTA S-rate <= 0.5 rejected (lower bound +0.739 > 0.5): yes; NOM S-rate <= 0.2 (point): yes; H0 NOM S-rate >= 0.3 rejected (upper bound +0.000 < 0.3): yes
+      qwen7: OPTA n=162 S-rate +0.883 [+0.796,+0.950] (B-rate 0.031); NOM n=104 S-rate +0.000 [+0.000,+0.000] (Z-rate 0.452) -> MET
+          OPTA S-rate >= 0.6 (point): yes; H0 OPTA S-rate <= 0.5 rejected (lower bound +0.796 > 0.5): yes; NOM S-rate <= 0.2 (point): yes; H0 NOM S-rate >= 0.3 rejected (upper bound +0.000 < 0.3): yes
+      mistral7: OPTA n=157 S-rate +0.637 [+0.513,+0.756] (B-rate 0.096); NOM n=43 S-rate +0.000 [+0.000,+0.000] (Z-rate 0.233) -> NOT EVALUABLE  [not evaluable: J-A-G2 NOM]
+  J-A6e     [R, prior 0.40] copy fallback (K_Z, V_S) in OPTA: S is answered -> MET (3 of 3 evaluable models met; 4 run)
+      llama8: n=148: S-rate +0.845 [+0.752,+0.929]; B 0.149, X 0.000, D 0.000, Z 0.000, other 0.007 -> NOT EVALUABLE  [not evaluable: J-A-G1 OPTA]
+      gemma9: n=158: S-rate +0.880 [+0.802,+0.947]; B 0.108, X 0.000, D 0.000, Z 0.000, other 0.013 -> MET
+          S-rate >= 0.5 (point): yes; H0 S-rate <= 0.4 rejected (lower bound +0.802 > 0.4): yes
+      qwen7: n=162: S-rate +0.840 [+0.755,+0.914]; B 0.111, X 0.019, D 0.019, Z 0.000, other 0.012 -> MET
+          S-rate >= 0.5 (point): yes; H0 S-rate <= 0.4 rejected (lower bound +0.755 > 0.4): yes
+      mistral7: n=157: S-rate +0.834 [+0.742,+0.916]; B 0.134, X 0.000, D 0.025, Z 0.000, other 0.006 -> MET
+          S-rate >= 0.5 (point): yes; H0 S-rate <= 0.4 rejected (lower bound +0.742 > 0.4): yes
+  J-A7      [R, prior 0.30] KIVI 2-bit: value quantization hurts free form more than MCQ, beyond keys (DiD) -> NOT MET (0 of 1 evaluable models met; 4 run)
+      llama8: prior-free n=23: DiD [drop_NOM(V) - drop_OPTA(V)] - [drop_NOM(K) - drop_OPTA(K)] -0.130 [-0.304,+0.000]; drops NOM(K) +0.130, NOM(V) +0.000, OPTA(K) +0.000, OPTA(V) +0.000 -> NOT EVALUABLE  [not evaluable: J-A-G1 OPTA]
+      gemma9: prior-free n=27: DiD [drop_NOM(V) - drop_OPTA(V)] - [drop_NOM(K) - drop_OPTA(K)] +0.037 [+0.000,+0.130]; drops NOM(K) +0.000, NOM(V) +0.037, OPTA(K) +0.000, OPTA(V) +0.000 -> NOT EVALUABLE  [not evaluable: prior-free n 27 < 30]
+      qwen7: prior-free n=33: DiD [drop_NOM(V) - drop_OPTA(V)] - [drop_NOM(K) - drop_OPTA(K)] -0.091 [-0.243,+0.038]; drops NOM(K) +0.121, NOM(V) +0.030, OPTA(K) +0.000, OPTA(V) +0.000 -> NOT MET
+          DiD >= 0.10 (point): no; H0 DiD <= 0 rejected (lower bound -0.243 > 0): no
+      mistral7: prior-free n=14: DiD [drop_NOM(V) - drop_OPTA(V)] - [drop_NOM(K) - drop_OPTA(K)] -0.214 [-0.462,+0.000]; drops NOM(K) +0.214, NOM(V) +0.000, OPTA(K) +0.000, OPTA(V) +0.000 -> NOT EVALUABLE  [not evaluable: J-A-G2 NOM]
+  J-A7b     [R, prior 0.35] KIVI 2-bit: value quantization hurts free form more than MCQ -> NOT MET (0 of 1 evaluable models met; 4 run)
+      llama8: prior-free n=23: drop_NOM(V) - drop_OPTA(V) +0.000 [+0.000,+0.000] -> NOT EVALUABLE  [not evaluable: J-A-G1 OPTA]
+      gemma9: prior-free n=27: drop_NOM(V) - drop_OPTA(V) +0.037 [+0.000,+0.130] -> NOT EVALUABLE  [not evaluable: prior-free n 27 < 30]
+      qwen7: prior-free n=33: drop_NOM(V) - drop_OPTA(V) +0.030 [+0.000,+0.107] -> NOT MET
+          >= 0.10 (point): no; H0 drop_NOM(V) - drop_OPTA(V) <= 0 rejected (lower bound +0.000 > 0): no
+      mistral7: prior-free n=14: drop_NOM(V) - drop_OPTA(V) +0.000 [+0.000,+0.000] -> NOT EVALUABLE  [not evaluable: J-A-G2 NOM]
+  J-A8      [M, prior 0.80] multi-token answers: continuation needs K and V jointly, decision token additive (NOM) -> NOT EVALUABLE (2 of 2 evaluable models met; 4 run)
+      llama8: n=39 (leak-free PERSON/PLACE with a continuation token differing from c_B): I_cont(NOM) +1.515 [+1.249,+1.797]; I_dec(NOM) +0.039 [-0.029,+0.116]; d_KV^cont OPTA/NOM +0.017 [+0.011,+0.024]; d^cont(NOM) K -12.23 V +5.10 KV +13.83 (>= 2 nats: yes) -> NOT EVALUABLE  [not evaluable: J-A-G1 OPTA]
+      gemma9: n=61 (leak-free PERSON/PLACE with a continuation token differing from c_B): I_cont(NOM) +1.192 [+1.022,+1.410]; I_dec(NOM) -0.002 [-0.036,+0.035]; d_KV^cont OPTA/NOM +0.003 [+0.001,+0.008]; d^cont(NOM) K -14.38 V +11.69 KV +14.01 (>= 2 nats: yes) -> MET
+          I_cont >= 0.5 (point): yes; H0 I_cont(NOM) <= 0.3 rejected (lower bound +1.022 > 0.3): yes; I_dec <= 0.25 (point): yes; H0 I_dec(NOM) >= 0.35 rejected (upper bound +0.035 < 0.35): yes; |d_KV^cont(OPTA)/d_KV^cont(NOM)| <= 0.2 (point): yes; H0 the ratio outside (-0.3, 0.3) rejected (interval [+0.001,+0.008]): yes
+      qwen7: n=51 (leak-free PERSON/PLACE with a continuation token differing from c_B): I_cont(NOM) +1.275 [+1.056,+1.525]; I_dec(NOM) -0.173 [-0.239,-0.101]; d_KV^cont OPTA/NOM +0.003 [+0.000,+0.010]; d^cont(NOM) K -13.36 V +8.19 KV +18.83 (>= 2 nats: yes) -> MET
+          I_cont >= 0.5 (point): yes; H0 I_cont(NOM) <= 0.3 rejected (lower bound +1.056 > 0.3): yes; I_dec <= 0.25 (point): yes; H0 I_dec(NOM) >= 0.35 rejected (upper bound -0.101 < 0.35): yes; |d_KV^cont(OPTA)/d_KV^cont(NOM)| <= 0.2 (point): yes; H0 the ratio outside (-0.3, 0.3) rejected (interval [+0.000,+0.010]): yes
+      mistral7: n=31 (leak-free PERSON/PLACE with a continuation token differing from c_B): I_cont(NOM) +1.314 [+1.110,+1.546]; I_dec(NOM) -0.014 [-0.084,+0.065]; d_KV^cont OPTA/NOM +0.002 [+0.000,+0.006]; d^cont(NOM) K -14.25 V +8.41 KV +18.64 (>= 2 nats: yes) -> NOT EVALUABLE  [not evaluable: J-A-G2 NOM]
+  J-A8d     [R, prior 0.60] hybrid answers under K_Z in NOM, not in OPTA -> NOT MET (0 of 1 evaluable models met; 4 run)
+      llama8: n=39; items with g1(K_Z) = dec_B: NOM 13, OPTA 38 (>= 40); h(K_Z, NOM) +0.462 [+0.067,+0.818]; h(K_Z, OPTA) +0.000 [+0.000,+0.000] -> NOT EVALUABLE  [not evaluable: J-A-G1 OPTA]
+      gemma9: n=61; items with g1(K_Z) = dec_B: NOM 57, OPTA 61 (>= 40); h(K_Z, NOM) +0.105 [+0.030,+0.217]; h(K_Z, OPTA) +0.000 [+0.000,+0.000] -> NOT MET
+          h(K_Z, NOM) >= 0.2 (point): no; H0 h(K_Z, NOM) <= 0.1 rejected (lower bound +0.030 > 0.1): no; h(K_Z, OPTA) <= 0.05 (point): yes; H0 h(K_Z, OPTA) >= 0.1 rejected (upper bound +0.000 < 0.1): yes
+      qwen7: n=51; items with g1(K_Z) = dec_B: NOM 27, OPTA 49 (>= 40); h(K_Z, NOM) +0.370 [+0.143,+0.636]; h(K_Z, OPTA) +0.000 [+0.000,+0.000] -> NOT EVALUABLE  [not evaluable: fewer than 40 items with g1 = dec_B]
+      mistral7: n=31; items with g1(K_Z) = dec_B: NOM 20, OPTA 28 (>= 40); h(K_Z, NOM) +0.300 [+0.053,+0.588]; h(K_Z, OPTA) +0.000 [+0.000,+0.000] -> NOT EVALUABLE  [not evaluable: J-A-G2 NOM]
+  J-A-HA1   [R, prior 0.75] sparse natural readers (N*) -> NOT EVALUABLE (1 of 1 evaluable models met; 2 run)
+      qwen7: k*=40, n=80: R_N +0.838 [+0.739,+0.912]; KO_N +0.978 [+0.947,+1.003]; R_rand -0.002 [-0.017,+0.011]; KO_rand +0.081 [+0.050,+0.116] (means over 3 draws) -> NOT EVALUABLE  [not evaluable: J-A-HA-G1]
+      mistral7: k*=52, n=80: R_N +0.938 [+0.865,+1.000]; KO_N +1.003 [+0.984,+1.014]; R_rand -0.001 [-0.004,+0.002]; KO_rand +0.047 [+0.027,+0.071] (means over 3 draws) -> MET
+          R_N(k*) >= 0.7 (point): yes; H0 R_N(k*) <= 0.6 rejected (lower bound +0.865 > 0.6): yes; KO_N(k*) >= 0.7 (point): yes; H0 KO_N(k*) <= 0.6 rejected (lower bound +0.984 > 0.6): yes; R_rand(k*) <= 0.15 (point): yes; KO_rand(k*) <= 0.15 (point): yes
+  J-A-HA2   [R, prior 0.40] the template readers (T*) transfer to natural text -> NOT EVALUABLE (1 of 1 evaluable models met; 2 run)
+      qwen7: k*=40, n=80: R_T +0.691 [+0.607,+0.770]; KO_T +0.967 [+0.938,+0.992]; |T* & N*| = 25 (hypergeometric P 1.2e-26) -> NOT EVALUABLE  [not evaluable: J-A-HA-G1]
+      mistral7: k*=52, n=80: R_T +0.555 [+0.442,+0.666]; KO_T +0.987 [+0.964,+1.009]; |T* & N*| = 23 (hypergeometric P 1.0e-18) -> MET
+          R_T(k*) >= 0.5 (point): yes; H0 R_T(k*) <= 0.35 rejected (lower bound +0.442 > 0.35): yes; KO_T(k*) >= 0.5 (point): yes; H0 KO_T(k*) <= 0.35 rejected (lower bound +0.964 > 0.35): yes
+  J-A-HA3a  [R, prior 0.30] ablating N* at Q+ breaks faithful MCQ answers (prior-free) -> NOT EVALUABLE (1 of 1 evaluable models met; 2 run)
+      qwen7: prior-free competent OPTA n=58: acc(none) 0.862; drop(N*) +0.534 [+0.353,+0.712]; drops of the random sets rand0 +0.017, rand1 +0.207, rand2 +0.103; drop(T*) +0.345 -> NOT EVALUABLE  [not evaluable: J-A-HA-G1]
+      mistral7: prior-free competent OPTA n=69: acc(none) 1.000; drop(N*) +0.449 [+0.300,+0.600]; drops of the random sets rand0 +0.000, rand1 +0.000, rand2 +0.014; drop(T*) +0.493 -> MET
+          drop(N*) >= 0.3 (point): yes; H0 drop(N*) <= 0 rejected (lower bound +0.300 > 0): yes; drop(rand0) <= 0.1 (point): yes; drop(rand1) <= 0.1 (point): yes; drop(rand2) <= 0.1 (point): yes
+  J-A-HA3b  [R, prior 0.65] ablating N* at Q+ leaves free-form answers (prior-free) -> NOT EVALUABLE (0 of 0 evaluable models met; 2 run)
+      qwen7: prior-free competent NOM n=36: decision accuracy change -0.083 [-0.209,+0.000]; continuation accuracy change -0.361 [-0.609,-0.081] -> NOT EVALUABLE  [not evaluable: J-A-HA-G1]
+      mistral7: prior-free competent NOM n=16: decision accuracy change -0.125 [-0.333,+0.000]; continuation accuracy change -0.688 [-0.895,-0.400] -> NOT EVALUABLE  [not evaluable: J-A-G2 NOM, prior-free n < 30]
+
+REPORTED (no verdicts)
+  [llama8] n valid 185; n_comp NOM 86, OPTA 148, OPTB 164, MENA 70, LETA 156, MENB 69; frame ' '
+    P_CB(B) CBOPT: 0.659 of 185 (undefined 0); by type PERSON 0.850 (n 80), PLACE 0.786 (n 28), NUMBER 0.416 (n 77)
+    P_CB(B) CBLET: 0.638 of 185 (undefined 0); by type PERSON 0.825 (n 80), PLACE 0.821 (n 28), NUMBER 0.377 (n 77)
+    A-12 graded reading of J-A1: s_ID(OPTA) +0.524 [+0.473,+0.568] -> J-A1's own threshold decides (s_ID >= 0.5) (with J-A3 met)
+    NOM competent n=86: accuracy (B) under V_Z +0.000 [+0.000,+0.000]; K_Z +0.570 [+0.420,+0.714]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.000 [+0.000,+0.000] value-source +0.506 [+0.366,+0.649]
+    NOM prior-free n=25: accuracy (B) under V_Z +0.000 [+0.000,+0.000]; K_Z +0.760 [+0.542,+0.952]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.000 [+0.000,+0.000] value-source +0.780 [+0.580,+0.952]
+    NOM cue conflict at the decision token (g1): key-source +0.000 [+0.000,+0.000], value-source +0.593 [+0.462,+0.719]
+    NOM old A6 flips: phi_dec(K_S) +0.000 [+0.000,+0.000], phi_dec(V_S) +0.686 [+0.554,+0.807]; full match K_S +0.000 [+0.000,+0.000], V_S +0.477 [+0.337,+0.620]
+    OPTA competent n=148: accuracy (B) under V_Z +0.824 [+0.739,+0.899]; K_Z +0.966 [+0.910,+1.000]; KV_Z +0.358 [+0.241,+0.476]; cue conflict key-source +0.267 [+0.188,+0.350] value-source +0.456 [+0.362,+0.564]
+    OPTA prior-free n=49: accuracy (B) under V_Z +0.592 [+0.422,+0.756]; K_Z +0.939 [+0.843,+1.000]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.296 [+0.179,+0.422] value-source +0.592 [+0.441,+0.735]
+    OPTA cue conflict at the decision token (g1): key-source +0.459 [+0.364,+0.550], value-source +0.456 [+0.362,+0.564]
+    OPTA old A6 flips: phi_dec(K_S) +0.304 [+0.214,+0.398], phi_dec(V_S) +0.412 [+0.283,+0.552]; full match K_S +0.196 [+0.115,+0.285], V_S +0.412 [+0.283,+0.552]
+    LETA competent n=156: accuracy (B) under V_Z +0.994 [+0.971,+1.000]; K_Z +0.917 [+0.854,+0.973]; KV_Z +0.519 [+0.392,+0.641]; cue conflict key-source +0.750 [+0.667,+0.820] value-source +0.176 [+0.116,+0.252]
+    LETA prior-free n=43: accuracy (B) under V_Z +0.977 [+0.906,+1.000]; K_Z +0.721 [+0.553,+0.879]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.733 [+0.578,+0.868] value-source +0.256 [+0.118,+0.409]
+    LETA cue conflict at the decision token (g1): key-source +0.750 [+0.667,+0.820], value-source +0.176 [+0.116,+0.252]
+    LETA old A6 flips: phi_dec(K_S) +0.513 [+0.403,+0.618], phi_dec(V_S) +0.122 [+0.059,+0.203]; full match K_S +0.513 [+0.403,+0.618], V_S +0.122 [+0.059,+0.203]
+    NOM all valid items n=185: s_ID +0.051 [+0.037,+0.065]; option mass (ID) 0.621
+    OPTA all valid items n=185: s_ID +0.518 [+0.472,+0.560]; option mass (ID) 0.981
+    OPTB all valid items n=185: s_ID -0.024 [-0.035,-0.013]; option mass (ID) 0.976
+    MENA all valid items n=185: s_ID +0.086 [+0.065,+0.105]; option mass (ID) 0.593
+    LETA all valid items n=185: s_ID +0.739 [+0.678,+0.792]; option mass (ID) 0.990
+    MENB all valid items n=185: s_ID -0.013 [-0.030,+0.003]; option mass (ID) 0.579
+    KIVI NOM competent n=86: relative error K 0.188, V 0.420; faithful (S) accuracy none 1.000, K2 0.849, V2 0.965
+    KIVI OPTA competent n=148: relative error K 0.189, V 0.420; faithful (S) accuracy none 1.000, K2 0.993, V2 0.986
+    KIVI LETA competent n=156: relative error K 0.189, V 0.420; faithful (S) accuracy none 1.000, K2 0.987, V2 0.981
+    d_K^cont(NOM) on the J-A8 population -12.228 [-16.207,-8.656] (sign reported; Part D owns the sign account)
+  [gemma9] n valid 185; n_comp NOM 109, OPTA 158, OPTB 167, MENA 107, LETA 158, MENB 117; frame ' '
+    P_CB(B) CBOPT: 0.665 of 185 (undefined 0); by type PERSON 0.800 (n 80), PLACE 0.786 (n 28), NUMBER 0.481 (n 77)
+    P_CB(B) CBLET: 0.649 of 185 (undefined 0); by type PERSON 0.812 (n 80), PLACE 0.821 (n 28), NUMBER 0.416 (n 77)
+    A-12 graded reading of J-A1: s_ID(OPTA) +0.627 [+0.599,+0.653] -> J-A1's own threshold decides (s_ID >= 0.5) (with J-A3 met)
+    NOM competent n=109: accuracy (B) under V_Z +0.000 [+0.000,+0.000]; K_Z +0.890 [+0.811,+0.957]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.000 [+0.000,+0.000] value-source +0.789 [+0.693,+0.879]
+    NOM prior-free n=30: accuracy (B) under V_Z +0.000 [+0.000,+0.000]; K_Z +0.900 [+0.760,+1.000]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.000 [+0.000,+0.000] value-source +0.917 [+0.794,+1.000]
+    NOM cue conflict at the decision token (g1): key-source +0.000 [+0.000,+0.000], value-source +0.945 [+0.900,+0.981]
+    NOM old A6 flips: phi_dec(K_S) +0.000 [+0.000,+0.000], phi_dec(V_S) +0.945 [+0.880,+0.991]; full match K_S +0.000 [+0.000,+0.000], V_S +0.752 [+0.636,+0.867]
+    OPTA competent n=158: accuracy (B) under V_Z +0.937 [+0.875,+0.982]; K_Z +1.000 [+1.000,+1.000]; KV_Z +0.152 [+0.074,+0.243]; cue conflict key-source +0.734 [+0.654,+0.809] value-source +0.180 [+0.123,+0.249]
+    OPTA prior-free n=53: accuracy (B) under V_Z +0.925 [+0.812,+1.000]; K_Z +1.000 [+1.000,+1.000]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.764 [+0.636,+0.882] value-source +0.179 [+0.083,+0.289]
+    OPTA cue conflict at the decision token (g1): key-source +0.794 [+0.720,+0.856], value-source +0.180 [+0.123,+0.249]
+    OPTA old A6 flips: phi_dec(K_S) +0.684 [+0.577,+0.786], phi_dec(V_S) +0.095 [+0.042,+0.163]; full match K_S +0.627 [+0.514,+0.741], V_S +0.095 [+0.042,+0.163]
+    LETA competent n=158: accuracy (B) under V_Z +0.987 [+0.960,+1.000]; K_Z +0.753 [+0.663,+0.841]; KV_Z +0.487 [+0.377,+0.601]; cue conflict key-source +0.978 [+0.950,+0.997] value-source +0.009 [+0.000,+0.027]
+    LETA prior-free n=43: accuracy (B) under V_Z +0.977 [+0.905,+1.000]; K_Z +0.442 [+0.256,+0.639]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.988 [+0.957,+1.000] value-source +0.012 [+0.000,+0.043]
+    LETA cue conflict at the decision token (g1): key-source +0.972 [+0.942,+0.993], value-source +0.006 [+0.000,+0.022]
+    LETA old A6 flips: phi_dec(K_S) +0.861 [+0.777,+0.933], phi_dec(V_S) +0.019 [+0.000,+0.053]; full match K_S +0.911 [+0.848,+0.964], V_S +0.019 [+0.000,+0.053]
+    NOM all valid items n=185: s_ID +0.002 [-0.004,+0.007]; option mass (ID) 0.838
+    OPTA all valid items n=185: s_ID +0.614 [+0.583,+0.641]; option mass (ID) 0.990
+    OPTB all valid items n=185: s_ID -0.016 [-0.023,-0.011]; option mass (ID) 0.987
+    MENA all valid items n=185: s_ID +0.064 [+0.046,+0.084]; option mass (ID) 0.840
+    LETA all valid items n=185: s_ID +0.960 [+0.926,+0.984]; option mass (ID) 0.915
+    MENB all valid items n=185: s_ID -0.015 [-0.020,-0.009]; option mass (ID) 0.862
+    KIVI NOM competent n=109: relative error K 0.239, V 0.421; faithful (S) accuracy none 1.000, K2 0.954, V2 0.982
+    KIVI OPTA competent n=158: relative error K 0.239, V 0.421; faithful (S) accuracy none 1.000, K2 0.994, V2 0.994
+    KIVI LETA competent n=158: relative error K 0.239, V 0.421; faithful (S) accuracy none 1.000, K2 0.994, V2 1.000
+    d_K^cont(NOM) on the J-A8 population -14.375 [-17.212,-12.042] (sign reported; Part D owns the sign account)
+  [qwen7] n valid 185; n_comp NOM 104, OPTA 162, OPTB 166, MENA 106, LETA 163, MENB 99; frame ' '
+    P_CB(B) CBOPT: 0.616 of 185 (undefined 0); by type PERSON 0.812 (n 80), PLACE 0.857 (n 28), NUMBER 0.325 (n 77)
+    P_CB(B) CBLET: 0.622 of 185 (undefined 0); by type PERSON 0.800 (n 80), PLACE 0.714 (n 28), NUMBER 0.403 (n 77)
+    A-12 graded reading of J-A1: s_ID(OPTA) +0.677 [+0.639,+0.715] -> J-A1's own threshold decides (s_ID >= 0.5) (with J-A3 met)
+    NOM competent n=104: accuracy (B) under V_Z +0.000 [+0.000,+0.000]; K_Z +0.577 [+0.452,+0.700]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.000 [+0.000,+0.000] value-source +0.438 [+0.317,+0.571]
+    NOM prior-free n=36: accuracy (B) under V_Z +0.000 [+0.000,+0.000]; K_Z +0.667 [+0.472,+0.875]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.000 [+0.000,+0.000] value-source +0.625 [+0.423,+0.833]
+    NOM cue conflict at the decision token (g1): key-source +0.005 [+0.000,+0.021], value-source +0.740 [+0.645,+0.833]
+    NOM old A6 flips: phi_dec(K_S) +0.000 [+0.000,+0.000], phi_dec(V_S) +0.750 [+0.636,+0.849]; full match K_S +0.000 [+0.000,+0.000], V_S +0.452 [+0.315,+0.592]
+    OPTA competent n=162: accuracy (B) under V_Z +0.907 [+0.844,+0.963]; K_Z +0.963 [+0.922,+0.994]; KV_Z +0.142 [+0.075,+0.220]; cue conflict key-source +0.778 [+0.702,+0.848] value-source +0.176 [+0.114,+0.243]
+    OPTA prior-free n=58: accuracy (B) under V_Z +0.845 [+0.727,+0.944]; K_Z +0.931 [+0.839,+1.000]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.767 [+0.658,+0.868] value-source +0.216 [+0.116,+0.324]
+    OPTA cue conflict at the decision token (g1): key-source +0.796 [+0.724,+0.860], value-source +0.176 [+0.114,+0.243]
+    OPTA old A6 flips: phi_dec(K_S) +0.710 [+0.609,+0.803], phi_dec(V_S) +0.123 [+0.063,+0.196]; full match K_S +0.704 [+0.602,+0.796], V_S +0.123 [+0.063,+0.196]
+    LETA competent n=163: accuracy (B) under V_Z +0.982 [+0.943,+1.000]; K_Z +0.742 [+0.656,+0.830]; KV_Z +0.497 [+0.390,+0.604]; cue conflict key-source +0.923 [+0.871,+0.965] value-source +0.055 [+0.022,+0.103]
+    LETA prior-free n=41: accuracy (B) under V_Z +0.927 [+0.795,+1.000]; K_Z +0.463 [+0.270,+0.658]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.902 [+0.778,+0.986] value-source +0.085 [+0.011,+0.207]
+    LETA cue conflict at the decision token (g1): key-source +0.923 [+0.871,+0.965], value-source +0.055 [+0.022,+0.103]
+    LETA old A6 flips: phi_dec(K_S) +0.859 [+0.780,+0.930], phi_dec(V_S) +0.043 [+0.010,+0.090]; full match K_S +0.859 [+0.780,+0.930], V_S +0.043 [+0.010,+0.090]
+    NOM all valid items n=185: s_ID +0.015 [+0.006,+0.025]; option mass (ID) 0.837
+    OPTA all valid items n=185: s_ID +0.673 [+0.634,+0.709]; option mass (ID) 0.997
+    OPTB all valid items n=185: s_ID -0.051 [-0.064,-0.039]; option mass (ID) 0.982
+    MENA all valid items n=185: s_ID +0.073 [+0.047,+0.101]; option mass (ID) 0.851
+    LETA all valid items n=185: s_ID +0.938 [+0.889,+0.974]; option mass (ID) 1.000
+    MENB all valid items n=185: s_ID -0.030 [-0.044,-0.016]; option mass (ID) 0.864
+    KIVI NOM competent n=104: relative error K 0.172, V 0.420; faithful (S) accuracy none 1.000, K2 0.865, V2 0.971
+    KIVI OPTA competent n=162: relative error K 0.173, V 0.421; faithful (S) accuracy none 1.000, K2 0.988, V2 0.988
+    KIVI LETA competent n=163: relative error K 0.173, V 0.421; faithful (S) accuracy none 1.000, K2 0.988, V2 0.988
+    d_K^cont(NOM) on the J-A8 population -13.360 [-17.823,-9.360] (sign reported; Part D owns the sign account)
+  [mistral7] n valid 185; n_comp NOM 43, OPTA 157, OPTB 150, MENA 43, LETA 155, MENB 44; frame ' '
+    P_CB(B) CBOPT: 0.573 of 185 (undefined 0); by type PERSON 0.738 (n 80), PLACE 0.607 (n 28), NUMBER 0.390 (n 77)
+    P_CB(B) CBLET: 0.584 of 185 (undefined 0); by type PERSON 0.750 (n 80), PLACE 0.679 (n 28), NUMBER 0.377 (n 77)
+    A-12 graded reading of J-A1: s_ID(OPTA) +0.550 [+0.503,+0.593] -> J-A1's own threshold decides (s_ID >= 0.5) (with J-A3 met)
+    NOM competent n=43: accuracy (B) under V_Z +0.000 [+0.000,+0.000]; K_Z +0.558 [+0.375,+0.746]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.000 [+0.000,+0.000] value-source +0.244 [+0.132,+0.403]
+    NOM prior-free n=16: accuracy (B) under V_Z +0.000 [+0.000,+0.000]; K_Z +0.562 [+0.312,+0.846]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.000 [+0.000,+0.000] value-source +0.344 [+0.156,+0.577]
+    NOM cue conflict at the decision token (g1): key-source +0.000 [+0.000,+0.000], value-source +0.535 [+0.388,+0.682]
+    NOM old A6 flips: phi_dec(K_S) +0.000 [+0.000,+0.000], phi_dec(V_S) +0.605 [+0.422,+0.800]; full match K_S +0.000 [+0.000,+0.000], V_S +0.116 [+0.024,+0.250]
+    OPTA competent n=157: accuracy (B) under V_Z +0.777 [+0.685,+0.866]; K_Z +0.930 [+0.872,+0.977]; KV_Z +0.153 [+0.079,+0.237]; cue conflict key-source +0.408 [+0.325,+0.488] value-source +0.379 [+0.307,+0.461]
+    OPTA prior-free n=69: accuracy (B) under V_Z +0.797 [+0.676,+0.909]; K_Z +0.855 [+0.746,+0.945]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.493 [+0.364,+0.615] value-source +0.377 [+0.273,+0.487]
+    OPTA cue conflict at the decision token (g1): key-source +0.519 [+0.434,+0.600], value-source +0.379 [+0.307,+0.461]
+    OPTA old A6 flips: phi_dec(K_S) +0.452 [+0.354,+0.556], phi_dec(V_S) +0.236 [+0.147,+0.333]; full match K_S +0.331 [+0.241,+0.429], V_S +0.236 [+0.147,+0.333]
+    LETA competent n=155: accuracy (B) under V_Z +0.910 [+0.854,+0.964]; K_Z +0.723 [+0.632,+0.808]; KV_Z +0.406 [+0.299,+0.514]; cue conflict key-source +0.629 [+0.538,+0.721] value-source +0.187 [+0.121,+0.263]
+    LETA prior-free n=55: accuracy (B) under V_Z +0.800 [+0.677,+0.921]; K_Z +0.545 [+0.409,+0.696]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.609 [+0.479,+0.729] value-source +0.255 [+0.152,+0.372]
+    LETA cue conflict at the decision token (g1): key-source +0.629 [+0.538,+0.721], value-source +0.187 [+0.121,+0.263]
+    LETA old A6 flips: phi_dec(K_S) +0.516 [+0.413,+0.619], phi_dec(V_S) +0.148 [+0.079,+0.230]; full match K_S +0.516 [+0.413,+0.619], V_S +0.148 [+0.079,+0.230]
+    NOM all valid items n=185: s_ID +0.002 [-0.005,+0.011]; option mass (ID) 0.627
+    OPTA all valid items n=185: s_ID +0.542 [+0.496,+0.585]; option mass (ID) 0.980
+    OPTB all valid items n=185: s_ID -0.025 [-0.035,-0.014]; option mass (ID) 0.981
+    MENA all valid items n=185: s_ID +0.093 [+0.061,+0.125]; option mass (ID) 0.631
+    LETA all valid items n=185: s_ID +0.787 [+0.702,+0.867]; option mass (ID) 1.000
+    MENB all valid items n=185: s_ID -0.016 [-0.030,-0.002]; option mass (ID) 0.671
+    KIVI NOM competent n=43: relative error K 0.193, V 0.414; faithful (S) accuracy none 1.000, K2 0.860, V2 0.953
+    KIVI OPTA competent n=157: relative error K 0.193, V 0.414; faithful (S) accuracy none 0.994, K2 0.987, V2 0.987
+    KIVI LETA competent n=155: relative error K 0.193, V 0.414; faithful (S) accuracy none 1.000, K2 0.974, V2 0.994
+    d_K^cont(NOM) on the J-A8 population -14.255 [-17.455,-11.279] (sign reported; Part D owns the sign account)
+  [qwen7] k*=40, KS=[1, 2, 5, 10, 20, 40, 80], frame ' '; ranking items 60, evaluation items 80, ablation items 185
+    OPTA every ablated item n=185 (option margin of the unablated prompt under each condition): none: faithful(S) 0.816, clean-B chain 0.854, margin m_B +17.47; N: faithful(S) 0.270, clean-B chain 0.616, margin m_B +5.44; T: faithful(S) 0.497, clean-B chain 0.778, margin m_B +7.45; rand0: faithful(S) 0.811, clean-B chain 0.870, margin m_B +16.46; rand1: faithful(S) 0.659, clean-B chain 0.746, margin m_B +12.09; rand2: faithful(S) 0.757, clean-B chain 0.849, margin m_B +16.16; C: faithful(S) 0.281, clean-B chain 0.422, margin m_B +5.54
+    NOM every ablated item n=185 (option margin of the unablated prompt under each condition): none: faithful(S) 0.643, clean-B chain 0.654, margin m_B +20.44; N: faithful(S) 0.330, clean-B chain 0.503, margin m_B +15.28; T: faithful(S) 0.562, clean-B chain 0.665, margin m_B +17.68; rand0: faithful(S) 0.589, clean-B chain 0.551, margin m_B +18.33; rand1: faithful(S) 0.535, clean-B chain 0.589, margin m_B +18.12; rand2: faithful(S) 0.611, clean-B chain 0.573, margin m_B +19.13; C: faithful(S) 0.097, clean-B chain 0.211, margin m_B +6.23
+  [mistral7] k*=52, KS=[1, 2, 5, 10, 20, 52, 104], frame ' '; ranking items 60, evaluation items 80, ablation items 185
+    OPTA every ablated item n=185 (option margin of the unablated prompt under each condition): none: faithful(S) 0.892, clean-B chain 0.957, margin m_B +16.03; N: faithful(S) 0.324, clean-B chain 0.665, margin m_B +3.44; T: faithful(S) 0.411, clean-B chain 0.492, margin m_B +4.25; rand0: faithful(S) 0.897, clean-B chain 0.935, margin m_B +12.73; rand1: faithful(S) 0.908, clean-B chain 0.973, margin m_B +16.90; rand2: faithful(S) 0.870, clean-B chain 0.968, margin m_B +14.78; C: faithful(S) 0.481, clean-B chain 0.535, margin m_B +6.13
+    NOM every ablated item n=185 (option margin of the unablated prompt under each condition): none: faithful(S) 0.281, clean-B chain 0.314, margin m_B +13.53; N: faithful(S) 0.086, clean-B chain 0.124, margin m_B +11.44; T: faithful(S) 0.086, clean-B chain 0.146, margin m_B +7.84; rand0: faithful(S) 0.265, clean-B chain 0.286, margin m_B +12.91; rand1: faithful(S) 0.422, clean-B chain 0.405, margin m_B +13.72; rand2: faithful(S) 0.308, clean-B chain 0.346, margin m_B +13.90; C: faithful(S) 0.022, clean-B chain 0.022, margin m_B +2.96
+
+SUMMARY (G4: per class; all part-A lines are account lines, none is a measurement-validity line; J-A3 derived and not counted; expected = the sum of the recorded priors of the lines with a verdict; Brier = mean (prior - 1[MET])^2 over the same lines; NOT EVALUABLE lines are left out of both and listed)
+  account lines, class L: 1 lines: 1 MET, 0 NOT MET, 0 MET IN PART, 0 NOT EVALUABLE; observed 1 against expected 0.90; Brier 0.010
+  account lines, class M: 5 lines: 3 MET, 0 NOT MET, 0 MET IN PART, 2 NOT EVALUABLE; observed 3 against expected 2.50; Brier 0.028; not evaluable: J-A5B (llama8: J-A-G2 MENA, J-A-G2 MENB; mistral7: J-A-G2 MENA, J-A-G2 MENB) | J-A8 (llama8: J-A-G1 OPTA; mistral7: J-A-G2 NOM)
+  account lines, class R: 14 lines: 3 MET, 6 NOT MET, 0 MET IN PART, 5 NOT EVALUABLE; observed 3 against expected 4.20; Brier 0.217; not evaluable: J-A6d (llama8: J-A-G1 OPTA; mistral7: J-A-G2 NOM) | J-A-HA1 (qwen7: J-A-HA-G1) | J-A-HA2 (qwen7: J-A-HA-G1) | J-A-HA3a (qwen7: J-A-HA-G1) | J-A-HA3b (qwen7: J-A-HA-G1; mistral7: J-A-G2 NOM, prior-free n < 30)
+  met rate among R account lines with a verdict: 3 of 9 (expected 4.20)
+  Holm sensitivity (analysis/stage8_holm.py; reported, no verdict uses it): step-down at one-sided 0.025 over the 43 interval components of the R-class account lines in the models where the line has a verdict; p = Phi(-(est - bound)/se) for '>' and Phi((est - bound)/se) for '<', se the bootstrap standard deviation
+    J-A1b: no component decision changes under Holm; verdict unchanged (MET)
+    J-A5: 1 component decision(s) change under Holm: qwen7: s_ID(MENA) - s_ID(NOM) > 0 (p 0.0099, Holm threshold 0.0031; interval rule rejects, Holm does not reject); verdict unchanged (NOT MET)
+    J-A6a: no component decision changes under Holm; verdict unchanged (NOT MET)
+    J-A6b: no component decision changes under Holm; verdict unchanged (MET)
+    J-A6c: no component decision changes under Holm; verdict unchanged (NOT MET)
+    J-A6d: no component decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-A6e: no component decision changes under Holm; verdict unchanged (MET)
+    J-A7: no component decision changes under Holm; verdict unchanged (NOT MET)
+    J-A7b: no component decision changes under Holm; verdict unchanged (NOT MET)
+    J-A8d: no component decision changes under Holm; verdict unchanged (NOT MET)
+    J-A-HA1: no component decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-A-HA2: no component decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-A-HA3a: no component decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-A-HA3b: no component decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+  overall: 7 MET, 6 NOT MET, 7 NOT EVALUABLE of 20 counted lines; provenance OK; population OK
+
+######## EXPLORATORY (not scored)
+  [llama8] explore parts: ['leak', 'onset_piece', 'quant_extra', 'x_target', 'year']
+    E3 OPTA s_ID by D_in=False: +0.521 (n 112); D_in=True: +0.531 (n 36); type=NUMBER: +0.386 (n 70); type=PERSON: +0.621 (n 67); type=PLACE: +0.637 (n 11); |P|=1: +0.424 (n 78); |P|=2: +0.491 (n 32); |P|=3+: +0.688 (n 38)
+    E3 NOM s_ID by D_in=False: +0.050 (n 65); D_in=True: +0.027 (n 21); type=NUMBER: +0.091 (n 32); type=PERSON: +0.015 (n 46); type=PLACE: +0.018 (n 8); |P|=1: +0.076 (n 40); |P|=2: +0.007 (n 22); |P|=3+: +0.022 (n 24)
+    E1/E2 OPTA (185 items, all valid): d_K = m(K_S) - m(ID) +10.47 nats; fractions K_S@on +0.273, K_S^1 +0.454, K_S^r +0.402
+    E1/E2 NOM (185 items, all valid): d_V = m(V_S) - m(ID) +22.85 nats; fractions V_S@on +1.000, V_S^1 +0.973, V_S^r +0.020
+    E4 YEAR NOM n=80: at the first token where c_S differs from c_B: d_K +1.12, d_V +11.27, d_KV +11.54, I_dec -0.073 (written expectation: about 0, value-only)
+    E4 YEAR OPTA n=80: at the first token where c_S differs from c_B: d_K +7.64, d_V +10.71, d_KV +11.62, I_dec -0.579 (written expectation: about 0, value-only)
+    LEAK NOM competent n=27 of 65: ID_K +0.21, ID_V +13.02, s_ID +0.016
+    LEAK OPTA competent n=32 of 65: ID_K +7.13, ID_V +5.64, s_ID +0.558
+    E5 NOM n=185 (all valid): S-base 3-bit accuracy K3 0.530, V3 0.524; unmodified B-base accuracy none 0.578, K2 0.524, V2 0.557
+    E5 OPTA n=185 (all valid): S-base 3-bit accuracy K3 0.832, V3 0.832; unmodified B-base accuracy none 0.978, K2 0.984, V2 0.973
+    E5 LETA n=185 (all valid): unmodified B-base accuracy none 0.989, K2 0.984, V2 0.989
+    E6 NOM full string (decision token and later) n=86: ID_K -5.44, ID_V +14.13, s_ID^full -0.626
+    E6 OPTA full string (decision token and later) n=148: ID_K +4.46, ID_V +6.31, s_ID^full +0.414
+  [gemma9] explore parts: ['leak', 'onset_piece', 'quant_extra', 'x_target', 'year']
+    E3 OPTA s_ID by D_in=False: +0.627 (n 121); D_in=True: +0.626 (n 37); type=NUMBER: +0.611 (n 70); type=PERSON: +0.635 (n 78); type=PLACE: +0.667 (n 10); |P|=1: +0.590 (n 15); |P|=2: +0.611 (n 86); |P|=3+: +0.661 (n 57)
+    E3 NOM s_ID by D_in=False: -0.003 (n 81); D_in=True: -0.003 (n 28); type=NUMBER: +0.004 (n 33); type=PERSON: -0.006 (n 63); type=PLACE: -0.005 (n 13); |P|=1: -0.004 (n 16); |P|=2: -0.001 (n 56); |P|=3+: -0.007 (n 37)
+    E1/E2 OPTA (185 items, all valid): d_K = m(K_S) - m(ID) +13.59 nats; fractions K_S@on +0.116, K_S^1 +0.173, K_S^r +0.552
+    E1/E2 NOM (185 items, all valid): d_V = m(V_S) - m(ID) +29.02 nats; fractions V_S@on +0.991, V_S^1 +0.798, V_S^r +0.187
+    E4 YEAR NOM n=80: at the first token where c_S differs from c_B: d_K -0.12, d_V +15.61, d_KV +15.61, I_dec +0.008 (written expectation: about 0, value-only)
+    E4 YEAR OPTA n=80: at the first token where c_S differs from c_B: d_K +10.47, d_V +8.29, d_KV +13.01, I_dec -0.442 (written expectation: about 0, value-only)
+    LEAK NOM competent n=41 of 65: ID_K +0.03, ID_V +17.95, s_ID +0.002
+    LEAK OPTA competent n=45 of 65: ID_K +9.59, ID_V +5.48, s_ID +0.636
+    E5 NOM n=185 (all valid): S-base 3-bit accuracy K3 0.649, V3 0.670; unmodified B-base accuracy none 0.654, K2 0.665, V2 0.670
+    E5 OPTA n=185 (all valid): S-base 3-bit accuracy K3 0.892, V3 0.892; unmodified B-base accuracy none 0.978, K2 0.973, V2 0.978
+    E5 LETA n=185 (all valid): unmodified B-base accuracy none 0.978, K2 0.973, V2 0.984
+    E6 NOM full string (decision token and later) n=109: ID_K -7.66, ID_V +23.55, s_ID^full -0.482
+    E6 OPTA full string (decision token and later) n=158: ID_K +9.07, ID_V +5.90, s_ID^full +0.606
+  [qwen7] explore parts: ['leak', 'onset_piece', 'quant_extra', 'x_target', 'year']
+    E3 OPTA s_ID by D_in=False: +0.675 (n 124); D_in=True: +0.686 (n 38); type=NUMBER: +0.581 (n 70); type=PERSON: +0.763 (n 76); type=PLACE: +0.738 (n 16); |P|=1: +0.629 (n 21); |P|=2: +0.648 (n 78); |P|=3+: +0.726 (n 63)
+    E3 NOM s_ID by D_in=False: +0.017 (n 76); D_in=True: +0.006 (n 28); type=NUMBER: +0.001 (n 34); type=PERSON: +0.022 (n 54); type=PLACE: +0.023 (n 16); |P|=1: +0.016 (n 20); |P|=2: +0.008 (n 44); |P|=3+: +0.020 (n 40)
+    E1/E2 OPTA (185 items, all valid): d_K = m(K_S) - m(ID) +26.00 nats; fractions K_S@on +0.516, K_S^1 +0.185, K_S^r +0.502
+    E1/E2 NOM (185 items, all valid): d_V = m(V_S) - m(ID) +42.91 nats; fractions V_S@on +0.987, V_S^1 +0.810, V_S^r +0.159
+    E4 YEAR NOM n=80: at the first token where c_S differs from c_B: d_K -0.44, d_V +30.34, d_KV +30.33, I_dec +0.014 (written expectation: about 0, value-only)
+    E4 YEAR OPTA n=80: at the first token where c_S differs from c_B: d_K +21.97, d_V +16.42, d_KV +25.13, I_dec -0.528 (written expectation: about 0, value-only)
+    LEAK NOM competent n=45 of 65: ID_K +0.48, ID_V +19.39, s_ID +0.024
+    LEAK OPTA competent n=52 of 65: ID_K +17.18, ID_V +4.86, s_ID +0.780
+    E5 NOM n=185 (all valid): S-base 3-bit accuracy K3 0.595, V3 0.600; unmodified B-base accuracy none 0.627, K2 0.551, V2 0.627
+    E5 OPTA n=185 (all valid): S-base 3-bit accuracy K3 0.886, V3 0.903; unmodified B-base accuracy none 0.984, K2 0.989, V2 0.978
+    E5 LETA n=185 (all valid): unmodified B-base accuracy none 0.973, K2 0.978, V2 0.968
+    E6 NOM full string (decision token and later) n=104: ID_K -6.33, ID_V +24.75, s_ID^full -0.344
+    E6 OPTA full string (decision token and later) n=162: ID_K +15.18, ID_V +7.39, s_ID^full +0.673
+  [mistral7] explore parts: ['leak', 'onset_piece', 'quant_extra', 'x_target', 'year']
+    E3 OPTA s_ID by D_in=False: +0.564 (n 119); D_in=True: +0.505 (n 38); type=NUMBER: +0.524 (n 72); type=PERSON: +0.563 (n 69); type=PLACE: +0.611 (n 16); |P|=1: +0.466 (n 21); |P|=2: +0.529 (n 59); |P|=3+: +0.587 (n 77)
+    E3 NOM s_ID by D_in=False: +0.002 (n 29); D_in=True: -0.001 (n 14); type=NUMBER: +0.012 (n 4); type=PERSON: +0.000 (n 37); type=PLACE: -0.005 (n 2); |P|=1: +0.013 (n 1); |P|=2: +0.003 (n 16); |P|=3+: -0.001 (n 26)
+    E1/E2 OPTA (185 items, all valid): d_K = m(K_S) - m(ID) +14.77 nats; fractions K_S@on +0.014, K_S^1 +0.102, K_S^r +0.594
+    E1/E2 NOM (185 items, all valid): d_V = m(V_S) - m(ID) +26.59 nats; fractions V_S@on +0.996, V_S^1 +0.752, V_S^r +0.199
+    E4 YEAR NOM n=80: at the first token where c_S differs from c_B: d_K +0.01, d_V +19.36, d_KV +19.06, I_dec -0.016 (written expectation: about 0, value-only)
+    E4 YEAR OPTA n=80: at the first token where c_S differs from c_B: d_K +12.42, d_V +11.94, d_KV +17.17, I_dec -0.419 (written expectation: about 0, value-only)
+    LEAK NOM competent n=27 of 65: ID_K +0.24, ID_V +15.34, s_ID +0.016
+    LEAK OPTA competent n=39 of 65: ID_K +7.92, ID_V +6.86, s_ID +0.536
+    E5 NOM n=185 (all valid): S-base 3-bit accuracy K3 0.292, V3 0.276; unmodified B-base accuracy none 0.297, K2 0.286, V2 0.292
+    E5 OPTA n=185 (all valid): S-base 3-bit accuracy K3 0.886, V3 0.892; unmodified B-base accuracy none 0.957, K2 0.951, V2 0.968
+    E5 LETA n=185 (all valid): unmodified B-base accuracy none 0.973, K2 0.968, V2 0.962
+    E6 NOM full string (decision token and later) n=43: ID_K -12.27, ID_V +22.35, s_ID^full -1.218
+    E6 OPTA full string (decision token and later) n=157: ID_K +4.57, ID_V +8.13, s_ID^full +0.360
+  heads [qwen7]
+    curves N: R 1:+0.00 2:+0.00 5:+0.07 10:+0.44 20:+0.72 40:+0.84 80:+0.90 | KO 1:+0.17 2:+0.17 5:+0.71 10:+0.92 20:+0.99 40:+0.98 80:+0.98
+    curves T: R 1:+0.00 2:+0.00 5:+0.01 10:+0.25 20:+0.48 40:+0.69 80:+0.78 | KO 1:+0.17 2:+0.17 5:+0.48 10:+0.85 20:+0.93 40:+0.97 80:+0.97
+    curves rand0: R 1:+0.01 2:-0.00 5:+0.00 10:+0.01 20:-0.00 40:+0.00 80:+0.01 | KO 1:-0.00 2:-0.00 5:+0.00 10:-0.00 20:+0.01 40:+0.01 80:+0.06
+    layer profile (m with one layer's heads seeing K_S in G, minus none): top layers 15:+2.15, 14:+0.62, 4:+0.18, 20:+0.14, 17:+0.13
+    N* layers: [0, 2, 3, 4, 5, 8, 11, 12, 14, 15, 16, 17, 19, 21, 22, 23, 26]; C* (DLA copy set) overlap with N*: 6
+    C* double dissociation OPTA (every ablated item, n=185): faithful accuracy none 0.816, C* 0.281
+    C* double dissociation NOM (every ablated item, n=185): faithful accuracy none 0.643, C* 0.097
+    ID_K / ID_V with N* ablated at Q+ (OPTA, n=80): none +13.63 / +5.10; N* -0.25 / +4.37 (rho_K -0.018, ID_V change -0.73)
+  heads [mistral7]
+    curves N: R 1:+0.06 2:+0.07 5:+0.28 10:+0.65 20:+0.89 52:+0.94 104:+0.97 | KO 1:+0.61 2:+0.65 5:+0.90 10:+1.00 20:+1.01 52:+1.00 104:+1.01
+    curves T: R 1:+0.06 2:+0.09 5:+0.34 10:+0.46 20:+0.58 52:+0.55 104:+0.61 | KO 1:+0.61 2:+0.77 5:+0.88 10:+0.96 20:+0.98 52:+0.99 104:+0.99
+    curves rand0: R 1:+0.00 2:+0.00 5:+0.00 10:+0.00 20:+0.00 52:-0.00 104:-0.00 | KO 1:-0.00 2:-0.00 5:-0.00 10:-0.00 20:-0.00 52:+0.02 104:+0.02
+    layer profile (m with one layer's heads seeing K_S in G, minus none): top layers 7:+1.24, 12:+0.08, 18:+0.04, 15:+0.02, 3:+0.02
+    N* layers: [1, 2, 6, 7, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 22, 26, 28, 29, 30, 31]; C* (DLA copy set) overlap with N*: 15
+    C* double dissociation OPTA (every ablated item, n=185): faithful accuracy none 0.892, C* 0.481
+    C* double dissociation NOM (every ablated item, n=185): faithful accuracy none 0.281, C* 0.022
+    ID_K / ID_V with N* ablated at Q+ (OPTA, n=80): none +8.91 / +7.68; N* -0.61 / +3.01 (rho_K -0.068, ID_V change -4.67)
+  s_ID(OPTA) per model: llama8 +0.524, gemma9 +0.627, qwen7 +0.677, mistral7 +0.550; unweighted mean +0.595

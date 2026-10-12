@@ -1,0 +1,576 @@
+==== 2026-10-12T13:13:32Z python -m pytest tests/test_natural_clamp.py tests/test_kvquant.py tests/test_natural_heads.py tests/test_stage8a_score.py tests/test_generate.py tests/test_clamp.py tests/test_head_splice.py tests/test_stage8_populations.py tests/test_stage8_holm.py -v -rA -p no:cacheprovider
+========================================================================= test session starts =========================================================================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /venv/main/bin/python
+rootdir: /workspace/Causal-keys/Causal-keys
+plugins: anyio-4.15.1
+collecting ... collected 67 items
+
+tests/test_natural_clamp.py::test_kv_s_row_is_the_s_run_and_id_is_clean_b[NOM-57268739708984140094c8f0] PASSED                                                  [  1%]
+tests/test_natural_clamp.py::test_kv_s_row_is_the_s_run_and_id_is_clean_b[NOM-56f88025aef2371900626121] PASSED                                                  [  2%]
+tests/test_natural_clamp.py::test_kv_s_row_is_the_s_run_and_id_is_clean_b[OPTA-57268739708984140094c8f0] PASSED                                                 [  4%]
+tests/test_natural_clamp.py::test_kv_s_row_is_the_s_run_and_id_is_clean_b[OPTA-56f88025aef2371900626121] PASSED                                                 [  5%]
+tests/test_natural_clamp.py::test_kv_s_row_is_the_s_run_and_id_is_clean_b[LETA-57268739708984140094c8f0] PASSED                                                 [  7%]
+tests/test_natural_clamp.py::test_kv_s_row_is_the_s_run_and_id_is_clean_b[LETA-56f88025aef2371900626121] PASSED                                                 [  8%]
+tests/test_natural_clamp.py::test_batched_rows_equal_single_rows PASSED                                                                                         [ 10%]
+tests/test_natural_clamp.py::test_cue_conflict_z_and_explore_rows_equal_hand_built_clamps PASSED                                                                [ 11%]
+tests/test_natural_clamp.py::test_generation_under_kv_s_is_greedy_on_the_s_prompt[NOM] PASSED                                                                   [ 13%]
+tests/test_natural_clamp.py::test_generation_under_kv_s_is_greedy_on_the_s_prompt[LETA] PASSED                                                                  [ 14%]
+tests/test_natural_clamp.py::test_answer_ends_at_a_special_token_missing_from_the_eos_list PASSED                                                               [ 16%]
+tests/test_natural_clamp.py::test_passage_positions_and_frames PASSED                                                                                           [ 17%]
+tests/test_natural_clamp.py::test_early_stop_never_changes_the_answer_class PASSED                                                                              [ 19%]
+tests/test_natural_clamp.py::test_frame_cont_is_cont_ids_on_every_item_and_parsing PASSED                                                                       [ 20%]
+tests/test_kvquant.py::test_quantizer_equals_reference PASSED                                                                                                   [ 22%]
+tests/test_kvquant.py::test_hooked_run_equals_layerwise_reference[k] PASSED                                                                                     [ 23%]
+tests/test_kvquant.py::test_hooked_run_equals_layerwise_reference[v] PASSED                                                                                     [ 25%]
+tests/test_kvquant.py::test_mixed_batch_equals_single_rows_and_decoding PASSED                                                                                  [ 26%]
+tests/test_natural_heads.py::test_span_splice_all_none_and_rows_G PASSED                                                                                        [ 28%]
+tests/test_natural_heads.py::test_batch_size_equal_to_span_length PASSED                                                                                        [ 29%]
+tests/test_natural_heads.py::test_region_ablation_with_own_outputs_is_clean_and_fixed_means_match_a_hook PASSED                                                 [ 31%]
+tests/test_natural_heads.py::test_argmax_chain_is_greedy_and_qplus PASSED                                                                                       [ 32%]
+tests/test_natural_heads.py::test_a3_self_clamp_is_zero_and_dla_slices PASSED                                                                                   [ 34%]
+tests/test_stage8a_score.py::test_bootstrap_is_two_stage_and_reproducible PASSED                                                                                [ 35%]
+tests/test_stage8a_score.py::test_combination_rules_and_holm PASSED                                                                                             [ 37%]
+tests/test_stage8a_score.py::test_classes_follow_the_recorded_priors PASSED                                                                                     [ 38%]
+tests/test_stage8a_score.py::test_every_line_met_on_data_built_to_meet_it PASSED                                                                                [ 40%]
+tests/test_stage8a_score.py::test_not_met_and_not_evaluable_paths PASSED                                                                                        [ 41%]
+tests/test_stage8a_score.py::test_a8_and_hybrid_values PASSED                                                                                                   [ 43%]
+tests/test_stage8a_score.py::test_head_lines PASSED                                                                                                             [ 44%]
+tests/test_stage8a_score.py::test_heads_ratios_use_each_sets_own_batch PASSED                                                                                   [ 46%]
+tests/test_stage8a_score.py::test_heads_population_takes_the_first_valid_items PASSED                                                                           [ 47%]
+tests/test_stage8a_score.py::test_pytest_gate_parser PASSED                                                                                                     [ 49%]
+tests/test_stage8a_score.py::test_pytest_step_runs_the_gates_and_the_shared_tests PASSED                                                                        [ 50%]
+tests/test_stage8a_score.py::test_full_report PASSED                                                                                                            [ 52%]
+tests/test_stage8a_score.py::test_holm_family_is_the_r_lines_interval_components PASSED                                                                         [ 53%]
+tests/test_stage8a_score.py::test_compute_estimate_agrees_with_the_runbook PASSED                                                                               [ 55%]
+tests/test_stage8a_score.py::test_runbook_stage8_names_what_the_code_does PASSED                                                                                [ 56%]
+tests/test_generate.py::test_greedy_with_cache_equals_stepwise_reference_under_clamps PASSED                                                                    [ 58%]
+tests/test_generate.py::test_greedy_cache_equals_reference_tiny[<lambda>0] PASSED                                                                               [ 59%]
+tests/test_generate.py::test_greedy_cache_equals_reference_tiny[<lambda>1] PASSED                                                                               [ 61%]
+tests/test_generate.py::test_parse_and_frames PASSED                                                                                                            [ 62%]
+tests/test_generate.py::test_end_of_turn_tokens_end_an_answer PASSED                                                                                            [ 64%]
+tests/test_clamp.py::test_kv_sites PASSED                                                                                                                       [ 65%]
+tests/test_clamp.py::test_gpt2_clamp_exact PASSED                                                                                                               [ 67%]
+tests/test_clamp.py::test_qwen_clamp_matches_single_position_hooks PASSED                                                                                       [ 68%]
+tests/test_clamp.py::test_format_factorial_regression PASSED                                                                                                    [ 70%]
+tests/test_clamp.py::test_row_restricted_regression PASSED                                                                                                      [ 71%]
+tests/test_head_splice.py::test_headsplice_all_heads_is_full_clamp_and_empty_is_clean PASSED                                                                    [ 73%]
+tests/test_head_splice.py::test_headsplice_rows_G_and_group_slices_equal_rowsplice PASSED                                                                       [ 74%]
+tests/test_head_splice.py::test_headsplice_batched_grid_equals_single_runs PASSED                                                                               [ 76%]
+tests/test_head_splice.py::test_self_ablation_is_clean PASSED                                                                                                   [ 77%]
+tests/test_head_splice.py::test_hopsplice_all_rows_is_plain_clamp PASSED                                                                                        [ 79%]
+tests/test_head_splice.py::test_hopsplice_no_overwrite_and_answer_only_cache PASSED                                                                             [ 80%]
+tests/test_head_splice.py::test_hop_batch_equals_single_rows PASSED                                                                                             [ 82%]
+tests/test_stage8_populations.py::test_every_part_computes_U_identically PASSED                                                                                 [ 83%]
+tests/test_stage8_populations.py::test_populations_have_the_expected_sizes PASSED                                                                               [ 85%]
+tests/test_stage8_populations.py::test_fresh_populations_disjoint_from_U_and_from_each_other PASSED                                                             [ 86%]
+tests/test_stage8_populations.py::test_labelled_reuses PASSED                                                                                                   [ 88%]
+tests/test_stage8_populations.py::test_no_confirmatory_population_uses_a_pilot_seed PASSED                                                                      [ 89%]
+tests/test_stage8_holm.py::test_phi_and_p_values PASSED                                                                                                         [ 91%]
+tests/test_stage8_holm.py::test_degenerate_and_undefined PASSED                                                                                                 [ 92%]
+tests/test_stage8_holm.py::test_holm_hand_worked PASSED                                                                                                         [ 94%]
+tests/test_stage8_holm.py::test_directions_mixed_and_passthrough PASSED                                                                                         [ 95%]
+tests/test_stage8_holm.py::test_ties_keep_input_order PASSED                                                                                                    [ 97%]
+tests/test_stage8_holm.py::test_adjusted_p_against_brute_force PASSED                                                                                           [ 98%]
+tests/test_stage8_holm.py::test_single_component_equals_the_unadjusted_test PASSED                                                                              [100%]
+
+=============================================================================== PASSES ================================================================================
+__________________________________________________________________________ test_full_report ___________________________________________________________________________
+------------------------------------------------------------------------ Captured stdout call -------------------------------------------------------------------------
+Stage 8 part A scoring, preregistration P-2026-10-10-J part A; results /tmp/pytest-of-root/pytest-1/test_full_report0
+TEST MODE: the size floors are waived and the verdict lines below are plumbing checks, not results
+
+PROVENANCE (the pipeline's COMMIT.txt, ENV.txt, REVISIONS.txt, SKIPPED.txt, every line; every results file)
+  COMMIT.txt: absent
+  ENV.txt: absent
+  REVISIONS.txt: absent
+  SKIPPED.txt: absent
+  FETCH_FAILED.txt: absent
+  preflight.json: absent
+  factorial/TEST_gemma9.json: commit None, model None (key gemma9), revision None, dtype -, attn -, device -, transformers None, torch None, frame ' ', wrapper None, test_mode None
+  factorial/TEST_llama8.json: commit None, model None (key llama8), revision None, dtype -, attn -, device -, transformers None, torch None, frame ' ', wrapper None, test_mode None
+  factorial/TEST_mistral7.json: commit None, model None (key mistral7), revision None, dtype -, attn -, device -, transformers None, torch None, frame ' ', wrapper None, test_mode None
+  factorial/TEST_qwen7.json: commit None, model None (key qwen7), revision None, dtype -, attn -, device -, transformers None, torch None, frame ' ', wrapper None, test_mode None
+  heads/TEST_qwen7.json: commit None, model None (key None), revision None, dtype -, attn -, device -, transformers None, torch None, frame None, wrapper None, test_mode None  MISMATCH: head sets changed after hashing
+  commits: ['None']
+
+POPULATION (TEST: sizes not checked; E items of data/stage8a_items.json valid for each model's tokenizer and frame, the same items in every format; heads: the first min(60, n) of the n valid R items and the first min(80, n) of the n valid E items, valid in NOM and OPTA under the model's frame, n from provenance n_valid)
+  gemma9: 100 valid E items, 0 skipped (); formats ['LETA', 'MENA', 'MENB', 'NOM', 'OPTA', 'OPTB']; same items in every format OK; all from E MISMATCH; valid + skipped = |E| OK; population sha256 OK
+  llama8: 100 valid E items, 0 skipped (); formats ['LETA', 'MENA', 'MENB', 'NOM', 'OPTA', 'OPTB']; same items in every format OK; all from E MISMATCH; valid + skipped = |E| OK; population sha256 OK
+  mistral7: 100 valid E items, 0 skipped (); formats ['LETA', 'MENA', 'MENB', 'NOM', 'OPTA', 'OPTB']; same items in every format OK; all from E MISMATCH; valid + skipped = |E| OK; population sha256 OK
+  qwen7: 100 valid E items, 0 skipped (); formats ['LETA', 'MENA', 'MENB', 'NOM', 'OPTA', 'OPTB']; same items in every format OK; all from E MISMATCH; valid + skipped = |E| OK; population sha256 OK
+  heads qwen7: ranking items 0 (R, in rank order: OK), evaluation items 80 (expected 60 and 80; no n_valid record), ablation items OPTA 100 NOM 100  MISMATCH
+  population: MISMATCH
+
+GATES (J-A-G0 and J-A-HA-G0 before any model; J-A-G1 BF16 floor, J-A-G2 competence, J-A-G3 emitted form per model and format; J-A-G4 per line and cell, printed with the line; J-A-HA-G1 floor, J-A-HA-G2 option rows are the readers)
+  J-A-G0  FP32 exactness (tests/test_natural_clamp.py, tests/test_kvquant.py): no pytest log in the results -> NOT EVALUABLE (not run)
+  J-A-HA-G0  FP32 exactness (tests/test_natural_heads.py): no pytest log in the results -> NOT EVALUABLE (not run)
+  (TEST: no pytest log; J-A-G0 and J-A-HA-G0 treated as passed for the plumbing check)
+  llama8   NOM  J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  llama8   NOM  J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  llama8   NOM  J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  llama8   OPTA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  llama8   OPTA J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  llama8   OPTA J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  llama8   OPTB J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  llama8   OPTB J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  llama8   OPTB J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  llama8   MENA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  llama8   MENA J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  llama8   MENA J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  llama8   LETA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  llama8   LETA J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  llama8   LETA J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  llama8   MENB J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  llama8   MENB J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  llama8   MENB J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  gemma9   NOM  J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  gemma9   NOM  J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  gemma9   NOM  J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  gemma9   OPTA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  gemma9   OPTA J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  gemma9   OPTA J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  gemma9   OPTB J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  gemma9   OPTB J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  gemma9   OPTB J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  gemma9   MENA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  gemma9   MENA J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  gemma9   MENA J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  gemma9   LETA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  gemma9   LETA J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  gemma9   LETA J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  gemma9   MENB J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  gemma9   MENB J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  gemma9   MENB J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  qwen7    NOM  J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  qwen7    NOM  J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  qwen7    NOM  J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  qwen7    OPTA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  qwen7    OPTA J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  qwen7    OPTA J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  qwen7    OPTB J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  qwen7    OPTB J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  qwen7    OPTB J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  qwen7    MENA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  qwen7    MENA J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  qwen7    MENA J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  qwen7    LETA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  qwen7    LETA J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  qwen7    LETA J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  qwen7    MENB J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  qwen7    MENB J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  qwen7    MENB J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  mistral7 NOM  J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  mistral7 NOM  J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  mistral7 NOM  J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  mistral7 OPTA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  mistral7 OPTA J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  mistral7 OPTA J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  mistral7 OPTB J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  mistral7 OPTB J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  mistral7 OPTB J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  mistral7 MENA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  mistral7 MENA J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  mistral7 MENA J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  mistral7 LETA J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  mistral7 LETA J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  mistral7 LETA J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  mistral7 MENB J-A-G1 mean max|lp(KV_S) - lp(S run)| 0.000, mean max|lp(ID) - lp(B run)| 0.000 (<= 0.3); g(KV_S) = g(S run) in 1.000 (>= 0.97) of 100 items -> MET
+  mistral7 MENB J-A-G2 n_comp 100 (>= 80, waived under TEST) -> MET
+  mistral7 MENB J-A-G3 median p(dec_B | ID) 0.951 (>= 0.5); g1 = dec in ID 1.000, KV_S 1.000, KV_X 1.000 (>= 0.95) -> MET
+  qwen7    J-A-HA-G1 mean |m(none) - m(clean)| 0.000, mean |m(all_T) - m(full clamp)| 0.000 (<= max(0.5, 0.02 x d_full) = 0.500) -> MET
+  qwen7    J-A-HA-G2 d_full +9.928 [+9.685,+10.172] (>= 3 nats); d_G/d_full +0.900 [+0.900,+0.900] (>= 0.6); n=80 -> MET
+
+PREDICTIONS (code [class, recorded prior P(met)] title -> verdict; then per model: numbers, bounds, verdict)
+  J-A1      [M, prior 0.80] a key read with later options on natural passages (OPTA) -> MET (4 of 4 evaluable models met; 4 run)
+      llama8: n=100 (20 articles): s_ID +0.751 [+0.739,+0.762]; ID_K +5.989 [+5.848,+6.130]; ID_V +1.991 [+1.874,+2.109]; J-A-G4 mean ID_K + ID_V 7.98 >= 2.0: yes -> MET
+          s_ID >= 0.5 (point): yes; H0 s_ID <= 0.35 rejected (lower bound +0.739 > 0.35): yes; H0 ID_K <= 0 rejected (lower bound +5.848 > 0): yes
+      gemma9: n=100 (20 articles): s_ID +0.747 [+0.733,+0.761]; ID_K +5.992 [+5.870,+6.110]; ID_V +2.032 [+1.883,+2.181]; J-A-G4 mean ID_K + ID_V 8.02 >= 2.0: yes -> MET
+          s_ID >= 0.5 (point): yes; H0 s_ID <= 0.35 rejected (lower bound +0.733 > 0.35): yes; H0 ID_K <= 0 rejected (lower bound +5.870 > 0): yes
+      qwen7: n=100 (20 articles): s_ID +0.750 [+0.737,+0.762]; ID_K +6.059 [+5.923,+6.200]; ID_V +2.024 [+1.905,+2.145]; J-A-G4 mean ID_K + ID_V 8.08 >= 2.0: yes -> MET
+          s_ID >= 0.5 (point): yes; H0 s_ID <= 0.35 rejected (lower bound +0.737 > 0.35): yes; H0 ID_K <= 0 rejected (lower bound +5.923 > 0): yes
+      mistral7: n=100 (20 articles): s_ID +0.758 [+0.746,+0.771]; ID_K +6.001 [+5.877,+6.122]; ID_V +1.913 [+1.783,+2.046]; J-A-G4 mean ID_K + ID_V 7.91 >= 2.0: yes -> MET
+          s_ID >= 0.5 (point): yes; H0 s_ID <= 0.35 rejected (lower bound +0.746 > 0.35): yes; H0 ID_K <= 0 rejected (lower bound +5.877 > 0): yes
+  J-A1b     [R, prior 0.55] the key read on spans of >= 3 tokens (OPTA) -> MET (4 of 4 evaluable models met; 4 run)
+      llama8: |P| >= 3: n=100 (20 articles): s_ID +0.751 [+0.739,+0.762]; ID_K +5.989 [+5.848,+6.130]; ID_V +1.991 [+1.874,+2.109]; J-A-G4 mean ID_K + ID_V 7.98 >= 2.0: yes -> MET
+          s_ID >= 0.4 (point): yes; H0 s_ID <= 0.25 rejected (lower bound +0.739 > 0.25): yes
+      gemma9: |P| >= 3: n=100 (20 articles): s_ID +0.747 [+0.733,+0.761]; ID_K +5.992 [+5.870,+6.110]; ID_V +2.032 [+1.883,+2.181]; J-A-G4 mean ID_K + ID_V 8.02 >= 2.0: yes -> MET
+          s_ID >= 0.4 (point): yes; H0 s_ID <= 0.25 rejected (lower bound +0.733 > 0.25): yes
+      qwen7: |P| >= 3: n=100 (20 articles): s_ID +0.750 [+0.737,+0.762]; ID_K +6.059 [+5.923,+6.200]; ID_V +2.024 [+1.905,+2.145]; J-A-G4 mean ID_K + ID_V 8.08 >= 2.0: yes -> MET
+          s_ID >= 0.4 (point): yes; H0 s_ID <= 0.25 rejected (lower bound +0.737 > 0.25): yes
+      mistral7: |P| >= 3: n=100 (20 articles): s_ID +0.758 [+0.746,+0.771]; ID_K +6.001 [+5.877,+6.122]; ID_V +1.913 [+1.783,+2.046]; J-A-G4 mean ID_K + ID_V 7.91 >= 2.0: yes -> MET
+          s_ID >= 0.4 (point): yes; H0 s_ID <= 0.25 rejected (lower bound +0.746 > 0.25): yes
+  J-A1c     [M, prior 0.85] the key read with lettered options (LETA) -> MET (4 of 4 evaluable models met; 4 run)
+      llama8: n=100 (20 articles): s_ID +0.941 [+0.928,+0.954]; ID_K +7.986 [+7.845,+8.123]; ID_V +0.502 [+0.385,+0.617]; J-A-G4 mean ID_K + ID_V 8.49 >= 2.0: yes -> MET
+          s_ID >= 0.5 (point): yes; H0 s_ID <= 0.35 rejected (lower bound +0.928 > 0.35): yes
+      gemma9: n=100 (20 articles): s_ID +0.946 [+0.934,+0.958]; ID_K +8.084 [+7.965,+8.206]; ID_V +0.465 [+0.355,+0.569]; J-A-G4 mean ID_K + ID_V 8.55 >= 2.0: yes -> MET
+          s_ID >= 0.5 (point): yes; H0 s_ID <= 0.35 rejected (lower bound +0.934 > 0.35): yes
+      qwen7: n=100 (20 articles): s_ID +0.940 [+0.925,+0.955]; ID_K +8.030 [+7.896,+8.169]; ID_V +0.514 [+0.379,+0.651]; J-A-G4 mean ID_K + ID_V 8.54 >= 2.0: yes -> MET
+          s_ID >= 0.5 (point): yes; H0 s_ID <= 0.35 rejected (lower bound +0.925 > 0.35): yes
+      mistral7: n=100 (20 articles): s_ID +0.943 [+0.928,+0.957]; ID_K +7.921 [+7.809,+8.034]; ID_V +0.481 [+0.353,+0.613]; J-A-G4 mean ID_K + ID_V 8.40 >= 2.0: yes -> MET
+          s_ID >= 0.5 (point): yes; H0 s_ID <= 0.35 rejected (lower bound +0.928 > 0.35): yes
+  J-A2      [M, prior 0.85] a value copy without a later mention (NOM) -> MET (4 of 4 evaluable models met; 4 run)
+      llama8: n=100 (20 articles): s_ID +0.065 [+0.059,+0.072]; ID_K +0.627 [+0.562,+0.693]; ID_V +8.977 [+8.913,+9.044]; J-A-G4 mean ID_K + ID_V 9.60 >= 2.0: yes -> MET
+          s_ID <= 0.2 (point): yes; H0 s_ID >= 0.3 rejected (upper bound +0.072 < 0.3): yes; H0 ID_V <= 0 rejected (lower bound +8.913 > 0): yes
+      gemma9: n=100 (20 articles): s_ID +0.064 [+0.059,+0.070]; ID_K +0.619 [+0.560,+0.677]; ID_V +9.007 [+8.946,+9.067]; J-A-G4 mean ID_K + ID_V 9.63 >= 2.0: yes -> MET
+          s_ID <= 0.2 (point): yes; H0 s_ID >= 0.3 rejected (upper bound +0.070 < 0.3): yes; H0 ID_V <= 0 rejected (lower bound +8.946 > 0): yes
+      qwen7: n=100 (20 articles): s_ID +0.064 [+0.057,+0.071]; ID_K +0.614 [+0.544,+0.685]; ID_V +8.976 [+8.912,+9.040]; J-A-G4 mean ID_K + ID_V 9.59 >= 2.0: yes -> MET
+          s_ID <= 0.2 (point): yes; H0 s_ID >= 0.3 rejected (upper bound +0.071 < 0.3): yes; H0 ID_V <= 0 rejected (lower bound +8.912 > 0): yes
+      mistral7: n=100 (20 articles): s_ID +0.063 [+0.057,+0.070]; ID_K +0.610 [+0.549,+0.673]; ID_V +9.015 [+8.957,+9.078]; J-A-G4 mean ID_K + ID_V 9.63 >= 2.0: yes -> MET
+          s_ID <= 0.2 (point): yes; H0 s_ID >= 0.3 rejected (upper bound +0.070 < 0.3): yes; H0 ID_V <= 0 rejected (lower bound +8.957 > 0): yes
+  J-A3      [D, prior 0.70] crossover OPTA - NOM (derived from J-A1 and J-A2; not counted) -> MET (derived; not counted) (4 of 4 evaluable models met; 4 run)
+      llama8: n=100: s_ID(OPTA) - s_ID(NOM) +0.685 [+0.672,+0.699] -> MET
+          s_ID(OPTA) - s_ID(NOM) >= 0.4 (point): yes; H0 s_ID(OPTA) - s_ID(NOM) <= 0 rejected (lower bound +0.672 > 0): yes
+      gemma9: n=100: s_ID(OPTA) - s_ID(NOM) +0.683 [+0.668,+0.697] -> MET
+          s_ID(OPTA) - s_ID(NOM) >= 0.4 (point): yes; H0 s_ID(OPTA) - s_ID(NOM) <= 0 rejected (lower bound +0.668 > 0): yes
+      qwen7: n=100: s_ID(OPTA) - s_ID(NOM) +0.686 [+0.673,+0.698] -> MET
+          s_ID(OPTA) - s_ID(NOM) >= 0.4 (point): yes; H0 s_ID(OPTA) - s_ID(NOM) <= 0 rejected (lower bound +0.673 > 0): yes
+      mistral7: n=100: s_ID(OPTA) - s_ID(NOM) +0.695 [+0.682,+0.708] -> MET
+          s_ID(OPTA) - s_ID(NOM) >= 0.4 (point): yes; H0 s_ID(OPTA) - s_ID(NOM) <= 0 rejected (lower bound +0.682 > 0): yes
+  J-A4      [L, prior 0.90] position: options before the passage give no key read (OPTB) -> MET (4 of 4 evaluable models met; 4 run)
+      llama8: n=100: ratio +0.022 [+0.000,+0.043]; ID_K(OPTA) - ID_K(OPTB) +5.858 [+5.665,+6.045]; ID_K(OPTB) +0.131 [+0.001,+0.258] -> MET
+          ID_K(OPTB) / ID_K(OPTA) <= 0.15 (point): yes; H0 ID_K(OPTB)/ID_K(OPTA) >= 0.25 rejected (upper bound +0.043 < 0.25): yes; H0 ID_K(OPTA) - ID_K(OPTB) <= 0 rejected (lower bound +5.665 > 0): yes
+      gemma9: n=100: ratio +0.023 [+0.003,+0.044]; ID_K(OPTA) - ID_K(OPTB) +5.852 [+5.683,+6.015]; ID_K(OPTB) +0.140 [+0.021,+0.262] -> MET
+          ID_K(OPTB) / ID_K(OPTA) <= 0.15 (point): yes; H0 ID_K(OPTB)/ID_K(OPTA) >= 0.25 rejected (upper bound +0.044 < 0.25): yes; H0 ID_K(OPTA) - ID_K(OPTB) <= 0 rejected (lower bound +5.683 > 0): yes
+      qwen7: n=100: ratio +0.005 [-0.015,+0.026]; ID_K(OPTA) - ID_K(OPTB) +6.027 [+5.842,+6.208]; ID_K(OPTB) +0.032 [-0.094,+0.156] -> MET
+          ID_K(OPTB) / ID_K(OPTA) <= 0.15 (point): yes; H0 ID_K(OPTB)/ID_K(OPTA) >= 0.25 rejected (upper bound +0.026 < 0.25): yes; H0 ID_K(OPTA) - ID_K(OPTB) <= 0 rejected (lower bound +5.842 > 0): yes
+      mistral7: n=100: ratio +0.019 [-0.003,+0.043]; ID_K(OPTA) - ID_K(OPTB) +5.885 [+5.678,+6.085]; ID_K(OPTB) +0.116 [-0.018,+0.256] -> MET
+          ID_K(OPTB) / ID_K(OPTA) <= 0.15 (point): yes; H0 ID_K(OPTB)/ID_K(OPTA) >= 0.25 rejected (upper bound +0.043 < 0.25): yes; H0 ID_K(OPTA) - ID_K(OPTB) <= 0 rejected (lower bound +5.678 > 0): yes
+  J-A5      [R, prior 0.50] a natural mention sentence after the passage opens a key read (MENA vs NOM) -> MET (4 of 4 evaluable models met; 4 run)
+      llama8: n=100: s_ID(MENA) - s_ID(NOM) +0.181 [+0.168,+0.194]; ID_K(MENA) +1.966 [+1.820,+2.118]; s_ID(MENA) +0.246 [+0.232,+0.260] -> MET
+          s_ID(MENA) - s_ID(NOM) >= 0.10 (point): yes; H0 s_ID(MENA) - s_ID(NOM) <= 0 rejected (lower bound +0.168 > 0): yes; H0 ID_K(MENA) <= 0 rejected (lower bound +1.820 > 0): yes
+      gemma9: n=100: s_ID(MENA) - s_ID(NOM) +0.184 [+0.172,+0.196]; ID_K(MENA) +2.000 [+1.881,+2.117]; s_ID(MENA) +0.249 [+0.237,+0.259] -> MET
+          s_ID(MENA) - s_ID(NOM) >= 0.10 (point): yes; H0 s_ID(MENA) - s_ID(NOM) <= 0 rejected (lower bound +0.172 > 0): yes; H0 ID_K(MENA) <= 0 rejected (lower bound +1.881 > 0): yes
+      qwen7: n=100: s_ID(MENA) - s_ID(NOM) +0.188 [+0.172,+0.203]; ID_K(MENA) +1.979 [+1.839,+2.114]; s_ID(MENA) +0.252 [+0.238,+0.265] -> MET
+          s_ID(MENA) - s_ID(NOM) >= 0.10 (point): yes; H0 s_ID(MENA) - s_ID(NOM) <= 0 rejected (lower bound +0.172 > 0): yes; H0 ID_K(MENA) <= 0 rejected (lower bound +1.839 > 0): yes
+      mistral7: n=100: s_ID(MENA) - s_ID(NOM) +0.184 [+0.172,+0.196]; ID_K(MENA) +1.971 [+1.864,+2.077]; s_ID(MENA) +0.247 [+0.237,+0.258] -> MET
+          s_ID(MENA) - s_ID(NOM) >= 0.10 (point): yes; H0 s_ID(MENA) - s_ID(NOM) <= 0 rejected (lower bound +0.172 > 0): yes; H0 ID_K(MENA) <= 0 rejected (lower bound +1.864 > 0): yes
+  J-A5B     [M, prior 0.80] the same sentence before the passage does not (MENA vs MENB) -> MET (4 of 4 evaluable models met; 4 run)
+      llama8: n=100: ID_K(MENA) - ID_K(MENB) +1.996 [+1.815,+2.181]; ID_K(MENB) -0.029 [-0.141,+0.083] -> MET
+          H0 ID_K(MENA) - ID_K(MENB) <= 0 rejected (lower bound +1.815 > 0): yes
+      gemma9: n=100: ID_K(MENA) - ID_K(MENB) +2.021 [+1.837,+2.202]; ID_K(MENB) -0.021 [-0.151,+0.105] -> MET
+          H0 ID_K(MENA) - ID_K(MENB) <= 0 rejected (lower bound +1.837 > 0): yes
+      qwen7: n=100: ID_K(MENA) - ID_K(MENB) +2.028 [+1.854,+2.199]; ID_K(MENB) -0.049 [-0.174,+0.078] -> MET
+          H0 ID_K(MENA) - ID_K(MENB) <= 0 rejected (lower bound +1.854 > 0): yes
+      mistral7: n=100: ID_K(MENA) - ID_K(MENB) +1.984 [+1.809,+2.168]; ID_K(MENB) -0.013 [-0.149,+0.118] -> MET
+          H0 ID_K(MENA) - ID_K(MENB) <= 0 rejected (lower bound +1.809 > 0): yes
+  J-A6a     [R, prior 0.45] cue conflict, OPTA: the key's entity is answered -> MET (4 of 4 evaluable models met; 4 run)
+      llama8: OPTA n=100: key-source +1.000 [+1.000,+1.000]; value-source +0.000 [+0.000,+0.000]; difference +1.000 [+1.000,+1.000]; other answers B 0.000, Z 0.000, D 0.000, other 0.000 -> MET
+          key-source rate >= 0.6 (point): yes; H0 key-source rate <= 0.5 rejected (lower bound +1.000 > 0.5): yes; key - value >= 0.3 (point): yes; H0 key - value <= 0 rejected (lower bound +1.000 > 0): yes
+      gemma9: OPTA n=100: key-source +1.000 [+1.000,+1.000]; value-source +0.000 [+0.000,+0.000]; difference +1.000 [+1.000,+1.000]; other answers B 0.000, Z 0.000, D 0.000, other 0.000 -> MET
+          key-source rate >= 0.6 (point): yes; H0 key-source rate <= 0.5 rejected (lower bound +1.000 > 0.5): yes; key - value >= 0.3 (point): yes; H0 key - value <= 0 rejected (lower bound +1.000 > 0): yes
+      qwen7: OPTA n=100: key-source +1.000 [+1.000,+1.000]; value-source +0.000 [+0.000,+0.000]; difference +1.000 [+1.000,+1.000]; other answers B 0.000, Z 0.000, D 0.000, other 0.000 -> MET
+          key-source rate >= 0.6 (point): yes; H0 key-source rate <= 0.5 rejected (lower bound +1.000 > 0.5): yes; key - value >= 0.3 (point): yes; H0 key - value <= 0 rejected (lower bound +1.000 > 0): yes
+      mistral7: OPTA n=100: key-source +1.000 [+1.000,+1.000]; value-source +0.000 [+0.000,+0.000]; difference +1.000 [+1.000,+1.000]; other answers B 0.000, Z 0.000, D 0.000, other 0.000 -> MET
+          key-source rate >= 0.6 (point): yes; H0 key-source rate <= 0.5 rejected (lower bound +1.000 > 0.5): yes; key - value >= 0.3 (point): yes; H0 key - value <= 0 rejected (lower bound +1.000 > 0): yes
+  J-A6b     [R, prior 0.60] cue conflict, LETA: the key's entity's letter is answered -> MET (4 of 4 evaluable models met; 4 run)
+      llama8: LETA n=100: key-source +1.000 [+1.000,+1.000]; value-source +0.000 [+0.000,+0.000]; difference +1.000 [+1.000,+1.000]; other answers B 0.000, Z 0.000, D 0.000, other 0.000 -> MET
+          key-source rate >= 0.6 (point): yes; H0 key-source rate <= 0.5 rejected (lower bound +1.000 > 0.5): yes; key - value >= 0.3 (point): yes; H0 key - value <= 0 rejected (lower bound +1.000 > 0): yes
+      gemma9: LETA n=100: key-source +1.000 [+1.000,+1.000]; value-source +0.000 [+0.000,+0.000]; difference +1.000 [+1.000,+1.000]; other answers B 0.000, Z 0.000, D 0.000, other 0.000 -> MET
+          key-source rate >= 0.6 (point): yes; H0 key-source rate <= 0.5 rejected (lower bound +1.000 > 0.5): yes; key - value >= 0.3 (point): yes; H0 key - value <= 0 rejected (lower bound +1.000 > 0): yes
+      qwen7: LETA n=100: key-source +1.000 [+1.000,+1.000]; value-source +0.000 [+0.000,+0.000]; difference +1.000 [+1.000,+1.000]; other answers B 0.000, Z 0.000, D 0.000, other 0.000 -> MET
+          key-source rate >= 0.6 (point): yes; H0 key-source rate <= 0.5 rejected (lower bound +1.000 > 0.5): yes; key - value >= 0.3 (point): yes; H0 key - value <= 0 rejected (lower bound +1.000 > 0): yes
+      mistral7: LETA n=100: key-source +1.000 [+1.000,+1.000]; value-source +0.000 [+0.000,+0.000]; difference +1.000 [+1.000,+1.000]; other answers B 0.000, Z 0.000, D 0.000, other 0.000 -> MET
+          key-source rate >= 0.6 (point): yes; H0 key-source rate <= 0.5 rejected (lower bound +1.000 > 0.5): yes; key - value >= 0.3 (point): yes; H0 key - value <= 0 rejected (lower bound +1.000 > 0): yes
+  J-A6c     [R, prior 0.45] cue conflict, NOM: the value's entity is answered -> MET (4 of 4 evaluable models met; 4 run)
+      llama8: NOM n=100: key-source +0.000 [+0.000,+0.000]; value-source +1.000 [+1.000,+1.000]; difference +1.000 [+1.000,+1.000]; other answers B 0.000, Z 0.000, D 0.000, other 0.000 -> MET
+          value-source rate >= 0.6 (point): yes; H0 value-source rate <= 0.5 rejected (lower bound +1.000 > 0.5): yes; value - key >= 0.3 (point): yes; H0 value - key <= 0 rejected (lower bound +1.000 > 0): yes
+      gemma9: NOM n=100: key-source +0.000 [+0.000,+0.000]; value-source +1.000 [+1.000,+1.000]; difference +1.000 [+1.000,+1.000]; other answers B 0.000, Z 0.000, D 0.000, other 0.000 -> MET
+          value-source rate >= 0.6 (point): yes; H0 value-source rate <= 0.5 rejected (lower bound +1.000 > 0.5): yes; value - key >= 0.3 (point): yes; H0 value - key <= 0 rejected (lower bound +1.000 > 0): yes
+      qwen7: NOM n=100: key-source +0.000 [+0.000,+0.000]; value-source +1.000 [+1.000,+1.000]; difference +1.000 [+1.000,+1.000]; other answers B 0.000, Z 0.000, D 0.000, other 0.000 -> MET
+          value-source rate >= 0.6 (point): yes; H0 value-source rate <= 0.5 rejected (lower bound +1.000 > 0.5): yes; value - key >= 0.3 (point): yes; H0 value - key <= 0 rejected (lower bound +1.000 > 0): yes
+      mistral7: NOM n=100: key-source +0.000 [+0.000,+0.000]; value-source +1.000 [+1.000,+1.000]; difference +1.000 [+1.000,+1.000]; other answers B 0.000, Z 0.000, D 0.000, other 0.000 -> MET
+          value-source rate >= 0.6 (point): yes; H0 value-source rate <= 0.5 rejected (lower bound +1.000 > 0.5): yes; value - key >= 0.3 (point): yes; H0 value - key <= 0 rejected (lower bound +1.000 > 0): yes
+  J-A6d     [R, prior 0.45] flag only (K_S, V_Z): S in OPTA, not in NOM -> MET (4 of 4 evaluable models met; 4 run)
+      llama8: OPTA n=100 S-rate +1.000 [+1.000,+1.000] (B-rate 0.000); NOM n=100 S-rate +0.000 [+0.000,+0.000] (Z-rate 1.000) -> MET
+          OPTA S-rate >= 0.6 (point): yes; H0 OPTA S-rate <= 0.5 rejected (lower bound +1.000 > 0.5): yes; NOM S-rate <= 0.2 (point): yes; H0 NOM S-rate >= 0.3 rejected (upper bound +0.000 < 0.3): yes
+      gemma9: OPTA n=100 S-rate +1.000 [+1.000,+1.000] (B-rate 0.000); NOM n=100 S-rate +0.000 [+0.000,+0.000] (Z-rate 1.000) -> MET
+          OPTA S-rate >= 0.6 (point): yes; H0 OPTA S-rate <= 0.5 rejected (lower bound +1.000 > 0.5): yes; NOM S-rate <= 0.2 (point): yes; H0 NOM S-rate >= 0.3 rejected (upper bound +0.000 < 0.3): yes
+      qwen7: OPTA n=100 S-rate +1.000 [+1.000,+1.000] (B-rate 0.000); NOM n=100 S-rate +0.000 [+0.000,+0.000] (Z-rate 1.000) -> MET
+          OPTA S-rate >= 0.6 (point): yes; H0 OPTA S-rate <= 0.5 rejected (lower bound +1.000 > 0.5): yes; NOM S-rate <= 0.2 (point): yes; H0 NOM S-rate >= 0.3 rejected (upper bound +0.000 < 0.3): yes
+      mistral7: OPTA n=100 S-rate +1.000 [+1.000,+1.000] (B-rate 0.000); NOM n=100 S-rate +0.000 [+0.000,+0.000] (Z-rate 1.000) -> MET
+          OPTA S-rate >= 0.6 (point): yes; H0 OPTA S-rate <= 0.5 rejected (lower bound +1.000 > 0.5): yes; NOM S-rate <= 0.2 (point): yes; H0 NOM S-rate >= 0.3 rejected (upper bound +0.000 < 0.3): yes
+  J-A6e     [R, prior 0.40] copy fallback (K_Z, V_S) in OPTA: S is answered -> MET (4 of 4 evaluable models met; 4 run)
+      llama8: n=100: S-rate +1.000 [+1.000,+1.000]; B 0.000, X 0.000, D 0.000, Z 0.000, other 0.000 -> MET
+          S-rate >= 0.5 (point): yes; H0 S-rate <= 0.4 rejected (lower bound +1.000 > 0.4): yes
+      gemma9: n=100: S-rate +1.000 [+1.000,+1.000]; B 0.000, X 0.000, D 0.000, Z 0.000, other 0.000 -> MET
+          S-rate >= 0.5 (point): yes; H0 S-rate <= 0.4 rejected (lower bound +1.000 > 0.4): yes
+      qwen7: n=100: S-rate +1.000 [+1.000,+1.000]; B 0.000, X 0.000, D 0.000, Z 0.000, other 0.000 -> MET
+          S-rate >= 0.5 (point): yes; H0 S-rate <= 0.4 rejected (lower bound +1.000 > 0.4): yes
+      mistral7: n=100: S-rate +1.000 [+1.000,+1.000]; B 0.000, X 0.000, D 0.000, Z 0.000, other 0.000 -> MET
+          S-rate >= 0.5 (point): yes; H0 S-rate <= 0.4 rejected (lower bound +1.000 > 0.4): yes
+  J-A7      [R, prior 0.30] KIVI 2-bit: value quantization hurts free form more than MCQ, beyond keys (DiD) -> MET (4 of 4 evaluable models met; 4 run)
+      llama8: prior-free n=100: DiD [drop_NOM(V) - drop_OPTA(V)] - [drop_NOM(K) - drop_OPTA(K)] +1.000 [+1.000,+1.000]; drops NOM(K) +0.000, NOM(V) +1.000, OPTA(K) +0.000, OPTA(V) +0.000 -> MET
+          DiD >= 0.10 (point): yes; H0 DiD <= 0 rejected (lower bound +1.000 > 0): yes
+      gemma9: prior-free n=100: DiD [drop_NOM(V) - drop_OPTA(V)] - [drop_NOM(K) - drop_OPTA(K)] +1.000 [+1.000,+1.000]; drops NOM(K) +0.000, NOM(V) +1.000, OPTA(K) +0.000, OPTA(V) +0.000 -> MET
+          DiD >= 0.10 (point): yes; H0 DiD <= 0 rejected (lower bound +1.000 > 0): yes
+      qwen7: prior-free n=100: DiD [drop_NOM(V) - drop_OPTA(V)] - [drop_NOM(K) - drop_OPTA(K)] +1.000 [+1.000,+1.000]; drops NOM(K) +0.000, NOM(V) +1.000, OPTA(K) +0.000, OPTA(V) +0.000 -> MET
+          DiD >= 0.10 (point): yes; H0 DiD <= 0 rejected (lower bound +1.000 > 0): yes
+      mistral7: prior-free n=100: DiD [drop_NOM(V) - drop_OPTA(V)] - [drop_NOM(K) - drop_OPTA(K)] +1.000 [+1.000,+1.000]; drops NOM(K) +0.000, NOM(V) +1.000, OPTA(K) +0.000, OPTA(V) +0.000 -> MET
+          DiD >= 0.10 (point): yes; H0 DiD <= 0 rejected (lower bound +1.000 > 0): yes
+  J-A7b     [R, prior 0.35] KIVI 2-bit: value quantization hurts free form more than MCQ -> MET (4 of 4 evaluable models met; 4 run)
+      llama8: prior-free n=100: drop_NOM(V) - drop_OPTA(V) +1.000 [+1.000,+1.000] -> MET
+          >= 0.10 (point): yes; H0 drop_NOM(V) - drop_OPTA(V) <= 0 rejected (lower bound +1.000 > 0): yes
+      gemma9: prior-free n=100: drop_NOM(V) - drop_OPTA(V) +1.000 [+1.000,+1.000] -> MET
+          >= 0.10 (point): yes; H0 drop_NOM(V) - drop_OPTA(V) <= 0 rejected (lower bound +1.000 > 0): yes
+      qwen7: prior-free n=100: drop_NOM(V) - drop_OPTA(V) +1.000 [+1.000,+1.000] -> MET
+          >= 0.10 (point): yes; H0 drop_NOM(V) - drop_OPTA(V) <= 0 rejected (lower bound +1.000 > 0): yes
+      mistral7: prior-free n=100: drop_NOM(V) - drop_OPTA(V) +1.000 [+1.000,+1.000] -> MET
+          >= 0.10 (point): yes; H0 drop_NOM(V) - drop_OPTA(V) <= 0 rejected (lower bound +1.000 > 0): yes
+  J-A8      [M, prior 0.80] multi-token answers: continuation needs K and V jointly, decision token additive (NOM) -> MET (4 of 4 evaluable models met; 4 run)
+      llama8: n=50 (leak-free PERSON/PLACE with a continuation token differing from c_B): I_cont(NOM) +1.250 [+1.250,+1.250]; I_dec(NOM) +0.000 [+0.000,+0.000]; d_KV^cont OPTA/NOM +0.012 [+0.013,+0.013]; d^cont(NOM) K -3.00 V +1.00 KV +8.00 (>= 2 nats: yes) -> MET
+          I_cont >= 0.5 (point): yes; H0 I_cont(NOM) <= 0.3 rejected (lower bound +1.250 > 0.3): yes; I_dec <= 0.25 (point): yes; H0 I_dec(NOM) >= 0.35 rejected (upper bound +0.000 < 0.35): yes; |d_KV^cont(OPTA)/d_KV^cont(NOM)| <= 0.2 (point): yes; H0 the ratio outside (-0.3, 0.3) rejected (interval [+0.013,+0.013]): yes
+      gemma9: n=50 (leak-free PERSON/PLACE with a continuation token differing from c_B): I_cont(NOM) +1.250 [+1.250,+1.250]; I_dec(NOM) +0.000 [+0.000,+0.000]; d_KV^cont OPTA/NOM +0.012 [+0.013,+0.013]; d^cont(NOM) K -3.00 V +1.00 KV +8.00 (>= 2 nats: yes) -> MET
+          I_cont >= 0.5 (point): yes; H0 I_cont(NOM) <= 0.3 rejected (lower bound +1.250 > 0.3): yes; I_dec <= 0.25 (point): yes; H0 I_dec(NOM) >= 0.35 rejected (upper bound +0.000 < 0.35): yes; |d_KV^cont(OPTA)/d_KV^cont(NOM)| <= 0.2 (point): yes; H0 the ratio outside (-0.3, 0.3) rejected (interval [+0.013,+0.013]): yes
+      qwen7: n=50 (leak-free PERSON/PLACE with a continuation token differing from c_B): I_cont(NOM) +1.250 [+1.250,+1.250]; I_dec(NOM) +0.000 [+0.000,+0.000]; d_KV^cont OPTA/NOM +0.012 [+0.013,+0.013]; d^cont(NOM) K -3.00 V +1.00 KV +8.00 (>= 2 nats: yes) -> MET
+          I_cont >= 0.5 (point): yes; H0 I_cont(NOM) <= 0.3 rejected (lower bound +1.250 > 0.3): yes; I_dec <= 0.25 (point): yes; H0 I_dec(NOM) >= 0.35 rejected (upper bound +0.000 < 0.35): yes; |d_KV^cont(OPTA)/d_KV^cont(NOM)| <= 0.2 (point): yes; H0 the ratio outside (-0.3, 0.3) rejected (interval [+0.013,+0.013]): yes
+      mistral7: n=50 (leak-free PERSON/PLACE with a continuation token differing from c_B): I_cont(NOM) +1.250 [+1.250,+1.250]; I_dec(NOM) +0.000 [+0.000,+0.000]; d_KV^cont OPTA/NOM +0.012 [+0.013,+0.013]; d^cont(NOM) K -3.00 V +1.00 KV +8.00 (>= 2 nats: yes) -> MET
+          I_cont >= 0.5 (point): yes; H0 I_cont(NOM) <= 0.3 rejected (lower bound +1.250 > 0.3): yes; I_dec <= 0.25 (point): yes; H0 I_dec(NOM) >= 0.35 rejected (upper bound +0.000 < 0.35): yes; |d_KV^cont(OPTA)/d_KV^cont(NOM)| <= 0.2 (point): yes; H0 the ratio outside (-0.3, 0.3) rejected (interval [+0.013,+0.013]): yes
+  J-A8d     [R, prior 0.60] hybrid answers under K_Z in NOM, not in OPTA -> MET (4 of 4 evaluable models met; 4 run)
+      llama8: n=50; items with g1(K_Z) = dec_B: NOM 50, OPTA 50 (>= 40); h(K_Z, NOM) +0.300 [+0.140,+0.480]; h(K_Z, OPTA) +0.000 [+0.000,+0.000] -> MET
+          h(K_Z, NOM) >= 0.2 (point): yes; H0 h(K_Z, NOM) <= 0.1 rejected (lower bound +0.140 > 0.1): yes; h(K_Z, OPTA) <= 0.05 (point): yes; H0 h(K_Z, OPTA) >= 0.1 rejected (upper bound +0.000 < 0.1): yes
+      gemma9: n=50; items with g1(K_Z) = dec_B: NOM 50, OPTA 50 (>= 40); h(K_Z, NOM) +0.300 [+0.160,+0.440]; h(K_Z, OPTA) +0.000 [+0.000,+0.000] -> MET
+          h(K_Z, NOM) >= 0.2 (point): yes; H0 h(K_Z, NOM) <= 0.1 rejected (lower bound +0.160 > 0.1): yes; h(K_Z, OPTA) <= 0.05 (point): yes; H0 h(K_Z, OPTA) >= 0.1 rejected (upper bound +0.000 < 0.1): yes
+      qwen7: n=50; items with g1(K_Z) = dec_B: NOM 50, OPTA 50 (>= 40); h(K_Z, NOM) +0.300 [+0.120,+0.500]; h(K_Z, OPTA) +0.000 [+0.000,+0.000] -> MET
+          h(K_Z, NOM) >= 0.2 (point): yes; H0 h(K_Z, NOM) <= 0.1 rejected (lower bound +0.120 > 0.1): yes; h(K_Z, OPTA) <= 0.05 (point): yes; H0 h(K_Z, OPTA) >= 0.1 rejected (upper bound +0.000 < 0.1): yes
+      mistral7: n=50; items with g1(K_Z) = dec_B: NOM 50, OPTA 50 (>= 40); h(K_Z, NOM) +0.300 [+0.140,+0.460]; h(K_Z, OPTA) +0.000 [+0.000,+0.000] -> MET
+          h(K_Z, NOM) >= 0.2 (point): yes; H0 h(K_Z, NOM) <= 0.1 rejected (lower bound +0.140 > 0.1): yes; h(K_Z, OPTA) <= 0.05 (point): yes; H0 h(K_Z, OPTA) >= 0.1 rejected (upper bound +0.000 < 0.1): yes
+  J-A-HA1   [R, prior 0.75] sparse natural readers (N*) -> NOT EVALUABLE (1 of 1 evaluable models met; 1 run)
+      qwen7: k*=40, n=80: R_N +0.900 [+0.900,+0.900]; KO_N +0.950 [+0.950,+0.950]; R_rand +0.010 [+0.010,+0.010]; KO_rand +0.010 [+0.010,+0.010] (means over 3 draws) -> MET
+          R_N(k*) >= 0.7 (point): yes; H0 R_N(k*) <= 0.6 rejected (lower bound +0.900 > 0.6): yes; KO_N(k*) >= 0.7 (point): yes; H0 KO_N(k*) <= 0.6 rejected (lower bound +0.950 > 0.6): yes; R_rand(k*) <= 0.15 (point): yes; KO_rand(k*) <= 0.15 (point): yes
+  J-A-HA2   [R, prior 0.40] the template readers (T*) transfer to natural text -> NOT EVALUABLE (1 of 1 evaluable models met; 1 run)
+      qwen7: k*=40, n=80: R_T +0.600 [+0.600,+0.600]; KO_T +0.600 [+0.600,+0.600]; |T* & N*| = 20 (hypergeometric P 4.6e-18) -> MET
+          R_T(k*) >= 0.5 (point): yes; H0 R_T(k*) <= 0.35 rejected (lower bound +0.600 > 0.35): yes; KO_T(k*) >= 0.5 (point): yes; H0 KO_T(k*) <= 0.35 rejected (lower bound +0.600 > 0.35): yes
+  J-A-HA3a  [R, prior 0.30] ablating N* at Q+ breaks faithful MCQ answers (prior-free) -> NOT EVALUABLE (1 of 1 evaluable models met; 1 run)
+      qwen7: prior-free competent OPTA n=100: acc(none) 1.000; drop(N*) +0.500 [+0.390,+0.610]; drops of the random sets rand0 +0.000, rand1 +0.000, rand2 +0.000; drop(T*) +0.000 -> MET
+          drop(N*) >= 0.3 (point): yes; H0 drop(N*) <= 0 rejected (lower bound +0.390 > 0): yes; drop(rand0) <= 0.1 (point): yes; drop(rand1) <= 0.1 (point): yes; drop(rand2) <= 0.1 (point): yes
+  J-A-HA3b  [R, prior 0.65] ablating N* at Q+ leaves free-form answers (prior-free) -> NOT EVALUABLE (1 of 1 evaluable models met; 1 run)
+      qwen7: prior-free competent NOM n=100: decision accuracy change +0.000 [+0.000,+0.000]; continuation accuracy change +0.000 [+0.000,+0.000] -> MET
+          |delta acc_dec| <= 0.05 (point): yes; H0 delta acc_dec outside (-0.1, 0.1) rejected (interval [+0.000,+0.000]): yes; |delta acc_cont| <= 0.05 (point): yes; H0 delta acc_cont outside (-0.1, 0.1) rejected (interval [+0.000,+0.000]): yes
+
+REPORTED (no verdicts)
+  [llama8] n valid 100; n_comp NOM 100, OPTA 100, OPTB 100, MENA 100, LETA 100, MENB 100; frame ' '
+    P_CB(B) CBOPT: 0.000 of 100 (undefined 0); by type PERSON 0.000 (n 50), PLACE -, NUMBER 0.000 (n 50)
+    P_CB(B) CBLET: 0.000 of 100 (undefined 0); by type PERSON 0.000 (n 50), PLACE -, NUMBER 0.000 (n 50)
+    A-12 graded reading of J-A1: s_ID(OPTA) +0.751 [+0.739,+0.762] -> J-A1's own threshold decides (s_ID >= 0.5) (with J-A3 met)
+    NOM competent n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +0.850 [+0.730,+0.950]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.000 [+0.000,+0.000] value-source +1.000 [+1.000,+1.000]
+    NOM prior-free n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +0.850 [+0.730,+0.950]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.000 [+0.000,+0.000] value-source +1.000 [+1.000,+1.000]
+    NOM cue conflict at the decision token (g1): key-source +0.000 [+0.000,+0.000], value-source +0.000 [+0.000,+0.000]
+    NOM old A6 flips: phi_dec(K_S) +0.000 [+0.000,+0.000], phi_dec(V_S) +0.000 [+0.000,+0.000]; full match K_S +0.000 [+0.000,+0.000], V_S +0.000 [+0.000,+0.000]
+    OPTA competent n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +1.000 [+1.000,+1.000]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +1.000 [+1.000,+1.000] value-source +0.000 [+0.000,+0.000]
+    OPTA prior-free n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +1.000 [+1.000,+1.000]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +1.000 [+1.000,+1.000] value-source +0.000 [+0.000,+0.000]
+    OPTA cue conflict at the decision token (g1): key-source +0.000 [+0.000,+0.000], value-source +0.000 [+0.000,+0.000]
+    OPTA old A6 flips: phi_dec(K_S) +0.000 [+0.000,+0.000], phi_dec(V_S) +0.000 [+0.000,+0.000]; full match K_S +0.000 [+0.000,+0.000], V_S +0.000 [+0.000,+0.000]
+    LETA competent n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +1.000 [+1.000,+1.000]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +1.000 [+1.000,+1.000] value-source +0.000 [+0.000,+0.000]
+    LETA prior-free n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +1.000 [+1.000,+1.000]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +1.000 [+1.000,+1.000] value-source +0.000 [+0.000,+0.000]
+    LETA cue conflict at the decision token (g1): key-source +0.000 [+0.000,+0.000], value-source +0.000 [+0.000,+0.000]
+    LETA old A6 flips: phi_dec(K_S) +0.000 [+0.000,+0.000], phi_dec(V_S) +0.000 [+0.000,+0.000]; full match K_S +0.000 [+0.000,+0.000], V_S +0.000 [+0.000,+0.000]
+    NOM all valid items n=100: s_ID +0.065 [+0.059,+0.072]; option mass (ID) 0.990
+    OPTA all valid items n=100: s_ID +0.751 [+0.739,+0.762]; option mass (ID) 0.990
+    OPTB all valid items n=100: s_ID +0.050 [+0.000,+0.095]; option mass (ID) 0.990
+    MENA all valid items n=100: s_ID +0.246 [+0.232,+0.260]; option mass (ID) 0.990
+    LETA all valid items n=100: s_ID +0.941 [+0.928,+0.954]; option mass (ID) 0.990
+    MENB all valid items n=100: s_ID -0.004 [-0.021,+0.012]; option mass (ID) 0.990
+    KIVI NOM competent n=100: relative error K 0.200, V 0.400; faithful (S) accuracy none 1.000, K2 1.000, V2 0.000
+    KIVI OPTA competent n=100: relative error K 0.200, V 0.400; faithful (S) accuracy none 1.000, K2 1.000, V2 1.000
+    KIVI LETA competent n=100: relative error K 0.200, V 0.400; faithful (S) accuracy none 1.000, K2 1.000, V2 1.000
+    d_K^cont(NOM) on the J-A8 population -3.000 [-3.000,-3.000] (sign reported; Part D owns the sign account)
+  [gemma9] n valid 100; n_comp NOM 100, OPTA 100, OPTB 100, MENA 100, LETA 100, MENB 100; frame ' '
+    P_CB(B) CBOPT: 0.000 of 100 (undefined 0); by type PERSON 0.000 (n 50), PLACE -, NUMBER 0.000 (n 50)
+    P_CB(B) CBLET: 0.000 of 100 (undefined 0); by type PERSON 0.000 (n 50), PLACE -, NUMBER 0.000 (n 50)
+    A-12 graded reading of J-A1: s_ID(OPTA) +0.747 [+0.733,+0.761] -> J-A1's own threshold decides (s_ID >= 0.5) (with J-A3 met)
+    NOM competent n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +0.850 [+0.740,+0.940]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.000 [+0.000,+0.000] value-source +1.000 [+1.000,+1.000]
+    NOM prior-free n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +0.850 [+0.740,+0.940]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.000 [+0.000,+0.000] value-source +1.000 [+1.000,+1.000]
+    NOM cue conflict at the decision token (g1): key-source +0.000 [+0.000,+0.000], value-source +0.000 [+0.000,+0.000]
+    NOM old A6 flips: phi_dec(K_S) +0.000 [+0.000,+0.000], phi_dec(V_S) +0.000 [+0.000,+0.000]; full match K_S +0.000 [+0.000,+0.000], V_S +0.000 [+0.000,+0.000]
+    OPTA competent n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +1.000 [+1.000,+1.000]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +1.000 [+1.000,+1.000] value-source +0.000 [+0.000,+0.000]
+    OPTA prior-free n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +1.000 [+1.000,+1.000]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +1.000 [+1.000,+1.000] value-source +0.000 [+0.000,+0.000]
+    OPTA cue conflict at the decision token (g1): key-source +0.000 [+0.000,+0.000], value-source +0.000 [+0.000,+0.000]
+    OPTA old A6 flips: phi_dec(K_S) +0.000 [+0.000,+0.000], phi_dec(V_S) +0.000 [+0.000,+0.000]; full match K_S +0.000 [+0.000,+0.000], V_S +0.000 [+0.000,+0.000]
+    LETA competent n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +1.000 [+1.000,+1.000]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +1.000 [+1.000,+1.000] value-source +0.000 [+0.000,+0.000]
+    LETA prior-free n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +1.000 [+1.000,+1.000]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +1.000 [+1.000,+1.000] value-source +0.000 [+0.000,+0.000]
+    LETA cue conflict at the decision token (g1): key-source +0.000 [+0.000,+0.000], value-source +0.000 [+0.000,+0.000]
+    LETA old A6 flips: phi_dec(K_S) +0.000 [+0.000,+0.000], phi_dec(V_S) +0.000 [+0.000,+0.000]; full match K_S +0.000 [+0.000,+0.000], V_S +0.000 [+0.000,+0.000]
+    NOM all valid items n=100: s_ID +0.064 [+0.059,+0.070]; option mass (ID) 0.990
+    OPTA all valid items n=100: s_ID +0.747 [+0.733,+0.761]; option mass (ID) 0.990
+    OPTB all valid items n=100: s_ID +0.052 [+0.008,+0.093]; option mass (ID) 0.990
+    MENA all valid items n=100: s_ID +0.249 [+0.237,+0.259]; option mass (ID) 0.990
+    LETA all valid items n=100: s_ID +0.946 [+0.934,+0.958]; option mass (ID) 0.990
+    MENB all valid items n=100: s_ID -0.003 [-0.022,+0.015]; option mass (ID) 0.990
+    KIVI NOM competent n=100: relative error K 0.200, V 0.400; faithful (S) accuracy none 1.000, K2 1.000, V2 0.000
+    KIVI OPTA competent n=100: relative error K 0.200, V 0.400; faithful (S) accuracy none 1.000, K2 1.000, V2 1.000
+    KIVI LETA competent n=100: relative error K 0.200, V 0.400; faithful (S) accuracy none 1.000, K2 1.000, V2 1.000
+    d_K^cont(NOM) on the J-A8 population -3.000 [-3.000,-3.000] (sign reported; Part D owns the sign account)
+  [qwen7] n valid 100; n_comp NOM 100, OPTA 100, OPTB 100, MENA 100, LETA 100, MENB 100; frame ' '
+    P_CB(B) CBOPT: 0.000 of 100 (undefined 0); by type PERSON 0.000 (n 50), PLACE -, NUMBER 0.000 (n 50)
+    P_CB(B) CBLET: 0.000 of 100 (undefined 0); by type PERSON 0.000 (n 50), PLACE -, NUMBER 0.000 (n 50)
+    A-12 graded reading of J-A1: s_ID(OPTA) +0.750 [+0.737,+0.762] -> J-A1's own threshold decides (s_ID >= 0.5) (with J-A3 met)
+    NOM competent n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +0.850 [+0.720,+0.950]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.000 [+0.000,+0.000] value-source +1.000 [+1.000,+1.000]
+    NOM prior-free n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +0.850 [+0.720,+0.950]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.000 [+0.000,+0.000] value-source +1.000 [+1.000,+1.000]
+    NOM cue conflict at the decision token (g1): key-source +0.000 [+0.000,+0.000], value-source +0.000 [+0.000,+0.000]
+    NOM old A6 flips: phi_dec(K_S) +0.000 [+0.000,+0.000], phi_dec(V_S) +0.000 [+0.000,+0.000]; full match K_S +0.000 [+0.000,+0.000], V_S +0.000 [+0.000,+0.000]
+    OPTA competent n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +1.000 [+1.000,+1.000]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +1.000 [+1.000,+1.000] value-source +0.000 [+0.000,+0.000]
+    OPTA prior-free n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +1.000 [+1.000,+1.000]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +1.000 [+1.000,+1.000] value-source +0.000 [+0.000,+0.000]
+    OPTA cue conflict at the decision token (g1): key-source +0.000 [+0.000,+0.000], value-source +0.000 [+0.000,+0.000]
+    OPTA old A6 flips: phi_dec(K_S) +0.000 [+0.000,+0.000], phi_dec(V_S) +0.000 [+0.000,+0.000]; full match K_S +0.000 [+0.000,+0.000], V_S +0.000 [+0.000,+0.000]
+    LETA competent n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +1.000 [+1.000,+1.000]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +1.000 [+1.000,+1.000] value-source +0.000 [+0.000,+0.000]
+    LETA prior-free n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +1.000 [+1.000,+1.000]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +1.000 [+1.000,+1.000] value-source +0.000 [+0.000,+0.000]
+    LETA cue conflict at the decision token (g1): key-source +0.000 [+0.000,+0.000], value-source +0.000 [+0.000,+0.000]
+    LETA old A6 flips: phi_dec(K_S) +0.000 [+0.000,+0.000], phi_dec(V_S) +0.000 [+0.000,+0.000]; full match K_S +0.000 [+0.000,+0.000], V_S +0.000 [+0.000,+0.000]
+    NOM all valid items n=100: s_ID +0.064 [+0.057,+0.071]; option mass (ID) 0.990
+    OPTA all valid items n=100: s_ID +0.750 [+0.737,+0.762]; option mass (ID) 0.990
+    OPTB all valid items n=100: s_ID +0.013 [-0.039,+0.060]; option mass (ID) 0.990
+    MENA all valid items n=100: s_ID +0.252 [+0.238,+0.265]; option mass (ID) 0.990
+    LETA all valid items n=100: s_ID +0.940 [+0.925,+0.955]; option mass (ID) 0.990
+    MENB all valid items n=100: s_ID -0.007 [-0.026,+0.011]; option mass (ID) 0.990
+    KIVI NOM competent n=100: relative error K 0.200, V 0.400; faithful (S) accuracy none 1.000, K2 1.000, V2 0.000
+    KIVI OPTA competent n=100: relative error K 0.200, V 0.400; faithful (S) accuracy none 1.000, K2 1.000, V2 1.000
+    KIVI LETA competent n=100: relative error K 0.200, V 0.400; faithful (S) accuracy none 1.000, K2 1.000, V2 1.000
+    d_K^cont(NOM) on the J-A8 population -3.000 [-3.000,-3.000] (sign reported; Part D owns the sign account)
+  [mistral7] n valid 100; n_comp NOM 100, OPTA 100, OPTB 100, MENA 100, LETA 100, MENB 100; frame ' '
+    P_CB(B) CBOPT: 0.000 of 100 (undefined 0); by type PERSON 0.000 (n 50), PLACE -, NUMBER 0.000 (n 50)
+    P_CB(B) CBLET: 0.000 of 100 (undefined 0); by type PERSON 0.000 (n 50), PLACE -, NUMBER 0.000 (n 50)
+    A-12 graded reading of J-A1: s_ID(OPTA) +0.758 [+0.746,+0.771] -> J-A1's own threshold decides (s_ID >= 0.5) (with J-A3 met)
+    NOM competent n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +0.850 [+0.740,+0.950]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.000 [+0.000,+0.000] value-source +1.000 [+1.000,+1.000]
+    NOM prior-free n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +0.850 [+0.740,+0.950]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +0.000 [+0.000,+0.000] value-source +1.000 [+1.000,+1.000]
+    NOM cue conflict at the decision token (g1): key-source +0.000 [+0.000,+0.000], value-source +0.000 [+0.000,+0.000]
+    NOM old A6 flips: phi_dec(K_S) +0.000 [+0.000,+0.000], phi_dec(V_S) +0.000 [+0.000,+0.000]; full match K_S +0.000 [+0.000,+0.000], V_S +0.000 [+0.000,+0.000]
+    OPTA competent n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +1.000 [+1.000,+1.000]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +1.000 [+1.000,+1.000] value-source +0.000 [+0.000,+0.000]
+    OPTA prior-free n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +1.000 [+1.000,+1.000]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +1.000 [+1.000,+1.000] value-source +0.000 [+0.000,+0.000]
+    OPTA cue conflict at the decision token (g1): key-source +0.000 [+0.000,+0.000], value-source +0.000 [+0.000,+0.000]
+    OPTA old A6 flips: phi_dec(K_S) +0.000 [+0.000,+0.000], phi_dec(V_S) +0.000 [+0.000,+0.000]; full match K_S +0.000 [+0.000,+0.000], V_S +0.000 [+0.000,+0.000]
+    LETA competent n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +1.000 [+1.000,+1.000]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +1.000 [+1.000,+1.000] value-source +0.000 [+0.000,+0.000]
+    LETA prior-free n=100: accuracy (B) under V_Z +1.000 [+1.000,+1.000]; K_Z +1.000 [+1.000,+1.000]; KV_Z +0.000 [+0.000,+0.000]; cue conflict key-source +1.000 [+1.000,+1.000] value-source +0.000 [+0.000,+0.000]
+    LETA cue conflict at the decision token (g1): key-source +0.000 [+0.000,+0.000], value-source +0.000 [+0.000,+0.000]
+    LETA old A6 flips: phi_dec(K_S) +0.000 [+0.000,+0.000], phi_dec(V_S) +0.000 [+0.000,+0.000]; full match K_S +0.000 [+0.000,+0.000], V_S +0.000 [+0.000,+0.000]
+    NOM all valid items n=100: s_ID +0.063 [+0.057,+0.070]; option mass (ID) 0.990
+    OPTA all valid items n=100: s_ID +0.758 [+0.746,+0.771]; option mass (ID) 0.990
+    OPTB all valid items n=100: s_ID +0.046 [-0.007,+0.097]; option mass (ID) 0.990
+    MENA all valid items n=100: s_ID +0.247 [+0.237,+0.258]; option mass (ID) 0.990
+    LETA all valid items n=100: s_ID +0.943 [+0.928,+0.957]; option mass (ID) 0.990
+    MENB all valid items n=100: s_ID -0.002 [-0.022,+0.016]; option mass (ID) 0.990
+    KIVI NOM competent n=100: relative error K 0.200, V 0.400; faithful (S) accuracy none 1.000, K2 1.000, V2 0.000
+    KIVI OPTA competent n=100: relative error K 0.200, V 0.400; faithful (S) accuracy none 1.000, K2 1.000, V2 1.000
+    KIVI LETA competent n=100: relative error K 0.200, V 0.400; faithful (S) accuracy none 1.000, K2 1.000, V2 1.000
+    d_K^cont(NOM) on the J-A8 population -3.000 [-3.000,-3.000] (sign reported; Part D owns the sign account)
+  [qwen7] k*=40, KS=[1, 2, 5, 10, 20, 40, 80], frame None; ranking items None, evaluation items None, ablation items None
+    OPTA every ablated item n=100 (option margin of the unablated prompt under each condition): none: faithful(S) 1.000, clean-B chain 1.000, margin m_B +4.90; N: faithful(S) 0.500, clean-B chain 1.000, margin m_B +4.90; T: faithful(S) 1.000, clean-B chain 1.000, margin m_B +4.90; rand0: faithful(S) 1.000, clean-B chain 1.000, margin m_B +4.90; rand1: faithful(S) 1.000, clean-B chain 1.000, margin m_B +4.90; rand2: faithful(S) 1.000, clean-B chain 1.000, margin m_B +4.90; C: faithful(S) 1.000, clean-B chain 1.000, margin m_B +4.90
+    NOM every ablated item n=100 (option margin of the unablated prompt under each condition): none: faithful(S) 1.000, clean-B chain 1.000, margin m_B +4.90; N: faithful(S) 1.000, clean-B chain 1.000, margin m_B +4.90; T: faithful(S) 1.000, clean-B chain 1.000, margin m_B +4.90; rand0: faithful(S) 1.000, clean-B chain 1.000, margin m_B +4.90; rand1: faithful(S) 1.000, clean-B chain 1.000, margin m_B +4.90; rand2: faithful(S) 1.000, clean-B chain 1.000, margin m_B +4.90; C: faithful(S) 1.000, clean-B chain 1.000, margin m_B +4.90
+
+SUMMARY (G4: per class; all part-A lines are account lines, none is a measurement-validity line; J-A3 derived and not counted; expected = the sum of the recorded priors of the lines with a verdict; Brier = mean (prior - 1[MET])^2 over the same lines; NOT EVALUABLE lines are left out of both and listed)
+  account lines, class L: 1 lines: 1 MET, 0 NOT MET, 0 MET IN PART, 0 NOT EVALUABLE; observed 1 against expected 0.90; Brier 0.010
+  account lines, class M: 5 lines: 5 MET, 0 NOT MET, 0 MET IN PART, 0 NOT EVALUABLE; observed 5 against expected 4.10; Brier 0.033
+  account lines, class R: 14 lines: 10 MET, 0 NOT MET, 0 MET IN PART, 4 NOT EVALUABLE; observed 10 against expected 4.65; Brier 0.295; not evaluable: J-A-HA1 (no model run) | J-A-HA2 (no model run) | J-A-HA3a (no model run) | J-A-HA3b (no model run)
+  met rate among R account lines with a verdict: 10 of 10 (expected 4.65)
+  Holm sensitivity (analysis/stage8_holm.py; reported, no verdict uses it): step-down at one-sided 0.025 over the 73 interval components of the R-class account lines in the models where the line has a verdict; p = Phi(-(est - bound)/se) for '>' and Phi((est - bound)/se) for '<', se the bootstrap standard deviation
+    J-A1b: no component decision changes under Holm; verdict unchanged (MET)
+    J-A5: no component decision changes under Holm; verdict unchanged (MET)
+    J-A6a: no component decision changes under Holm; verdict unchanged (MET)
+    J-A6b: no component decision changes under Holm; verdict unchanged (MET)
+    J-A6c: no component decision changes under Holm; verdict unchanged (MET)
+    J-A6d: no component decision changes under Holm; verdict unchanged (MET)
+    J-A6e: no component decision changes under Holm; verdict unchanged (MET)
+    J-A7: no component decision changes under Holm; verdict unchanged (MET)
+    J-A7b: no component decision changes under Holm; verdict unchanged (MET)
+    J-A8d: no component decision changes under Holm; verdict unchanged (MET)
+    J-A-HA1: no component decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-A-HA2: no component decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-A-HA3a: no component decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-A-HA3b: no component decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+  overall: 16 MET, 0 NOT MET, 4 NOT EVALUABLE of 20 counted lines; provenance MISMATCH; population MISMATCH
+
+######## EXPLORATORY (not scored)
+  [llama8] explore parts: [] (no explore file)
+    E3 OPTA s_ID by D_in=False: +0.751 (n 100); type=NUMBER: +0.749 (n 50); type=PERSON: +0.752 (n 50); |P|=3+: +0.751 (n 100)
+    E3 NOM s_ID by D_in=False: +0.065 (n 100); type=NUMBER: +0.069 (n 50); type=PERSON: +0.062 (n 50); |P|=3+: +0.065 (n 100)
+  [gemma9] explore parts: [] (no explore file)
+    E3 OPTA s_ID by D_in=False: +0.747 (n 100); type=NUMBER: +0.746 (n 50); type=PERSON: +0.747 (n 50); |P|=3+: +0.747 (n 100)
+    E3 NOM s_ID by D_in=False: +0.064 (n 100); type=NUMBER: +0.065 (n 50); type=PERSON: +0.064 (n 50); |P|=3+: +0.064 (n 100)
+  [qwen7] explore parts: [] (no explore file)
+    E3 OPTA s_ID by D_in=False: +0.750 (n 100); type=NUMBER: +0.748 (n 50); type=PERSON: +0.751 (n 50); |P|=3+: +0.750 (n 100)
+    E3 NOM s_ID by D_in=False: +0.064 (n 100); type=NUMBER: +0.067 (n 50); type=PERSON: +0.061 (n 50); |P|=3+: +0.064 (n 100)
+  [mistral7] explore parts: [] (no explore file)
+    E3 OPTA s_ID by D_in=False: +0.758 (n 100); type=NUMBER: +0.767 (n 50); type=PERSON: +0.750 (n 50); |P|=3+: +0.758 (n 100)
+    E3 NOM s_ID by D_in=False: +0.063 (n 100); type=NUMBER: +0.061 (n 50); type=PERSON: +0.066 (n 50); |P|=3+: +0.063 (n 100)
+  heads [qwen7]
+    curves N: R 1:+0.13 2:+0.26 5:+0.39 10:+0.51 20:+0.64 40:+0.90 80:+0.90 | KO 1:+0.00 2:+0.00 5:+0.00 10:+0.00 20:+0.00 40:+0.95 80:+0.95
+    curves T: R 1:+0.09 2:+0.17 5:+0.26 10:+0.34 20:+0.43 40:+0.60 80:+0.60 | KO 1:+0.00 2:+0.00 5:+0.00 10:+0.00 20:+0.00 40:+0.60 80:+0.60
+    curves rand0: R 1:+0.00 2:+0.00 5:+0.00 10:+0.00 20:+0.00 40:+0.00 80:+0.00 | KO 1:+0.00 2:+0.00 5:+0.00 10:+0.00 20:+0.00 40:+0.00 80:+0.00
+    layer profile (m with one layer's heads seeing K_S in G, minus none): top layers 0:+0.00, 1:+0.00, 2:+0.00, 3:+0.00
+    N* layers: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]; C* (DLA copy set) overlap with N*: 0
+    C* double dissociation OPTA (every ablated item, n=100): faithful accuracy none 1.000, C* 1.000
+    C* double dissociation NOM (every ablated item, n=100): faithful accuracy none 1.000, C* 1.000
+  s_ID(OPTA) per model: llama8 +0.751, gemma9 +0.747, qwen7 +0.750, mistral7 +0.758; unweighted mean +0.751
+_________________________________________________________ test_greedy_cache_equals_reference_tiny[<lambda>1] __________________________________________________________
+------------------------------------------------------------------------ Captured stderr call -------------------------------------------------------------------------
+[transformers] Model config: eos_token_id must be `None` or an integer within the vocabulary (between 0 and 96), got 32000. This may result in unexpected behavior.
+-------------------------------------------------------------------------- Captured log call --------------------------------------------------------------------------
+WARNING  transformers.configuration_utils:logging.py:340 Model config: eos_token_id must be `None` or an integer within the vocabulary (between 0 and 96), got 32000. This may result in unexpected behavior.
+======================================================================= short test summary info =======================================================================
+PASSED tests/test_natural_clamp.py::test_kv_s_row_is_the_s_run_and_id_is_clean_b[NOM-57268739708984140094c8f0]
+PASSED tests/test_natural_clamp.py::test_kv_s_row_is_the_s_run_and_id_is_clean_b[NOM-56f88025aef2371900626121]
+PASSED tests/test_natural_clamp.py::test_kv_s_row_is_the_s_run_and_id_is_clean_b[OPTA-57268739708984140094c8f0]
+PASSED tests/test_natural_clamp.py::test_kv_s_row_is_the_s_run_and_id_is_clean_b[OPTA-56f88025aef2371900626121]
+PASSED tests/test_natural_clamp.py::test_kv_s_row_is_the_s_run_and_id_is_clean_b[LETA-57268739708984140094c8f0]
+PASSED tests/test_natural_clamp.py::test_kv_s_row_is_the_s_run_and_id_is_clean_b[LETA-56f88025aef2371900626121]
+PASSED tests/test_natural_clamp.py::test_batched_rows_equal_single_rows
+PASSED tests/test_natural_clamp.py::test_cue_conflict_z_and_explore_rows_equal_hand_built_clamps
+PASSED tests/test_natural_clamp.py::test_generation_under_kv_s_is_greedy_on_the_s_prompt[NOM]
+PASSED tests/test_natural_clamp.py::test_generation_under_kv_s_is_greedy_on_the_s_prompt[LETA]
+PASSED tests/test_natural_clamp.py::test_answer_ends_at_a_special_token_missing_from_the_eos_list
+PASSED tests/test_natural_clamp.py::test_passage_positions_and_frames
+PASSED tests/test_natural_clamp.py::test_early_stop_never_changes_the_answer_class
+PASSED tests/test_natural_clamp.py::test_frame_cont_is_cont_ids_on_every_item_and_parsing
+PASSED tests/test_kvquant.py::test_quantizer_equals_reference
+PASSED tests/test_kvquant.py::test_hooked_run_equals_layerwise_reference[k]
+PASSED tests/test_kvquant.py::test_hooked_run_equals_layerwise_reference[v]
+PASSED tests/test_kvquant.py::test_mixed_batch_equals_single_rows_and_decoding
+PASSED tests/test_natural_heads.py::test_span_splice_all_none_and_rows_G
+PASSED tests/test_natural_heads.py::test_batch_size_equal_to_span_length
+PASSED tests/test_natural_heads.py::test_region_ablation_with_own_outputs_is_clean_and_fixed_means_match_a_hook
+PASSED tests/test_natural_heads.py::test_argmax_chain_is_greedy_and_qplus
+PASSED tests/test_natural_heads.py::test_a3_self_clamp_is_zero_and_dla_slices
+PASSED tests/test_stage8a_score.py::test_bootstrap_is_two_stage_and_reproducible
+PASSED tests/test_stage8a_score.py::test_combination_rules_and_holm
+PASSED tests/test_stage8a_score.py::test_classes_follow_the_recorded_priors
+PASSED tests/test_stage8a_score.py::test_every_line_met_on_data_built_to_meet_it
+PASSED tests/test_stage8a_score.py::test_not_met_and_not_evaluable_paths
+PASSED tests/test_stage8a_score.py::test_a8_and_hybrid_values
+PASSED tests/test_stage8a_score.py::test_head_lines
+PASSED tests/test_stage8a_score.py::test_heads_ratios_use_each_sets_own_batch
+PASSED tests/test_stage8a_score.py::test_heads_population_takes_the_first_valid_items
+PASSED tests/test_stage8a_score.py::test_pytest_gate_parser
+PASSED tests/test_stage8a_score.py::test_pytest_step_runs_the_gates_and_the_shared_tests
+PASSED tests/test_stage8a_score.py::test_full_report
+PASSED tests/test_stage8a_score.py::test_holm_family_is_the_r_lines_interval_components
+PASSED tests/test_stage8a_score.py::test_compute_estimate_agrees_with_the_runbook
+PASSED tests/test_stage8a_score.py::test_runbook_stage8_names_what_the_code_does
+PASSED tests/test_generate.py::test_greedy_with_cache_equals_stepwise_reference_under_clamps
+PASSED tests/test_generate.py::test_greedy_cache_equals_reference_tiny[<lambda>0]
+PASSED tests/test_generate.py::test_greedy_cache_equals_reference_tiny[<lambda>1]
+PASSED tests/test_generate.py::test_parse_and_frames
+PASSED tests/test_generate.py::test_end_of_turn_tokens_end_an_answer
+PASSED tests/test_clamp.py::test_kv_sites
+PASSED tests/test_clamp.py::test_gpt2_clamp_exact
+PASSED tests/test_clamp.py::test_qwen_clamp_matches_single_position_hooks
+PASSED tests/test_clamp.py::test_format_factorial_regression
+PASSED tests/test_clamp.py::test_row_restricted_regression
+PASSED tests/test_head_splice.py::test_headsplice_all_heads_is_full_clamp_and_empty_is_clean
+PASSED tests/test_head_splice.py::test_headsplice_rows_G_and_group_slices_equal_rowsplice
+PASSED tests/test_head_splice.py::test_headsplice_batched_grid_equals_single_runs
+PASSED tests/test_head_splice.py::test_self_ablation_is_clean
+PASSED tests/test_head_splice.py::test_hopsplice_all_rows_is_plain_clamp
+PASSED tests/test_head_splice.py::test_hopsplice_no_overwrite_and_answer_only_cache
+PASSED tests/test_head_splice.py::test_hop_batch_equals_single_rows
+PASSED tests/test_stage8_populations.py::test_every_part_computes_U_identically
+PASSED tests/test_stage8_populations.py::test_populations_have_the_expected_sizes
+PASSED tests/test_stage8_populations.py::test_fresh_populations_disjoint_from_U_and_from_each_other
+PASSED tests/test_stage8_populations.py::test_labelled_reuses
+PASSED tests/test_stage8_populations.py::test_no_confirmatory_population_uses_a_pilot_seed
+PASSED tests/test_stage8_holm.py::test_phi_and_p_values
+PASSED tests/test_stage8_holm.py::test_degenerate_and_undefined
+PASSED tests/test_stage8_holm.py::test_holm_hand_worked
+PASSED tests/test_stage8_holm.py::test_directions_mixed_and_passthrough
+PASSED tests/test_stage8_holm.py::test_ties_keep_input_order
+PASSED tests/test_stage8_holm.py::test_adjusted_p_against_brute_force
+PASSED tests/test_stage8_holm.py::test_single_component_equals_the_unadjusted_test
+=================================================================== 67 passed in 130.84s (0:02:10) ====================================================================

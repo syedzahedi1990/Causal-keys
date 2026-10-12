@@ -1,0 +1,2 @@
+==== 2026-10-12T13:49:57Z python experiments/natural_factorial.py --stage frames --model /root/stage8_models/gemma9 --key gemma9 --squad results/gpu_stage8a/squad/dev-v1.1.json --out results/gpu_stage8a
+frame ' ' (counts {'': 0, ' ': 48, ' **': 0, '**': 0, ' The ': 0, ' the ': 0}; valid rates {' ': 1.0})

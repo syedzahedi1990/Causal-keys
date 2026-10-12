@@ -1,0 +1,9 @@
+==== 2026-10-12T14:34:22Z python experiments/natural_factorial.py --stage factorial --model /root/stage8_models/qwen7 --key qwen7 --squad results/gpu_stage8a/squad/dev-v1.1.json --out results/gpu_stage8a --reserve-min 88
+[qwen7] frame ' '; 185 valid E items, 0 skipped; closed book (8s)
+[qwen7] NOM: 185 items (181s)
+[qwen7] OPTA: 185 items (175s)
+[qwen7] OPTB: 185 items (70s)
+[qwen7] MENA: 185 items (75s)
+[qwen7] LETA: 185 items (164s)
+[qwen7] MENB: 185 items (76s)
+wrote results/gpu_stage8a/factorial/qwen7.json (751s)

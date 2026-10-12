@@ -1,0 +1,2 @@
+==== 2026-10-12T15:06:14Z python experiments/natural_factorial.py --stage frames --model /root/stage8_models/mistral7 --key mistral7 --squad results/gpu_stage8a/squad/dev-v1.1.json --out results/gpu_stage8a
+frame ' ' (counts {'': 0, ' ': 40, ' **': 0, '**': 0, ' The ': 0, ' the ': 0}; valid rates {' ': 1.0})

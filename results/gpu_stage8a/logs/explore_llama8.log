@@ -1,0 +1,8 @@
+==== 2026-10-12T13:37:03Z python experiments/natural_factorial.py --stage explore --model /root/stage8_models/llama8 --key llama8 --squad results/gpu_stage8a/squad/dev-v1.1.json --out results/gpu_stage8a
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+[llama8] explore onset_piece (96s)
+[llama8] explore x_target (96s)
+[llama8] explore year (33s)
+[llama8] explore leak (60s)
+[llama8] explore quant_extra (300s)
+wrote results/gpu_stage8a/explore/llama8.json (586s)

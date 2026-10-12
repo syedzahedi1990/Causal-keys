@@ -1,0 +1,6 @@
+==== 2026-10-12T15:22:30Z python experiments/natural_heads.py --model /root/stage8_models/mistral7 --key mistral7 --squad results/gpu_stage8a/squad/dev-v1.1.json --out results/gpu_stage8a
+[mistral7] ranked on 60 R items; k* 52; |T* & N*| = 23 (25s)
+[mistral7] eval curves on 80 E items (401s)
+[mistral7] ablate OPTA on 185 E items (515s)
+[mistral7] ablate NOM on 185 E items (624s)
+wrote results/gpu_stage8a/heads/mistral7.json (670s)

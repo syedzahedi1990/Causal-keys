@@ -1,0 +1,9 @@
+==== 2026-10-12T15:06:45Z python experiments/natural_factorial.py --stage factorial --model /root/stage8_models/mistral7 --key mistral7 --squad results/gpu_stage8a/squad/dev-v1.1.json --out results/gpu_stage8a --reserve-min 30
+[mistral7] frame ' '; 185 valid E items, 0 skipped; closed book (8s)
+[mistral7] NOM: 185 items (224s)
+[mistral7] OPTA: 185 items (225s)
+[mistral7] OPTB: 185 items (86s)
+[mistral7] MENA: 185 items (89s)
+[mistral7] LETA: 185 items (203s)
+[mistral7] MENB: 185 items (90s)
+wrote results/gpu_stage8a/factorial/mistral7.json (928s)

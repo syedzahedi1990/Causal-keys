@@ -1,0 +1,2 @@
+2026-10-12T15:44:11Z HEAD 8b74b79b76e06b27bedc0d841c7b1e4a5f671649
+python experiments/natural_factorial.py --stage explore --model /root/stage8_models/mistral7 --key mistral7 --squad results/gpu_stage8a/squad/dev-v1.1.json --out results/gpu_stage8a 

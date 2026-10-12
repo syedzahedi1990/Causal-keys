@@ -1,0 +1,2 @@
+==== 2026-10-12T14:33:55Z python experiments/natural_factorial.py --stage frames --model /root/stage8_models/qwen7 --key qwen7 --squad results/gpu_stage8a/squad/dev-v1.1.json --out results/gpu_stage8a
+frame ' ' (counts {'': 0, ' ': 52, ' **': 0, '**': 0, ' The ': 0, ' the ': 0}; valid rates {' ': 1.0})

@@ -1,0 +1,6 @@
+==== 2026-10-12T14:47:11Z python experiments/natural_heads.py --model /root/stage8_models/qwen7 --key qwen7 --squad results/gpu_stage8a/squad/dev-v1.1.json --out results/gpu_stage8a
+[qwen7] ranked on 60 R items; k* 40; |T* & N*| = 25 (22s)
+[qwen7] eval curves on 80 E items (309s)
+[qwen7] ablate OPTA on 185 E items (402s)
+[qwen7] ablate NOM on 185 E items (489s)
+wrote results/gpu_stage8a/heads/qwen7.json (526s)

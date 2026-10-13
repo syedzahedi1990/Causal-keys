@@ -2357,6 +2357,1437 @@ lines.append(r"\end{tabular}")
 wtab("tab_link.tex", lines)
 
 
+# ================================================================ stage 8 (preregistration J, paper v5): parts A, B and D
+# Parsed from STAGE8A_SCORE.txt, STAGE8B_SCORE.txt and STAGE8D_SCORE.txt as stages 5-7 are: smac/smac3 take a printed
+# string at its printed precision and assert that it is on the cited line; a range over models or cells (...Min, ...Max)
+# selects printed strings (nm); counts and sums of printed values are registered with amac; values the scorers do not
+# print are recomputed from the raw results through the committed scorers' own classes (rmac: label them exploratory or
+# post hoc), and where docs/PREREGISTRATION.md records them the recomputation reproduces the record (asserted below).
+# Part B's cell table results/gpu_stage8b/tab_invariance.tex is the part-B scorer's own output, written in the same run
+# as its score file, and is cited the same way (tag S8BINV). Part D's pytest session of record (results/gpu_stage8d/logs/
+# pytest.log) prints the J-D-G0 total of the outcome record, which the score line does not (tag S8DPY).
+# Groups: S8A (part A, natural passages), S8B (part B, fresh samples and the emitted-form score), S8D (part D, the flag),
+# S8X (counts across parts). Part C is still running on the GPU: its section below is a placeholder that registers nothing.
+# Names: J + part (Ja, Jb, Jd, Jx) + statistic + format or arm + model tag; an estimate with an interval also has ...Lo and
+# ...Hi. Model tags: LlamaEight, GemmaNine, GemmaTwo, QwenOnefive, QwenThree, QwenSeven, QwenFourteen, MistralSeven,
+# MistralTwentyfour, OlmoSeven, PhiFour, FalconSeven. Part A formats: Opta, Leta, Mena, Nom, Optb, Menb. Part B arms:
+# After, Post, PostNull, None, Pre, Before (Opt = P1 on S0). Part D cells: Qin, Qout, Inline, InlineChat, After.
+PRE8 = dict(macros)   # every macro defined before stage 8 (asserted unchanged at the end)
+N_PRE8 = len(REG)
+G8A, G8B, G8D, G8X = "S8A", "S8B", "S8D", "S8X"
+for _tag, _f in (("S8A", "results/gpu_stage8a/STAGE8A_SCORE.txt"), ("S8B", "results/gpu_stage8b/STAGE8B_SCORE.txt"),
+                 ("S8D", "results/gpu_stage8d/STAGE8D_SCORE.txt"), ("S8BINV", "results/gpu_stage8b/tab_invariance.tex")):
+    SCORE[_tag] = (ROOT / _f).read_text().splitlines()
+    SNAME[_tag] = _f
+S8A, S8B, S8D = SCORE["S8A"], SCORE["S8B"], SCORE["S8D"]
+K8 = {"llama8": "LlamaEight", "gemma9": "GemmaNine", "gemma2b": "GemmaTwo", "qwen1.5": "QwenOnefive", "qwen3b": "QwenThree",
+      "qwen7": "QwenSeven", "qwen14": "QwenFourteen", "mistral7": "MistralSeven", "mistral24": "MistralTwentyfour",
+      "olmo7": "OlmoSeven", "phi4": "PhiFour", "falcon7": "FalconSeven"}
+SH8 = {"llama8": "Llama-3.1-8B", "gemma9": "Gemma-2-9B", "gemma2b": "Gemma-2-2B", "qwen1.5": "Qwen2.5-1.5B", "qwen3b": "Qwen2.5-3B",
+       "qwen7": "Qwen2.5-7B", "qwen14": "Qwen2.5-14B", "mistral7": "Mistral-7B", "mistral24": "Mistral-Small-24B",
+       "olmo7": "OLMo-2-7B", "phi4": "Phi-4", "falcon7": "Falcon3-7B"}
+FAM8 = {"llama8": "Llama", "gemma9": "Gemma", "gemma2b": "Gemma", "qwen1.5": "Qwen", "qwen3b": "Qwen", "qwen7": "Qwen",
+        "qwen14": "Qwen", "mistral7": "Mistral", "mistral24": "Mistral", "olmo7": "OLMo", "phi4": "Phi", "falcon7": "Falcon"}
+VRD = r"(MET|NOT MET|NOT EVALUABLE)"
+CLS8 = (r"(\d+) lines: (\d+) MET, (\d+) NOT MET, (\d+) MET IN PART, (\d+) NOT EVALUABLE; observed (\d+) against expected "
+        r"(\d+\.\d+); Brier (\d\.\d+)")
+
+
+def sm8(name, tag, i, pat, desc, group, g=0):
+    """one printed string (group g of pat on line i of score file tag) -> macro; returns the string."""
+    s = grab(SCORE[tag], i, pat)[g]
+    smac(name, tag, i, s, desc, group)
+    return s
+
+
+def sm83(name, tag, i, pat, desc, group, off=0):
+    """estimate and interval (groups off..off+2 of pat on line i) -> name, nameLo, nameHi; returns the strings."""
+    t_ = grab(SCORE[tag], i, pat)[off:off + 3]
+    smac3(name, tag, i, t_, desc, group)
+    return t_
+
+
+def rng8(name, strs, desc, src, group):
+    """the smallest and the largest of printed strings (by value) -> nameMin, nameMax, each a printed string."""
+    v = sorted(strs, key=fl)
+    nm(name + "Min", sv(v[0]), desc + " (smallest)", src, group)
+    nm(name + "Max", sv(v[-1]), desc + " (largest)", src, group)
+
+
+def rmac3(name, e3, desc, src, group, fmt="{:.3f}"):
+    """recomputed estimate and 95 % interval -> name, nameLo, nameHi."""
+    for suf, v, d in (("", e3[0], ""), ("Lo", e3[1], " (lower 95 % bound)"), ("Hi", e3[2], " (upper 95 % bound)")):
+        rmac(name + suf, v, desc + d, src, group, fmt)
+
+
+def classes8(L, a, b, pre, group, kinds=("L", "M", "R")):
+    """the SUMMARY class lines: lines, MET, NOT MET, NOT EVALUABLE, observed against expected, Brier."""
+    for c in kinds:
+        lab = f"  account lines, class {c}: " if c != "Val" else "  measurement-validity lines, class R: "
+        i = find(L, lab, start=a, end=b)
+        tag = {id(S8A): "S8A", id(S8B): "S8B", id(S8D): "S8D"}[id(L)]
+        what = "measurement-validity lines (class R)" if c == "Val" else f"account lines of class {c}"
+        for j, w in enumerate(("Lines", "Met", "NotMet", "MetInPart", "NotEval", "Observed", "Exp", "Brier")):
+            if w in ("MetInPart", "Observed"):
+                continue
+            sm8(f"{pre}Class{c}{w}", tag, i, CLS8, f"{what}: {dict(Lines='lines', Met='MET', NotMet='NOT MET', NotEval='NOT EVALUABLE', Exp='expected MET (sum of the recorded priors of the lines with a verdict)', Brier='Brier score')[w]}", group, j)
+
+
+# ---------------------------------------------------------------- stage 8, part A: the format law on natural passages
+MA8 = ["llama8", "gemma9", "qwen7", "mistral7"]
+FA8 = {"OPTA": "Opta", "LETA": "Leta", "MENA": "Mena", "NOM": "Nom", "OPTB": "Optb", "MENB": "Menb"}   # figure order
+FLAB8 = {"OPTA": "options after", "LETA": "letters after", "MENA": "sentence after", "NOM": "free form",
+         "OPTB": "options before", "MENB": "sentence before"}
+LWA = {"J-A1": "One", "J-A1b": "Oneb", "J-A1c": "Onec", "J-A2": "Two", "J-A3": "Three", "J-A4": "Four", "J-A5": "Five",
+       "J-A5B": "FiveB", "J-A6a": "Sixa", "J-A6b": "Sixb", "J-A6c": "Sixc", "J-A6d": "Sixd", "J-A6e": "Sixe", "J-A7": "Seven",
+       "J-A7b": "Sevenb", "J-A8": "Eight", "J-A8d": "Eightd", "J-A-HA1": "HaOne", "J-A-HA2": "HaTwo", "J-A-HA3a": "HaThreea",
+       "J-A-HA3b": "HaThreeb"}
+GA8, PA8, RA8, SA8, XA8 = (sec(S8A, s) for s in ("GATES (J-A-G0", "PREDICTIONS (code", "REPORTED (no verdicts)", "SUMMARY (G4",
+                                                  "######## EXPLORATORY"))
+SRCA = SNAME["S8A"]
+# gates per model and format; NE8A: the cells a gate makes not evaluable
+NE8A = {}
+_lp, _p3, _g13 = [], [], []
+for k in MA8:
+    t = K8[k]
+    for f, fw in FA8.items():
+        for g in ("G1", "G2", "G3"):
+            i = find(S8A, f"  {k:8s} {f:4s} J-A-{g} ", start=GA8, end=PA8)
+            if not S8A[i].rstrip().endswith("-> MET"):
+                NE8A.setdefault((k, f), []).append(g)
+            if g == "G1":
+                _lp += list(grab(S8A, i, r"lp\(S run\)\| (\d\.\d+), mean max\|lp\(ID\) - lp\(B run\)\| (\d\.\d+)"))
+                sm8(f"JaGoneAgree{fw}{t}", "S8A", i, r"in (\d\.\d+) \(>= 0\.97\)",
+                    f"J-A-G1: share of items whose KV_S generation equals the S run's (>= 0.97 required), {f}, {SH8[k]}", G8A)
+            elif g == "G2":
+                sm8(f"JaNcomp{fw}{t}", "S8A", i, r"n_comp (\d+)",
+                    f"J-A-G2 n_comp: items competent in {f} (ID answers B, KV_S answers S, KV_X answers X), {SH8[k]}", G8A)
+            else:
+                _p3.append(grab(S8A, i, r"median p\(dec_B \| ID\) (\d\.\d+)")[0])
+                _g13 += list(grab(S8A, i, r"g1 = dec in ID (\d\.\d+), KV_S (\d\.\d+), KV_X (\d\.\d+)"))
+assert NE8A == {("llama8", "OPTA"): ["G1"], ("llama8", "MENA"): ["G2"], ("llama8", "MENB"): ["G2"], ("mistral7", "NOM"): ["G2"],
+                ("mistral7", "MENA"): ["G2"], ("mistral7", "MENB"): ["G2"]}, NE8A
+rng8("JaGoneLp", _lp, "J-A-G1 mean largest log-probability differences (KV_S vs the S run, ID vs the B run) over the 24 model x format cells, nats",
+     SRCA + " GATES", G8A)
+rng8("JaGthreeP", _p3, "J-A-G3 median p(dec_B | ID) over the 24 cells", SRCA + " GATES", G8A)
+rng8("JaGthreeGone", _g13, "J-A-G3 share of competent items whose first generated token is the decision token (ID, KV_S, KV_X rows) over the 24 cells",
+     SRCA + " GATES", G8A)
+for k in ("qwen7", "mistral7"):
+    t = K8[k]
+    i = find(S8A, f"  {k:8s} J-A-HA-G1 ", start=GA8, end=PA8)
+    for j, (w, d) in enumerate((("NoneClean", "mean |m(none) - m(clean)|"), ("AllFull", "mean |m(all_T) - m(full clamp)|"),
+                                ("Bound", "bound max(0.5, 0.02 d_full)"))):
+        sm8(f"JaHaGone{w}{t}", "S8A", i, r"\|m\(none\) - m\(clean\)\| (\d\.\d+), mean \|m\(all_T\) - m\(full clamp\)\| (\d\.\d+) "
+            r"\(<= max\(0\.5, 0\.02 x d_full\) = (\d\.\d+)\)", f"J-A-HA-G1 heads BF16 floor: {d} (nats), {SH8[k]}", G8A, j)
+    i = find(S8A, f"  {k:8s} J-A-HA-G2 ", start=GA8, end=PA8)
+    sm83(f"JaHaGtwoDfull{t}", "S8A", i, r"d_full " + CIR, f"J-A-HA-G2 d_full: the key clamp's effect read at the option rows (nats), OPTA, {SH8[k]}", G8A)
+    sm83(f"JaHaGtwoRatio{t}", "S8A", i, r"d_G/d_full " + CIR, f"J-A-HA-G2 d_G/d_full, OPTA, {SH8[k]}", G8A)
+# the lines: header (code, class, prior, title, verdict, models met / evaluable / run) and one result line per model
+LA8 = {}
+for i in range(PA8 + 1, RA8):
+    mm = re.match(r"  (J-A[\w-]+)\s+\[(\w), prior (\d\.\d\d)\] (.*?) -> " + VRD +
+                  r"(?: \(derived; not counted\))? \((\d+) of (\d+) evaluable models met; (\d+) run\)$", S8A[i])
+    if mm:
+        cur = mm[1]
+        LA8[cur] = dict(i=i, cls=mm[2], prior=mm[3], title=mm[4], v=mm[5], met=mm[6], ev=mm[7], run=mm[8], m={})
+        continue
+    mm = re.match(r"      (\w+): (.*) -> " + VRD + r"(?:  \[not evaluable: (.*)\])?$", S8A[i])
+    if mm:
+        LA8[cur]["m"][mm[1]] = dict(i=i, v=mm[3], why=mm[4] or "")
+assert list(LA8) == list(LWA), list(LA8)
+assert all(set(L["m"]) == set(MA8) for c, L in LA8.items() if not c.startswith("J-A-HA")), "part A: a model line is missing"
+for code, L in LA8.items():
+    smac(f"Ja{LWA[code]}Met", "S8A", L["i"], L["met"], f"{code}: evaluable models that meet the line", G8A)
+    smac(f"Ja{LWA[code]}Eval", "S8A", L["i"], L["ev"], f"{code}: evaluable models (of {L['run']} run)", G8A)
+
+
+def ia8(code, k):
+    return LA8[code]["m"][k]["i"]
+
+
+A8P = {}   # (model, format) -> printed (s_ID, ID_K, ID_V) triples on C(f), for the figure and the table
+for k in MA8:
+    t, S = K8[k], SH8[k]
+    for code, f in (("J-A1", "OPTA"), ("J-A1c", "LETA"), ("J-A2", "NOM")):
+        i, fw = ia8(code, k), FA8[f]
+        for st, lab in (("Sid", "s_ID"), ("IDK", "ID_K"), ("IDV", "ID_V")):
+            A8P[k, f, st] = sm83(f"Ja{st}{fw}{t}", "S8A", i, lab + " " + CIR,
+                                 f"{lab}{'' if st == 'Sid' else ' (nats)'} on C({f}), the items competent in {FLAB8[f]} ({f}); line {code}, {S}", G8A)
+        sm8(f"JaNart{fw}{t}", "S8A", i, r"\((\d+) articles\)", f"articles (clusters) of C({f}), {S}", G8A)
+        assert grab(S8A, i, r"n=(\d+)")[0] == macros[f"JaNcomp{fw}{t}"], (k, f)
+    i = ia8("J-A1b", k)
+    sm83(f"JaOnebSid{t}", "S8A", i, r"s_ID " + CIR, f"J-A1b s_ID on the OPTA items whose answer has |P| >= 3 tokens, {S}", G8A)
+    sm8(f"JaOnebN{t}", "S8A", i, r"n=(\d+)", f"J-A1b items with |P| >= 3, {S}", G8A)
+    i = ia8("J-A3", k)
+    sm83(f"JaThreeDiff{t}", "S8A", i, r"s_ID\(OPTA\) - s_ID\(NOM\) " + CIR, f"J-A3 (derived) s_ID(OPTA) - s_ID(NOM) on C(OPTA, NOM), {S}", G8A)
+    sm8(f"JaThreeN{t}", "S8A", i, r"n=(\d+)", f"J-A3 items competent in OPTA and NOM, {S}", G8A)
+    i = ia8("J-A4", k)
+    sm83(f"JaFourRatio{t}", "S8A", i, r"ratio " + CIR, f"J-A4 ID_K(OPTB) / ID_K(OPTA) on C(OPTA, OPTB), {S}", G8A)
+    sm83(f"JaFourDiff{t}", "S8A", i, r"ID_K\(OPTA\) - ID_K\(OPTB\) " + CIR, f"J-A4 ID_K(OPTA) - ID_K(OPTB) (nats), {S}", G8A)
+    sm83(f"JaFourIDKOptb{t}", "S8A", i, r"; ID_K\(OPTB\) " + CIR, f"J-A4 ID_K(OPTB) on C(OPTA, OPTB) (nats), {S}", G8A)
+    sm8(f"JaFourN{t}", "S8A", i, r"n=(\d+)", f"J-A4 items competent in OPTA and OPTB, {S}", G8A)
+    i = ia8("J-A5", k)
+    sm83(f"JaFiveDiff{t}", "S8A", i, r"s_ID\(MENA\) - s_ID\(NOM\) " + CIR, f"J-A5 s_ID(MENA) - s_ID(NOM) on C(MENA, NOM), {S}", G8A)
+    sm83(f"JaFiveIDKMena{t}", "S8A", i, r"; ID_K\(MENA\) " + CIR, f"J-A5 ID_K(MENA) on C(MENA, NOM) (nats), {S}", G8A)
+    sm83(f"JaFiveSidMena{t}", "S8A", i, r"; s_ID\(MENA\) " + CIR, f"J-A5 s_ID(MENA) on C(MENA, NOM), {S}", G8A)
+    sm8(f"JaFiveN{t}", "S8A", i, r"n=(\d+)", f"J-A5 items competent in MENA and NOM, {S}", G8A)
+    i = ia8("J-A5B", k)
+    if "not both run" not in S8A[i]:
+        sm83(f"JaFiveBDiff{t}", "S8A", i, r"ID_K\(MENA\) - ID_K\(MENB\) " + CIR, f"J-A5B ID_K(MENA) - ID_K(MENB) on C(MENA, MENB) (nats), {S}", G8A)
+        sm83(f"JaFiveBIDKMenb{t}", "S8A", i, r"; ID_K\(MENB\) " + CIR, f"J-A5B ID_K(MENB) on C(MENA, MENB) (nats), {S}", G8A)
+        sm8(f"JaFiveBN{t}", "S8A", i, r"n=(\d+)", f"J-A5B items competent in MENA and MENB, {S}", G8A)
+    for code, f in (("J-A6a", "OPTA"), ("J-A6b", "LETA"), ("J-A6c", "NOM")):
+        i, fw = ia8(code, k), FA8[f]
+        cc = f"{code} cue conflict (key from one counterfactual entity, value from the other; KS_VX and KX_VS rows), {f}, {S}"
+        A8P[k, f, "key"] = sm83(f"JaKeySrc{fw}{t}", "S8A", i, r"key-source " + CIR, "rate of answering the key source's entity, " + cc, G8A)
+        A8P[k, f, "val"] = sm83(f"JaValSrc{fw}{t}", "S8A", i, r"value-source " + CIR, "rate of answering the value source's entity, " + cc, G8A)
+        sm83(f"JaSrcDiff{fw}{t}", "S8A", i, r"difference " + CIR,
+             ("value-source minus key-source rate, " if f == "NOM" else "key-source minus value-source rate, ") + cc, G8A)
+        sm8(f"JaOtherB{fw}{t}", "S8A", i, r"other answers B (\d\.\d+)", "rate of answering B (the passage's own entity), " + cc, G8A)
+        sm8(f"JaOther{fw}{t}", "S8A", i, r", other (\d\.\d+) ->", "rate of answers naming none of B, S, X, Z, D ('other'), " + cc, G8A)
+    i = ia8("J-A6d", k)
+    sm83(f"JaSixdOpta{t}", "S8A", i, r"OPTA n=\d+ S-rate " + CIR, f"J-A6d flag only (K_S, V_Z): rate of answering S, OPTA, {S}", G8A)
+    sm8(f"JaSixdBOpta{t}", "S8A", i, r"\(B-rate (\d\.\d+)\)", f"J-A6d flag only: rate of answering B, OPTA, {S}", G8A)
+    sm83(f"JaSixdNom{t}", "S8A", i, r"NOM n=\d+ S-rate " + CIR, f"J-A6d flag only (K_S, V_Z): rate of answering S, NOM, {S}", G8A)
+    sm8(f"JaSixdZNom{t}", "S8A", i, r"\(Z-rate (\d\.\d+)\)", f"J-A6d flag only: rate of answering Z (the value's entity), NOM, {S}", G8A)
+    i = ia8("J-A6e", k)
+    sm83(f"JaSixeS{t}", "S8A", i, r"S-rate " + CIR, f"J-A6e copy fallback (K_Z, V_S): rate of answering S, OPTA, {S}", G8A)
+    sm8(f"JaSixeB{t}", "S8A", i, r"; B (\d\.\d+),", f"J-A6e copy fallback: rate of answering B, OPTA, {S}", G8A)
+    i = ia8("J-A7", k)
+    sm8(f"JaSevenN{t}", "S8A", i, r"prior-free n=(\d+)", f"J-A7 prior-free items (closed-book argmax not B), {S}", G8A)
+    sm83(f"JaSevenDiD{t}", "S8A", i, r"drop_OPTA\(K\)\] " + CIR,
+         f"J-A7 KIVI 2-bit DiD [drop_NOM(V) - drop_OPTA(V)] - [drop_NOM(K) - drop_OPTA(K)] (faithful accuracy), {S}", G8A)
+    for w, p in (("NomK", r"NOM\(K\)"), ("NomV", r"NOM\(V\)"), ("OptaK", r"OPTA\(K\)"), ("OptaV", r"OPTA\(V\)")):
+        sm8(f"JaSevenDrop{w}{t}", "S8A", i, r"drops .*?" + p + " " + NUM, f"J-A7 accuracy drop under 2-bit {w[-1]} quantization, {w[:-1].upper()}, {S}", G8A)
+    i = ia8("J-A7b", k)
+    sm83(f"JaSevenbDiff{t}", "S8A", i, r"drop_NOM\(V\) - drop_OPTA\(V\) " + CIR, f"J-A7b drop_NOM(V) - drop_OPTA(V), {S}", G8A)
+    i = ia8("J-A8", k)
+    sm8(f"JaEightN{t}", "S8A", i, r"n=(\d+)", f"J-A8 items (leak-free PERSON/PLACE with a continuation token differing from c_B), {S}", G8A)
+    A8P[k, "Icont"] = sm83(f"JaIcont{t}", "S8A", i, r"I_cont\(NOM\) " + CIR, f"J-A8 I_cont(NOM): K-V interaction on the continuation, as a share of d_KV^cont, {S}", G8A)
+    A8P[k, "Idec"] = sm83(f"JaIdec{t}", "S8A", i, r"I_dec\(NOM\) " + CIR, f"J-A8 I_dec(NOM): K-V interaction at the decision token, {S}", G8A)
+    sm83(f"JaContRatio{t}", "S8A", i, r"d_KV\^cont OPTA/NOM " + CIR, f"J-A8 d_KV^cont(OPTA) / d_KV^cont(NOM), {S}", G8A)
+    for j, w in enumerate(("K", "V", "KV")):
+        sm8(f"JaDcont{w}{t}", "S8A", i, r"d\^cont\(NOM\) K " + NUM + " V " + NUM + " KV " + NUM, f"J-A8 d_{w}^cont(NOM): effect on the continuation (nats), {S}", G8A, j)
+    i = ia8("J-A8d", k)
+    sm8(f"JaEightdNNom{t}", "S8A", i, r"NOM (\d+), OPTA (\d+)", f"J-A8d items with g1(K_Z) = dec_B, NOM (>= 40 needed), {S}", G8A, 0)
+    sm8(f"JaEightdNOpta{t}", "S8A", i, r"NOM (\d+), OPTA (\d+)", f"J-A8d items with g1(K_Z) = dec_B, OPTA, {S}", G8A, 1)
+    sm83(f"JaEightdNom{t}", "S8A", i, r"h\(K_Z, NOM\) " + CIR, f"J-A8d hybrid rate h(K_Z, NOM), {S}", G8A)
+    sm8(f"JaEightdOpta{t}", "S8A", i, r"h\(K_Z, OPTA\) " + NUM, f"J-A8d hybrid rate h(K_Z, OPTA), {S}", G8A)
+for k in ("qwen7", "mistral7"):
+    t, S = K8[k], SH8[k]
+    i = ia8("J-A-HA1", k)
+    sm8(f"JaHaKstar{t}", "S8A", i, r"k\*=(\d+)", f"k* of the natural reader set N* (5 % of the heads), {S}", G8A)
+    for w, p in (("R", "R_N "), ("KO", "KO_N "), ("Rrand", "R_rand "), ("KOrand", "KO_rand ")):
+        sm83(f"JaHaOne{w}{t}", "S8A", i, p + CIR, f"J-A-HA1 {p.strip()}(k*) of the natural readers N* (rand: mean of 3 draws){' (not evaluable: J-A-HA-G1)' if k == 'qwen7' else ''}, {S}", G8A)
+    i = ia8("J-A-HA2", k)
+    sm83(f"JaHaTwoR{t}", "S8A", i, r"R_T " + CIR, f"J-A-HA2 R_T(k*): the template readers T* on natural text, {S}", G8A)
+    sm83(f"JaHaTwoKO{t}", "S8A", i, r"KO_T " + CIR, f"J-A-HA2 KO_T(k*), {S}", G8A)
+    ov, P_ = grab(S8A, i, r"\|T\* & N\*\| = (\d+) \(hypergeometric P (\S+)\)")
+    smac(f"JaHaTwoOverlap{t}", "S8A", i, ov, f"J-A-HA2 |T* & N*| (template and natural reader sets), {S}", G8A)
+    mant, ex_ = P_.split("e")
+    nm(f"JaHaTwoP{t}", f"{mant}\\times 10^{{{int(ex_)}}}", f"J-A-HA2 hypergeometric P of that overlap (math mode; printed {P_}), {S}", f"{SRCA}:{i + 1}", G8A)
+    i = ia8("J-A-HA3a", k)
+    sm8(f"JaHaThreeaN{t}", "S8A", i, r"OPTA n=(\d+)", f"J-A-HA3a prior-free competent OPTA items, {S}", G8A)
+    sm8(f"JaHaThreeaAcc{t}", "S8A", i, r"acc\(none\) (\d\.\d+)", f"J-A-HA3a faithful accuracy without ablation, {S}", G8A)
+    sm83(f"JaHaThreeaDrop{t}", "S8A", i, r"drop\(N\*\) " + CIR, f"J-A-HA3a accuracy drop when N* is ablated at the options, {S}", G8A)
+    for j, w in enumerate(("RandZero", "RandOne", "RandTwo", "Tstar")):
+        sm8(f"JaHaThreea{w}{t}", "S8A", i, r"rand0 " + NUM + ", rand1 " + NUM + ", rand2 " + NUM + r"; drop\(T\*\) " + NUM,
+            f"J-A-HA3a accuracy drop when {('random set 0', 'random set 1', 'random set 2', 'T*')[j]} is ablated, {S}", G8A, j)
+    i = ia8("J-A-HA3b", k)
+    sm83(f"JaHaThreebDec{t}", "S8A", i, r"decision accuracy change " + CIR, f"J-A-HA3b NOM decision-token accuracy change under N* ablation, {S}", G8A)
+    sm83(f"JaHaThreebCont{t}", "S8A", i, r"continuation accuracy change " + CIR, f"J-A-HA3b NOM continuation accuracy change under N* ablation, {S}", G8A)
+# reported (no verdicts): closed-book prior, accuracies, decision-token cue conflict, all valid items, KIVI, d_K^cont
+for k in MA8:
+    t, S = K8[k], SH8[k]
+    h = find(S8A, f"  [{k}] n valid ", start=RA8, end=SA8)
+    e = next(j for j in range(h + 1, SA8) if S8A[j].startswith("  ["))
+    for cb, cw in (("CBOPT", "Opt"), ("CBLET", "Let")):
+        i = find(S8A, f"    P_CB(B) {cb}:", start=h, end=e)
+        sm8(f"JaPrior{cw}{t}", "S8A", i, cb + r": (\d\.\d+) of", f"closed-book prior: share of items whose argmax over the options is B ({cb}), {S}", G8A)
+        for ty in ("PERSON", "PLACE", "NUMBER"):
+            sm8(f"JaPrior{cw}{ty.capitalize()}{t}", "S8A", i, ty + r" (\d\.\d+) \(n", f"closed-book prior ({cb}), {ty} items, {S}", G8A)
+    for f in ("NOM", "OPTA", "LETA"):
+        fw = FA8[f]
+        i = find(S8A, f"    {f} competent n=", start=h, end=e)
+        for w, p in (("VZ", r"under V_Z "), ("KZ", r"; K_Z "), ("KVZ", r"KV_Z ")):
+            sm83(f"JaAcc{w}{fw}{t}", "S8A", i, p + CIR, f"accuracy for B with {w[:-1]}_Z (the {w[:-1]} of a third entity Z) on C({f}), {S}", G8A)
+        i = find(S8A, f"    {f} cue conflict at the decision token", start=h, end=e)
+        A8P[k, f, "keyDec"] = sm83(f"JaKeySrcDec{fw}{t}", "S8A", i, r"key-source " + CIR, f"cue conflict at the decision token (g1): key-source rate, {f}, {S}", G8A)
+        A8P[k, f, "valDec"] = sm83(f"JaValSrcDec{fw}{t}", "S8A", i, r"value-source " + CIR, f"cue conflict at the decision token (g1): value-source rate, {f}, {S}", G8A)
+        i = find(S8A, f"    KIVI {f} competent n=", start=h, end=e)
+        for j, w in enumerate(("ErrK", "ErrV", "None", "Ktwo", "Vtwo")):
+            sm8(f"JaKivi{w}{fw}{t}", "S8A", i, r"relative error K (\d\.\d+), V (\d\.\d+); faithful \(S\) accuracy none (\d\.\d+), K2 (\d\.\d+), V2 (\d\.\d+)",
+                f"KIVI on C({f}): {('relative reconstruction error of the keys (per channel)', 'relative reconstruction error of the values (per token)', 'faithful accuracy, no quantization', 'faithful accuracy, 2-bit keys', 'faithful accuracy, 2-bit values')[j]}, {S}", G8A, j)
+    for f, fw in FA8.items():
+        i = find(S8A, f"    {f} all valid items n=", start=h, end=e)
+        sm83(f"JaSidAll{fw}{t}", "S8A", i, r"s_ID " + CIR, f"s_ID on all valid items (185), {f}, {S}", G8A)
+        sm8(f"JaMassAll{fw}{t}", "S8A", i, r"option mass \(ID\) (\d\.\d+)", f"mass of the four options at the decision token (ID row), all valid items, {f}, {S}", G8A)
+    i = find(S8A, "    d_K^cont(NOM) on the J-A8 population", start=h, end=e)
+    sm83(f"JaDKcont{t}", "S8A", i, r"population " + CIR, f"d_K^cont(NOM): the key alone's effect on the continuation, J-A8 population (nats), {S}", G8A)
+for k in ("qwen7", "mistral7"):
+    t, S = K8[k], SH8[k]
+    h = find(S8A, f"  [{k}] k*=", start=RA8, end=SA8)
+    for f in ("OPTA", "NOM"):
+        i = find(S8A, f"    {f} every ablated item", start=h, end=h + 4)
+        cond = dict((c, a) for c, a in re.findall(r"(\w+): faithful\(S\) (\d\.\d+), clean-B chain", S8A[i]))
+        assert set(cond) == {"none", "N", "T", "rand0", "rand1", "rand2", "C"}, cond
+        for c, w in (("none", "None"), ("N", "Nstar"), ("T", "Tstar"), ("rand0", "RandZero"), ("rand1", "RandOne"), ("rand2", "RandTwo"), ("C", "Cstar")):
+            smac(f"JaAblFaith{w}{FA8[f]}{t}", "S8A", i, cond[c],
+                 f"faithful accuracy on every item with heads {c} ablated (N*: natural readers, T*: template readers, C*: DLA copy set), {f}, {S}", G8A)
+# summary: classes, the R tally (S8X), the overall count, Holm
+classes8(S8A, SA8, XA8, "Ja", G8A)
+i = find(S8A, "  met rate among R account lines with a verdict:", start=SA8, end=XA8)
+for j, (w, d) in enumerate((("Met", "met"), ("Verd", "with a verdict"), ("Exp", "expected met"))):
+    sm8(f"JxRisky{w}A", "S8A", i, r"(\d+) of (\d+) \(expected (\d+\.\d+)\)", f"part A: risky (class R) account lines {d}", G8X, j)
+i = find(S8A, "  overall: ", start=SA8, end=XA8)
+for j, w in enumerate(("Met", "NotMet", "NotEval", "Lines")):
+    sm8(f"JaCount{w}", "S8A", i, r"(\d+) MET, (\d+) NOT MET, (\d+) NOT EVALUABLE of (\d+) counted lines",
+        f"part A: lines {('MET', 'NOT MET', 'NOT EVALUABLE', 'counted (J-A3 derived, not counted)')[j]}", G8A, j)
+i = find(S8A, "    J-A5: 1 component", start=SA8, end=XA8)
+sm8("JaHolmP", "S8A", i, r"\(p (\S+), Holm threshold (\S+);", "Holm sensitivity: one-sided p of J-A5's Qwen2.5-7B component s_ID(MENA) - s_ID(NOM) > 0", G8A, 0)
+sm8("JaHolmThr", "S8A", i, r"\(p (\S+), Holm threshold (\S+);", "Holm sensitivity: its Holm threshold (the one decision that changes; no verdict changes)", G8A, 1)
+# exploratory (not scored): onset and pieces (E1/E2), YEAR (E4), the LEAK stratum, full strings (E6), heads
+for k in MA8:
+    t, S = K8[k], SH8[k]
+    h = find(S8A, f"  [{k}] explore parts:", start=XA8)
+    e = next(j for j in range(h + 1, len(S8A)) if S8A[j].startswith("  [") or S8A[j].startswith("  heads ["))
+    i = find(S8A, "    E1/E2 OPTA", start=h, end=e)
+    for j, w in enumerate(("DKOpta", "OnOpta", "FirstOpta", "RestOpta")):
+        sm8(f"JaEone{w}{t}", "S8A", i, r"d_K = m\(K_S\) - m\(ID\) " + NUM + r" nats; fractions K_S@on " + NUM + r", K_S\^1 " + NUM + r", K_S\^r " + NUM,
+            f"E1/E2 OPTA (exploratory): {('d_K = m(K_S) - m(ID) (nats)', 'fraction of d_K kept with the clamp from 30 % depth', 'fraction carried by the first span piece', 'fraction carried by the later span pieces')[j]}, {S}", G8A, j)
+    i = find(S8A, "    E1/E2 NOM", start=h, end=e)
+    for j, w in enumerate(("DVNom", "OnNom", "FirstNom", "RestNom")):
+        sm8(f"JaEone{w}{t}", "S8A", i, r"d_V = m\(V_S\) - m\(ID\) " + NUM + r" nats; fractions V_S@on " + NUM + r", V_S\^1 " + NUM + r", V_S\^r " + NUM,
+            f"E1/E2 NOM (exploratory): {('d_V = m(V_S) - m(ID) (nats)', 'fraction of d_V kept with the clamp from 30 % depth', 'fraction carried by the first span piece', 'fraction carried by the later span pieces')[j]}, {S}", G8A, j)
+    for f in ("NOM", "OPTA"):
+        fw = FA8[f]
+        i = find(S8A, f"    E4 YEAR {f} n=", start=h, end=e)
+        for j, w in enumerate(("DK", "DV", "DKV", "Idec")):
+            sm8(f"JaEfour{w}{fw}{t}", "S8A", i, r"d_K " + NUM + ", d_V " + NUM + ", d_KV " + NUM + ", I_dec " + NUM,
+                f"E4 YEAR items (exploratory), at the first differing digit: {('d_K (nats)', 'd_V (nats)', 'd_KV (nats)', 'I_dec')[j]}, {f}, {S}", G8A, j)
+        i = find(S8A, f"    LEAK {f} competent", start=h, end=e)
+        sm8(f"JaLeakSid{fw}{t}", "S8A", i, r"s_ID " + NUM, f"LEAK stratum (partial re-mention of e_B in the passage; exploratory): s_ID, {f}, {S}", G8A)
+        sm8(f"JaLeakN{fw}{t}", "S8A", i, r"competent n=(\d+) of", f"LEAK stratum: competent items, {f}, {S}", G8A)
+        i = find(S8A, f"    E6 {f} full string", start=h, end=e)
+        for j, w in enumerate(("IDK", "IDV", "Sid")):
+            sm8(f"JaEsix{w}{fw}{t}", "S8A", i, r"ID_K " + NUM + ", ID_V " + NUM + r", s_ID\^full " + NUM,
+                f"E6 full-string score (exploratory): {('ID_K (nats)', 'ID_V (nats)', 's_ID^full')[j]}, {f}, {S}", G8A, j)
+for k in ("qwen7", "mistral7"):
+    t, S = K8[k], SH8[k]
+    h = find(S8A, f"  heads [{k}]", start=XA8)
+    e = next((j for j in range(h + 1, len(S8A)) if not S8A[j].startswith("    ")), len(S8A))
+    i = find(S8A, "    ID_K / ID_V with N* ablated at Q+", start=h, end=e)
+    sm8(f"JaHeadsRhoK{t}", "S8A", i, r"\(rho_K " + NUM, f"heads (exploratory): rho_K with N* ablated at the options, OPTA, {S}", G8A)
+    sm8(f"JaHeadsDV{t}", "S8A", i, r"ID_V change " + NUM, f"heads (exploratory): change of ID_V with N* ablated (nats), OPTA, {S}", G8A)
+i = find(S8A, "  s_ID(OPTA) per model:", start=XA8)
+sm8("JaSidOptaMean", "S8A", i, r"unweighted mean " + NUM, "unweighted mean of s_ID(OPTA) over the four models (gated cells included)", G8A)
+# ranges over models that the outcome record cites
+_tA = lambda base, fs=("",), ms=MA8: [macros[f"{base}{f}{K8[k]}"] for k in ms for f in fs]  # noqa: E731
+rng8("JaFourIDKOptb", _tA("JaFourIDKOptb"), "J-A4 ID_K(OPTB) over the four models (nats)", SRCA + " J-A4", G8A)
+rng8("JaFourRatio", _tA("JaFourRatio"), "J-A4 ID_K(OPTB)/ID_K(OPTA) over the four models", SRCA + " J-A4", G8A)
+rng8("JaIcont", _tA("JaIcont"), "J-A8 I_cont(NOM) over the four models", SRCA + " J-A8", G8A)
+rng8("JaIdec", _tA("JaIdec"), "J-A8 I_dec(NOM) over the four models", SRCA + " J-A8", G8A)
+rng8("JaContRatio", _tA("JaContRatio"), "J-A8 continuation ratio OPTA/NOM over the four models", SRCA + " J-A8", G8A)
+rng8("JaDKcont", _tA("JaDKcont"), "d_K^cont(NOM) over the four models (nats)", SRCA + " REPORTED", G8A)
+rng8("JaSidAllBefore", _tA("JaSidAll", ("Optb", "Menb")), "s_ID on all valid items, OPTB and MENB, over the four models", SRCA + " REPORTED", G8A)
+rng8("JaSidAllMena", _tA("JaSidAll", ("Mena",)), "s_ID on all valid items, MENA, over the four models", SRCA + " REPORTED", G8A)
+rng8("JaMassAllList", _tA("JaMassAll", ("Opta", "Optb", "Leta")), "option mass with the options listed (OPTA, OPTB, LETA), all valid items", SRCA + " REPORTED", G8A)
+rng8("JaMassAllNoList", _tA("JaMassAll", ("Nom", "Mena", "Menb")), "option mass without the options listed (NOM, MENA, MENB), all valid items", SRCA + " REPORTED", G8A)
+for ty in ("Person", "Place", "Number"):
+    rng8(f"JaPriorOpt{ty}", _tA(f"JaPriorOpt{ty}"), f"closed-book prior (CBOPT), {ty.upper()} items, over the four models", SRCA + " REPORTED", G8A)
+rng8("JaPriorOpt", _tA("JaPriorOpt"), "closed-book prior (CBOPT), all items, over the four models", SRCA + " REPORTED", G8A)
+rng8("JaKiviErrK", _tA("JaKiviErrK", ("Nom", "Opta", "Leta")), "KIVI relative error of the keys over models and formats", SRCA + " REPORTED", G8A)
+rng8("JaKiviErrV", _tA("JaKiviErrV", ("Nom", "Opta", "Leta")), "KIVI relative error of the values over models and formats", SRCA + " REPORTED", G8A)
+rng8("JaKiviMcq", _tA("JaKiviKtwo", ("Opta", "Leta")) + _tA("JaKiviVtwo", ("Opta", "Leta")), "KIVI faithful MCQ accuracy (OPTA, LETA) under 2-bit keys or values", SRCA + " REPORTED", G8A)
+EONE8 = {"OnNom": "fraction of d_V = m(V_S) - m(ID) kept with the clamp from 30 % depth, NOM", "FirstNom": "fraction of d_V carried by the first span piece, NOM",
+         "OnOpta": "fraction of d_K = m(K_S) - m(ID) kept with the clamp from 30 % depth, OPTA", "FirstOpta": "fraction of d_K carried by the first span piece, OPTA",
+         "RestOpta": "fraction of d_K carried by the later span pieces, OPTA"}
+for w, d in EONE8.items():
+    rng8(f"JaEone{w}", _tA(f"JaEone{w}"), f"E1/E2 (exploratory): {d}, over the four models", SRCA + " EXPLORATORY", G8A)
+EFOUR8 = {"DKNom": "d_K (nats), NOM", "DVNom": "d_V (nats), NOM", "IdecNom": "I_dec, NOM", "DKOpta": "d_K (nats), OPTA", "IdecOpta": "I_dec, OPTA"}
+for w, d in EFOUR8.items():
+    rng8(f"JaEfour{w}", _tA(f"JaEfour{w}"), f"E4 YEAR items (exploratory), at the first differing digit: {d}, over the four models", SRCA + " EXPLORATORY", G8A)
+for w in ("Nom", "Opta"):
+    rng8(f"JaLeakSid{w}", _tA(f"JaLeakSid{w}"), f"LEAK stratum s_ID, {w.upper()}, over the four models", SRCA + " EXPLORATORY", G8A)
+rng8("JaEsixSidNom", _tA("JaEsixSidNom"), "E6 s_ID^full(NOM) over the four models", SRCA + " EXPLORATORY", G8A)
+rng8("JaDcontK", _tA("JaDcontK"), "J-A8 d_K^cont(NOM) over the four models (nats)", SRCA + " J-A8", G8A)
+rng8("JaValSrcDecNom", _tA("JaValSrcDecNom"), "NOM cue conflict at the decision token, value-source rate, over the four models", SRCA + " REPORTED", G8A)
+# recomputed (not printed): s_ID, ID_K and ID_V on C(f) for MENA, OPTB and MENB, through the committed part-A scorer's own
+# Model (Model.C, Model.idkv) and its two-stage article bootstrap (common.est, seed 20261010); the same code reproduces
+# the printed OPTA, LETA and NOM values to the last printed digit (asserted).
+from stage8a_parts import common as CA8  # noqa: E402
+from stage8a_parts import factorial as FA8M  # noqa: E402
+for k in MA8:
+    t, S = K8[k], SH8[k]
+    srcf = f"results/gpu_stage8a/factorial/{k}.json"
+    M8 = FA8M.Model(k, json.load(open(ROOT / srcf)), None, False, True)
+    for f, fw in FA8.items():
+        ids = M8.C(f)
+        assert len(ids) == int(macros[f"JaNcomp{fw}{t}"]), (k, f)
+        kk, vv = M8.idkv(f, ids)
+        arts = M8.arts(ids)
+        for st, e8 in (("Sid", CA8.est(arts, CA8.sid, kk, vv)), ("IDK", CA8.est(arts, CA8.mean, kk)), ("IDV", CA8.est(arts, CA8.mean, vv))):
+            if f in ("OPTA", "LETA", "NOM"):
+                assert tuple(f"{x:+.3f}" for x in (e8.pt, e8.lo, e8.hi)) == A8P[k, f, st], (k, f, st, e8, A8P[k, f, st])
+            else:
+                lab = {"Sid": "s_ID", "IDK": "ID_K (nats)", "IDV": "ID_V (nats)"}[st]
+                rmac3(f"Ja{st}{fw}{t}", (e8.pt, e8.lo, e8.hi),
+                      f"{lab} on C({f}), the items competent in {FLAB8[f]} ({f}); scorer's Model.C/idkv and two-stage article bootstrap, {S}", srcf, G8A)
+                A8P[k, f, st] = tuple(f"{x:+.3f}" for x in (e8.pt, e8.lo, e8.hi))
+
+# ---------------------------------------------------------------- stage 8, part B: fresh samples and the emitted-form score
+MB8P = ["qwen7", "qwen14", "mistral7", "olmo7"]
+MB8N = ["llama8", "gemma9", "phi4", "falcon7"]
+MB8 = MB8P + MB8N + ["gemma2b"]
+AB8 = {"AFTER": "After", "POST": "Post", "POST-NULL": "PostNull", "NONE": "None", "PRE": "Pre", "BEFORE": "Before"}   # figure order
+AS08 = {"P1": "Opt", "AFTER": "After", "BEFORE": "Before", "POST": "Post", "PRE": "Pre", "NONE": "None"}
+ALAB8 = {"AFTER": "list after", "POST": "sentence after", "POST-NULL": "null sentence after", "NONE": "no mention",
+         "PRE": "sentence before", "BEFORE": "list before", "P1": "options after"}
+LWB = {"J-B1-P4f": "OnePf", "J-B1-N4": "OneNf", "J-B2-P4f": "TwoPf", "J-B2-N4": "TwoNf", "J-B3-P4f": "ThreePf", "J-B3-N4": "ThreeNf",
+       "J-B4-P4f": "FourPf", "J-B4-N4": "FourNf", "J-B5-P4f": "FivePf", "J-B5-N4": "FiveNf", "J-B5b-P4f": "FivebPf", "J-B5b-N4": "FivebNf",
+       "J-B-NULL-P4f": "NullPf", "J-B-NULL-N4": "NullNf", "J-B-LB-N4": "LbNf", "J-B-SMALL": "Small", "J-B6a": "Sixa", "J-B6b": "Sixb",
+       "J-B6c": "Sixc", "J-B7": "Seven", "J-B8": "Eight"}
+GB8, PB8, RB8, SB8, XB8 = (sec(S8B, s) for s in ("GATES (J-B-G0", "PREDICTIONS (code", "REPORTED (no verdicts)", "SUMMARY (G4",
+                                                  "######## EXPLORATORY"))
+SRCB = SNAME["S8B"]
+# REPORTED: per model and arm on F, r, s_ID, beta_K, beta_V with 95 % cluster intervals, ID_K^E, ID_V^E and the flip rate
+B8 = {}
+_pb = (r"^    (\S+)\s+(AFTER|BEFORE|NONE|POST-NULL|POST|PRE)\s+\[(E|L)\] r " + CIR + r"  s_ID " + CIR + r"  beta_K " + CIR +
+       r"  beta_V " + CIR + r"  ID_K\^E " + NUM + r"  ID_V\^E " + NUM + r"  flip (\d\.\d+)$")
+for i in range(RB8, SB8):
+    mm = re.match(_pb, S8B[i])
+    if mm:
+        g_ = mm.groups()
+        B8[mm[1], mm[2]] = dict(i=i, sc=mm[3], R=g_[3:6], Sid=g_[6:9], BetaK=g_[9:12], BetaV=g_[12:15], IDK=g_[15], IDV=g_[16], Flip=g_[17])
+assert len(B8) == 54 and all(d["sc"] == "E" for d in B8.values()), (len(B8), {d["sc"] for d in B8.values()})
+for k in MB8:
+    t, S = K8[k], SH8[k]
+    ne = " (not evaluable: J-B-G5 competence)" if k == "gemma2b" else ""
+    for arm, aw in AB8.items():
+        d = B8[k, arm]
+        for st, lab in (("R", "r = ID_K^E(arm)/ID_K^E(AFTER)"), ("Sid", "s_ID^E"), ("BetaK", "beta_K: share of generated answers flipped by the key-only clamp"),
+                        ("BetaV", "beta_V: share flipped by the value-only clamp")):
+            smac3(f"Jb{st}{aw}{t}", "S8B", d["i"], d[st], f"{lab}, {ALAB8[arm]} ({arm}), F, 95 % cluster interval, {S}{ne}", G8B)
+        smac(f"JbIDK{aw}{t}", "S8B", d["i"], d["IDK"], f"ID_K^E (nats), {ALAB8[arm]} ({arm}), F, {S}{ne}", G8B)
+        smac(f"JbIDV{aw}{t}", "S8B", d["i"], d["IDV"], f"ID_V^E (nats), {ALAB8[arm]} ({arm}), F, {S}{ne}", G8B)
+        smac(f"JbFlip{aw}{t}", "S8B", d["i"], d["Flip"], f"flip rate of the key-only clamp, {ALAB8[arm]} ({arm}), F, {S}{ne}", G8B)
+# the scorer's fig_crossover.csv carries the same beta values (to the printed precision)
+import csv  # noqa: E402
+for row in csv.DictReader(open(ROOT / "results/gpu_stage8b/fig_crossover.csv")):
+    d = B8[row["model"], row["arm"]]
+    for st, c in (("BetaK", "beta_K"), ("BetaV", "beta_V")):
+        for v, s in zip((row[c], row[c + "_lo"], row[c + "_hi"]), d[st]):
+            assert abs(float(v) - float(s)) <= 0.0005 + 1e-9, (row, st, d[st])
+# ranges over models of every reported statistic, per arm (P4, N4, all eight P4 and N4 models; Gemma-2-2B excluded)
+STB8 = {"R": "r^E = ID_K^E(arm)/ID_K^E(AFTER)", "Sid": "s_ID^E", "BetaK": "beta_K (share of generated answers flipped by the key-only clamp)",
+        "BetaV": "beta_V (share flipped by the value-only clamp)", "Flip": "flip rate of the key-only clamp", "IDK": "ID_K^E (nats)", "IDV": "ID_V^E (nats)"}
+GRB8 = {"Pfour": "four P4 models (Qwen2.5-7B, Qwen2.5-14B, Mistral-7B, OLMo-2-7B)", "Nfour": "four N4 models (Llama-3.1-8B, Gemma-2-9B, Phi-4, Falcon3-7B)",
+        "Eight": "eight P4 and N4 models"}
+for arm, aw in AB8.items():
+    for st in ("R", "Sid", "BetaK", "BetaV", "Flip", "IDK", "IDV"):
+        if st == "R" and arm == "AFTER":
+            continue
+        for grp, ms in (("Pfour", MB8P), ("Nfour", MB8N), ("Eight", MB8P + MB8N)):
+            vals = [B8[k, arm][st][0] if isinstance(B8[k, arm][st], tuple) else B8[k, arm][st] for k in ms]
+            rng8(f"JbRange{st}{aw}{grp}", vals, f"{STB8[st]}, {ALAB8[arm]} ({arm}), F, emitted-form scoring: point estimates over the {GRB8[grp]}",
+                 SRCB + " REPORTED", G8B)
+# the lines: header and per-model blocks with their component lines
+LB8 = {}
+for i in range(PB8 + 1, RB8):
+    mm = re.match(r"  (J-B[\w-]+)\s+\[(\w), (\w), prior (\d\.\d\d)\] (.*?) -> " + VRD + r" \((\d+) of (\d+) evaluable met; (\d+) slots\)$", S8B[i])
+    if mm:
+        cur = mm[1]
+        LB8[cur] = dict(i=i, cls=mm[2], kind=mm[3], prior=mm[4], title=mm[5], v=mm[6], met=mm[7], ev=mm[8], run=mm[9], m={})
+        continue
+    mm = re.match(r"      (?:P4 |N4 )?([\w.]+): " + VRD + r"\s*(.*)$", S8B[i])
+    if mm:
+        last = mm[1]
+        LB8[cur]["m"][last] = dict(i=i, v=mm[2], txt=mm[3], comps=[])
+    elif S8B[i].startswith("          "):
+        LB8[cur]["m"][last]["comps"].append(i)
+assert list(LB8) == list(LWB), list(LB8)
+for code, L in LB8.items():
+    smac(f"Jb{LWB[code]}Met", "S8B", L["i"], L["met"], f"{code}: evaluable models (slots) that meet the line", G8B)
+    smac(f"Jb{LWB[code]}Eval", "S8B", L["i"], L["ev"], f"{code}: evaluable models (of {L['run']} slots)", G8B)
+
+
+def cb8(code, k, sub):
+    """the unique component line of model k on line code that contains sub."""
+    hits = [j for j in LB8[code]["m"][k]["comps"] if sub in S8B[j]]
+    assert len(hits) == 1, (code, k, sub, hits)
+    return hits[0]
+
+
+BND = r"(?:lower|upper) bound ([+-]\d+\.\d+)"
+CBP = {}   # (name stem, model) -> printed bound, for ranges
+for code, ms, lvl in (("J-B1-P4f", MB8P, "95 %"), ("J-B1-N4", MB8N, "98.75 %"), ("J-B2-P4f", MB8P, "95 %"), ("J-B2-N4", MB8N, "98.75 %"),
+                      ("J-B3-P4f", MB8P, "95 %"), ("J-B3-N4", MB8N, "98.75 %"), ("J-B4-P4f", MB8P, "95 %"), ("J-B4-N4", MB8N, "98.75 %"),
+                      ("J-B5-P4f", MB8P, "95 %"), ("J-B5-N4", MB8N, "98.75 %"), ("J-B5b-P4f", MB8P, "95 %"), ("J-B5b-N4", MB8N, "98.75 %"),
+                      ("J-B-NULL-P4f", MB8P, "95 %"), ("J-B-NULL-N4", MB8N, "98.75 %"), ("J-B-LB-N4", MB8N, "98.75 %")):
+    stem = {"J-B1": "One", "J-B2": "Two", "J-B3": "Three", "J-B4": "Four", "J-B5": "Five", "J-B5b": "Fiveb", "J-B-NULL": "Null", "J-B-LB": "Lb"}[code.rsplit("-", 1)[0]]
+    comps = {"One": (("SidLb", "H0 s_ID^E(AFTER) <= 0.4", "lower bound of s_ID^E(AFTER)"), ("IDKLb", "H0 ID_K^E(AFTER) <= 0", "lower bound of ID_K^E(AFTER) (nats)")),
+             "Two": (("RBeforeUb", "H0 r^E(BEFORE) - r^E(NONE)", "upper bound of r^E(BEFORE) - r^E(NONE)"), ("RPreUb", "H0 r^E(PRE) - r^E(NONE)", "upper bound of r^E(PRE) - r^E(NONE)"),
+                     ("SidBeforeUb", "H0 s_ID^E(BEFORE) >= 0.1", "upper bound of s_ID^E(BEFORE)"), ("SidPreUb", "H0 s_ID^E(PRE) >= 0.1", "upper bound of s_ID^E(PRE)")),
+             "Three": (("RLb", "H0 r^E(POST) <= 0.1", "lower bound of r^E(POST)"), ("RUb", "H0 r^E(POST) >= 1", "upper bound of r^E(POST)"),
+                       ("DeltaPreLb", "H0 delta^E(POST - PRE)", "lower bound of delta^E(POST - PRE)"), ("DeltaNoneLb", "H0 delta^E(POST - NONE)", "lower bound of delta^E(POST - NONE)"),
+                       ("SidLb", "H0 s_ID^E(POST) <= 0.1", "lower bound of s_ID^E(POST)"), ("SidDiffLb", "H0 s_ID^E(POST) - s_ID^E(NONE)", "lower bound of s_ID^E(POST) - s_ID^E(NONE)")),
+             "Four": (("SidUb", "H0 s_ID^E(NONE) >= 0.15", "upper bound of s_ID^E(NONE)"), ("IDVLb", "H0 ID_V^E(NONE) <= 0", "lower bound of ID_V^E(NONE) (nats)")),
+             "Five": (("BetaKLb", "H0 beta_K(AFTER) <= 0.4", "lower bound of beta_K(AFTER)"), ("BetaVLb", "H0 beta_V(NONE) <= 0.4", "lower bound of beta_V(NONE)"),
+                      ("BetaKNoneUb", "H0 beta_K(NONE) >= 0.1", "upper bound of beta_K(NONE)"), ("BetaKBeforeUb", "H0 beta_K(BEFORE) >= 0.1", "upper bound of beta_K(BEFORE)"),
+                      ("BetaKPreUb", "H0 beta_K(PRE) >= 0.1", "upper bound of beta_K(PRE)"), ("DiffLb", "H0 beta_K(AFTER) - beta_V(AFTER)", "lower bound of beta_K(AFTER) - beta_V(AFTER)")),
+             "Fiveb": (("Lb", "H0 beta_K(POST) - beta_K(PRE)", "lower bound of beta_K(POST) - beta_K(PRE)"),),
+             "Null": (("RUb", "H0 r^E(POST-NULL) >= 0.1", "upper bound of r^E(POST-NULL)"), ("SidUb", "H0 s_ID^E(POST-NULL) >= 0.1", "upper bound of s_ID^E(POST-NULL)"),
+                      ("DeltaLb", "H0 delta^E(POST - POST-NULL)", "lower bound of delta^E(POST - POST-NULL)")),
+             "Lb": (("Ub", "H0 ID_K^E(BEFORE) - ID_K^E(NONE)", "upper bound of ID_K^E(BEFORE) - ID_K^E(NONE) (nats)"),)}[stem]
+    for k in ms:
+        t, S = K8[k], SH8[k]
+        for w, sub, d in comps:
+            i = cb8(code, k, sub)
+            CBP[stem + w, k] = sm8(f"Jb{stem}{w}{t}", "S8B", i, BND, f"{code}: {d} at {lvl} (the bound the line tests), {S}", G8B)
+        if stem == "Three":
+            i = next(j for j in LB8[code]["m"][k]["comps"] if "competent-only (n=" in S8B[j])
+            sm8(f"JbThreeCompN{t}", "S8B", i, r"\(n=(\d+)\)", f"{code}: items competent in every arm (the competent-only check), {S}", G8B)
+            for w, sub in (("DeltaPre", "delta^E(POST - PRE)"), ("DeltaNone", "delta^E(POST - NONE)"), ("SidDiff", "s_ID^E(POST) - s_ID^E(NONE)")):
+                sm8(f"JbThreeComp{w}{t}", "S8B", cb8(code, k, "competent-only (n=" + macros[f"JbThreeCompN{t}"] + ") " + sub),
+                    r"\) " + re.escape(sub) + " " + NUM, f"{code}: competent-only point estimate of {sub}, {S}", G8B)
+        if stem == "Fiveb":
+            i = LB8[code]["m"][k]["i"]
+            sm8(f"JbFivebFlipPost{t}", "S8B", i, r"flip rate POST (\d\.\d+), PRE (\d\.\d+)", f"{code}: flip rate of the key-only clamp under POST, {S}", G8B, 0)
+            sm8(f"JbFivebFlipPre{t}", "S8B", i, r"flip rate POST (\d\.\d+), PRE (\d\.\d+)", f"{code}: flip rate of the key-only clamp under PRE, {S}", G8B, 1)
+for grp, ms, sx, lvl in (("Pfour", MB8P, "P4f", "95 %"), ("Nfour", MB8N, "N4", "98.75 %")):
+    wh = f"over the {GRB8[grp]}, F, emitted-form scoring"
+    rng8(f"JbOneSidLb{grp}", [CBP["OneSidLb", k] for k in ms], f"J-B1-{sx}: {lvl} lower bounds of s_ID^E(AFTER) (the bound the line tests) {wh}", SRCB + " J-B1", G8B)
+    rng8(f"JbTwoRUb{grp}", [CBP[w, k] for k in ms for w in ("TwoRBeforeUb", "TwoRPreUb")],
+         f"J-B2-{sx}: {lvl} upper bounds of r^E(BEFORE) - r^E(NONE) and r^E(PRE) - r^E(NONE) (the bounds the line tests) {wh}", SRCB + " J-B2", G8B)
+    rng8(f"JbTwoSidUb{grp}", [CBP[w, k] for k in ms for w in ("TwoSidBeforeUb", "TwoSidPreUb")],
+         f"J-B2-{sx}: {lvl} upper bounds of s_ID^E(BEFORE) and s_ID^E(PRE) (the bounds the line tests) {wh}", SRCB + " J-B2", G8B)
+    rng8(f"JbNullRUb{grp}", [CBP["NullRUb", k] for k in ms], f"J-B-NULL-{sx}: {lvl} upper bounds of r^E(POST-NULL) (the bound the line tests) {wh}", SRCB + " J-B-NULL", G8B)
+    rng8(f"JbNullDeltaLb{grp}", [CBP["NullDeltaLb", k] for k in ms],
+         f"J-B-NULL-{sx}: {lvl} lower bounds of delta^E(POST - POST-NULL) (the bound the line tests) {wh}", SRCB + " J-B-NULL", G8B)
+_fm = [k for c in ("J-B5b-P4f", "J-B5b-N4") for k, r_ in LB8[c]["m"].items() if r_["v"] == "MET"]
+rng8("JbFivebFlipPostMet", [macros[f"JbFivebFlipPost{K8[k]}"] for k in _fm],
+     f"J-B5b flip rate under POST over the models that meet J-B5b ({len(_fm)}: OLMo-2-7B excluded by its per-model verdict)", SRCB + " J-B5b", G8B)
+amac("JbFivebNMet", len(_fm), "J-B5b: models (of the eight) whose per-model component is met", SRCB + " J-B5b", G8B, "{:d}")
+# J-B-SMALL (Gemma-2-2B): its not-evaluable reason; J-B6a coverage; J-B6b cells (tab_invariance.tex, checked against the score file)
+i = LB8["J-B-SMALL"]["m"]["gemma2b"]["i"]
+assert "not evaluable: competence" in S8B[i], S8B[i]
+_cov = []
+for k in MB8P:
+    for arm, aw in AS08.items():
+        i = cb8("J-B6a", k, f"{arm}: coverage ")
+        _cov.append(sm8(f"JbSixaCov{aw}{K8[k]}", "S8B", i, r"coverage (\d\.\d+)", f"J-B6a S0 coverage of the emitted forms (lowest row), {ALAB8[arm]} ({arm}), {SH8[k]}", G8B))
+rng8("JbSixaCov", _cov, "J-B6a S0 coverage over the 24 cells of the four P4 models", SRCB + " J-B6a", G8B)
+INV8 = {}
+_inv_name = {SH8[k]: k for k in MB8P}
+_c3 = r"^(-?\d+\.\d+) \[(-?\d+\.\d+), (-?\d+\.\d+)\]$"
+for i, line in enumerate(SCORE["S8BINV"]):
+    cells = [c.strip() for c in line.rstrip(" \\").split("&")]
+    if len(cells) != 7 or cells[0] not in _inv_name:
+        continue
+    k, arm = _inv_name[cells[0]], cells[1]
+    t = K8[k]
+    smac(f"JbSixbML{AS08[arm]}{t}", "S8BINV", i, cells[2], f"J-B6b S0 M^L: mass of the lower-case clean-B form, {ALAB8[arm]} ({arm}), {SH8[k]}", G8B)
+    INV8[k, arm, "Sid"] = re.match(_c3, cells[5]).groups()
+    smac3(f"JbSixbSid{AS08[arm]}{t}", "S8BINV", i, INV8[k, arm, "Sid"], f"J-B6b/S0: s_ID^E - s_ID^L (emitted-form minus lower-case score), {ALAB8[arm]} ({arm}), 95 % interval, {SH8[k]}", G8B)
+    if cells[6] != "--":
+        INV8[k, arm, "R"] = re.match(_c3, cells[6]).groups()
+        smac3(f"JbSixbR{AS08[arm]}{t}", "S8BINV", i, INV8[k, arm, "R"], f"J-B6b/S0: r^E - r^L, {ALAB8[arm]} ({arm}), 95 % interval, {SH8[k]}", G8B)
+assert len([x for x in INV8 if x[2] == "Sid"]) == 24, len(INV8)
+_n6b = 0
+for k in MB8P:
+    for j in LB8["J-B6b"]["m"][k]["comps"]:
+        mm = re.search(r"H0 (s_ID|r)\^E\((\w+)\) - (?:s_ID|r)\^L\(\w+\)(?: \[M\^L (\d\.\d+)\])? outside \(-0\.05, 0\.05\) rejected at 95% "
+                       r"\(interval \[([+-]\d+\.\d+),([+-]\d+\.\d+)\]\)", S8B[j])
+        assert mm, S8B[j]
+        tb = INV8[k, mm[2], "Sid" if mm[1] == "s_ID" else "R"]
+        assert (float(mm[4]), float(mm[5])) == (float(tb[1]), float(tb[2])), (k, mm.groups(), tb)
+        if mm[3]:
+            assert mm[3] == macros[f"JbSixbML{AS08[mm[2]]}{K8[k]}"], (k, mm[3])
+        _n6b += 1
+assert _n6b == 22, _n6b   # 6 (Qwen2.5-7B) + 8 + 8; OLMo-2-7B has no low-L-mass cell
+# J-B7 and J-B8
+_a7, _o7, _c7 = [], [], []
+for k in MB8P + MB8N:
+    for j in LB8["J-B7"]["m"][k]["comps"]:
+        a, o, c = grab(S8B, j, r"A (\d\.\d+) >= 0\.95 \(n=\d+\), other\(B\) (\d\.\d+) <= 0\.10, coverage (\d\.\d+)")
+        _a7.append(a), _o7.append(o), _c7.append(c)
+assert len(_a7) == 48
+rng8("JbSevenA", _a7, "J-B7 agreement A of the emitted-form argmax with generation over the 48 F cells", SRCB + " J-B7", G8B)
+rng8("JbSevenOther", _o7, "J-B7 clean-B 'other' rate over the 48 F cells", SRCB + " J-B7", G8B)
+rng8("JbSevenCov", _c7, "J-B7 coverage over the 48 F cells", SRCB + " J-B7", G8B)
+L8m = LB8["J-B8"]["m"]["mistral24"]
+sm8("JbEightN", "S8B", L8m["i"], r"(\d+) cores", "J-B8: native cores of the Mistral-Small-24B intervention frames", G8B)
+_lo8, _hi8, _me8 = [], [], []
+for j in L8m["comps"]:
+    mm = re.search(r"interval \[([+-]\d+\.\d+),([+-]\d+\.\d+)\]", S8B[j])
+    if mm:
+        _lo8.append(mm[1]), _hi8.append(mm[2])
+    mm = re.search(r"^          (\w+): M\^E\(natural B\) (\d\.\d+)", S8B[j])
+    if mm:
+        _me8.append(mm[2])
+        smac(f"JbEightME{dict(P1='Opt', NONE='None', BEFORE='Before', POST='Post')[mm[1]]}", "S8B", j, mm[2], f"J-B8 M^E(natural B), {mm[1]}, Mistral-Small-24B", G8B)
+assert len(_lo8) == 12 and len(_me8) == 4
+rng8("JbEightLo", _lo8, "J-B8 lower bounds of the 12 E - L differences of phi, psi_K, psi_V (P1, NONE, BEFORE, POST)", SRCB + " J-B8", G8B)
+rng8("JbEightHi", _hi8, "J-B8 upper bounds of the 12 E - L differences", SRCB + " J-B8", G8B)
+rng8("JbEightME", _me8, "J-B8 M^E(natural B) over the four frames", SRCB + " J-B8", G8B)
+i = find(S8B, "  J-B8 detail (L -> E):", start=RB8, end=SB8)
+for arm, aw in (("P1", "Opt"), ("NONE", "None"), ("BEFORE", "Before"), ("POST", "Post"), ("LETTER", "Letter")):
+    for j, (w, d) in enumerate((("PhiL", "phi under L"), ("PhiE", "phi under E"), ("PsiKL", "psi_K under L"), ("PsiKE", "psi_K under E"),
+                                ("PsiVL", "psi_V under L"), ("PsiVE", "psi_V under E"))):
+        sm8(f"JbEight{w}{aw}", "S8B", i, re.escape(arm) + r": phi " + NUM + " -> " + NUM + r", psi_K " + NUM + " -> " + NUM + r", psi_V " + NUM + " -> " + NUM,
+            f"J-B8 detail: {d}, {arm}, Mistral-Small-24B frames", G8B, j)
+# gates: J-B-G0 tests, J-B-G3 trie floor, J-B-G4 coverage and floor, J-B-G5 competence
+i = find(S8B, "  J-B-G0  FP32 exactness", start=GB8, end=PB8)
+amac("JbGzeroPassed", sum(int(x) for x in re.findall(r" (\d+) passed", S8B[i])), "J-B-G0: unit tests passed (sum over the eight files)", f"{SRCB}:{i + 1}", G8B, "{:d}")
+i = find(S8B, "  N4 slots: ", start=GB8, end=PB8)
+amac("JbNfourFamilies", len(re.findall(r"'(\w+)': '\w+'", S8B[i])), "N4: model families never examined before in this work (Llama, Gemma, Phi, Falcon)", f"{SRCB}:{i + 1}", G8B, "{:d}")
+_ds, _dl, _bd = [], [], []
+for j in find(S8B, "J-B-G3 (first 30 F cores)", start=GB8, end=PB8, many=True):
+    for a, b, c in re.findall(r"\|ds\| (\d\.\d+) \(<= 0\.02\), mean\|dL\| (\d\.\d+) \(<= (\d\.\d+)\)", S8B[j]):
+        _ds.append(a), _dl.append(b), _bd.append(c)
+assert len(_ds) == 33, len(_ds)
+rng8("JbGthreeDs", _ds, "J-B-G3 trie floor |delta s_ID| over 11 models x 3 arms", SRCB + " GATES", G8B)
+rng8("JbGthreeDL", _dl, "J-B-G3 trie floor mean |delta L| (nats) over 11 models x 3 arms", SRCB + " GATES", G8B)
+rng8("JbGthreeBound", _bd, "J-B-G3 bounds of the mean |delta L| (nats)", SRCB + " GATES", G8B)
+_cv, _fl, _ac = [], [], []
+for k in MB8:
+    for arm, aw in AB8.items():
+        i = find(S8B, f"  {k:9s} {arm:9s} J-B-G4 coverage", start=GB8, end=PB8)
+        c, f_, a = grab(S8B, i, r"J-B-G4 coverage (\d\.\d+) .*? floor (\d\.\d+) .*?J-B-G5 acc_B (\d\.\d+)")
+        _cv.append(c), _fl.append(f_)
+        if k == "gemma2b":
+            smac(f"JbGfiveAcc{aw}GemmaTwo", "S8B", i, a, f"J-B-G5 generated accuracy acc_B (>= 0.8 needed), {ALAB8[arm]} ({arm}), Gemma-2-2B", G8B)
+        else:
+            _ac.append(a)
+rng8("JbGfourCov", _cv, "J-B-G4 coverage over the 54 F cells of the nine models", SRCB + " GATES", G8B)
+rng8("JbGfourFloor", _fl, "J-B-G4 floor (nats) over the 54 F cells", SRCB + " GATES", G8B)
+rng8("JbGfiveAcc", _ac, "J-B-G5 generated accuracy acc_B over the 48 F cells of the eight P4 and N4 models", SRCB + " GATES", G8B)
+# reported: S0 relative changes of ID_K and ID_V, E against L
+for i in range(RB8, SB8):
+    mm = re.match(r"^    (\S+)\s+(P1|AFTER|BEFORE|POST|PRE|NONE)\s+M\^L\(B\) (\d\.\d+)  ID_K " + NUM + " -> " + NUM + r" \(([+-]\d+\.\d)%, (?:within|beyond) 15%\)  ID_V "
+                  + NUM + " -> " + NUM + r" \(([+-]\d+\.\d)%", S8B[i])
+    if mm:
+        t, aw = K8[mm[1]], AS08[mm[2]]
+        smac(f"JbSzeroPctIDK{aw}{t}", "S8B", i, mm[6], f"S0: relative change of ID_K, E against L (per cent), {ALAB8[mm[2]]} ({mm[2]}), {SH8[mm[1]]}", G8B)
+        smac(f"JbSzeroPctIDV{aw}{t}", "S8B", i, mm[9], f"S0: relative change of ID_V, E against L (per cent), {ALAB8[mm[2]]} ({mm[2]}), {SH8[mm[1]]}", G8B)
+# summary
+classes8(S8B, SB8, XB8, "Jb", G8B, ("L", "M", "R", "Val"))
+i = find(S8B, "  met rate among R account lines with a verdict:", start=SB8, end=XB8)
+for j, (w, d) in enumerate((("Met", "met"), ("Verd", "with a verdict"), ("Exp", "expected met"))):
+    sm8(f"JxRisky{w}B", "S8B", i, r"(\d+) of (\d+) \(expected (\d+\.\d+)\)", f"part B: risky (class R) account lines {d}", G8X, j)
+i = find(S8B, "  overall: ", start=SB8, end=XB8)
+for j, w in enumerate(("Met", "NotMet", "NotEval", "Lines")):
+    sm8(f"JbCount{w}", "S8B", i, r"(\d+) MET, (\d+) NOT MET, (\d+) NOT EVALUABLE of (\d+) lines", f"part B: lines {('MET', 'NOT MET', 'NOT EVALUABLE', 'in all')[j]}", G8B, j)
+# exploratory: the list-before sign, per-sentence and per-lexicon r(POST), X1 (attention and precision), X2 (1.5B and 3B on S0)
+_lev, _lev2 = [], []
+for k in MB8:
+    h = find(S8B, f"  [{k} F] Sigma", start=XB8)
+    e = next(j for j in range(h + 1, len(S8B)) if not S8B[j].startswith("    "))
+    i = find(S8B, "    LIST-BEFORE sign:", start=h, end=e)
+    sm8(f"JbLbDiff{K8[k]}", "S8B", i, r"ID_K\^E\(NONE\) " + NUM, f"ID_K^E(BEFORE) - ID_K^E(NONE) (nats; exploratory point estimate), {SH8[k]}", G8B)
+    sm8(f"JbBidPost{K8[k]}", "S8B", i, r"b_ID\(POST\) " + NUM, f"b_ID(POST) (exploratory), {SH8[k]}", G8B)
+    for j in find(S8B, "    per level ", start=h, end=e, many=True):
+        (_lev2 if k == "gemma2b" else _lev).append(grab(S8B, j, r"r\^E\(POST\) " + NUM)[0])
+assert len(_lev) == 80 and len(_lev2) == 10, (len(_lev), len(_lev2))
+rng8("JbLevelRPost", _lev, "r^E(POST) per sentence (8) and per lexicon (2) over the eight P4 and N4 models (exploratory)", SRCB + " EXPLORATORY", G8B)
+rng8("JbLevelRPostGemmaTwo", _lev2, "r^E(POST) per sentence and lexicon, Gemma-2-2B (exploratory)", SRCB + " EXPLORATORY", G8B)
+for k in ("qwen1.5", "qwen3b"):
+    h = find(S8B, f"  [{k} S0] Sigma", start=XB8)
+    for arm in ("AFTER", "POST"):
+        i = find(S8B, f"    {arm:9s} s_ID L/Sigma/E", start=h, end=h + 6)
+        sm8(f"JbXtwoSid{AB8[arm]}{K8[k]}", "S8B", i, r"s_ID L/Sigma/E " + NUM + "/" + NUM + "/" + NUM, f"X2 (exploratory): s_ID^E on S0, {arm}, {SH8[k]}", G8B, 2)
+        sm8(f"JbXtwoComp{AB8[arm]}{K8[k]}", "S8B", i, r"competent n=(\d+)", f"X2: competent S0 items, {arm}, {SH8[k]}", G8B)
+for tag8, w in (("x1eager", "Eager"), ("x1fp32", "Fp")):
+    i = find(S8B, f"  eval/qwen7_{tag8}_S0.json", start=XB8)
+    for arm in ("AFTER", "POST", "NONE"):
+        sm8(f"JbXone{w}{AB8[arm]}", "S8B", i, re.escape(arm) + r" s_ID\^E " + NUM,
+            f"X1 (exploratory): s_ID^E on the first 60 S0 cores, {arm}, Qwen2.5-7B, {'BF16 eager attention' if w == 'Eager' else 'FP32 sdpa'}", G8B)
+
+# ---------------------------------------------------------------- stage 8, part C: placeholder (still running on the GPU)
+# Part C is scored by analysis/stage8c_score.py into results/gpu_stage8c/STAGE8C_SCORE.txt when its run completes. Its
+# section goes here, in the style of parts A, B and D (group S8C, prefix Jc), followed by the part-C rows of
+# tab_prereg_j.tex and the A-B-C-D totals in S8X. Nothing of part C is registered yet; the cross-part counts below cover
+# parts A, B and D only (the macros ending in ABD).
+if (ROOT / "results/gpu_stage8c/STAGE8C_SCORE.txt").exists():
+    print("note: results/gpu_stage8c/STAGE8C_SCORE.txt exists, but part C is not yet parsed by make_figures.py")
+
+# ---------------------------------------------------------------- stage 8, part D: the flag the reader heads write
+MD8 = ["qwen7", "mistral7"]
+MD8S = ["qwen1.5", "qwen3b", "qwen7"]
+CELLD = {"Q_IN": "Qin", "Q_OUT": "Qout", "INLINE": "Inline", "INLINE_CHAT": "InlineChat", "AFTER": "After"}
+LWD = {"J-D1": "One", "J-D2": "Two", "J-D3": "Three", "J-D4": "Four", "J-D-ADDR": "Addr", "J-D-KN": "Kn", "J-D5": "Five", "J-D7": "Seven",
+       "J-D-SIGN-Q": "SignQ", "J-D-SIGN-IOI": "SignIoi", "J-D8-Q": "EightQ", "J-D8-IOI": "EightIoi", "J-D-ROUTE-IOI": "Route",
+       "J-D-HOP2": "HopTwo", "J-D6a": "Sixa", "J-D6": "Six", "J-D6-ROUTE": "SixRoute"}
+GD8, PD8, DD8, RD8 = (sec(S8D, s) for s in ("GATES (J-D-G0", "PREDICTIONS (code, class", "D6 DECISION TABLE", "REPORTED (no verdict counted)"))
+SD8, XD8 = S8D.index("SUMMARY"), sec(S8D, "######## EXPLORATORY")
+SRCD = SNAME["S8D"]
+i = find(S8D, "  J-D-G0  FP32 unit tests")
+amac("JdGzeroPassed", sum(int(x) for x in re.findall(r" (\d+) passed", S8D[i])), "J-D-G0: unit tests passed, summed over the five files the score line prints (the outcome record's 61 also counts tests/test_head_splice.py, which the line does not print: JdGzeroPassedRun)", f"{SRCD}:{i + 1}", G8D, "{:d}")
+# the pytest session of record (results/gpu_stage8d/logs/pytest.log, one session) prints the 61 of the outcome record: the five
+# files above and tests/test_head_splice.py (7, counted from the session's PASSED lines)
+SCORE["S8DPY"] = (ROOT / "results/gpu_stage8d/logs/pytest.log").read_text().splitlines()
+SNAME["S8DPY"] = "results/gpu_stage8d/logs/pytest.log"
+assert sum("test session starts" in x for x in SCORE["S8DPY"]) == 1
+i = find(SCORE["S8DPY"], " passed in ")
+sm8("JdGzeroPassedRun", "S8DPY", i, r"=+ (\d+) passed in [\d.]+s", "J-D-G0: unit tests passed in the pytest session of record (all six files, tests/test_head_splice.py included; 0 failed, 0 skipped)", G8D)
+assert not re.search(r"\b(failed|skipped|error)", SCORE["S8DPY"][i]), SCORE["S8DPY"][i]
+_py8 = [x.split("::")[0] for x in SCORE["S8DPY"] if re.match(r"^tests/\w+\.py::\S+ PASSED", x)]
+amac("JdGzeroHeadSplice", _py8.count("tests/test_head_splice.py"), "J-D-G0: tests of tests/test_head_splice.py passed in that session (PASSED lines)", SNAME["S8DPY"], G8D, "{:d}")
+assert len(_py8) == int(macros["JdGzeroPassedRun"]) == int(macros["JdGzeroPassed"]) + int(macros["JdGzeroHeadSplice"]), (len(_py8), macros["JdGzeroPassedRun"])
+for k in MD8:
+    t, S = K8[k], SH8[k]
+    i = find(S8D, f"  J-D-G1 {k:8s} N_X", start=GD8, end=PD8)
+    sm83(f"JdGoneNX{t}", "S8D", i, r"N_X \(P1, E8\) " + CIR, f"J-D-G1 N_X: the natural key read's effect on X under P1 on E8 (nats), {S}", G8D)
+    i = find(S8D, f"  J-D-G5 {k:8s} accuracy", start=GD8, end=PD8)
+    sm8(f"JdGfiveOther{t}", "S8D", i, r"other_agent (\d\.\d+), irrelevant_object (\d\.\d+)", f"J-D-G5 binding-query accuracy, other_agent, {S}", G8D, 0)
+    sm8(f"JdGfiveIrr{t}", "S8D", i, r"other_agent (\d\.\d+), irrelevant_object (\d\.\d+)", f"J-D-G5 binding-query accuracy, irrelevant_object, {S}", G8D, 1)
+    for cell, cw in CELLD.items():
+        if not find(S8D, f"  J-D-G3 {k:8s} {cell:11s} ", start=GD8, end=PD8, many=True):
+            assert (k, cell) == ("mistral7", "AFTER"), (k, cell)   # the IOI AFTER cell is run at Qwen2.5-7B only
+            continue
+        i = find(S8D, f"  J-D-G3 {k:8s} {cell:11s} ", start=GD8, end=PD8)
+        if cell.startswith("Q_"):
+            sm8(f"JdGthreeArg{cw}{t}", "S8D", i, r"argmax (?:un)?mentioned (\d\.\d+)", f"J-D-G3 competence, {cell}: argmax rate on the correct class, {S}", G8D)
+        else:
+            for j, w in enumerate(("Two", "Four")):
+                sm8(f"JdGthree{w}{cw}{t}", "S8D", i, r"two-way (\d\.\d+) \(>= 0\.75\), four-way (\d\.\d+)", f"J-D-G3 competence, {cell}: {w.lower()}-way accuracy, {S}", G8D, j)
+        i = find(S8D, f"  J-D-G4 {k:8s} {cell:11s} ", start=GD8, end=PD8)
+        sm83(f"JdGfourDG{cw}{t}", "S8D", i, r"d_G " + CIR, f"J-D-G4 d_G (nats): the re-mention read at the list or name rows, {cell}, {S}", G8D)
+        sm83(f"JdGfourIDK{cw}{t}", "S8D", i, r"ID_K\(allT\) " + CIR, f"J-D-G4 ID_K(allT) (nats), {cell}, {S}", G8D)
+        sm8(f"JdGfourRatio{cw}{t}", "S8D", i, r"d_G/ID_K " + NUM, f"J-D-G4 d_G/ID_K (>= 0.5 for the transfer to be evaluable), {cell}, {S}", G8D)
+for k in MD8S:
+    t, S = K8[k], SH8[k]
+    i = find(S8D, f"  J-D-G6 {k:8s} competent cores", start=GD8, end=PD8)
+    sm8(f"JdGsixComp{t}", "S8D", i, r"competent cores (\d+) of (\d+)", f"J-D-G6: competent dissociation cores (>= 40 needed), {S}", G8D, 0)
+    sm8(f"JdGsixN{t}", "S8D", i, r"competent cores (\d+) of (\d+)", f"J-D-G6: dissociation cores run, {S}", G8D, 1)
+    sm83(f"JdGsixDlx{t}", "S8D", i, r"P1 injection dl_X " + CIR, f"J-D-G6: P1 injection's dl_X (nats), {S}", G8D)
+    if "R(k*) of the in-run H*" in S8D[i]:
+        sm83(f"JdGsixR{t}", "S8D", i, r"R\(k\*\) of the in-run H\* " + CIR, f"J-D-G6: R(k*) of the heads ranked in the run, {S}", G8D)
+# the lines
+LD8 = {}
+for i in range(PD8 + 1, DD8):
+    mm = re.match(r"  (J-D[\w-]+)\s+(\w) (\w) prior (\d\.\d\d)\s+" + VRD + r"\s+(.*)$", S8D[i])
+    if mm:
+        cur = mm[1]
+        LD8[cur] = dict(i=i, cls=mm[2], kind=mm[3], prior=mm[4], v=mm[5], title=mm[6], m={})
+        continue
+    mm = re.match(r"    ([\w.]+)\s+" + VRD + r"\s+(.*)$", S8D[i])
+    if mm:
+        LD8[cur]["m"][mm[1]] = dict(i=i, v=mm[2], txt=mm[3])
+assert list(LD8) == list(LWD), list(LD8)
+for code, L in LD8.items():
+    vs = [r_["v"] for r_ in L["m"].values()]
+    amac(f"Jd{LWD[code]}Met", sum(v == "MET" for v in vs), f"{code}: models that meet the line", f"{SRCD}:{L['i'] + 1}", G8D, "{:d}")
+    amac(f"Jd{LWD[code]}Eval", sum(v != "NOT EVALUABLE" for v in vs), f"{code}: evaluable models (of {len(vs)} run)", f"{SRCD}:{L['i'] + 1}", G8D, "{:d}")
+
+
+def id8(code, k):
+    return LD8[code]["m"][k]["i"]
+
+
+for k in MD8:
+    t, S = K8[k], SH8[k]
+    i = id8("J-D1", k)
+    sm83(f"JdOneRatio{t}", "S8D", i, r"ID_inj\^LOO/ID_K " + CIR, f"J-D1 ID_inj^LOO/ID_K: the leave-one-word-out flag injected at an absent option's row, as a share of the key read's identity effect, {S}", G8D)
+    sm8(f"JdOnePiX{t}", "S8D", i, r"pi_X\(move, LOO\) (\d\.\d+)", f"J-D1 pi_X: share of stories whose answer moves to the absent option, {S}", G8D)
+    sm83(f"JdOneIDK{t}", "S8D", i, r"; ID_K " + CIR, f"J-D1 ID_K (nats) of the natural key read on the inject population, {S}", G8D)
+    i = id8("J-D2", k)
+    sm83(f"JdTwoIotaMove{t}", "S8D", i, r"iota\(move\) " + CIR, f"J-D2 iota(move Delta): the flag moved from B's row to X's, as a share of N_X, {S}", G8D)
+    for c, cw in (("orth", "Orth"), ("meanH", "MeanH"), ("active", "Active")):
+        pat = c + r": iota " + CIR + r", difference " + CIR + r" \(>= 0\.4; H0: <= 0\), ratio " + NUM
+        cd = {"orth": "the story's own write orthogonal to the flag, norm-matched", "meanH": "the mean H* output", "active": "the active-set flag"}[c]
+        sm83(f"JdTwoIota{cw}{t}", "S8D", i, pat, f"J-D2 iota of the control ({cd}), {S}", G8D, 0)
+        sm83(f"JdTwoDiff{cw}{t}", "S8D", i, pat, f"J-D2 iota(move) - iota(control: {cd}), {S}", G8D, 3)
+        sm8(f"JdTwoRatio{cw}{t}", "S8D", i, pat, f"J-D2 iota(control) / iota(move) ({cd}), {S}", G8D, 6)
+    i = id8("J-D3", k)
+    for w, p, d in (("Flag", r"rho_K flag ", "the flag direction"), ("Pcone", r"pc1 ", "the first principal direction (pc1)"), ("MeanH", r"mean-H\* output ", "the mean H* output direction")):
+        sm83(f"JdThreeRho{w}{t}", "S8D", i, p + CIR, f"J-D3 rho_K: key read left when {d} is ablated per layer at the option rows, {S}", G8D)
+    i = id8("J-D4", k)
+    for w, p, d in (("KV", r"r_ans\^inj\(KV\) ", "r_ans^inj(KV)"), ("K", r", K ", "r_ans^inj(K): the answer row sees the base keys only"),
+                    ("V", r", V ", "r_ans^inj(V): base values only"), ("KmV", r"K - V ", "r_ans^inj(K) - r_ans^inj(V)"), ("Den", r"denominator ", "denominator (nats)")):
+        sm83(f"JdFour{w}{t}", "S8D", i, p + CIR, f"J-D4 the injected flag read at hop 2: {d}, {S}", G8D)
+    i = id8("J-D-ADDR", k)
+    sm8(f"JdAddrCos{t}", "S8D", i, r"weighted cos\(Delta\^K, Delta\^KV\) " + NUM, f"J-D-ADDR weighted cosine of the key-only and the K-and-V flags, {S}", G8D)
+    sm83(f"JdAddrRatio{t}", "S8D", i, r"ID_inj\(KV\)/ID_inj\(K\) " + CIR, f"J-D-ADDR ID_inj(KV)/ID_inj(K), {S}", G8D)
+    i = id8("J-D-KN", k)
+    sm83(f"JdKnPearson{t}", "S8D", i, r"mean per-story Pearson " + CIR, f"J-D-KN mean per-story Pearson correlation, {S}", G8D)
+    sm83(f"JdKnBeta{t}", "S8D", i, r"B-loss ratio " + CIR, f"J-D-KN B-loss ratio beta (non-candidate key against removing B's flag), {S}", G8D)
+    sm83(f"JdKnDiff{t}", "S8D", i, r"mean\(dl_S - dl_X\) " + CIR, f"J-D-KN mean(dl_S - dl_X) (nats), {S}", G8D)
+    sm8(f"JdKnTol{t}", "S8D", i, r"inside \+-(\d+\.\d+) =", f"J-D-KN tolerance 0.1 x ID_K (nats), {S}", G8D)
+    i = id8("J-D5", k)
+    sm83(f"JdFivePooled{t}", "S8D", i, r"Psi_bind pooled " + CIR, f"J-D5 Psi_bind pooled (nats), {S}", G8D)
+    for w, p in (("Obj", "object-first "), ("Dis", "distractor-first ")):
+        sm83(f"JdFive{w}{t}", "S8D", i, p + CIR, f"J-D5 Psi_bind, {p.strip()} stories (nats), {S}", G8D)
+        sm8(f"JdFiveN{w}{t}", "S8D", i, p + CIR + r" \(n (\d+)\)", f"J-D5 {p.strip()} stories, {S}", G8D, 3)
+    sm83(f"JdFiveDiff{t}", "S8D", i, r"stratum difference " + CIR, f"J-D5 stratum difference (nats; its CI must include 0), {S}", G8D)
+    i = id8("J-D7", k)
+    for w, p, d in (("Qout", r"ID_K\(Q_OUT\) ", "ID_K under Q_OUT (which option is not mentioned?)"), ("Qin", r"ID_K\(Q_IN\) ", "ID_K under Q_IN (which option is mentioned?)"),
+                    ("Diff", r"paired difference ", "ID_K(Q_IN) - ID_K(Q_OUT), paired")):
+        sm83(f"JdSeven{w}{t}", "S8D", i, p + CIR, f"J-D7 {d} (nats), {S}", G8D)
+    sm83(f"JdSignQIDV{t}", "S8D", id8("J-D-SIGN-Q", k), r"ID_V " + CIR, f"J-D-SIGN-Q ID_V under Q_OUT (nats), {S}", G8D)
+    i = id8("J-D-SIGN-IOI", k)
+    sm83(f"JdSignIoiIDK{t}", "S8D", i, r"INLINE ID_K " + CIR, f"J-D-SIGN-IOI ID_K under IOI INLINE (in-sentence re-mention) (nats), {S}", G8D)
+    sm83(f"JdSignIoiIDV{t}", "S8D", i, r"ID_V " + CIR, f"J-D-SIGN-IOI ID_V under IOI INLINE (nats), {S}", G8D)
+    i = id8("J-D8-Q", k)
+    for cell, cw in (("Q_IN", "Qin"), ("Q_OUT", "Qout")):
+        pre = (r"Q_IN: " if cell == "Q_IN" else r"\| Q_OUT: ") + r".*?"
+        sm83(f"JdEight{cw}R{t}", "S8D", i, pre + r"R\(H\*\) " + CIR, f"J-D8-Q R(H*): the frozen reader heads recover the {cell} key read, {S}", G8D)
+        sm83(f"JdEight{cw}KO{t}", "S8D", i, pre + r"KO\(H\*\) " + CIR, f"J-D8-Q KO(H*): blocking them removes it, {cell}, {S}", G8D)
+        for j, w in enumerate(("Rrand", "KOrand")):
+            sm8(f"JdEight{cw}{w}{t}", "S8D", i, pre + r"random R " + NUM + " KO " + NUM, f"J-D8-Q random sets' {w[:-4]}, {cell}, {S}", G8D, j)
+        sm8(f"JdEight{cw}DGc{t}", "S8D", i, pre + r"d_Gc/ID_K " + NUM, f"J-D8-Q d_Gc/ID_K, {cell}, {S}", G8D)
+    i = id8("J-D-ROUTE-IOI", k)
+    for w, p, d in (("KV", r"r_ans\(KV\) ", "r_ans(KV)"), ("K", r", K ", "r_ans(K)"), ("V", r", V ", "r_ans(V)"), ("KmV", r"K - V ", "r_ans(K) - r_ans(V)"),
+                    ("Other", r"r_other ", "r_other (S2 or tail rows)"), ("Dm", r"dm\(K_S\) ", "dm(K_S): the denominator (nats)")):
+        sm83(f"JdRoute{w}{t}", "S8D", i, p + CIR, f"J-D-ROUTE-IOI the negative IOI read at the answer row's key read of the listed names: {d}, {S}", G8D)
+    i = id8("J-D-HOP2", k)
+    for cell, cw in (("Q_OUT", "Qout"), ("INLINE", "Inline")):
+        pre = (r"Q_OUT: " if cell == "Q_OUT" else r"; INLINE: ") + r".*?"
+        sm83(f"JdHopTwo{cw}Carry{t}", "S8D", i, pre + r"carry\(top-10\) " + CIR, f"J-D-HOP2 share of the injected flag's {cell} effect carried by the top-10 hop-2 heads, {S}", G8D)
+        sm8(f"JdHopTwo{cw}All{t}", "S8D", i, pre + r"all heads " + NUM, f"J-D-HOP2 carried by all heads, {cell}, {S}", G8D)
+        sm8(f"JdHopTwo{cw}Rand{t}", "S8D", i, pre + r"random 10 " + NUM, f"J-D-HOP2 carried by 10 random heads, {cell}, {S}", G8D)
+        sm83(f"JdHopTwo{cw}Dlx{t}", "S8D", i, pre + r"dl_X\(inj\) " + CIR, f"J-D-HOP2 dl_X of the injection (nats), {cell}, {S}", G8D)
+i = id8("J-D8-IOI", "qwen7")
+for w, p in (("R", r"R\(H\*\) "), ("KO", r"KO\(H\*\) ")):
+    sm83(f"JdEightIoi{w}QwenSeven", "S8D", i, p + CIR, f"J-D8-IOI {w}(H*) under IOI INLINE, Qwen2.5-7B (Mistral-7B not evaluable: J-D-G4)", G8D)
+for j, w in enumerate(("Rrand", "KOrand")):
+    sm8(f"JdEightIoi{w}QwenSeven", "S8D", i, r"random R " + NUM + " KO " + NUM, f"J-D8-IOI random sets' {w[:-4]}, Qwen2.5-7B", G8D, j)
+sm8("JdEightIoiDGcQwenSeven", "S8D", i, r"d_Gc/ID_K " + NUM, "J-D8-IOI d_Gc/ID_K, Qwen2.5-7B", G8D)
+for k in MD8S:
+    t, S = K8[k], SH8[k]
+    i = id8("J-D6a", k)
+    sm83(f"JdSixaOmega{t}", "S8D", i, r"omega " + CIR, f"J-D6a omega: the flag written in the sentence (POST) against the list (P1), {S}", G8D)
+    sm8(f"JdSixaKappa{t}", "S8D", i, r"kappa " + NUM, f"J-D6a kappa (cosine of the sentence and list flags), {S}", G8D)
+    i = id8("J-D6", k)
+    if LD8["J-D6"]["m"][k]["v"] == "NOT EVALUABLE":
+        continue
+    for w, p, d in (("Rho", r"rho ", "rho = dl_X(inj, POST)/dl_X(inj, P1)"), ("RhoNat", r"rho_nat ", "rho_nat = N_X(POST)/N_X(P1)"), ("Diff", r"rho - rho_nat ", "rho - rho_nat")):
+        sm83(f"JdSix{w}{t}", "S8D", i, p + CIR, f"J-D6 {d}, {S}", G8D)
+    sm8(f"JdSixTol{t}", "S8D", i, r"inside \+-(\d\.\d+)\)", f"J-D6 tolerance max(0.1, 0.5 |rho_nat|), {S}", G8D)
+    for j, w in enumerate(("InjOpt", "InjPost")):
+        sm83(f"JdSix{w}{t}", "S8D", i, r"dl_X\(inj\) P1 " + CIR + r", POST " + CIR, f"J-D6 dl_X of the injected P1 flag (nats), {('P1', 'POST')[j]}, {S}", G8D, 3 * j)
+    for j, w in enumerate(("NXOpt", "NXPost")):
+        sm83(f"JdSix{w}{t}", "S8D", i, r"N_X P1 " + CIR + r", POST " + CIR, f"J-D6 N_X (nats), {('P1', 'POST')[j]}, {S}", G8D, 3 * j)
+i = id8("J-D6-ROUTE", "qwen1.5")
+for w, p, d in (("V", r"r_ans\^inj\(V\) ", "r_ans^inj(V)"), ("K", r", K ", "r_ans^inj(K)"), ("VmK", r"V - K ", "r_ans^inj(V) - r_ans^inj(K)"), ("KV", r"; KV ", "r_ans^inj(KV)"),
+                ("Dlx", r"dl_X\(inj\) ", "dl_X of the injection (nats)")):
+    sm83(f"JdSixRoute{w}QwenOnefive", "S8D", i, p + CIR, f"J-D6-ROUTE at 1.5B under POST: {d}, Qwen2.5-1.5B", G8D)
+sm8("JdSixTable", "S8D", DD8, r"\((\w)\) MIXED", "the D6 decision table's outcome letter (fixed in the entry): (d) mixed", G8D)
+# reported
+for k in MD8:
+    t, S = K8[k], SH8[k]
+    i = find(S8D, f"  {k}: iota add 0.5 / 1 / 2", start=RD8, end=SD8)
+    dose = grab(S8D, i, r"iota add 0\.5 / 1 / 2 " + NUM + " / " + NUM + " / " + NUM)
+    add1 = grab(S8D, i, r"add-only " + CIR)
+    assert add1[0] == dose[1], (k, dose, add1)
+    smac(f"JdDoseHalf{t}", "S8D", i, dose[0], f"dose: iota of adding 0.5 Delta at X's row, {S}", G8D)
+    smac3(f"JdDoseOne{t}", "S8D", i, add1, f"dose: iota of adding 1 Delta at X's row (the add-only row, with its interval), {S}", G8D)
+    smac(f"JdDoseTwo{t}", "S8D", i, dose[2], f"dose: iota of adding 2 Delta at X's row, {S}", G8D)
+    sm8(f"JdPiXMove{t}", "S8D", i, r"pi_X\(move\) (\d\.\d+)", f"pi_X(move): share of stories whose answer moves to X when the full flag is moved, {S}", G8D)
+    sm83(f"JdFullFlag{t}", "S8D", i, r"ID_inj\(full flag\)/ID_K " + CIR, f"ID_inj(full flag)/ID_K, {S}", G8D)
+    i = find(S8D, f"  {k}: sanity rows:", start=RD8, end=SD8)
+    for c, w in (("iso0", "IsoZero"), ("iso1", "IsoOne"), ("iso2", "IsoTwo"), ("hspan0", "HspanZero"), ("hspan1", "HspanOne"), ("hspan2", "HspanTwo"),
+                 ("perm", "Perm"), ("choices", "Choices"), ("question", "Question")):
+        sm8(f"JdSanity{w}{t}", "S8D", i, r"\b" + c + " " + NUM, f"iota of the sanity row {c}, {S}", G8D)
+    sm83(f"JdRankOne{t}", "S8D", i, r"rank-1 capture " + CIR, f"rank-1 capture of the flag, {S}", G8D)
+    sm83(f"JdFourOther{t}", "S8D", find(S8D, f"  {k}: D4 r_other", start=RD8, end=SD8), r"r_other " + CIR, f"J-D4 (reported) r_other, {S}", G8D)
+    i = find(S8D, f"  {k}: B-identity share", start=RD8, end=SD8)
+    rng8(f"JdBidShare{t}", re.findall(r"l\d+ (\d\.\d+)", S8D[i]), f"B-identity share of the per-story flag's variance over layers, {S}", f"{SRCD}:{i + 1}", G8D)
+    if k == "qwen7":
+        sm8("JdBidShareNull", "S8D", i, r"\(null (\d\.\d+)\)", "null B-identity share", G8D)
+    i = find(S8D, f"  {k}: logit lens", start=RD8, end=SD8)
+    lens = re.findall(r"l(\d+) (\d\.\d+)/(\d\.\d+)", S8D[i])
+    top = max(lens, key=lambda x: float(x[1]))
+    nm(f"JdLensMax{t}", top[1], f"largest |cos(Delta, W_U[location])| over layers, {S}", f"{SRCD}:{i + 1}", G8D)
+    nm(f"JdLensLayer{t}", top[0], f"layer of that largest cosine, {S}", f"{SRCD}:{i + 1}", G8D)
+    nm(f"JdLensRandMax{t}", max((x[2] for x in lens), key=float), f"largest cosine with random token rows over layers, {S}", f"{SRCD}:{i + 1}", G8D)
+    i = find(S8D, f"  {k}: rho_K isotropic", start=RD8, end=SD8)
+    for c, w in (("iso0", "Zero"), ("iso1", "One"), ("iso2", "Two")):
+        sm83(f"JdRhoIso{w}{t}", "S8D", i, c + " " + CIR, f"rho_K of the isotropic direction {c}, {S}", G8D)
+    sm83(f"JdPsiEv{t}", "S8D", find(S8D, f"  {k}: event vs initial", start=RD8, end=SD8), r"Psi_ev " + CIR, f"Psi_ev: event against initial flag (role confounded with order) (nats), {S}", G8D)
+    for cell, cw in CELLD.items():
+        if (k, cell) == ("mistral7", "AFTER"):
+            continue
+        h = find(S8D, f"  {k} {cell}: ID_K", start=RD8, end=SD8)
+        for w, p in (("IDK", r"ID_K "), ("IDV", r"ID_V "), ("R", r"R\(H\*\) "), ("KO", r"KO\(H\*\) "), ("DG", r"d_G/ID_K "), ("DGc", r"d_Gc/ID_K ")):
+            sm83(f"JdCell{cw}{w}{t}", "S8D", h, p + CIR, f"reported, {cell}: {p.replace(chr(92), '').strip()}{' (nats)' if w in ('IDK', 'IDV') else ''}, {S}", G8D)
+        for j in range(h + 1, h + 4):
+            if not S8D[j].startswith("     "):
+                break   # the next cell's header (or the next block): only the indented sub-rows below a header belong to its cell
+            sub = next(w for p, w in (("     behavioural correlate", "DlB"), ("     D9 rows", "D9"), ("     route of the injected IOI flag", "Route"))
+                       if S8D[j].startswith(p))
+            # the dl_B and D9 rows exist for the question cells only, the route row for the IOI in-sentence cell only
+            assert (sub in ("DlB", "D9")) == (cell in ("Q_IN", "Q_OUT")) and (sub == "Route") == (cell == "INLINE"), (k, cell, sub, j + 1)
+            if S8D[j].startswith("     behavioural correlate"):
+                sm83(f"JdCell{cw}DlB{t}", "S8D", j, r"dl_B under K_S " + CIR, f"reported, {cell}: dl_B under K_S (nats), {S}", G8D)
+            elif S8D[j].startswith("     D9 rows"):
+                sm83(f"JdNine{cw}Dlx{t}", "S8D", j, r"dl_X\(\+Delta\^P1 at r_X\) " + CIR, f"D9, {cell}: dl_X of the P1 flag injected at X's row (nats), {S}", G8D)
+                sm83(f"JdNine{cw}NX{t}", "S8D", j, r"N_X\(cfg\) " + CIR, f"D9, {cell}: N_X (nats), {S}", G8D)
+                sm8(f"JdNine{cw}Ratio{t}", "S8D", j, r"ratio " + NUM, f"D9, {cell}: the P1 flag's effect as a share of N_X, {S}", G8D)
+            elif S8D[j].startswith("     route of the injected IOI flag"):
+                for w, p in (("KV", r"r_ans\(KV\) "), ("K", r", K "), ("V", r", V "), ("Other", r"other "), ("Dm", r"dm\(inj\) ")):
+                    sm83(f"JdRouteInj{w}{t}", "S8D", j, p + CIR, f"route of the injected IOI flag: {p.replace(chr(92), '').strip(', ')}, {S}", G8D)
+    i = find(S8D, f"  {k}: hop-2 carry under P1", start=RD8, end=SD8)
+    for w, p in (("Top", r"top10 "), ("Rand", r"rand10 "), ("All", r"all ")):
+        sm83(f"JdHopOpt{w}{t}", "S8D", i, p + CIR, f"hop-2 carry under P1 (the ranking format): {p.strip()}, {S}", G8D)
+_sub8 = sorted(n for n in macros if n not in PRE8 and re.match(r"Jd(Cell\w+DlB|Nine|RouteInj)", n))
+assert all(re.match(r"Jd(Cell(Qin|Qout)DlB|Nine(Qin|Qout)(Dlx|NX|Ratio))(QwenSeven|MistralSeven)(Lo|Hi)?$", n) or
+           re.match(r"JdRouteInj\w+(QwenSeven|MistralSeven)(Lo|Hi)?$", n) for n in _sub8), _sub8
+assert len(_sub8) == 2 * (2 * 3 + 2 * 7) + 2 * 5 * 3, len(_sub8)   # per model: dl_B and D9 under Q_IN and Q_OUT; the INLINE route row
+for k in MD8S:
+    sm83(f"JdSixb{K8[k]}", "S8D", find(S8D, f"  {k}: D6b Delta^POST", start=RD8, end=SD8), r"there " + CIR,
+         f"D6b: the POST flag at the P1 list row as a share of the P1 flag there, {SH8[k]}", G8D)
+amac("JdSanityAbsMax", max(abs(fl(macros[n])) for n in macros if n.startswith("JdSanity") and n not in PRE8), "largest |iota| of the sanity rows over both models",
+     SRCD + " REPORTED", G8D, "{:.3f}")
+rng8("JdRhoIso", [macros[f"JdRhoIso{w}{K8[k]}"] for k in MD8 for w in ("Zero", "One", "Two")], "rho_K of the isotropic directions over both models", SRCD + " REPORTED", G8D)
+rng8("JdBidShare", [macros[f"JdBidShare{K8[k]}{x}"] for k in MD8 for x in ("Min", "Max")], "B-identity share over layers and both models", SRCD + " REPORTED", G8D)
+# exploratory
+for k in MD8:
+    t, S = K8[k], SH8[k]
+    for task in ("paint", "schedule"):
+        sm8(f"JdXtask{task.capitalize()}{t}", "S8D", find(S8D, f"-- {k}: cross-task {task}:", start=XD8), r"ratio " + NUM,
+            f"cross-task (exploratory): the belief flag in the {task} task as a share of the task's own flag, {S}", G8D)
+    sm8(f"JdQoutKS{t}", "S8D", find(S8D, f"-- {k}: Q_OUT behaviour", start=XD8), r"K_S (\d\.\d+)", f"Q_OUT behaviour: share answering the story's own word B under K_S, {S}", G8D)
+# summary
+classes8(S8D, SD8, XD8, "Jd", G8D)
+i = find(S8D, "  met rate among R account lines with a verdict:", start=SD8, end=XD8)
+for j, (w, d) in enumerate((("Met", "met"), ("Verd", "with a verdict"), ("Exp", "expected met"))):
+    sm8(f"JxRisky{w}D", "S8D", i, r"(\d+) of (\d+) \(expected (\d+\.\d+)\)", f"part D: risky (class R) account lines {d}", G8X, j)
+_vd = [L["v"] for L in LD8.values()]
+for w, v in (("Met", "MET"), ("NotMet", "NOT MET"), ("NotEval", "NOT EVALUABLE")):
+    amac(f"JdCount{w}", _vd.count(v), f"part D: lines {v} (counted from the verdict lines)", SRCD + " PREDICTIONS", G8D, "{:d}")
+amac("JdCountLines", len(_vd), "part D: lines in all", SRCD + " PREDICTIONS", G8D, "{:d}")
+assert sum(int(macros[f"JdClass{c}{w}"]) for c in "LMR" for w in ("Met",)) == int(macros["JdCountMet"])
+# recomputed (not printed; docs/PREREGISTRATION.md, outcome of part D): the 3B values of rho and rho_nat on its 35 competent
+# cores, and the post hoc natural ratios on the X-specific contrast dl_X(K_X) - dl_X(K_S) and on ID_K, with rho minus
+# each, through the committed scorer's own Diss class (competent cores, story bootstrap, seed 20261010). The same code
+# reproduces the printed 1.5B and 7B rho, rho_nat and rho - rho_nat (asserted).
+from stage8d_parts.lines import Diss as D8Diss, pick as d8pick, renorm as d8renorm  # noqa: E402
+from stage8d_parts.stats import ratio as d8ratio  # noqa: E402
+D8R = {}
+for k in MD8S:
+    t, S = K8[k], SH8[k]
+    srcf = f"results/gpu_stage8d/diss/{k}.json"
+    D_ = D8Diss(json.load(open(ROOT / srcf)))
+    assert len(D_.ci) == int(macros[f"JdGsixComp{t}"]), (k, len(D_.ci))
+    r_ = D_.rho()
+    trio = {w: (r_[x].pt, *r_[x].ci()) for w, x in (("Rho", "rho"), ("RhoNat", "rho_nat"), ("Diff", "d"))}
+    if k == "qwen3b":
+        for w, d in (("Rho", "rho"), ("RhoNat", "rho_nat"), ("Diff", "rho - rho_nat")):
+            rmac3(f"JdSix{w}{t}", trio[w], f"J-D6 {d} on the 35 competent cores (the line is not evaluable at 3B: J-D-G6), {S}", srcf, G8D)
+    else:
+        for w in ("Rho", "RhoNat", "Diff"):
+            assert tuple(f"{x:+.3f}" for x in trio[w]) == tuple(("+" if not macros[f"JdSix{w}{t}{s}"].startswith("-") else "") + macros[f"JdSix{w}{t}{s}"]
+                                                              for s in ("", "Lo", "Hi")), (k, w, trio[w])
+
+        def _idk(f, D=D_):
+            def l_(name, w):
+                a = d8renorm(np.array([D.S[j]["fmt"][f]["rows"][name] for j in D.ci], float))
+                return d8pick(a, D.ix[w][D.ci])
+            c_ = lambda nm_: l_(nm_, "S") - l_(nm_, "X")  # noqa: E731
+            return D.bc.mean(0.5 * (c_("K_S") - c_("K_X")))
+        xs = d8ratio(*(D_.bc.mean(D_.dlx(f, "K_X") - D_.dlx(f, "K_S")) for f in ("POST", "P1")))
+        ik = d8ratio(_idk("POST"), _idk("P1"))
+        for w, q, d in (("NatX", xs, "natural ratio on the X-specific contrast [dl_X(K_X) - dl_X(K_S)](POST) / [same](P1)"),
+                        ("DiffX", r_["rho"] - xs, "rho minus the X-specific natural ratio"),
+                        ("NatIDK", ik, "natural ratio on ID_K: ID_K(POST)/ID_K(P1)"), ("DiffIDK", r_["rho"] - ik, "rho minus the ID_K natural ratio")):
+            rmac3(f"JdSix{w}{t}", (q.pt, *q.ci()), f"J-D6 post hoc: {d}, competent cores, {S}", srcf, G8D)
+            D8R[k, w] = q
+# the outcome record's numbers (docs/PREREGISTRATION.md, part D sensitivities) are reproduced
+assert (macros["JdSixRhoQwenThree"], macros["JdSixRhoNatQwenThree"]) == ("-0.025", "0.266")
+assert (macros["JdSixNatXQwenOnefive"], macros["JdSixNatXQwenSeven"], macros["JdSixDiffXQwenOnefive"], macros["JdSixDiffXQwenSeven"]) == ("-0.113", "0.271", "-0.013", "-0.014")
+assert (macros["JdSixNatIDKQwenOnefive"], macros["JdSixNatIDKQwenSeven"], macros["JdSixDiffIDKQwenOnefive"], macros["JdSixDiffIDKQwenSeven"]) == ("-0.115", "0.290", "-0.011", "-0.033")
+
+# ---------------------------------------------------------------- stage 8, across parts A, B and D (part C to be added)
+_vs = []   # (part, line, model, verdict) of every counted line's per-model result
+_vs += [("A", c, k, r_["v"]) for c, L in LA8.items() if L["cls"] != "D" for k, r_ in L["m"].items()]
+_vs += [("B", c, k, r_["v"]) for c, L in LB8.items() for k, r_ in L["m"].items() if k in FAM8]
+_vs += [("D", c, k, r_["v"]) for c, L in LD8.items() for k, r_ in L["m"].items()]
+_fam = sorted({FAM8[k] for _, _, k, v in _vs if v in ("MET", "NOT MET")})
+_famm = sorted({FAM8[k] for _, _, k, v in _vs if v == "MET"})
+_mods = sorted({k for _, _, k, v in _vs if v in ("MET", "NOT MET")})
+amac("JxFamilies", len(_fam), f"model families with a confirmatory stage-8 result (a per-model verdict, met or not met, on a counted line of parts A, B or D): {', '.join(_fam)}",
+     "STAGE8A/8B/8D_SCORE.txt PREDICTIONS", G8X, "{:d}")
+amac("JxFamiliesMet", len(_famm), f"model families with at least one per-model MET on a counted line of parts A, B or D: {', '.join(_famm)}", "STAGE8A/8B/8D_SCORE.txt PREDICTIONS", G8X, "{:d}")
+amac("JxModels", len(_mods), f"models with a per-model verdict on a counted stage-8 line (parts A, B, D): {', '.join(SH8[k] for k in _mods)}",
+     "STAGE8A/8B/8D_SCORE.txt PREDICTIONS", G8X, "{:d}")
+for w, fmt in (("Met", "{:d}"), ("Verd", "{:d}"), ("Exp", "{:.2f}")):
+    vals = [macros[f"JxRisky{w}{p}"] for p in "ABD"]
+    amac(f"JxRisky{w}ABD", sum((float if w == "Exp" else int)(v) for v in vals),
+         f"parts A, B and D: risky (class R) account lines {dict(Met='met', Verd='with a verdict', Exp='expected met')[w]} ({' + '.join(vals)}; part C to be added)",
+         "STAGE8A/8B/8D_SCORE.txt SUMMARY", G8X, fmt)
+for w in ("Met", "NotMet", "NotEval", "Lines"):
+    vals = [macros[f"J{p}Count{w}"] for p in "abd"]
+    amac(f"Jx{w}ABD" if w != "Lines" else "JxLinesABD", sum(int(v) for v in vals),
+         f"parts A, B and D: lines {dict(Met='MET', NotMet='NOT MET', NotEval='NOT EVALUABLE', Lines='counted')[w]} ({' + '.join(vals)}; part C to be added)",
+         "STAGE8A/8B/8D_SCORE.txt SUMMARY", G8X, "{:d}")
+for c in ("L", "M"):
+    for w, fmt in (("Met", "{:d}"), ("Exp", "{:.2f}")):
+        vals = [macros[f"J{p}Class{c}{w}"] for p in "abd"]
+        amac(f"JxClass{c}{w}ABD", sum((float if w == "Exp" else int)(v) for v in vals), f"parts A, B and D: class-{c} account lines {'met' if w == 'Met' else 'expected met'} ({' + '.join(vals)})",
+             "STAGE8A/8B/8D_SCORE.txt SUMMARY", G8X, fmt)
+    amac(f"JxClass{c}VerdABD", sum(int(macros[f"J{p}Class{c}Lines"]) - int(macros[f"J{p}Class{c}NotEval"]) for p in "abd"),
+         f"parts A, B and D: class-{c} account lines with a verdict", "STAGE8A/8B/8D_SCORE.txt SUMMARY", G8X, "{:d}")
+assert int(macros["JxRiskyVerdA"]) == int(macros["JaClassRLines"]) - int(macros["JaClassRNotEval"])
+
+
+# ---------------------------------------------------------------- stage 8 tables (captions and labels live in the section files)
+def mf8(name):
+    return fl(macros[name])
+
+
+def mci8(name, sign=False):
+    """'est [lo, hi]' of a registered estimate (printed strings; negatives in math mode)."""
+    return tci((macros[name], macros[name + "Lo"], macros[name + "Hi"]), sign)
+
+
+VW8 = {"MET": r"\textbf{met}", "NOT MET": r"\textbf{not met}", "NOT EVALUABLE": r"\textbf{not evaluable}"}
+# Part B's three tables are the part-B scorer's own output: copied unchanged (read and re-written; the bytes are asserted equal)
+for _t in ("tab_fresh.tex", "tab_mass.tex", "tab_invariance.tex"):
+    _src = (ROOT / "results/gpu_stage8b" / _t).read_text()
+    (TAB / _t).write_text(_src)
+    assert (TAB / _t).read_bytes() == (ROOT / "results/gpu_stage8b" / _t).read_bytes(), _t
+
+# ---- tab_prereg_j.tex: every stage-8 line of parts A, B and D (code, class, kind, prior, models met / evaluable, verdict);
+# part C is a placeholder row group. Two halves side by side: parts A and B on the left, C and D on the right.
+_left, _right = [], []
+HALF = r"\multicolumn{6}{@{}p{0.47\textwidth}@{}}"
+
+
+def _jrow(code, cls, kind, prior, met, ev, v, note=""):
+    return f"{code} & {cls} & {kind} & {prior} & {met}/{ev} & {VW8[v]}{note}"
+
+
+assert "all part-A lines are account lines" in S8A[SA8]
+_left.append(HALF + r"{\textbf{Part A}: natural passages (Llama-3.1-8B, Gemma-2-9B, Qwen2.5-7B, Mistral-7B)}")
+for code, L in LA8.items():
+    _left.append(_jrow(code, L["cls"], "--" if L["cls"] == "D" else "A", L["prior"], L["met"], L["ev"], L["v"],
+                       r"$^\ddagger$" if L["cls"] == "D" else ""))
+_left.append(HALF + r"{\footnotesize \JaCountMet{} met, \JaCountNotMet{} not met, \JaCountNotEval{} not evaluable of \JaCountLines{} counted lines; "
+             r"risky account lines met: \JxRiskyMetA{} of \JxRiskyVerdA{} with a verdict (expected \JxRiskyExpA{}).}")
+_left.append(r"\addlinespace")
+_left.append(HALF + r"{\textbf{Part B}: fresh samples (P4: Qwen2.5-7B, Qwen2.5-14B, Mistral-7B, OLMo-2-7B; N4: Llama-3.1-8B, Gemma-2-9B, Phi-4, Falcon3-7B)}")
+for code, L in LB8.items():
+    _left.append(_jrow(code, L["cls"], L["kind"], L["prior"], L["met"], L["ev"], L["v"]))
+_left.append(HALF + r"{\footnotesize \JbCountMet{} met, \JbCountNotMet{} not met, \JbCountNotEval{} not evaluable of \JbCountLines{} lines; "
+             r"risky account lines met: \JxRiskyMetB{} of \JxRiskyVerdB{} with a verdict (expected \JxRiskyExpB{}).}")
+_right.append(HALF + r"{\textbf{Part C}: placeholder}")
+_right.append(HALF + r"{\footnotesize Part C is not scored yet; its lines are added here when its run is scored.}")
+_right.append(r"\addlinespace")
+_right.append(HALF + r"{\textbf{Part D}: the flag (Qwen2.5-7B, Mistral-7B; J-D6, J-D6a, J-D6-ROUTE at Qwen2.5-1.5B, 3B, 7B)}")
+for code, L in LD8.items():
+    _right.append(_jrow(code, L["cls"], L["kind"], L["prior"], macros[f"Jd{LWD[code]}Met"], macros[f"Jd{LWD[code]}Eval"], L["v"]))
+_right.append(HALF + r"{\footnotesize \JdCountMet{} met, \JdCountNotMet{} not met, \JdCountNotEval{} not evaluable of \JdCountLines{} lines; "
+              r"risky account lines met: \JxRiskyMetD{} of \JxRiskyVerdD{} with a verdict (expected \JxRiskyExpD{}).}")
+_n8 = max(len(_left), len(_right))
+_left += [" & & & & & "] * (_n8 - len(_left))
+_right += [" & & & & & "] * (_n8 - len(_right))
+lines = [r"% two halves of 0.47\textwidth side by side: set this table in a table* float (full page width)",
+         r"\small", r"\setlength{\tabcolsep}{4pt}", r"\begin{tabular}{@{}lcccll@{\hspace{1.5em}}lcccll@{}}", r"\toprule",
+         r"Line & Cl. & Kind & Prior & Met & Verdict & Line & Cl. & Kind & Prior & Met & Verdict \\", r"\midrule"]
+for a, b in zip(_left, _right):
+    if a == r"\addlinespace" or b == r"\addlinespace":
+        a = " & & & & & " if a == r"\addlinespace" else a
+        b = " & & & & & " if b == r"\addlinespace" else b
+    lines.append(f"{a} & {b} \\\\")
+# the grand total, full width below both halves (part C to be added)
+lines += [r"\midrule",
+          r"\multicolumn{12}{@{}p{0.94\textwidth}@{}}{\textbf{Parts A, B and D}: \JxMetABD{} met, \JxNotMetABD{} not met, \JxNotEvalABD{} not evaluable of "
+          r"\JxLinesABD{} lines; risky account lines met: \JxRiskyMetABD{} of \JxRiskyVerdABD{} with a verdict (expected \JxRiskyExpABD{}; part C to be added).} \\",
+          r"\bottomrule", r"\end{tabular}"]
+wtab("tab_prereg_j.tex", lines)
+
+# ---- tab_natural8.tex: part A, per model and format: n_comp, s_ID, ID_K and ID_V on C(f), and the gate that fails
+lines = [r"\small", r"\setlength{\tabcolsep}{4pt}", r"\begin{tabular}{@{}llrcccl@{}}", r"\toprule",
+         r"Model & Format & $n_{\mathrm{comp}}$ & $s_{\mathrm{ID}}$ & $\mathrm{ID}_K$ (nats) & $\mathrm{ID}_V$ (nats) & Gate \\", r"\midrule"]
+for n_, k in enumerate(MA8):
+    for j, (f, fw) in enumerate(FA8.items()):
+        dag = r"$^\dagger$" if f in ("MENA", "OPTB", "MENB") else ""
+        gate = ", ".join(f"J-A-{g}" for g in NE8A.get((k, f), [])) or "--"
+        lines.append(f"{SH8[k] if j == 0 else ''} & {FLAB8[f]}{dag} & {macros[f'JaNcomp{fw}{K8[k]}']} & {tcell(A8P[k, f, 'Sid'])} & "
+                     f"{tcell(A8P[k, f, 'IDK'])} & {tcell(A8P[k, f, 'IDV'])} & {gate} \\\\")
+    lines.append(r"\midrule" if n_ < len(MA8) - 1 else r"\bottomrule")
+lines.append(r"\end{tabular}")
+wtab("tab_natural8.tex", lines)
+
+# ---- tab_flag.tex: part D, every line's numbers per model (95 % story-bootstrap CIs); then the scale lines (1.5B, 3B, 7B)
+FR8 = [("J-D1", [(r"$\mathrm{ID}^{\mathrm{LOO}}_{\mathrm{inj}}/\mathrm{ID}_K$", "JdOneRatio", True), (r"$\pi_X$", "JdOnePiX", False)]),
+       ("J-D2", [(r"$\iota$(move $\Delta$)", "JdTwoIotaMove", True), (r"$\iota$(own write $\perp$ flag)", "JdTwoIotaOrth", True),
+                 (r"$\iota$(mean $H^*$ output)", "JdTwoIotaMeanH", True), (r"$\iota$(active-set flag)", "JdTwoIotaActive", True)]),
+       ("J-D3", [(r"$\rho_K$(flag)", "JdThreeRhoFlag", True), (r"$\rho_K$(pc1)", "JdThreeRhoPcone", True), (r"$\rho_K$(mean $H^*$ output)", "JdThreeRhoMeanH", True)]),
+       ("J-D4", [(r"$r^{\mathrm{inj}}_{\mathrm{ans}}(KV)$", "JdFourKV", True), (r"$r^{\mathrm{inj}}_{\mathrm{ans}}(K)$", "JdFourK", True),
+                 (r"$r^{\mathrm{inj}}_{\mathrm{ans}}(V)$", "JdFourV", True), (r"$r^{\mathrm{inj}}_{\mathrm{ans}}(K) - r^{\mathrm{inj}}_{\mathrm{ans}}(V)$", "JdFourKmV", True)]),
+       ("J-D-ADDR", [(r"weighted $\cos(\Delta^K, \Delta^{KV})$", "JdAddrCos", False), (r"$\mathrm{ID}_{\mathrm{inj}}(KV)/\mathrm{ID}_{\mathrm{inj}}(K)$", "JdAddrRatio", True)]),
+       ("J-D-KN", [("Pearson (per story)", "JdKnPearson", True), (r"B-loss ratio $\beta$", "JdKnBeta", True),
+                   (r"mean$(\Delta\ell_S - \Delta\ell_X)$ (nats)", "JdKnDiff", True)]),
+       ("J-D5", [(r"$\Psi_{\mathrm{bind}}$ pooled (nats)", "JdFivePooled", True), ("object-first", "JdFiveObj", True), ("distractor-first", "JdFiveDis", True),
+                 ("stratum difference", "JdFiveDiff", True)]),
+       ("J-D7", [(r"$\mathrm{ID}_K(Q_{\mathrm{OUT}})$ (nats)", "JdSevenQout", True), (r"$\mathrm{ID}_K(Q_{\mathrm{IN}})$ (nats)", "JdSevenQin", True),
+                 ("paired difference (nats)", "JdSevenDiff", True)]),
+       ("J-D-SIGN-Q", [(r"$\mathrm{ID}_V(Q_{\mathrm{OUT}})$ (nats)", "JdSignQIDV", True)]),
+       ("J-D-SIGN-IOI", [(r"$\mathrm{ID}_K$, IOI in-sentence (nats)", "JdSignIoiIDK", True), (r"$\mathrm{ID}_V$, IOI in-sentence (nats)", "JdSignIoiIDV", True)]),
+       ("J-D8-Q", [(r"$R(H^*)$, $Q_{\mathrm{IN}}$", "JdEightQinR", True), (r"$\mathrm{KO}(H^*)$, $Q_{\mathrm{IN}}$", "JdEightQinKO", True),
+                   (r"$R(H^*)$, $Q_{\mathrm{OUT}}$", "JdEightQoutR", True), (r"$\mathrm{KO}(H^*)$, $Q_{\mathrm{OUT}}$", "JdEightQoutKO", True)]),
+       ("J-D8-IOI", [(r"$R(H^*)$, IOI in-sentence", "JdEightIoiR", True), (r"$\mathrm{KO}(H^*)$, IOI in-sentence", "JdEightIoiKO", True)]),
+       ("J-D-ROUTE-IOI", [(r"$r_{\mathrm{ans}}(KV)$", "JdRouteKV", True), (r"$r_{\mathrm{ans}}(K)$", "JdRouteK", True), (r"$r_{\mathrm{ans}}(V)$", "JdRouteV", True),
+                          (r"$r_{\mathrm{ans}}(K) - r_{\mathrm{ans}}(V)$", "JdRouteKmV", True), (r"$r_{\mathrm{other}}$", "JdRouteOther", True)]),
+       ("J-D-HOP2", [(r"carry, top-10 hop-2 heads, $Q_{\mathrm{OUT}}$", "JdHopTwoQoutCarry", True),
+                     (r"carry, top-10 hop-2 heads, IOI", "JdHopTwoInlineCarry", True)])]
+
+
+def _dcell(stem, k, ci):
+    n_ = stem + K8[k]
+    if n_ not in macros:
+        why = LD8[next(c for c, rs in FR8 if any(s == stem for _, s, _ in rs))]["m"][k]
+        assert why["v"] == "NOT EVALUABLE", (stem, k)
+        return r"n.e.\ (" + why["txt"].replace(" not passed", "") + ")"
+    return mci8(n_) if ci else tx(macros[n_])
+
+
+lines = [r"\footnotesize", r"\setlength{\tabcolsep}{4pt}", r"\begin{tabular}{@{}lllll@{}}", r"\toprule", r"Line & Statistic & Qwen2.5-7B & Mistral-7B & Verdict \\", r"\midrule"]
+for code, rows in FR8:
+    for j, (lab, stem, ci) in enumerate(rows):
+        lines.append(f"{code if j == 0 else ''} & {lab} & {_dcell(stem, 'qwen7', ci)} & {_dcell(stem, 'mistral7', ci)} & {VW8[LD8[code]['v']] if j == 0 else ''} \\\\")
+lines += [r"\bottomrule", r"\end{tabular}", r"", r"\medskip", r"",
+          r"\begin{tabular}{@{}llcccl@{}}", r"\toprule", r"Line & Statistic & Qwen2.5-1.5B & Qwen2.5-3B & Qwen2.5-7B & Verdict \\", r"\midrule"]
+FS8 = [("J-D6a", [(r"$\omega$", "JdSixaOmega", True), (r"$\kappa$", "JdSixaKappa", False)]),
+       ("J-D6", [(r"$\rho$", "JdSixRho", True), (r"$\rho_{\mathrm{nat}}$", "JdSixRhoNat", True), (r"$\rho - \rho_{\mathrm{nat}}$", "JdSixDiff", True)]),
+       ("J-D6-ROUTE", [(r"$r^{\mathrm{inj}}_{\mathrm{ans}}(V)$", "JdSixRouteV", True), (r"$r^{\mathrm{inj}}_{\mathrm{ans}}(K)$", "JdSixRouteK", True),
+                       (r"$r^{\mathrm{inj}}_{\mathrm{ans}}(V) - r^{\mathrm{inj}}_{\mathrm{ans}}(K)$", "JdSixRouteVmK", True)]),
+       ("post hoc", [(r"natural ratio, $X$-specific contrast$^\dagger$", "JdSixNatX", True), (r"$\rho$ minus it$^\dagger$", "JdSixDiffX", True),
+                     (r"natural ratio on $\mathrm{ID}_K$$^\dagger$", "JdSixNatIDK", True), (r"$\rho$ minus it$^\dagger$", "JdSixDiffIDK", True)]),
+       ("D6b", [(r"$\Delta^{\mathrm{POST}}/\Delta^{\mathrm{P1}}$ at the list row", "JdSixb", True)])]
+for code, rows in FS8:
+    for j, (lab, stem, ci) in enumerate(rows):
+        cells = []
+        for k in MD8S:
+            n_ = stem + K8[k]
+            if n_ not in macros:
+                cells.append("--")
+            else:
+                t3 = (macros[n_], macros[n_ + "Lo"], macros[n_ + "Hi"]) if ci else None
+                c_ = tcell(t3) if ci else tx(macros[n_])
+                if k == "qwen3b" and code == "J-D6":
+                    c_ = two(tx(t3[0]) + r"$^\dagger$ (n.e.)", f"[{tx(t3[1])}, {tx(t3[2])}]")
+                cells.append(c_)
+        v = (VW8[LD8[code]["v"]] if code in LD8 else "--" if code == "post hoc" else "reported") if j == 0 else ""
+        lines.append(f"{({'post hoc': 'J-D6, post hoc'}.get(code, code)) if j == 0 else ''} & {lab} & {' & '.join(cells)} & {v} \\\\")
+lines += [r"\bottomrule", r"\end{tabular}"]
+wtab("tab_flag.tex", lines)
+
+# ---------------------------------------------------------------- stage 8 figures (no titles in the PDFs; captions come from LaTeX)
+MD8META = {"CreationDate": None}   # reproducible PDFs
+COLA8 = {"llama8": BLUE, "gemma9": ORANGE, "qwen7": AQUA, "mistral7": PURPLE}
+
+
+def fresh_figure():
+    """part B: s_ID^E per arm and model with its 95 % interval; P4 (blue) and N4 (orange) grouped; Gemma-2-2B grey and hollow."""
+    fig, ax = plt.subplots(figsize=(3.25, 2.3))
+    fig.subplots_adjust(left=0.13, right=0.99, bottom=0.14, top=0.985)
+    slots = [(k, BLUE, mk, "P4") for k, mk in zip(MB8P, "osD^")] + [(k, ORANGE, mk, "N4") for k, mk in zip(MB8N, "osD^")] + [("gemma2b", GREY, "v", "NE")]
+    pos = np.array([0, 1, 2, 3, 4.6, 5.6, 6.6, 7.6, 9.0])
+    pos = (pos - pos.mean()) * 0.083
+    for j, arm in enumerate(AB8):
+        ax.axvspan(j - 0.46, j + 0.46, color="#f4f3f0", lw=0, zorder=0)
+        for (k, col, mk, grp), dx in zip(slots, pos):
+            y, lo, hi = (mf8(f"JbSid{AB8[arm]}{K8[k]}{s}") for s in ("", "Lo", "Hi"))
+            ax.plot([j + dx, j + dx], [lo, hi], color=col, lw=0.8, zorder=2, solid_capstyle="butt")
+            ax.plot(j + dx, y, marker=mk, ms=2.9, ls="none", color=col, mfc="white" if grp == "NE" else col, mew=0.6, zorder=3,
+                    label=(SH8[k] + (" (not evaluable)" if grp == "NE" else "")) if j == 0 else None)
+    ax.axhline(0, color=INK2, lw=0.6, zorder=1)
+    ax.set_xticks(range(len(AB8)))
+    ax.set_xticklabels(["list\nafter", "sentence\nafter", "null\nsentence", "no\nmention", "sentence\nbefore", "list\nbefore"], fontsize=5.6)
+    ax.tick_params(axis="x", length=0, pad=2)
+    ax.tick_params(axis="y", labelsize=6)
+    ax.set_xlim(-0.5, len(AB8) - 0.5)
+    ax.set_ylim(-0.1, 0.95)
+    ax.set_yticks([0, 0.25, 0.5, 0.75])
+    ax.grid(axis="y", color=GRID, lw=0.6, zorder=0)
+    ax.set_ylabel(r"$s_{\mathrm{ID}}^E$: key share of the identity", fontsize=6.3, labelpad=1)
+    h_, l_ = ax.get_legend_handles_labels()
+    hdr = matplotlib.lines.Line2D([], [], ls="none")
+    lg1 = ax.legend([hdr] + h_[:4] + [hdr] + h_[4:8], [r"$\bf{earlier\ models\ (P4)}$"] + l_[:4] + [r"$\bf{new\ families\ (N4)}$"] + l_[4:8],
+                    ncol=2, frameon=False, fontsize=5.5, loc="upper right", bbox_to_anchor=(1.0, 1.0), handletextpad=0.25, labelspacing=0.18,
+                    columnspacing=0.6, handlelength=0.9, borderaxespad=0.15)
+    ax.add_artist(lg1)
+    ax.legend(h_[8:], l_[8:], frameon=False, fontsize=5.5, loc="upper right", bbox_to_anchor=(1.0, 0.70), handletextpad=0.25, handlelength=0.9,
+              borderaxespad=0.15)
+    fig.savefig(FIG / "fig_fresh.pdf", metadata=MD8META)
+    plt.close(fig)
+
+
+fresh_figure()
+ST8 = {"AFTER": (BLUE, "o"), "POST": (ORANGE, "D"), "POST-NULL": (AQUA, "^"), "NONE": (INK2, "s"), "PRE": (PURPLE, "v"), "BEFORE": (BROWN, "<")}
+
+
+def crossover_figure():
+    """part B behaviour: beta_K against beta_V per arm and model (eight P4 and N4 models), with the diagonal. Four arms have
+    beta_K = 0.000 [0.000, 0.000] in every model and coincide on the beta_V axis; the strip below spreads them, one row per arm
+    (P4 above N4 within a row), on a zoomed beta_V axis. The strip is a second view of the same points, not an offset."""
+    Z8 = [a for a in ST8 if all(mf8(f"JbBetaK{AB8[a]}{K8[k]}{s_}") == 0 for k in MB8P + MB8N for s_ in ("", "Lo", "Hi"))]
+    assert Z8 == ["POST-NULL", "NONE", "PRE", "BEFORE"], Z8
+    W, H, R_ = 3.25, 3.3, 0.06
+    zb, zh, mb, ML, ZL = 0.29, 0.66, 1.31, 0.40, 0.86   # inches: strip bottom and height, main bottom, left edges
+    fig = plt.figure(figsize=(W, H))
+    ax = fig.add_axes([ML / W, mb / H, (W - ML - R_) / W, (H - mb - 0.04) / H])
+    zx = fig.add_axes([ZL / W, zb / H, (W - ZL - R_) / W, zh / H])
+    ax.plot([0, 1], [0, 1], color=INK2, lw=0.6, ls=(0, (3, 2)), zorder=1)
+    for arm, (col, mk) in ST8.items():
+        for k in MB8P + MB8N:
+            bk = [mf8(f"JbBetaK{AB8[arm]}{K8[k]}{s_}") for s_ in ("", "Lo", "Hi")]
+            bv = [mf8(f"JbBetaV{AB8[arm]}{K8[k]}{s_}") for s_ in ("", "Lo", "Hi")]
+            ax.plot([bv[1], bv[2]], [bk[0], bk[0]], color=col, lw=0.5, alpha=0.55, zorder=2, solid_capstyle="butt")
+            ax.plot([bv[0], bv[0]], [bk[1], bk[2]], color=col, lw=0.5, alpha=0.55, zorder=2, solid_capstyle="butt")
+            ax.plot(bv[0], bk[0], marker=mk, ms=3.6, ls="none", color=col, mfc=col if k in MB8P else "white", mew=0.7, zorder=3)
+            if arm in Z8:
+                y0 = len(Z8) - 1 - Z8.index(arm) + (0.2 if k in MB8P else -0.2)
+                zx.plot([bv[1], bv[2]], [y0, y0], color=col, lw=0.6, alpha=0.6, zorder=2, solid_capstyle="butt")
+                zx.plot(bv[0], y0, marker=mk, ms=3.0, ls="none", color=col, mfc=col if k in MB8P else "white", mew=0.6, zorder=3)
+    ax.set_xlim(-0.04, 1.04)
+    ax.set_ylim(-0.04, 1.04)
+    ax.set_xticks([0, 0.25, 0.5, 0.75, 1])
+    ax.set_yticks([0, 0.25, 0.5, 0.75, 1])
+    ax.tick_params(labelsize=6)
+    ax.grid(color=GRID, lw=0.6, zorder=0)
+    ax.set_xlabel(r"$\beta_V$: answers moved by the value-only clamp", fontsize=6.5, labelpad=1.5)
+    ax.set_ylabel(r"$\beta_K$: answers moved by the key-only clamp", fontsize=6.5, labelpad=2)
+    ax.text(0.635, 0.0, r"four arms at $\beta_K = 0$ (spread below)", fontsize=5.3, color=INK2, ha="right", va="center", zorder=4)
+    # legends in the empty regions: the arms above the diagonal, the model groups below it (nothing crosses either)
+    hs = [matplotlib.lines.Line2D([], [], marker=mk, ls="none", color=col, ms=3.6) for col, mk in ST8.values()]
+    lg = ax.legend(hs, [ALAB8[a] for a in ST8], frameon=False, fontsize=5.6, loc="upper left", bbox_to_anchor=(0.27, 1.0), handletextpad=0.3,
+                   labelspacing=0.25, borderaxespad=0.2)
+    ax.add_artist(lg)
+    hs = [matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, ms=3.6),
+          matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, mfc="white", ms=3.6, mew=0.7)]
+    ax.legend(hs, ["earlier models (P4)", "new families (N4)"], frameon=False, fontsize=5.6, loc="lower left", bbox_to_anchor=(0.30, 0.09),
+              handletextpad=0.3, labelspacing=0.25, borderaxespad=0.2)
+    lo = min(mf8(f"JbBetaV{AB8[a]}{K8[k]}Lo") for a in Z8 for k in MB8P + MB8N)
+    zx.set_xlim(np.floor((lo - 0.02) * 20) / 20, 1.02)
+    zx.set_xticks(np.arange(np.floor((lo - 0.02) * 20) / 20, 1.001, 0.1))
+    zx.set_ylim(-0.6, len(Z8) - 0.4)
+    zx.set_yticks(range(len(Z8)))
+    zx.set_yticklabels([ALAB8[a] for a in reversed(Z8)], fontsize=5.6)
+    for tl, a in zip(zx.get_yticklabels(), reversed(Z8)):
+        tl.set_color(ST8[a][0])
+    zx.tick_params(axis="y", length=0, pad=2)
+    zx.tick_params(axis="x", labelsize=6)
+    zx.grid(axis="x", color=GRID, lw=0.6, zorder=0)
+    for y_ in np.arange(0.5, len(Z8) - 1, 1.0):
+        zx.axhline(y_, color=GRID, lw=0.5, zorder=0)
+    zx.set_xlabel(r"$\beta_V$ of these four arms (zoom; filled P4, hollow N4)", fontsize=6.3, labelpad=1.5)
+    fig.savefig(FIG / "fig_crossover.pdf", metadata=MD8META)
+    plt.close(fig)
+
+
+crossover_figure()
+
+
+def natural_figure():
+    """part A: (a) s_ID per format and model with its 95 % interval (hollow: the cell is not evaluable; a dagger on a format:
+    its values are recomputed, as in tab_natural8.tex); (b) cue conflict, key-source against value-source rate (whole answer;
+    the crosses are the rates at the decision token)."""
+    fig = plt.figure(figsize=(6.75, 2.05))
+    gs = fig.add_gridspec(1, 2, width_ratios=[2.3, 1], wspace=0.25, left=0.065, right=0.99, bottom=0.15, top=0.91)
+    ax = fig.add_subplot(gs[0, 0])
+    offs = dict(zip(MA8, (-0.27, -0.09, 0.09, 0.27)))
+    for j, f in enumerate(FA8):
+        for k in MA8:
+            y, lo, hi = (fl(s) for s in A8P[k, f, "Sid"])
+            ne = (k, f) in NE8A
+            x = j + offs[k]
+            ax.plot([x, x], [lo, hi], color=COLA8[k], lw=0.9, zorder=2, solid_capstyle="butt")
+            ax.plot(x, y, marker="o", ms=3.6, ls="none", color=COLA8[k], mfc="white" if ne else COLA8[k], mew=0.8, zorder=3)
+    ax.axhline(0, color=INK2, lw=0.6, zorder=1)
+    for xv in (2.5, 3.5):
+        ax.axvline(xv, color=INK2, lw=0.5, ls=":", zorder=1)
+    ax.set_xticks(range(len(FA8)))
+    # the dagger marks the formats whose s_ID is recomputed from the raw results (not printed by the part-A scorer; rmac)
+    rec = [f for f in FA8 if not any(f"JaSid{FA8[f]}{K8[k]}" in SRCLINE for k in MA8)]
+    assert rec == ["MENA", "OPTB", "MENB"] and all(f"JaSid{FA8[f]}{K8[k]}" in SRCLINE for f in FA8 if f not in rec for k in MA8), rec
+    ax.set_xticklabels([FLAB8[f].replace(" ", "\n") + (r"$^\dagger$" if f in rec else "") for f in FA8], fontsize=6.3)
+    ax.tick_params(axis="x", length=0, pad=2)
+    ax.tick_params(axis="y", labelsize=6)
+    ax.set_xlim(-0.5, len(FA8) - 0.5)
+    ax.set_ylim(-0.1, 1.02)
+    ax.set_yticks([0, 0.25, 0.5, 0.75, 1])
+    ax.grid(axis="y", color=GRID, lw=0.6, zorder=0)
+    ax.set_ylabel(r"$s_{\mathrm{ID}}$: key share of the identity", fontsize=6.5)
+    ax.set_title(r"(a) $s_{\mathrm{ID}}$ by format, natural passages", fontsize=7, color=INK, loc="left")
+    # explicit handles: a model's key is its filled marker (its first plotted cell may be a hollow, not-evaluable one)
+    h_ = [matplotlib.lines.Line2D([], [], marker="o", ls="none", color=COLA8[k], ms=3.6, mew=0.8) for k in MA8]
+    l_ = [SH8[k] for k in MA8]
+    h_.append(matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, mfc="white", ms=3.6, mew=0.8))
+    l_.append("not evaluable (gate)")
+    ax.legend(h_, l_, frameon=False, fontsize=6, loc="upper right", bbox_to_anchor=(1.0, 1.0), handletextpad=0.3, labelspacing=0.25, borderaxespad=0.3)
+    bx = fig.add_subplot(gs[0, 1])
+    bx.plot([0, 1], [0, 1], color=INK2, lw=0.6, ls=(0, (3, 2)), zorder=1)
+    FMK = {"OPTA": "o", "LETA": "s", "NOM": "^"}
+    for f, mk in FMK.items():
+        for k in MA8:
+            ky, kl, kh = (fl(s) for s in A8P[k, f, "key"])
+            vy, vl, vh = (fl(s) for s in A8P[k, f, "val"])
+            kd, vd = fl(A8P[k, f, "keyDec"][0]), fl(A8P[k, f, "valDec"][0])
+            ne = (k, f) in NE8A
+            bx.plot([vy, vd], [ky, kd], color=COLA8[k], lw=0.5, ls=":", zorder=2)
+            bx.plot(vd, kd, marker="x", ms=2.6, mew=0.6, ls="none", color=COLA8[k], zorder=4)
+            bx.plot([vl, vh], [ky, ky], color=COLA8[k], lw=0.5, alpha=0.4, zorder=2, solid_capstyle="butt")
+            bx.plot([vy, vy], [kl, kh], color=COLA8[k], lw=0.5, alpha=0.4, zorder=2, solid_capstyle="butt")
+            bx.plot(vy, ky, marker=mk, ms=3.6, ls="none", color=COLA8[k], mfc="white" if ne else COLA8[k], mew=0.8, zorder=3)
+    bx.set_xlim(-0.03, 1.03)
+    bx.set_ylim(-0.03, 1.03)
+    bx.set_aspect("equal")
+    bx.set_xticks([0, 0.5, 1])
+    bx.set_yticks([0, 0.5, 1])
+    bx.tick_params(labelsize=6)
+    bx.grid(color=GRID, lw=0.6, zorder=0)
+    bx.set_xlabel("answers the value's entity", fontsize=6.3, labelpad=1)
+    bx.set_ylabel("answers the key's entity", fontsize=6.3, labelpad=1)
+    bx.set_title("(b) cue conflict", fontsize=7, color=INK, loc="left")
+    hs = [matplotlib.lines.Line2D([], [], marker=mk, ls="none", color=INK2, ms=3.6) for mk in FMK.values()]
+    hs.append(matplotlib.lines.Line2D([], [], marker="x", ls=":", color=INK2, ms=2.6, mew=0.6, lw=0.5))
+    bx.legend(hs, [FLAB8[f] for f in FMK] + ["first token only"], frameon=False, fontsize=5.6, loc="lower right", bbox_to_anchor=(1.03, 0.07),
+              handletextpad=0.3, labelspacing=0.25, borderaxespad=0.2)
+    fig.savefig(FIG / "fig_natural.pdf", metadata=MD8META)
+    plt.close(fig)
+
+
+natural_figure()
+COLD8 = {"qwen7": BLUE, "mistral7": ORANGE}
+MKD8 = {"qwen7": "o", "mistral7": "s"}
+
+
+def flag_figure():
+    """part D: (a) iota of the dose, the move and the structured and isotropic controls; (b) rho_K; (c) the sign of the
+    key and value reads under Q_IN, Q_OUT and IOI in-sentence re-mentions; (d) omega, rho and rho_nat by scale."""
+    fig = plt.figure(figsize=(6.75, 1.95))
+    gs = fig.add_gridspec(1, 4, width_ratios=[1.95, 0.9, 1.05, 0.9], wspace=0.4, left=0.055, right=0.995, bottom=0.17, top=0.9)
+    off = {"qwen7": -0.14, "mistral7": 0.14}
+
+    def dot(ax, x, k, stem, hollow=False, ms=3.4):
+        y = mf8(stem)
+        if stem + "Lo" in macros:
+            ax.plot([x, x], [mf8(stem + "Lo"), mf8(stem + "Hi")], color=COLD8[k], lw=0.8, zorder=2, solid_capstyle="butt")
+        ax.plot(x, y, marker=MKD8[k], ms=ms, ls="none", color=COLD8[k], mfc="white" if hollow else COLD8[k], mew=0.7, zorder=3)
+
+    # (a) iota
+    ax = fig.add_subplot(gs[0, 0])
+    cats = [("JdDoseHalf", "add\n" + r"0.5$\Delta$"), ("JdDoseOne", "add\n" + r"1$\Delta$"), ("JdDoseTwo", "add\n" + r"2$\Delta$"),
+            ("JdTwoIotaMove", "move\n" + r"$\Delta$"), ("JdTwoIotaOrth", "orth."), ("JdTwoIotaMeanH", "mean\n" + r"$H^*$"),
+            ("JdTwoIotaActive", "active"), (None, "iso.")]
+    for j, (stem, _) in enumerate(cats):
+        for k in MD8:
+            if stem:
+                dot(ax, j + off[k], k, stem + K8[k])
+            else:
+                for q, w in enumerate(("IsoZero", "IsoOne", "IsoTwo")):
+                    ax.plot(j + off[k] + (q - 1) * 0.06, mf8(f"JdSanity{w}{K8[k]}"), marker=MKD8[k], ms=2.2, ls="none", color=COLD8[k], zorder=3)
+    ax.axhline(0, color=INK2, lw=0.6, zorder=1)
+    ax.axhline(1, color=INK2, lw=0.5, ls=":", zorder=1)
+    ax.axvline(3.5, color=INK2, lw=0.5, ls=":", zorder=1)
+    ax.set_xticks(range(len(cats)))
+    ax.set_xticklabels([c[1] for c in cats], fontsize=5.3)
+    ax.tick_params(axis="x", length=0, pad=2)
+    ax.tick_params(axis="y", labelsize=6)
+    ax.set_xlim(-0.5, len(cats) - 0.5)
+    ax.set_ylim(-0.12, 1.12)
+    ax.set_yticks([0, 0.5, 1])
+    ax.grid(axis="y", color=GRID, lw=0.6, zorder=0)
+    ax.set_ylabel(r"$\iota$: share of the natural $N_X$", fontsize=6.3, labelpad=1)
+    ax.set_title(r"(a) injecting the flag: $\iota$", fontsize=7, color=INK, loc="left")
+    hs = [matplotlib.lines.Line2D([], [], marker=MKD8[k], ls="none", color=COLD8[k], ms=3.4) for k in MD8]
+    ax.legend(hs, [SH8[k] for k in MD8], frameon=False, fontsize=5.8, loc="upper right", bbox_to_anchor=(1.0, 0.9), handletextpad=0.2,
+              labelspacing=0.2, borderaxespad=0.2)
+    # (b) rho_K
+    bx = fig.add_subplot(gs[0, 1])
+    cats = [("JdThreeRhoFlag", "flag"), ("JdThreeRhoPcone", "pc1"), ("JdThreeRhoMeanH", "mean\n" + r"$H^*$"), (None, "iso.")]
+    for j, (stem, _) in enumerate(cats):
+        for k in MD8:
+            if stem:
+                dot(bx, j + off[k], k, stem + K8[k])
+            else:
+                for q, w in enumerate(("Zero", "One", "Two")):
+                    dot(bx, j + off[k] + (q - 1) * 0.06, k, f"JdRhoIso{w}{K8[k]}", ms=2.2)
+    bx.axhline(0.5, color=INK2, lw=0.5, ls=(0, (3, 2)), zorder=1)
+    bx.axhline(0.7, color=INK2, lw=0.5, ls=":", zorder=1)
+    bx.text(3.48, 0.5, "0.5", fontsize=5.2, color=INK2, ha="right", va="bottom")
+    bx.text(3.48, 0.7, "0.7", fontsize=5.2, color=INK2, ha="right", va="bottom")
+    bx.set_xticks(range(len(cats)))
+    bx.set_xticklabels([c[1] for c in cats], fontsize=5.6)
+    bx.tick_params(axis="x", length=0, pad=2)
+    bx.tick_params(axis="y", labelsize=6)
+    bx.set_xlim(-0.5, len(cats) - 0.5)
+    bx.set_ylim(0.3, 1.06)
+    bx.set_yticks([0.4, 0.6, 0.8, 1.0])
+    bx.grid(axis="y", color=GRID, lw=0.6, zorder=0)
+    bx.set_ylabel(r"$\rho_K$: key read left", fontsize=6.3, labelpad=1)
+    bx.set_title(r"(b) ablating it: $\rho_K$", fontsize=7, color=INK, loc="left")
+    # (c) sign
+    cx = fig.add_subplot(gs[0, 2])
+    cells = [("Qin", "$Q_{\\mathrm{IN}}$"), ("Qout", "$Q_{\\mathrm{OUT}}$"), ("Inline", "IOI")]
+    w_ = 0.18
+    for j, (cw, _) in enumerate(cells):
+        for q, (k, ch) in enumerate([(k, ch) for k in MD8 for ch in ("IDK", "IDV")]):
+            stem = f"JdCell{cw}{ch}{K8[k]}"
+            x = j + (q - 1.5) * w_
+            y = mf8(stem)
+            cx.bar(x, y, w_ * 0.9, color=COLD8[k] if ch == "IDK" else "white", edgecolor=COLD8[k], lw=0.6, hatch="////" if ch == "IDV" else None, zorder=3,
+                   yerr=[[y - mf8(stem + "Lo")], [mf8(stem + "Hi") - y]], error_kw=dict(lw=0.6, ecolor=INK, capsize=0))
+    cx.axhline(0, color=INK2, lw=0.6, zorder=4)
+    cx.set_xticks(range(len(cells)))
+    cx.set_xticklabels([c[1] for c in cells], fontsize=6)
+    cx.tick_params(axis="x", length=0, pad=2)
+    cx.tick_params(axis="y", labelsize=6)
+    cx.set_xlim(-0.5, len(cells) - 0.5)
+    cx.grid(axis="y", color=GRID, lw=0.6, zorder=0)
+    cx.set_ylabel("identity read (nats)", fontsize=6.3, labelpad=1)
+    cx.set_title("(c) sign of the reads", fontsize=7, color=INK, loc="left")
+    hs = [matplotlib.patches.Patch(facecolor=INK2, edgecolor=INK2, lw=0.6), matplotlib.patches.Patch(facecolor="white", edgecolor=INK2, hatch="////", lw=0.6)]
+    cx.legend(hs, [r"$\mathrm{ID}_K$", r"$\mathrm{ID}_V$"], frameon=False, fontsize=5.8, loc="lower left", handlelength=1.2, handletextpad=0.3,
+              labelspacing=0.2, borderaxespad=0.2)
+    # (d) scale
+    dx = fig.add_subplot(gs[0, 3])
+    # hollow: J-D6 is not evaluable at 3B (J-D-G6), and its rho and rho_nat there are recomputed (dagger); omega (J-D6a) is
+    # evaluable at every scale. The post hoc X-specific ratio (recomputed; dagger) exists at 1.5B and 7B only: no line through 3B.
+    SC8 = [("JdSixaOmega", INK, "o", r"$\omega$"), ("JdSixRho", AQUA, "D", r"$\rho$"), ("JdSixRhoNat", PURPLE, "s", r"$\rho_{\mathrm{nat}}$"),
+           ("JdSixNatX", BROWN, "^", r"$\rho^X_{\mathrm{nat}}$ (post hoc)$^\dagger$")]
+    hs, ls = [], []
+    for q, (stem, col, mk, lab) in enumerate(SC8):
+        xs_, ys_ = [], []
+        for j, k in enumerate(MD8S):
+            n_ = stem + K8[k]
+            if n_ not in macros:
+                continue
+            x = j + (q - 1.5) * 0.09
+            ne = k == "qwen3b" and stem != "JdSixaOmega"
+            assert ne == (n_ not in SRCLINE) or stem == "JdSixNatX", n_   # hollow exactly where the value is recomputed
+            dx.plot([x, x], [mf8(n_ + "Lo"), mf8(n_ + "Hi")], color=col, lw=0.8, zorder=2, solid_capstyle="butt")
+            dx.plot(x, mf8(n_), marker=mk, ms=3.2, ls="none", color=col, mfc="white" if ne else col, mew=0.7, zorder=3)
+            xs_.append(x), ys_.append(mf8(n_))
+        if stem != "JdSixNatX":
+            dx.plot(xs_, ys_, color=col, lw=0.6, ls="-", zorder=1)
+        hs.append(matplotlib.lines.Line2D([], [], marker=mk, ls="none", color=col, ms=3.2, mew=0.7)), ls.append(lab)
+    hs.append(matplotlib.lines.Line2D([], [], marker="s", ls="none", color=INK2, mfc="white", ms=3.2, mew=0.7))
+    ls.append(r"not evaluable$^\dagger$")
+    dx.axhline(0, color=INK2, lw=0.6, zorder=1)
+    dx.set_xticks(range(len(MD8S)))
+    dx.set_xticklabels(["1.5B", "3B", "7B"], fontsize=5.8)
+    dx.tick_params(axis="x", length=0, pad=2)
+    dx.tick_params(axis="y", labelsize=6)
+    dx.set_xlim(-0.85, len(MD8S) - 0.5)   # a margin at the left for the legend handles, clear of the 1.5B column
+    dx.set_ylim(-0.25, 1.05)
+    dx.set_yticks([0, 0.5, 1])
+    dx.grid(axis="y", color=GRID, lw=0.6, zorder=0)
+    dx.set_title("(d) by scale", fontsize=7, color=INK, loc="left")
+    # in the empty band under omega and above rho_nat (one column: two would run past the panel)
+    dx.legend(hs, ls, frameon=False, fontsize=5.4, loc="upper left", bbox_to_anchor=(0.0, 0.935), handletextpad=0.2, labelspacing=0.1,
+              borderaxespad=0.1)
+    fig.savefig(FIG / "fig_flag.pdf", metadata=MD8META)
+    plt.close(fig)
+
+
+flag_figure()
+
+
 # ---------------------------------------------------------------- checks
 # (1) every score-file macro still equals its line at the printed precision
 for name, (tag, idx, s) in SRCLINE.items():
@@ -2387,19 +3818,48 @@ if os.environ.get("VERIFY_STAGE5"):
 # (4) v2 macros are untouched (nm() refuses to overwrite; this guards any later edit)
 assert V2_MACROS <= set(macros)
 print(f"v3: {len(REG)} new macros ({sum(1 for r in REG if 'recomputed' in r[3])} recomputed, {sum(1 for r in REG if 'arithmetic' in r[3])} arithmetic)")
+# (5) stage 8: every macro defined before stage 8 keeps its value (every stage-8 score-file macro equals its line: (1));
+# the new macros by group
+assert all(macros[n] == v for n, v in PRE8.items()), [n for n, v in PRE8.items() if macros[n] != v][:5]
+_s8 = REG[N_PRE8:]
+assert all(r[0] in (G8A, G8B, G8D, G8X) for r in _s8)
+_s8n = {r[1] for r in _s8}
+print(f"stage 8: {len(_s8)} new macros (" + ", ".join(f"{g} {sum(1 for r in _s8 if r[0] == g)}" for g in (G8A, G8B, G8D, G8X)) +
+      f"; {sum(1 for n in SRCLINE if n in _s8n)} printed strings checked against their score-file lines, {sum(1 for r in _s8 if 'recomputed' in r[3])} recomputed, "
+      f"{sum(1 for r in _s8 if 'arithmetic' in r[3])} arithmetic, the rest ranges selecting printed strings); the {len(PRE8)} earlier macros are unchanged")
 
 # ---------------------------------------------------------------- index of the new macros (for the writers)
+# MACRO_INDEX=<file> lists every registered macro by group, as before stage 8. MACRO_INDEX_GROUPS=<g1,g2,...> (optional)
+# lists only those groups in full and counts the others, e.g. MACRO_INDEX_GROUPS=S8A,S8B,S8D,S8X for docs/V5_MACROS.md.
 if os.environ.get("MACRO_INDEX"):
     from collections import OrderedDict
     by = OrderedDict()
     for g, n, v, d, s in REG:
         by.setdefault(g, []).append((n, v, d, s))
+    only = [g for g in os.environ.get("MACRO_INDEX_GROUPS", "").split(",") if g]
+    assert all(g in by for g in only), [g for g in only if g not in by]
     out = ["# Index of the v3 macros (generated by paper/make_figures.py)", "",
            f"{len(REG)} new macros. Group = section of docs/V3_PLAN.md. Value = as in numbers.tex. "
            "'[recomputed]' = not printed by a scorer: label exploratory or post hoc in the paper.", ""]
+    if len(REG) > N_PRE8:
+        out += [f"Stage 8 (preregistration J; {len(REG) - N_PRE8} of the macros) has groups by part instead: S8A = part A (natural passages), "
+                "S8B = part B (fresh samples, the emitted-form score), S8D = part D (the flag), S8X = counts across parts A, B and D "
+                "(part C is still running and has no macros yet). Names: J + part (Ja, Jb, Jd, Jx) + statistic + format or arm + model tag; "
+                "...Lo and ...Hi are the interval bounds (95 %; the N4 verdict bounds of part B are 98.75 %, as each description says). "
+                "Negative values are in math mode. '[arithmetic on printed values]' = a count or sum of printed values; a name ending "
+                "in Min or Max selects a printed string. A value of -0.000 (or -0.0) is the scorer's printed string, kept verbatim; it is "
+                "marked NEGATIVE ZERO below: in running text quote its interval or range instead.", ""]
+    if only:
+        out += [f"Generated with MACRO_INDEX_GROUPS={','.join(only)}: groups {', '.join(only)} are listed in full; the others are only counted "
+                "(unset MACRO_INDEX_GROUPS to list every group).", ""]
+        out += [f"- {g}: {len(r_)} macros" for g, r_ in by.items() if g not in only] + [""]
+    negz = re.compile(r"-0(\.0+)?")
     for g, rows_ in by.items():
+        if only and g not in only:
+            continue
         out += [f"## {g}", "", "| macro | value | meaning | source |", "|---|---|---|---|"]
-        out += [f"| `\\{n}` | `{v}` | {d.replace('|', '/')} | {s} |" for n, v, d, s in rows_]
+        out += [f"| `\\{n}` | `{v}` | {(f'**NEGATIVE ZERO: prints as {v} (a minus sign on zero); quote the interval or range instead.** ' if g in (G8A, G8B, G8D, G8X) and negz.fullmatch(v) else '') + d.replace('|', '/')} | {s} |"
+                for n, v, d, s in rows_]
         out.append("")
     Path(os.environ["MACRO_INDEX"]).write_text("\n".join(out) + "\n")
     print("wrote macro index to", os.environ["MACRO_INDEX"])

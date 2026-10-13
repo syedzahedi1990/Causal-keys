@@ -1,0 +1,71 @@
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+Line & Statistic & Qwen2.5-7B & Mistral-7B & Verdict \\
+\midrule
+J-D1 & $\mathrm{ID}^{\mathrm{LOO}}_{\mathrm{inj}}/\mathrm{ID}_K$ & 0.997 [0.980, 1.014] & 0.803 [0.746, 0.856] & \textbf{met} \\
+ & $\pi_X$ & 0.96 & 0.67 &  \\
+J-D2 & $\iota$(move $\Delta$) & 0.999 [0.992, 1.006] & 0.794 [0.719, 0.864] & \textbf{not met} \\
+ & $\iota$(own write $\perp$ flag) & 0.135 [0.096, 0.179] & 0.409 [0.332, 0.488] &  \\
+ & $\iota$(mean $H^*$ output) & 0.614 [0.549, 0.679] & 0.120 [0.078, 0.166] &  \\
+ & $\iota$(active-set flag) & $-$0.032 [$-$0.037, $-$0.027] & $-$0.010 [$-$0.015, $-$0.006] &  \\
+J-D3 & $\rho_K$(flag) & 0.466 [0.416, 0.516] & 0.478 [0.403, 0.553] & \textbf{not met} \\
+ & $\rho_K$(pc1) & 0.687 [0.633, 0.738] & 0.846 [0.786, 0.902] &  \\
+ & $\rho_K$(mean $H^*$ output) & 0.561 [0.520, 0.600] & 0.899 [0.846, 0.946] &  \\
+J-D4 & $r^{\mathrm{inj}}_{\mathrm{ans}}(KV)$ & 0.869 [0.855, 0.884] & 0.762 [0.737, 0.786] & \textbf{met} \\
+ & $r^{\mathrm{inj}}_{\mathrm{ans}}(K)$ & 0.689 [0.642, 0.735] & 0.601 [0.540, 0.659] &  \\
+ & $r^{\mathrm{inj}}_{\mathrm{ans}}(V)$ & 0.047 [0.030, 0.067] & 0.068 [0.035, 0.104] &  \\
+ & $r^{\mathrm{inj}}_{\mathrm{ans}}(K) - r^{\mathrm{inj}}_{\mathrm{ans}}(V)$ & 0.642 [0.589, 0.692] & 0.533 [0.478, 0.588] &  \\
+J-D-ADDR & weighted $\cos(\Delta^K, \Delta^{KV})$ & 0.993 & 0.962 & \textbf{met} \\
+ & $\mathrm{ID}_{\mathrm{inj}}(KV)/\mathrm{ID}_{\mathrm{inj}}(K)$ & 1.005 [1.003, 1.008] & 0.981 [0.949, 1.013] &  \\
+J-D-KN & Pearson (per story) & 0.894 [0.868, 0.917] & 0.147 [0.041, 0.252] & \textbf{not met} \\
+ & B-loss ratio $\beta$ & 5.167 [3.878, 7.704] & 9.095 [2.862, 58.110] &  \\
+ & mean$(\Delta\ell_S - \Delta\ell_X)$ (nats) & $-$0.073 [$-$0.763, 0.612] & 0.290 [$-$0.457, 1.024] &  \\
+J-D5 & $\Psi_{\mathrm{bind}}$ pooled (nats) & $-$0.578 [$-$0.863, $-$0.308] & 0.269 [0.096, 0.456] & \textbf{not met} \\
+ & object-first & 0.376 [0.156, 0.619] & 0.459 [0.120, 0.848] &  \\
+ & distractor-first & $-$1.299 [$-$1.678, $-$0.955] & 0.126 [$-$0.034, 0.283] &  \\
+ & stratum difference & 1.675 [1.272, 2.115] & 0.333 [$-$0.049, 0.751] &  \\
+J-D7 & $\mathrm{ID}_K(Q_{\mathrm{OUT}})$ (nats) & $-$12.138 [$-$12.905, $-$11.413] & $-$7.083 [$-$7.726, $-$6.463] & \textbf{met} \\
+ & $\mathrm{ID}_K(Q_{\mathrm{IN}})$ (nats) & 13.005 [12.206, 13.777] & 3.575 [3.085, 4.059] &  \\
+ & paired difference (nats) & 25.143 [24.121, 26.159] & 10.658 [9.897, 11.413] &  \\
+J-D-SIGN-Q & $\mathrm{ID}_V(Q_{\mathrm{OUT}})$ (nats) & $-$0.431 [$-$0.616, $-$0.254] & $-$1.806 [$-$2.442, $-$1.192] & \textbf{met} \\
+J-D-SIGN-IOI & $\mathrm{ID}_K$, IOI in-sentence (nats) & $-$3.350 [$-$3.655, $-$3.042] & $-$2.352 [$-$2.542, $-$2.162] & \textbf{met} \\
+ & $\mathrm{ID}_V$, IOI in-sentence (nats) & 2.550 [2.244, 2.889] & 1.096 [0.945, 1.247] &  \\
+J-D8-Q & $R(H^*)$, $Q_{\mathrm{IN}}$ & 1.027 [1.016, 1.038] & 1.058 [1.032, 1.087] & \textbf{met} \\
+ & $\mathrm{KO}(H^*)$, $Q_{\mathrm{IN}}$ & 0.974 [0.968, 0.980] & 0.931 [0.892, 0.964] &  \\
+ & $R(H^*)$, $Q_{\mathrm{OUT}}$ & 0.986 [0.971, 1.002] & 1.050 [1.011, 1.093] &  \\
+ & $\mathrm{KO}(H^*)$, $Q_{\mathrm{OUT}}$ & 1.021 [1.001, 1.041] & 0.958 [0.918, 0.995] &  \\
+J-D8-IOI & $R(H^*)$, IOI in-sentence & 0.922 [0.882, 0.960] & n.e.\ (J-D-G4 INLINE) & \textbf{not evaluable} \\
+ & $\mathrm{KO}(H^*)$, IOI in-sentence & 0.998 [0.980, 1.016] & n.e.\ (J-D-G4 INLINE) &  \\
+J-D-ROUTE-IOI & $r_{\mathrm{ans}}(KV)$ & 0.897 [0.821, 0.976] & 0.839 [0.769, 0.910] & \textbf{met} \\
+ & $r_{\mathrm{ans}}(K)$ & 0.431 [0.318, 0.536] & 0.488 [0.406, 0.567] &  \\
+ & $r_{\mathrm{ans}}(V)$ & 0.211 [0.163, 0.267] & 0.263 [0.231, 0.298] &  \\
+ & $r_{\mathrm{ans}}(K) - r_{\mathrm{ans}}(V)$ & 0.220 [0.081, 0.343] & 0.225 [0.131, 0.314] &  \\
+ & $r_{\mathrm{other}}$ & 0.103 [0.064, 0.146] & 0.190 [0.157, 0.223] &  \\
+J-D-HOP2 & carry, top-10 hop-2 heads, $Q_{\mathrm{OUT}}$ & 0.077 [0.062, 0.092] & 0.161 [0.117, 0.208] & \textbf{not met} \\
+ & carry, top-10 hop-2 heads, IOI & $-$0.085 [$-$0.141, $-$0.036] & $-$0.029 [$-$0.093, 0.025] &  \\
+\bottomrule
+\end{tabular}
+
+\medskip
+
+\begin{tabular}{@{}llcccl@{}}
+\toprule
+Line & Statistic & Qwen2.5-1.5B & Qwen2.5-3B & Qwen2.5-7B & Verdict \\
+\midrule
+J-D6a & $\omega$ & \begin{tabular}[t]{@{}c@{}}0.967\\[-1pt]{\scriptsize[0.952, 0.982]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}0.954\\[-1pt]{\scriptsize[0.937, 0.971]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}0.822\\[-1pt]{\scriptsize[0.810, 0.834]}\end{tabular} & \textbf{met} \\
+ & $\kappa$ & 0.966 & 0.895 & 0.872 &  \\
+J-D6 & $\rho$ & \begin{tabular}[t]{@{}c@{}}$-$0.126\\[-1pt]{\scriptsize[$-$0.179, $-$0.077]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}$-$0.025$^\dagger$ (n.e.)\\[-1pt]{\scriptsize [$-$0.104, 0.050]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}0.257\\[-1pt]{\scriptsize[0.222, 0.292]}\end{tabular} & \textbf{not met} \\
+ & $\rho_{\mathrm{nat}}$ & \begin{tabular}[t]{@{}c@{}}0.090\\[-1pt]{\scriptsize[0.042, 0.137]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}0.266$^\dagger$ (n.e.)\\[-1pt]{\scriptsize [0.196, 0.341]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}0.468\\[-1pt]{\scriptsize[0.431, 0.505]}\end{tabular} &  \\
+ & $\rho - \rho_{\mathrm{nat}}$ & \begin{tabular}[t]{@{}c@{}}$-$0.216\\[-1pt]{\scriptsize[$-$0.273, $-$0.163]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}$-$0.290$^\dagger$ (n.e.)\\[-1pt]{\scriptsize [$-$0.376, $-$0.213]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}$-$0.211\\[-1pt]{\scriptsize[$-$0.245, $-$0.178]}\end{tabular} &  \\
+J-D6-ROUTE & $r^{\mathrm{inj}}_{\mathrm{ans}}(V)$ & \begin{tabular}[t]{@{}c@{}}$-$0.140\\[-1pt]{\scriptsize[$-$0.276, $-$0.054]}\end{tabular} & -- & -- & \textbf{not met} \\
+ & $r^{\mathrm{inj}}_{\mathrm{ans}}(K)$ & \begin{tabular}[t]{@{}c@{}}1.114\\[-1pt]{\scriptsize[1.006, 1.285]}\end{tabular} & -- & -- &  \\
+ & $r^{\mathrm{inj}}_{\mathrm{ans}}(V) - r^{\mathrm{inj}}_{\mathrm{ans}}(K)$ & \begin{tabular}[t]{@{}c@{}}$-$1.254\\[-1pt]{\scriptsize[$-$1.543, $-$1.075]}\end{tabular} & -- & -- &  \\
+J-D6, post hoc & natural ratio, $X$-specific contrast$^\dagger$ & \begin{tabular}[t]{@{}c@{}}$-$0.113\\[-1pt]{\scriptsize[$-$0.213, $-$0.030]}\end{tabular} & -- & \begin{tabular}[t]{@{}c@{}}0.271\\[-1pt]{\scriptsize[0.234, 0.308]}\end{tabular} & -- \\
+ & $\rho$ minus it$^\dagger$ & \begin{tabular}[t]{@{}c@{}}$-$0.013\\[-1pt]{\scriptsize[$-$0.099, 0.083]}\end{tabular} & -- & \begin{tabular}[t]{@{}c@{}}$-$0.014\\[-1pt]{\scriptsize[$-$0.049, 0.022]}\end{tabular} &  \\
+ & natural ratio on $\mathrm{ID}_K$$^\dagger$ & \begin{tabular}[t]{@{}c@{}}$-$0.115\\[-1pt]{\scriptsize[$-$0.182, $-$0.062]}\end{tabular} & -- & \begin{tabular}[t]{@{}c@{}}0.290\\[-1pt]{\scriptsize[0.270, 0.311]}\end{tabular} &  \\
+ & $\rho$ minus it$^\dagger$ & \begin{tabular}[t]{@{}c@{}}$-$0.011\\[-1pt]{\scriptsize[$-$0.079, 0.061]}\end{tabular} & -- & \begin{tabular}[t]{@{}c@{}}$-$0.033\\[-1pt]{\scriptsize[$-$0.066, $-$0.002]}\end{tabular} &  \\
+D6b & $\Delta^{\mathrm{POST}}/\Delta^{\mathrm{P1}}$ at the list row & \begin{tabular}[t]{@{}c@{}}0.926\\[-1pt]{\scriptsize[0.908, 0.942]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}0.926\\[-1pt]{\scriptsize[0.892, 0.961]}\end{tabular} & \begin{tabular}[t]{@{}c@{}}0.943\\[-1pt]{\scriptsize[0.924, 0.961]}\end{tabular} & reported \\
+\bottomrule
+\end{tabular}

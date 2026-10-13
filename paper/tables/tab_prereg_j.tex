@@ -1,0 +1,58 @@
+% two halves of 0.47\textwidth side by side: set this table in a table* float (full page width)
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcccll@{\hspace{1.5em}}lcccll@{}}
+\toprule
+Line & Cl. & Kind & Prior & Met & Verdict & Line & Cl. & Kind & Prior & Met & Verdict \\
+\midrule
+\multicolumn{6}{@{}p{0.47\textwidth}@{}}{\textbf{Part A}: natural passages (Llama-3.1-8B, Gemma-2-9B, Qwen2.5-7B, Mistral-7B)} & \multicolumn{6}{@{}p{0.47\textwidth}@{}}{\textbf{Part C}: placeholder} \\
+J-A1 & M & A & 0.80 & 3/3 & \textbf{met} & \multicolumn{6}{@{}p{0.47\textwidth}@{}}{\footnotesize Part C is not scored yet; its lines are added here when its run is scored.} \\
+J-A1b & R & A & 0.55 & 3/3 & \textbf{met} &  & & & & &  \\
+J-A1c & M & A & 0.85 & 4/4 & \textbf{met} & \multicolumn{6}{@{}p{0.47\textwidth}@{}}{\textbf{Part D}: the flag (Qwen2.5-7B, Mistral-7B; J-D6, J-D6a, J-D6-ROUTE at Qwen2.5-1.5B, 3B, 7B)} \\
+J-A2 & M & A & 0.85 & 3/3 & \textbf{met} & J-D1 & R & A & 0.55 & 2/2 & \textbf{met} \\
+J-A3 & D & -- & 0.70 & 2/2 & \textbf{not evaluable}$^\ddagger$ & J-D2 & R & A & 0.55 & 0/2 & \textbf{not met} \\
+J-A4 & L & A & 0.90 & 3/3 & \textbf{met} & J-D3 & R & A & 0.50 & 1/2 & \textbf{not met} \\
+J-A5 & R & A & 0.50 & 0/2 & \textbf{not met} & J-D4 & M & A & 0.85 & 2/2 & \textbf{met} \\
+J-A5B & M & A & 0.80 & 2/2 & \textbf{not evaluable} & J-D-ADDR & M & A & 0.80 & 2/2 & \textbf{met} \\
+J-A6a & R & A & 0.45 & 2/3 & \textbf{not met} & J-D-KN & R & A & 0.40 & 0/2 & \textbf{not met} \\
+J-A6b & R & A & 0.60 & 4/4 & \textbf{met} & J-D5 & R & A & 0.25 & 1/2 & \textbf{not met} \\
+J-A6c & R & A & 0.45 & 1/3 & \textbf{not met} & J-D7 & M & A & 0.85 & 2/2 & \textbf{met} \\
+J-A6d & R & A & 0.45 & 2/2 & \textbf{not evaluable} & J-D-SIGN-Q & M & A & 0.85 & 2/2 & \textbf{met} \\
+J-A6e & R & A & 0.40 & 3/3 & \textbf{met} & J-D-SIGN-IOI & L & A & 0.90 & 2/2 & \textbf{met} \\
+J-A7 & R & A & 0.30 & 0/1 & \textbf{not met} & J-D8-Q & M & A & 0.85 & 2/2 & \textbf{met} \\
+J-A7b & R & A & 0.35 & 0/1 & \textbf{not met} & J-D8-IOI & R & A & 0.55 & 1/1 & \textbf{not evaluable} \\
+J-A8 & M & A & 0.80 & 2/2 & \textbf{not evaluable} & J-D-ROUTE-IOI & R & A & 0.40 & 2/2 & \textbf{met} \\
+J-A8d & R & A & 0.60 & 0/1 & \textbf{not met} & J-D-HOP2 & R & A & 0.25 & 0/2 & \textbf{not met} \\
+J-A-HA1 & R & A & 0.75 & 1/1 & \textbf{not evaluable} & J-D6a & L & A & 0.90 & 3/3 & \textbf{met} \\
+J-A-HA2 & R & A & 0.40 & 1/1 & \textbf{not evaluable} & J-D6 & R & A & 0.35 & 0/2 & \textbf{not met} \\
+J-A-HA3a & R & A & 0.30 & 1/1 & \textbf{not evaluable} & J-D6-ROUTE & R & A & 0.35 & 0/1 & \textbf{not met} \\
+J-A-HA3b & R & A & 0.65 & 0/0 & \textbf{not evaluable} & \multicolumn{6}{@{}p{0.47\textwidth}@{}}{\footnotesize \JdCountMet{} met, \JdCountNotMet{} not met, \JdCountNotEval{} not evaluable of \JdCountLines{} lines; risky account lines met: \JxRiskyMetD{} of \JxRiskyVerdD{} with a verdict (expected \JxRiskyExpD{}).} \\
+\multicolumn{6}{@{}p{0.47\textwidth}@{}}{\footnotesize \JaCountMet{} met, \JaCountNotMet{} not met, \JaCountNotEval{} not evaluable of \JaCountLines{} counted lines; risky account lines met: \JxRiskyMetA{} of \JxRiskyVerdA{} with a verdict (expected \JxRiskyExpA{}).} &  & & & & &  \\
+ & & & & &  &  & & & & &  \\
+\multicolumn{6}{@{}p{0.47\textwidth}@{}}{\textbf{Part B}: fresh samples (P4: Qwen2.5-7B, Qwen2.5-14B, Mistral-7B, OLMo-2-7B; N4: Llama-3.1-8B, Gemma-2-9B, Phi-4, Falcon3-7B)} &  & & & & &  \\
+J-B1-P4f & L & A & 0.90 & 4/4 & \textbf{met} &  & & & & &  \\
+J-B1-N4 & M & A & 0.85 & 4/4 & \textbf{met} &  & & & & &  \\
+J-B2-P4f & L & A & 0.90 & 4/4 & \textbf{met} &  & & & & &  \\
+J-B2-N4 & M & A & 0.85 & 4/4 & \textbf{met} &  & & & & &  \\
+J-B3-P4f & M & A & 0.80 & 4/4 & \textbf{met} &  & & & & &  \\
+J-B3-N4 & R & A & 0.50 & 4/4 & \textbf{met} &  & & & & &  \\
+J-B4-P4f & L & A & 0.90 & 4/4 & \textbf{met} &  & & & & &  \\
+J-B4-N4 & M & A & 0.85 & 4/4 & \textbf{met} &  & & & & &  \\
+J-B5-P4f & M & A & 0.85 & 4/4 & \textbf{met} &  & & & & &  \\
+J-B5-N4 & M & A & 0.80 & 4/4 & \textbf{met} &  & & & & &  \\
+J-B5b-P4f & R & A & 0.45 & 3/4 & \textbf{not met} &  & & & & &  \\
+J-B5b-N4 & R & A & 0.40 & 4/4 & \textbf{met} &  & & & & &  \\
+J-B-NULL-P4f & M & A & 0.80 & 4/4 & \textbf{met} &  & & & & &  \\
+J-B-NULL-N4 & R & A & 0.55 & 3/4 & \textbf{met} &  & & & & &  \\
+J-B-LB-N4 & R & A & 0.65 & 4/4 & \textbf{met} &  & & & & &  \\
+J-B-SMALL & R & A & 0.40 & 0/0 & \textbf{not evaluable} &  & & & & &  \\
+J-B6a & R & V & 0.50 & 4/4 & \textbf{met} &  & & & & &  \\
+J-B6b & R & V & 0.45 & 1/3 & \textbf{not met} &  & & & & &  \\
+J-B6c & R & V & 0.75 & 1/1 & \textbf{met} &  & & & & &  \\
+J-B7 & R & V & 0.35 & 8/8 & \textbf{met} &  & & & & &  \\
+J-B8 & R & V & 0.55 & 1/1 & \textbf{met} &  & & & & &  \\
+\multicolumn{6}{@{}p{0.47\textwidth}@{}}{\footnotesize \JbCountMet{} met, \JbCountNotMet{} not met, \JbCountNotEval{} not evaluable of \JbCountLines{} lines; risky account lines met: \JxRiskyMetB{} of \JxRiskyVerdB{} with a verdict (expected \JxRiskyExpB{}).} &  & & & & &  \\
+\midrule
+\multicolumn{12}{@{}p{0.94\textwidth}@{}}{\textbf{Parts A, B and D}: \JxMetABD{} met, \JxNotMetABD{} not met, \JxNotEvalABD{} not evaluable of \JxLinesABD{} lines; risky account lines met: \JxRiskyMetABD{} of \JxRiskyVerdABD{} with a verdict (expected \JxRiskyExpABD{}; part C to be added).} \\
+\bottomrule
+\end{tabular}

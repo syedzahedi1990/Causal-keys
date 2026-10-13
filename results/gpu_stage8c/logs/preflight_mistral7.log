@@ -1,0 +1,2 @@
+==== 2026-10-13T15:48:00Z python experiments/stage8_edits.py --out results/gpu_stage8c --stage preflight --model /root/stage8_models/mistral7 --key mistral7 --sae-dir /root/stage8_models/sae_qwen7
+preflight OK: E 80, H 200, TSET 1000, THOLD 100; neutral families {'EN': 24, 'FR': 24, 'DE': 24, 'SYN': 24}; E5 unusable []; SAE hub None

@@ -1,0 +1,2 @@
+==== 2026-10-13T16:44:54Z python experiments/stage8_edits.py --out results/gpu_stage8c --stage explore --model /root/stage8_models/mistral7 --key mistral7 --sae-dir /root/stage8_models/sae_qwen7 --reserve-min 77
+wrote results/gpu_stage8c/explore/mistral7.json

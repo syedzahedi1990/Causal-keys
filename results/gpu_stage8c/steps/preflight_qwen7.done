@@ -1,0 +1,2 @@
+2026-10-13T14:51:42Z HEAD 8b74b79b76e06b27bedc0d841c7b1e4a5f671649
+python experiments/stage8_edits.py --out results/gpu_stage8c --stage preflight --model /root/stage8_models/qwen7 --key qwen7 --sae-dir /root/stage8_models/sae_qwen7 

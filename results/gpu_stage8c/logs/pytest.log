@@ -1,0 +1,1367 @@
+==== 2026-10-13T14:40:21Z python -m pytest tests/test_stage8_edits.py tests/test_sae.py tests/test_stage8c_score.py tests/test_surface.py tests/test_clamp.py tests/test_head_splice.py tests/test_prakash.py tests/test_generate.py tests/test_stage8_populations.py tests/test_stage8_holm.py -v -rA -p no:cacheprovider
+========================================================================= test session starts =========================================================================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /venv/main/bin/python
+rootdir: /workspace/Causal-keys
+plugins: anyio-4.15.1
+collecting ... collected 95 items
+
+tests/test_stage8_edits.py::test_populations_and_sentences PASSED                                                                                               [  1%]
+tests/test_stage8_edits.py::test_no_grad_guard PASSED                                                                                                           [  2%]
+tests/test_stage8_edits.py::test_lemma_natural_write_equals_kv_clamp PASSED                                                                                     [  3%]
+tests/test_stage8_edits.py::test_lemma_random_edit_equals_clamp_rows PASSED                                                                                     [  4%]
+tests/test_stage8_edits.py::test_prefix_tables_equal_full_run_and_formats PASSED                                                                                [  5%]
+tests/test_stage8_edits.py::test_score_rows_against_reference PASSED                                                                                            [  6%]
+tests/test_stage8_edits.py::test_T_rows_equal_natural_rows_and_layout PASSED                                                                                    [  7%]
+tests/test_stage8_edits.py::test_T_tables_bitwise_through_the_eval_passes PASSED                                                                                [  8%]
+tests/test_stage8_edits.py::test_components_and_kv_stats_known_answers PASSED                                                                                   [  9%]
+tests/test_stage8_edits.py::test_reader_rows_headsplice PASSED                                                                                                  [ 10%]
+tests/test_stage8_edits.py::test_sae_site_is_the_block_output PASSED                                                                                            [ 11%]
+tests/test_stage8_edits.py::test_das_at PASSED                                                                                                                  [ 12%]
+tests/test_stage8_edits.py::test_reader_sets_and_columns PASSED                                                                                                 [ 13%]
+tests/test_stage8_edits.py::test_families_vectors PASSED                                                                                                        [ 14%]
+tests/test_stage8_edits.py::test_prakash_caa_with_natural_difference_equals_id PASSED                                                                           [ 15%]
+tests/test_sae.py::test_encode_decode_reference PASSED                                                                                                          [ 16%]
+tests/test_sae.py::test_load_state_dict_layout_and_hash PASSED                                                                                                  [ 17%]
+tests/test_sae.py::test_fve_streaming_equals_direct PASSED                                                                                                      [ 18%]
+tests/test_sae.py::test_selectivity_and_select PASSED                                                                                                           [ 20%]
+tests/test_sae.py::test_edit_reference_and_kept_latents PASSED                                                                                                  [ 21%]
+tests/test_sae.py::test_full_latent_edit_reproduces_target_with_zero_error PASSED                                                                               [ 22%]
+tests/test_sae.py::test_random_and_pins PASSED                                                                                                                  [ 23%]
+tests/test_stage8c_score.py::test_bootstrap_two_stage_deterministic_and_seed_level PASSED                                                                       [ 24%]
+tests/test_stage8c_score.py::test_tost_log_ratio_holm_components PASSED                                                                                         [ 25%]
+tests/test_stage8c_score.py::test_law_equivalent_and_departures PASSED                                                                                          [ 26%]
+tests/test_stage8c_score.py::test_cell_gates_and_efficacy PASSED                                                                                                [ 27%]
+tests/test_stage8c_score.py::test_sensitivity_gate_and_old_rule PASSED                                                                                          [ 28%]
+tests/test_stage8c_score.py::test_lines_law_met_and_not_met PASSED                                                                                              [ 29%]
+tests/test_stage8c_score.py::test_combination_not_met_on_any_evaluable_failure PASSED                                                                           [ 30%]
+tests/test_stage8c_score.py::test_g0_not_passed_computes_no_line_and_no_outcome PASSED                                                                          [ 31%]
+tests/test_stage8c_score.py::test_j_c5_and_bound PASSED                                                                                                         [ 32%]
+tests/test_stage8c_score.py::test_readers PASSED                                                                                                                [ 33%]
+tests/test_stage8c_score.py::test_readers_e3_needs_layer_7_passing_g3 PASSED                                                                                    [ 34%]
+tests/test_stage8c_score.py::test_jc6_and_anchor PASSED                                                                                                         [ 35%]
+tests/test_stage8c_score.py::test_jc6_bind_usability_decides_evaluability PASSED                                                                                [ 36%]
+tests/test_stage8c_score.py::test_screen_and_window PASSED                                                                                                      [ 37%]
+tests/test_stage8c_score.py::test_lexical_code_counts_only_evaluable_models PASSED                                                                              [ 38%]
+tests/test_stage8c_score.py::test_holm_sensitivity_family_and_verdicts PASSED                                                                                   [ 40%]
+tests/test_stage8c_score.py::test_headline_outcomes PASSED                                                                                                      [ 41%]
+tests/test_stage8c_score.py::test_g0_requires_the_shared_files_the_script_runs PASSED                                                                           [ 42%]
+tests/test_stage8c_score.py::test_main_on_results_dir PASSED                                                                                                    [ 43%]
+tests/test_surface.py::test_trie_equals_plain_passes_clean_and_clamped[sdpa] PASSED                                                                             [ 44%]
+tests/test_surface.py::test_trie_equals_plain_passes_clean_and_clamped[eager] PASSED                                                                            [ 45%]
+tests/test_surface.py::test_trie_equals_plain_passes_tiny_families[gemma2] PASSED                                                                               [ 46%]
+tests/test_surface.py::test_trie_equals_plain_passes_tiny_families[phi3] PASSED                                                                                 [ 47%]
+tests/test_surface.py::test_trie_equals_plain_passes_tiny_families[llama] PASSED                                                                                [ 48%]
+tests/test_surface.py::test_trie_equals_plain_passes_tiny_families[mistral] PASSED                                                                              [ 49%]
+tests/test_surface.py::test_formset_invariants_on_study_tokenizers[Qwen/Qwen2.5-7B-Instruct] PASSED                                                             [ 50%]
+tests/test_surface.py::test_formset_invariants_on_study_tokenizers[mistralai/Mistral-7B-Instruct-v0.3] PASSED                                                   [ 51%]
+tests/test_surface.py::test_formset_invariants_on_study_tokenizers[unsloth/Meta-Llama-3.1-8B-Instruct] PASSED                                                   [ 52%]
+tests/test_surface.py::test_formset_invariants_on_study_tokenizers[unsloth/gemma-2-9b-it] PASSED                                                                [ 53%]
+tests/test_surface.py::test_formset_invariants_on_study_tokenizers[microsoft/phi-4] PASSED                                                                      [ 54%]
+tests/test_surface.py::test_formset_invariants_on_study_tokenizers[tiiuae/Falcon3-7B-Instruct] PASSED                                                           [ 55%]
+tests/test_surface.py::test_formset_invariants_on_study_tokenizers[allenai/OLMo-2-1124-7B-Instruct] PASSED                                                      [ 56%]
+tests/test_clamp.py::test_kv_sites PASSED                                                                                                                       [ 57%]
+tests/test_clamp.py::test_gpt2_clamp_exact PASSED                                                                                                               [ 58%]
+tests/test_clamp.py::test_qwen_clamp_matches_single_position_hooks PASSED                                                                                       [ 60%]
+tests/test_clamp.py::test_format_factorial_regression PASSED                                                                                                    [ 61%]
+tests/test_clamp.py::test_row_restricted_regression PASSED                                                                                                      [ 62%]
+tests/test_head_splice.py::test_headsplice_all_heads_is_full_clamp_and_empty_is_clean PASSED                                                                    [ 63%]
+tests/test_head_splice.py::test_headsplice_rows_G_and_group_slices_equal_rowsplice PASSED                                                                       [ 64%]
+tests/test_head_splice.py::test_headsplice_batched_grid_equals_single_runs PASSED                                                                               [ 65%]
+tests/test_head_splice.py::test_self_ablation_is_clean PASSED                                                                                                   [ 66%]
+tests/test_head_splice.py::test_hopsplice_all_rows_is_plain_clamp PASSED                                                                                        [ 67%]
+tests/test_head_splice.py::test_hopsplice_no_overwrite_and_answer_only_cache PASSED                                                                             [ 68%]
+tests/test_head_splice.py::test_hop_batch_equals_single_rows PASSED                                                                                             [ 69%]
+tests/test_prakash.py::test_pool_hash_and_release PASSED                                                                                                        [ 70%]
+tests/test_prakash.py::test_positions_lengths_qwen PASSED                                                                                                       [ 71%]
+tests/test_prakash.py::test_positions_lengths_llama3 PASSED                                                                                                     [ 72%]
+tests/test_prakash.py::test_preflight PASSED                                                                                                                    [ 73%]
+tests/test_prakash.py::test_exchange_exact[NO-MENTION] PASSED                                                                                                   [ 74%]
+tests/test_prakash.py::test_exchange_exact[OPTIONS-AFTER] PASSED                                                                                                [ 75%]
+tests/test_prakash.py::test_resid_patch_rows PASSED                                                                                                             [ 76%]
+tests/test_prakash.py::test_evaluability_rule PASSED                                                                                                            [ 77%]
+tests/test_prakash.py::test_tie_rule PASSED                                                                                                                     [ 78%]
+tests/test_prakash.py::test_scorer_h_read PASSED                                                                                                                [ 80%]
+tests/test_prakash.py::test_scorer_h_binding_and_rules PASSED                                                                                                   [ 81%]
+tests/test_prakash.py::test_scorer_llama_and_missing PASSED                                                                                                     [ 82%]
+tests/test_generate.py::test_greedy_with_cache_equals_stepwise_reference_under_clamps PASSED                                                                    [ 83%]
+tests/test_generate.py::test_greedy_cache_equals_reference_tiny[<lambda>0] PASSED                                                                               [ 84%]
+tests/test_generate.py::test_greedy_cache_equals_reference_tiny[<lambda>1] PASSED                                                                               [ 85%]
+tests/test_generate.py::test_parse_and_frames PASSED                                                                                                            [ 86%]
+tests/test_generate.py::test_end_of_turn_tokens_end_an_answer PASSED                                                                                            [ 87%]
+tests/test_stage8_populations.py::test_every_part_computes_U_identically PASSED                                                                                 [ 88%]
+tests/test_stage8_populations.py::test_populations_have_the_expected_sizes PASSED                                                                               [ 89%]
+tests/test_stage8_populations.py::test_fresh_populations_disjoint_from_U_and_from_each_other PASSED                                                             [ 90%]
+tests/test_stage8_populations.py::test_labelled_reuses PASSED                                                                                                   [ 91%]
+tests/test_stage8_populations.py::test_no_confirmatory_population_uses_a_pilot_seed PASSED                                                                      [ 92%]
+tests/test_stage8_holm.py::test_phi_and_p_values PASSED                                                                                                         [ 93%]
+tests/test_stage8_holm.py::test_degenerate_and_undefined PASSED                                                                                                 [ 94%]
+tests/test_stage8_holm.py::test_holm_hand_worked PASSED                                                                                                         [ 95%]
+tests/test_stage8_holm.py::test_directions_mixed_and_passthrough PASSED                                                                                         [ 96%]
+tests/test_stage8_holm.py::test_ties_keep_input_order PASSED                                                                                                    [ 97%]
+tests/test_stage8_holm.py::test_adjusted_p_against_brute_force PASSED                                                                                           [ 98%]
+tests/test_stage8_holm.py::test_single_component_equals_the_unadjusted_test PASSED                                                                              [100%]
+
+========================================================================== warnings summary ===========================================================================
+tests/test_stage8c_score.py::test_main_on_results_dir
+  /workspace/Causal-keys/analysis/stage8c_score.py:546: RuntimeWarning: Mean of empty slice
+    nu = np.nanmean([m.stat(l, Z, t, "nu") for t in ("S", "X")])
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=============================================================================== PASSES ================================================================================
+______________________________________________________________________ test_main_on_results_dir _______________________________________________________________________
+------------------------------------------------------------------------ Captured stdout call -------------------------------------------------------------------------
+Stage 8 part C scoring, preregistration P-2026-10-10-J; results /tmp/pytest-of-root/pytest-2/test_main_on_results_dir0/res
+
+PROVENANCE (the pipeline's COMMIT.txt, ENV.txt, REVISIONS.txt, SKIPPED.txt; every results file)
+  COMMIT.txt: absent
+  ENV.txt: absent
+  REVISIONS.txt: absent
+  SKIPPED.txt: absent
+  calib/qwen7: commit abc, model None (None @ None), dtype -, attn -, device -, transformers None, test_mode None
+  eval/llama8: commit abc, model None (None @ None), dtype torch.bfloat16, attn sdpa, device -, transformers None, test_mode None
+  eval/mistral7: commit abc, model None (None @ None), dtype torch.bfloat16, attn sdpa, device -, transformers None, test_mode None
+  eval/qwen7: commit abc, model None (None @ None), dtype torch.bfloat16, attn sdpa, device -, transformers None, test_mode None
+  readers/mistral7: commit abc, model None (None @ None), dtype -, attn -, device -, transformers None, test_mode None
+  readers/qwen7: commit abc, model None (None @ None), dtype -, attn -, device -, transformers None, test_mode None
+  calibration file of qwen7: sha256 cccccccccccccccc; every later file records it: OK
+  commits: ['abc']
+
+POPULATION (E: the first 80 cores of the Random(8101) stream with pi(S) != B, pi(X) != B, disjoint from U; a model needs >= 60 evaluated stories)
+  eval qwen7: 64 stories (indices 0..63 in order: OK); population hash recorded: OK
+  eval mistral7: 64 stories (indices 0..63 in order: OK); population hash recorded: OK
+  eval llama8: 64 stories (indices 0..63 in order: OK); population hash recorded: OK
+  population: OK
+
+GATES (J-C-G0 before any model; per model J-C-G1 equivalence control, J-C-G2 format effect, J-C-G8 sensitivity; J-C-G3 SAE alignment; J-C-G4 cells; J-C-G5 efficacy; J-C-G6 specificity)
+  J-C-G0  FP32 unit tests (last of 1 run(s)): tests/test_stage8_edits.py 15 passed, 0 failed, 0 skipped; tests/test_sae.py 7 passed, 0 failed, 0 skipped; tests/test_stage8c_score.py 19 passed, 0 failed, 0 skipped; tests/test_generate.py 5 passed, 0 failed, 0 skipped; tests/test_stage8_populations.py 5 passed, 0 failed, 0 skipped; tests/test_stage8_holm.py 7 passed, 0 failed, 0 skipped; failures in the run 0 -> MET
+  J-C-G1 qwen7    16 evaluable cells; all within tolerance -> MET
+  J-C-G2 qwen7    sigma(LETTER, 3) - sigma(NONE, 3) +0.948 [+0.948,+0.948] (>= 0.5; H0: <= 0 rejected) -> MET
+  J-C-G8 qwen7    sensitivity -> MET
+           T: 16 statistics, pooled lambda +0.000 [+0.000,+0.000] -> equivalent (required equivalent): yes; MAD +0.000 [+0.000,+0.000] max 0.000 over 16 cells -> old rule passes
+           SK50: 16 statistics, pooled lambda -0.916 [-0.916,-0.916] -> R1 copy-only (required a departure, lambda < -log 1.25): yes; MAD +0.109 [+0.109,+0.109] max 0.222 over 16 cells -> old rule passes
+           SV50: 16 statistics, pooled lambda +0.916 [+0.916,+0.916] -> R3 key-flat (required a departure, lambda > log 1.25): yes; MAD +0.111 [+0.111,+0.111] max 0.222 over 16 cells -> old rule passes
+           SK80: 16 statistics, pooled lambda -0.223 [-0.223,-0.223] -> graded departure (pooled lambda within the margin; some statistic not equivalent); MAD +0.027 [+0.027,+0.027] max 0.051 over 16 cells -> old rule passes
+           SV80: 16 statistics, pooled lambda +0.223 [+0.223,+0.223] -> graded departure (pooled lambda within the margin; some statistic not equivalent); MAD +0.028 [+0.028,+0.028] max 0.051 over 16 cells -> old rule passes
+  J-C-G4 qwen7    l= 3 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 qwen7    l= 7 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 qwen7    l=11 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 qwen7    l=15 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G6 qwen7    l= 3 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 qwen7    l= 7 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 qwen7    l=11 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 qwen7    l=15 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G5 qwen7    E1     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E1     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E1     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E1     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E2     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E2     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E2     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E2     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E3     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E3     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E3     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E3     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E4     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E4     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E4     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E4     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E5FR   l= 3 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 qwen7    E5FR   l= 7 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 qwen7    E5FR   l=11 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 qwen7    E5FR   l=15 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G1 mistral7 16 evaluable cells; all within tolerance -> MET
+  J-C-G2 mistral7 sigma(LETTER, 3) - sigma(NONE, 3) +0.948 [+0.948,+0.948] (>= 0.5; H0: <= 0 rejected) -> MET
+  J-C-G8 mistral7 sensitivity -> MET
+           T: 16 statistics, pooled lambda +0.000 [+0.000,+0.000] -> equivalent (required equivalent): yes; MAD +0.000 [+0.000,+0.000] max 0.000 over 16 cells -> old rule passes
+           SK50: 16 statistics, pooled lambda -0.916 [-0.916,-0.916] -> R1 copy-only (required a departure, lambda < -log 1.25): yes; MAD +0.109 [+0.109,+0.109] max 0.222 over 16 cells -> old rule passes
+           SV50: 16 statistics, pooled lambda +0.916 [+0.916,+0.916] -> R3 key-flat (required a departure, lambda > log 1.25): yes; MAD +0.111 [+0.111,+0.111] max 0.222 over 16 cells -> old rule passes
+           SK80: 16 statistics, pooled lambda -0.223 [-0.223,-0.223] -> graded departure (pooled lambda within the margin; some statistic not equivalent); MAD +0.027 [+0.027,+0.027] max 0.051 over 16 cells -> old rule passes
+           SV80: 16 statistics, pooled lambda +0.223 [+0.223,+0.223] -> graded departure (pooled lambda within the margin; some statistic not equivalent); MAD +0.028 [+0.028,+0.028] max 0.051 over 16 cells -> old rule passes
+  J-C-G4 mistral7 l= 3 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 mistral7 l= 7 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 mistral7 l=11 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 mistral7 l=15 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G6 mistral7 l= 3 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 mistral7 l= 7 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 mistral7 l=11 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 mistral7 l=15 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G5 mistral7 E1     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E1     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E1     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E1     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E2     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E2     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E2     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E2     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E4     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E4     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E4     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E4     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E5FR   l= 3 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 mistral7 E5FR   l= 7 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 mistral7 E5FR   l=11 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 mistral7 E5FR   l=15 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G1 llama8   16 evaluable cells; all within tolerance -> MET
+  J-C-G2 llama8   sigma(LETTER, 3) - sigma(NONE, 3) +0.948 [+0.948,+0.948] (>= 0.5; H0: <= 0 rejected) -> MET
+  J-C-G8 llama8   sensitivity -> MET
+           T: 16 statistics, pooled lambda +0.000 [+0.000,+0.000] -> equivalent (required equivalent): yes; MAD +0.000 [+0.000,+0.000] max 0.000 over 16 cells -> old rule passes
+           SK50: 16 statistics, pooled lambda -0.916 [-0.916,-0.916] -> R1 copy-only (required a departure, lambda < -log 1.25): yes; MAD +0.109 [+0.109,+0.109] max 0.222 over 16 cells -> old rule passes
+           SV50: 16 statistics, pooled lambda +0.916 [+0.916,+0.916] -> R3 key-flat (required a departure, lambda > log 1.25): yes; MAD +0.111 [+0.111,+0.111] max 0.222 over 16 cells -> old rule passes
+           SK80: 16 statistics, pooled lambda -0.223 [-0.223,-0.223] -> graded departure (pooled lambda within the margin; some statistic not equivalent); MAD +0.027 [+0.027,+0.027] max 0.051 over 16 cells -> old rule passes
+           SV80: 16 statistics, pooled lambda +0.223 [+0.223,+0.223] -> graded departure (pooled lambda within the margin; some statistic not equivalent); MAD +0.028 [+0.028,+0.028] max 0.051 over 16 cells -> old rule passes
+  J-C-G4 llama8   l= 3 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 llama8   l= 7 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 llama8   l=11 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 llama8   l=15 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G6 llama8   l= 3 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 llama8   l= 7 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 llama8   l=11 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 llama8   l=15 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G5 llama8   E1     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E1     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E1     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E1     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E2     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E2     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E2     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E2     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E5FR   l= 3 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 llama8   E5FR   l= 7 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 llama8   E5FR   l=11 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 llama8   E5FR   l=15 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G3 qwen7    l= 3 FVE 0.800 / 0.950 / 0.850 at l-1 / l / l+1 (published 0.93; >= published - 0.05 and above both neighbours); FVE at p 0.500; k_F 8 beta 1.0 -> MET
+  J-C-G3 qwen7    l= 7 FVE 0.800 / 0.950 / 0.850 at l-1 / l / l+1 (published 0.93; >= published - 0.05 and above both neighbours); FVE at p 0.500; k_F 8 beta 1.0 -> MET
+  J-C-G3 qwen7    l=11 FVE 0.800 / 0.950 / 0.850 at l-1 / l / l+1 (published 0.93; >= published - 0.05 and above both neighbours); FVE at p 0.500; k_F 8 beta 1.0 -> MET
+  J-C-G3 qwen7    l=15 FVE 0.800 / 0.950 / 0.850 at l-1 / l / l+1 (published 0.93; >= published - 0.05 and above both neighbours); FVE at p 0.500; k_F 8 beta 1.0 -> MET
+
+PREDICTIONS (code, class, kind, prior, verdict; the numbers it was decided on)
+  J-C1        M A prior 0.80  MET           the law in Tier 0: E1 at every depth, E2 at l in {3, 7}; Qwen2.5-7B, Mistral-7B
+    qwen7 E1 l in [3, 7, 11, 15]: 16/16 equivalent; pooled lambda +0.000 [+0.000,+0.000] (90 %) -> equivalent; W(P1,3) +0.00 [+0.00,+0.00], W(POST,3) +0.00 [+0.00,+0.00], A_L(3) +0.00 [+0.00,+0.00], A_P(3) +0.00 [+0.00,+0.00], W(P1,7) +0.00 [+0.00,+0.00], W(POST,7) +0.00 [+0.00,+0.00], A_L(7) +0.00 [+0.00,+0.00], A_P(7) +0.00 [+0.00,+0.00], W(P1,11) +0.00 [+0.00,+0.00], W(POST,11) +0.00 [+0.00,+0.00], A_L(11) +0.00 [+0.00,+0.00], A_P(11) +0.00 [+0.00,+0.00], W(P1,15) +0.00 [+0.00,+0.00], W(POST,15) +0.00 [+0.00,+0.00], A_L(15) +0.00 [+0.00,+0.00], A_P(15) +0.00 [+0.00,+0.00] -> MET
+    mistral7 E1 l in [3, 7, 11, 15]: 16/16 equivalent; pooled lambda +0.000 [+0.000,+0.000] (90 %) -> equivalent; W(P1,3) +0.00 [+0.00,+0.00], W(POST,3) +0.00 [+0.00,+0.00], A_L(3) +0.00 [+0.00,+0.00], A_P(3) +0.00 [+0.00,+0.00], W(P1,7) +0.00 [+0.00,+0.00], W(POST,7) +0.00 [+0.00,+0.00], A_L(7) +0.00 [+0.00,+0.00], A_P(7) +0.00 [+0.00,+0.00], W(P1,11) +0.00 [+0.00,+0.00], W(POST,11) +0.00 [+0.00,+0.00], A_L(11) +0.00 [+0.00,+0.00], A_P(11) +0.00 [+0.00,+0.00], W(P1,15) +0.00 [+0.00,+0.00], W(POST,15) +0.00 [+0.00,+0.00], A_L(15) +0.00 [+0.00,+0.00], A_P(15) +0.00 [+0.00,+0.00] -> MET
+    qwen7 E2 l in [3, 7]: 8/8 equivalent; pooled lambda +0.000 [+0.000,+0.000] (90 %) -> equivalent; W(P1,3) +0.00 [+0.00,+0.00], W(POST,3) +0.00 [+0.00,+0.00], A_L(3) +0.00 [+0.00,+0.00], A_P(3) +0.00 [+0.00,+0.00], W(P1,7) +0.00 [+0.00,+0.00], W(POST,7) +0.00 [+0.00,+0.00], A_L(7) +0.00 [+0.00,+0.00], A_P(7) +0.00 [+0.00,+0.00] -> MET
+    mistral7 E2 l in [3, 7]: 8/8 equivalent; pooled lambda +0.000 [+0.000,+0.000] (90 %) -> equivalent; W(P1,3) +0.00 [+0.00,+0.00], W(POST,3) +0.00 [+0.00,+0.00], A_L(3) +0.00 [+0.00,+0.00], A_P(3) +0.00 [+0.00,+0.00], W(P1,7) +0.00 [+0.00,+0.00], W(POST,7) +0.00 [+0.00,+0.00], A_L(7) +0.00 [+0.00,+0.00], A_P(7) +0.00 [+0.00,+0.00] -> MET
+  J-C2        M A prior 0.80  MET           the law in Tier 1: E2 at l in {11, 15} (Qwen2.5-7B, Mistral-7B); E1, E2 at Llama-3.1-8B
+    qwen7 E2 l in [11, 15]: 8/8 equivalent; pooled lambda +0.000 [+0.000,+0.000] (90 %) -> equivalent; W(P1,11) +0.00 [+0.00,+0.00], W(POST,11) +0.00 [+0.00,+0.00], A_L(11) +0.00 [+0.00,+0.00], A_P(11) +0.00 [+0.00,+0.00], W(P1,15) +0.00 [+0.00,+0.00], W(POST,15) +0.00 [+0.00,+0.00], A_L(15) +0.00 [+0.00,+0.00], A_P(15) +0.00 [+0.00,+0.00] -> MET
+    mistral7 E2 l in [11, 15]: 8/8 equivalent; pooled lambda +0.000 [+0.000,+0.000] (90 %) -> equivalent; W(P1,11) +0.00 [+0.00,+0.00], W(POST,11) +0.00 [+0.00,+0.00], A_L(11) +0.00 [+0.00,+0.00], A_P(11) +0.00 [+0.00,+0.00], W(P1,15) +0.00 [+0.00,+0.00], W(POST,15) +0.00 [+0.00,+0.00], A_L(15) +0.00 [+0.00,+0.00], A_P(15) +0.00 [+0.00,+0.00] -> MET
+    llama8 E1 l in [3, 7, 11, 15]: 16/16 equivalent; pooled lambda +0.000 [+0.000,+0.000] (90 %) -> equivalent; W(P1,3) +0.00 [+0.00,+0.00], W(POST,3) +0.00 [+0.00,+0.00], A_L(3) +0.00 [+0.00,+0.00], A_P(3) +0.00 [+0.00,+0.00], W(P1,7) +0.00 [+0.00,+0.00], W(POST,7) +0.00 [+0.00,+0.00], A_L(7) +0.00 [+0.00,+0.00], A_P(7) +0.00 [+0.00,+0.00], W(P1,11) +0.00 [+0.00,+0.00], W(POST,11) +0.00 [+0.00,+0.00], A_L(11) +0.00 [+0.00,+0.00], A_P(11) +0.00 [+0.00,+0.00], W(P1,15) +0.00 [+0.00,+0.00], W(POST,15) +0.00 [+0.00,+0.00], A_L(15) +0.00 [+0.00,+0.00], A_P(15) +0.00 [+0.00,+0.00] -> MET
+    llama8 E2 l in [3, 7, 11, 15]: 16/16 equivalent; pooled lambda +0.000 [+0.000,+0.000] (90 %) -> equivalent; W(P1,3) +0.00 [+0.00,+0.00], W(POST,3) +0.00 [+0.00,+0.00], A_L(3) +0.00 [+0.00,+0.00], A_P(3) +0.00 [+0.00,+0.00], W(P1,7) +0.00 [+0.00,+0.00], W(POST,7) +0.00 [+0.00,+0.00], A_L(7) +0.00 [+0.00,+0.00], A_P(7) +0.00 [+0.00,+0.00], W(P1,11) +0.00 [+0.00,+0.00], W(POST,11) +0.00 [+0.00,+0.00], A_L(11) +0.00 [+0.00,+0.00], A_P(11) +0.00 [+0.00,+0.00], W(P1,15) +0.00 [+0.00,+0.00], W(POST,15) +0.00 [+0.00,+0.00], A_L(15) +0.00 [+0.00,+0.00], A_P(15) +0.00 [+0.00,+0.00] -> MET
+  J-C3        R A prior 0.55  MET           the law for E3, third-party SAE features (Qwen2.5-7B)
+    qwen7 E3 l in [3, 7, 11, 15]: 16/16 equivalent; pooled lambda +0.000 [+0.000,+0.000] (90 %) -> equivalent; W(P1,3) +0.00 [+0.00,+0.00], W(POST,3) +0.00 [+0.00,+0.00], A_L(3) +0.00 [+0.00,+0.00], A_P(3) +0.00 [+0.00,+0.00], W(P1,7) +0.00 [+0.00,+0.00], W(POST,7) +0.00 [+0.00,+0.00], A_L(7) +0.00 [+0.00,+0.00], A_P(7) +0.00 [+0.00,+0.00], W(P1,11) +0.00 [+0.00,+0.00], W(POST,11) +0.00 [+0.00,+0.00], A_L(11) +0.00 [+0.00,+0.00], A_P(11) +0.00 [+0.00,+0.00], W(P1,15) +0.00 [+0.00,+0.00], W(POST,15) +0.00 [+0.00,+0.00], A_L(15) +0.00 [+0.00,+0.00], A_P(15) +0.00 [+0.00,+0.00] -> MET
+  J-C4        R A prior 0.35  MET           the law for E4, the DAS remap at p (Qwen2.5-7B, Mistral-7B; seeds as a level)
+    qwen7 E4 l in [3, 7, 11, 15]: 16/16 equivalent; pooled lambda +0.000 [-0.000,+0.000] (90 %) -> equivalent; W(P1,3) +0.00 [+0.00,+0.00], W(POST,3) +0.00 [+0.00,+0.00], A_L(3) +0.00 [-0.00,+0.00], A_P(3) +0.00 [-0.00,+0.00], W(P1,7) +0.00 [+0.00,+0.00], W(POST,7) +0.00 [+0.00,+0.00], A_L(7) +0.00 [-0.00,+0.00], A_P(7) +0.00 [-0.00,+0.00], W(P1,11) +0.00 [+0.00,+0.00], W(POST,11) +0.00 [+0.00,+0.00], A_L(11) +0.00 [-0.00,+0.00], A_P(11) +0.00 [-0.00,+0.00], W(P1,15) +0.00 [+0.00,+0.00], W(POST,15) +0.00 [+0.00,+0.00], A_L(15) +0.00 [-0.00,+0.00], A_P(15) +0.00 [-0.00,+0.00] -> MET
+    mistral7 E4 l in [3, 7, 11, 15]: 16/16 equivalent; pooled lambda +0.000 [-0.000,+0.000] (90 %) -> equivalent; W(P1,3) +0.00 [+0.00,+0.00], W(POST,3) +0.00 [+0.00,+0.00], A_L(3) +0.00 [-0.00,+0.00], A_P(3) +0.00 [-0.00,+0.00], W(P1,7) +0.00 [+0.00,+0.00], W(POST,7) +0.00 [+0.00,+0.00], A_L(7) +0.00 [-0.00,+0.00], A_P(7) +0.00 [-0.00,+0.00], W(P1,11) +0.00 [+0.00,+0.00], W(POST,11) +0.00 [+0.00,+0.00], A_L(11) +0.00 [-0.00,+0.00], A_P(11) +0.00 [-0.00,+0.00], W(P1,15) +0.00 [+0.00,+0.00], W(POST,15) +0.00 [+0.00,+0.00], A_L(15) +0.00 [-0.00,+0.00], A_P(15) +0.00 [-0.00,+0.00] -> MET
+    (seed-level, reported) qwen7 E4a: 16/16 equivalent; pooled lambda +0.000 [+0.000,+0.000] (90 %) -> equivalent; W(P1,3) +0.00 [+0.00,+0.00], W(POST,3) +0.00 [+0.00,+0.00], A_L(3) +0.00 [+0.00,+0.00], A_P(3) +0.00 [+0.00,+0.00], W(P1,7) +0.00 [+0.00,+0.00], W(POST,7) +0.00 [+0.00,+0.00], A_L(7) +0.00 [+0.00,+0.00], A_P(7) +0.00 [+0.00,+0.00], W(P1,11) +0.00 [+0.00,+0.00], W(POST,11) +0.00 [+0.00,+0.00], A_L(11) +0.00 [+0.00,+0.00], A_P(11) +0.00 [+0.00,+0.00], W(P1,15) +0.00 [+0.00,+0.00], W(POST,15) +0.00 [+0.00,+0.00], A_L(15) +0.00 [+0.00,+0.00], A_P(15) +0.00 [+0.00,+0.00] -> MET
+    (seed-level, reported) qwen7 E4b: 16/16 equivalent; pooled lambda +0.000 [+0.000,+0.000] (90 %) -> equivalent; W(P1,3) +0.00 [+0.00,+0.00], W(POST,3) +0.00 [+0.00,+0.00], A_L(3) +0.00 [+0.00,+0.00], A_P(3) +0.00 [+0.00,+0.00], W(P1,7) +0.00 [+0.00,+0.00], W(POST,7) +0.00 [+0.00,+0.00], A_L(7) +0.00 [+0.00,+0.00], A_P(7) +0.00 [+0.00,+0.00], W(P1,11) +0.00 [+0.00,+0.00], W(POST,11) +0.00 [+0.00,+0.00], A_L(11) +0.00 [+0.00,+0.00], A_P(11) +0.00 [+0.00,+0.00], W(P1,15) +0.00 [+0.00,+0.00], W(POST,15) +0.00 [+0.00,+0.00], A_L(15) +0.00 [+0.00,+0.00], A_P(15) +0.00 [+0.00,+0.00] -> MET
+    (seed-level, reported) mistral7 E4a: 16/16 equivalent; pooled lambda +0.000 [+0.000,+0.000] (90 %) -> equivalent; W(P1,3) +0.00 [+0.00,+0.00], W(POST,3) +0.00 [+0.00,+0.00], A_L(3) +0.00 [+0.00,+0.00], A_P(3) +0.00 [+0.00,+0.00], W(P1,7) +0.00 [+0.00,+0.00], W(POST,7) +0.00 [+0.00,+0.00], A_L(7) +0.00 [+0.00,+0.00], A_P(7) +0.00 [+0.00,+0.00], W(P1,11) +0.00 [+0.00,+0.00], W(POST,11) +0.00 [+0.00,+0.00], A_L(11) +0.00 [+0.00,+0.00], A_P(11) +0.00 [+0.00,+0.00], W(P1,15) +0.00 [+0.00,+0.00], W(POST,15) +0.00 [+0.00,+0.00], A_L(15) +0.00 [+0.00,+0.00], A_P(15) +0.00 [+0.00,+0.00] -> MET
+    (seed-level, reported) mistral7 E4b: 16/16 equivalent; pooled lambda +0.000 [+0.000,+0.000] (90 %) -> equivalent; W(P1,3) +0.00 [+0.00,+0.00], W(POST,3) +0.00 [+0.00,+0.00], A_L(3) +0.00 [+0.00,+0.00], A_P(3) +0.00 [+0.00,+0.00], W(P1,7) +0.00 [+0.00,+0.00], W(POST,7) +0.00 [+0.00,+0.00], A_L(7) +0.00 [+0.00,+0.00], A_P(7) +0.00 [+0.00,+0.00], W(P1,11) +0.00 [+0.00,+0.00], W(POST,11) +0.00 [+0.00,+0.00], A_L(11) +0.00 [+0.00,+0.00], A_P(11) +0.00 [+0.00,+0.00], W(P1,15) +0.00 [+0.00,+0.00], W(POST,15) +0.00 [+0.00,+0.00], A_L(15) +0.00 [+0.00,+0.00], A_P(15) +0.00 [+0.00,+0.00] -> MET
+  J-C5        R A prior 0.35  NOT EVALUABLE the law on the identity-carrying PERP / NONLEX components
+    no identity-carrying component with a lambda statistic
+  J-C-BOUND   R A prior 0.50  MET           the lexical boundary: a non-lexical identity edit is under-read by keys (lambda <= log 0.5)
+    qwen7 E5FR: pooled lambda_E5 -1.099 [-1.099,-1.099] (<= log 0.5 = -0.693; H0: >= log 0.8 rejected, upper < -0.223) over 16 statistics; E2 at the same cells +0.000 [+0.000,+0.000] (>= log 0.8) -> met
+    mistral7 E5FR: pooled lambda_E5 -1.099 [-1.099,-1.099] (<= log 0.5 = -0.693; H0: >= log 0.8 rejected, upper < -0.223) over 16 statistics; E2 at the same cells +0.000 [+0.000,+0.000] (>= log 0.8) -> met
+    llama8 E5FR: pooled lambda_E5 -1.099 [-1.099,-1.099] (<= log 0.5 = -0.693; H0: >= log 0.8 rejected, upper < -0.223) over 16 statistics; E2 at the same cells +0.000 [+0.000,+0.000] (>= log 0.8) -> met
+  J-C-READa   M A prior 0.85  MET           the same reader heads read E1 and E2 (P1, l = 7)
+    qwen7: gate natural KO(H*) +0.950 [+0.950,+0.950] (>= 0.7); ID_K^nat +8.000 [+8.000,+8.000] (>= 2.0) -> MET
+    qwen7 E1: KO(H*) +0.950 [+0.950,+0.950] (>= 0.7, H0: <= 0.5 rejected); random mean +0.030 [+0.030,+0.030] (<= 0.25); ID_K +8.00 -> MET
+    qwen7 E2: KO(H*) +0.950 [+0.950,+0.950] (>= 0.7, H0: <= 0.5 rejected); random mean +0.030 [+0.030,+0.030] (<= 0.25); ID_K +8.00 -> MET
+    qwen7 E3: KO(H*) +0.950 [+0.950,+0.950] (>= 0.7, H0: <= 0.5 rejected); random mean +0.030 [+0.030,+0.030] (<= 0.25); ID_K +8.00 -> MET
+    qwen7 E4a: KO(H*) +0.950 [+0.950,+0.950] (>= 0.7, H0: <= 0.5 rejected); random mean +0.030 [+0.030,+0.030] (<= 0.25); ID_K +8.00 -> MET
+    mistral7: gate natural KO(H*) +0.950 [+0.950,+0.950] (>= 0.7); ID_K^nat +8.000 [+8.000,+8.000] (>= 2.0) -> MET
+    mistral7 E1: KO(H*) +0.950 [+0.950,+0.950] (>= 0.7, H0: <= 0.5 rejected); random mean +0.030 [+0.030,+0.030] (<= 0.25); ID_K +8.00 -> MET
+    mistral7 E2: KO(H*) +0.950 [+0.950,+0.950] (>= 0.7, H0: <= 0.5 rejected); random mean +0.030 [+0.030,+0.030] (<= 0.25); ID_K +8.00 -> MET
+    mistral7 E3: KO(H*) +0.950 [+0.950,+0.950] (>= 0.7, H0: <= 0.5 rejected); random mean +0.030 [+0.030,+0.030] (<= 0.25); ID_K +8.00 -> MET
+    mistral7 E4a: KO(H*) +0.950 [+0.950,+0.950] (>= 0.7, H0: <= 0.5 rejected); random mean +0.030 [+0.030,+0.030] (<= 0.25); ID_K +8.00 -> MET
+  J-C-READb   R A prior 0.60  MET           the same reader heads read E3 and E4 (P1, l = 7)
+  J-C6        M A prior 0.85  NOT EVALUABLE a CAA identity edit at block 28 is not key-flat (Qwen2.5-14B, Prakash et al.'s material)
+    not run (deadline or no results)
+  J-C-SCREEN  R A prior 0.50  NOT EVALUABLE no overlap window: the binding swap acts only after the identity key route closes
+    qwen7: no screen results
+    llama8: no screen results
+    no screened model is evaluable
+  J-C-WIN     R A prior 0.30  NOT EVALUABLE inside an overlap window the binding swap follows the natural read (H7 and H9)
+    no window in any evaluable screened model
+
+HEADLINE (C-6, pre-committed; the Section-5 outcome of the entry): outcome (a): SUPPORTED OUT OF SAMPLE (the law met in E3 and E4, or in identity-carrying PERP / NONLEX, and J-C-BOUND met)
+
+REPORTED (no verdict counted)
+  pi(t) diagnostic qwen7 l=3 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic qwen7 l=7 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic qwen7 l=11 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic qwen7 l=15 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic mistral7 l=3 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic mistral7 l=7 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic mistral7 l=11 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic mistral7 l=15 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  lexical-code reading qwen7 E1 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading qwen7 E1 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading qwen7 E1 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading qwen7 E1 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading qwen7 E2 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading qwen7 E2 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading qwen7 E2 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading qwen7 E2 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading qwen7 E3 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading qwen7 E3 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading qwen7 E3 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading qwen7 E3 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading qwen7 E4 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading qwen7 E4 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading qwen7 E4 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading qwen7 E4 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading mistral7 E1 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading mistral7 E1 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading mistral7 E1 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading mistral7 E1 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading mistral7 E2 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading mistral7 E2 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading mistral7 E2 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading mistral7 E2 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading mistral7 E4 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading mistral7 E4 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading mistral7 E4 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading mistral7 E4 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading llama8 E1 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading llama8 E1 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading llama8 E1 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading llama8 E1 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading llama8 E2 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading llama8 E2 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading llama8 E2 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  lexical-code reading llama8 E2 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone
+  JC4 depth tracking (consistency check; delta_sigma = sigma(f, 3) - sigma(f, 15) >= 0.25 with both cells evaluable):
+    JC4: 0 of 0 qualifying pairs hold (fewer than 3 pairs: not evaluable)
+
+SUMMARY
+  account lines, class L: 0 lines: 0 MET, 0 NOT MET, 0 MET IN PART, 0 NOT EVALUABLE; observed 0 against expected 0.00; Brier nan
+  account lines, class M: 4 lines: 3 MET, 0 NOT MET, 0 MET IN PART, 1 NOT EVALUABLE; observed 3 against expected 2.45; Brier 0.034; not evaluable: J-C6
+  account lines, class R: 7 lines: 4 MET, 0 NOT MET, 0 MET IN PART, 3 NOT EVALUABLE; observed 4 against expected 2.00; Brier 0.259; not evaluable: J-C5, J-C-SCREEN, J-C-WIN
+  met rate among R account lines with a verdict: 4 of 4 (expected 2.00)
+  measurement-validity lines: none in part C (the T control and the sensitivity rows are gates)
+  Holm sensitivity (analysis/stage8_holm.py; reported, no verdict uses it): step-down at familywise one-sided 0.025 over the 103 interval components of the R-class account lines with a verdict (normal p from the bootstrap SE)
+    J-C3: 32 components; no decision changes under Holm; verdict unchanged (MET)
+    J-C4: 64 components; no decision changes under Holm; verdict unchanged (MET)
+    J-C5: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-C-BOUND: 3 components; no decision changes under Holm; verdict unchanged (MET)
+    J-C-READb: 4 components; no decision changes under Holm; verdict unchanged (MET)
+    J-C-SCREEN: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-C-WIN: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+  provenance OK; population OK; J-C-G0 MET
+
+######## EXPLORATORY (not scored)
+-- qwen7: kappa against sigma per cell (descriptive, Fig. 4), nu, K/V cosines and the residual cosine (means over stories and targets)
+   LETTER@3: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@3: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@3: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@3: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=3: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@7: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@7: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@7: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@7: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=7: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@11: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@11: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@11: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@11: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=11: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@15: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@15: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@15: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@15: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=15: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+-- qwen7: story-level distance D = mean |ID_K^Z - ID_K^nat| + |ID_V^Z - ID_V^nat| over mean ID_KV^nat (evaluable cells)
+   l=3: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=7: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=11: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=15: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+-- qwen7: O1, first-order prediction of psi_K from the edit's key displacement projected on the natural one (readers' KV groups where known)
+   E1 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+-- qwen7: L-scored lambda pooled over the law statistics
+   E1: mean lambda under L +0.000 vs E +0.000
+   E2: mean lambda under L +0.000 vs E +0.000
+   E3: mean lambda under L +0.000 vs E +0.000
+   E4: mean lambda under L +0.000 vs E +0.000
+-- mistral7: kappa against sigma per cell (descriptive, Fig. 4), nu, K/V cosines and the residual cosine (means over stories and targets)
+   LETTER@3: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@3: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@3: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@3: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=3: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@7: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@7: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@7: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@7: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=7: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@11: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@11: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@11: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@11: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=11: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@15: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@15: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@15: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@15: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=15: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+-- mistral7: story-level distance D = mean |ID_K^Z - ID_K^nat| + |ID_V^Z - ID_V^nat| over mean ID_KV^nat (evaluable cells)
+   l=3: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=7: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=11: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=15: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+-- mistral7: O1, first-order prediction of psi_K from the edit's key displacement projected on the natural one (readers' KV groups where known)
+   E1 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+-- mistral7: L-scored lambda pooled over the law statistics
+   E1: mean lambda under L +0.000 vs E +0.000
+   E2: mean lambda under L +0.000 vs E +0.000
+   E4: mean lambda under L +0.000 vs E +0.000
+-- llama8: kappa against sigma per cell (descriptive, Fig. 4), nu, K/V cosines and the residual cosine (means over stories and targets)
+   LETTER@3: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@3: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@3: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@3: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=3: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@7: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@7: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@7: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@7: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=7: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@11: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@11: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@11: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@11: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=11: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@15: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@15: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@15: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@15: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=15: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+-- llama8: story-level distance D = mean |ID_K^Z - ID_K^nat| + |ID_V^Z - ID_V^nat| over mean ID_KV^nat (evaluable cells)
+   l=3: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=7: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=11: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=15: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+-- llama8: O1, first-order prediction of psi_K from the edit's key displacement projected on the natural one (readers' KV groups where known)
+   E1 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+-- llama8: L-scored lambda pooled over the law statistics
+   E1: mean lambda under L +0.000 vs E +0.000
+   E2: mean lambda under L +0.000 vs E +0.000
+-- qwen7: frames admitted [], dropped 0; E5 alpha None
+Stage 8 part C scoring, preregistration P-2026-10-10-J; results /tmp/pytest-of-root/pytest-2/test_main_on_results_dir0/res
+
+PROVENANCE (the pipeline's COMMIT.txt, ENV.txt, REVISIONS.txt, SKIPPED.txt; every results file)
+  COMMIT.txt: absent
+  ENV.txt: absent
+  REVISIONS.txt: absent
+  SKIPPED.txt: absent
+  calib/qwen7: commit abc, model None (None @ None), dtype -, attn -, device -, transformers None, test_mode None
+  eval/llama8: commit abc, model None (None @ None), dtype torch.bfloat16, attn sdpa, device -, transformers None, test_mode None
+  eval/mistral7: commit abc, model None (None @ None), dtype torch.bfloat16, attn sdpa, device -, transformers None, test_mode None
+  eval/qwen7: commit abc, model None (None @ None), dtype torch.bfloat16, attn sdpa, device -, transformers None, test_mode None
+  readers/mistral7: commit abc, model None (None @ None), dtype -, attn -, device -, transformers None, test_mode None
+  readers/qwen7: commit abc, model None (None @ None), dtype -, attn -, device -, transformers None, test_mode None
+  calibration file of qwen7: sha256 cccccccccccccccc; every later file records it: OK
+  commits: ['abc']
+
+POPULATION (E: the first 80 cores of the Random(8101) stream with pi(S) != B, pi(X) != B, disjoint from U; a model needs >= 60 evaluated stories)
+  eval qwen7: 64 stories (indices 0..63 in order: OK); population hash recorded: OK
+  eval mistral7: 64 stories (indices 0..63 in order: OK); population hash recorded: OK
+  eval llama8: 64 stories (indices 0..63 in order: OK); population hash recorded: OK
+  population: OK
+
+GATES (J-C-G0 before any model; per model J-C-G1 equivalence control, J-C-G2 format effect, J-C-G8 sensitivity; J-C-G3 SAE alignment; J-C-G4 cells; J-C-G5 efficacy; J-C-G6 specificity)
+  J-C-G0  FP32 unit tests (last of 1 run(s)): tests/test_stage8_edits.py 14 passed, 1 failed, 0 skipped; tests/test_sae.py 7 passed, 0 failed, 0 skipped; tests/test_stage8c_score.py 19 passed, 0 failed, 0 skipped; tests/test_generate.py 5 passed, 0 failed, 0 skipped; tests/test_stage8_populations.py 5 passed, 0 failed, 0 skipped; tests/test_stage8_holm.py 7 passed, 0 failed, 0 skipped; failures in the run 1 -> NOT MET
+  J-C-G1 qwen7    16 evaluable cells; all within tolerance -> MET
+  J-C-G2 qwen7    sigma(LETTER, 3) - sigma(NONE, 3) +0.948 [+0.948,+0.948] (>= 0.5; H0: <= 0 rejected) -> MET
+  J-C-G8 qwen7    sensitivity -> MET
+           T: 16 statistics, pooled lambda +0.000 [+0.000,+0.000] -> equivalent (required equivalent): yes; MAD +0.000 [+0.000,+0.000] max 0.000 over 16 cells -> old rule passes
+           SK50: 16 statistics, pooled lambda -0.916 [-0.916,-0.916] -> R1 copy-only (required a departure, lambda < -log 1.25): yes; MAD +0.109 [+0.109,+0.109] max 0.222 over 16 cells -> old rule passes
+           SV50: 16 statistics, pooled lambda +0.916 [+0.916,+0.916] -> R3 key-flat (required a departure, lambda > log 1.25): yes; MAD +0.111 [+0.111,+0.111] max 0.222 over 16 cells -> old rule passes
+           SK80: 16 statistics, pooled lambda -0.223 [-0.223,-0.223] -> graded departure (pooled lambda within the margin; some statistic not equivalent); MAD +0.027 [+0.027,+0.027] max 0.051 over 16 cells -> old rule passes
+           SV80: 16 statistics, pooled lambda +0.223 [+0.223,+0.223] -> graded departure (pooled lambda within the margin; some statistic not equivalent); MAD +0.028 [+0.028,+0.028] max 0.051 over 16 cells -> old rule passes
+  J-C-G4 qwen7    l= 3 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 qwen7    l= 7 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 qwen7    l=11 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 qwen7    l=15 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G6 qwen7    l= 3 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 qwen7    l= 7 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 qwen7    l=11 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 qwen7    l=15 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G5 qwen7    E1     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E1     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E1     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E1     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E2     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E2     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E2     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E2     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E3     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E3     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E3     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E3     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E4     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E4     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E4     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E4     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E5FR   l= 3 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 qwen7    E5FR   l= 7 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 qwen7    E5FR   l=11 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 qwen7    E5FR   l=15 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G1 mistral7 16 evaluable cells; all within tolerance -> MET
+  J-C-G2 mistral7 sigma(LETTER, 3) - sigma(NONE, 3) +0.948 [+0.948,+0.948] (>= 0.5; H0: <= 0 rejected) -> MET
+  J-C-G8 mistral7 sensitivity -> MET
+           T: 16 statistics, pooled lambda +0.000 [+0.000,+0.000] -> equivalent (required equivalent): yes; MAD +0.000 [+0.000,+0.000] max 0.000 over 16 cells -> old rule passes
+           SK50: 16 statistics, pooled lambda -0.916 [-0.916,-0.916] -> R1 copy-only (required a departure, lambda < -log 1.25): yes; MAD +0.109 [+0.109,+0.109] max 0.222 over 16 cells -> old rule passes
+           SV50: 16 statistics, pooled lambda +0.916 [+0.916,+0.916] -> R3 key-flat (required a departure, lambda > log 1.25): yes; MAD +0.111 [+0.111,+0.111] max 0.222 over 16 cells -> old rule passes
+           SK80: 16 statistics, pooled lambda -0.223 [-0.223,-0.223] -> graded departure (pooled lambda within the margin; some statistic not equivalent); MAD +0.027 [+0.027,+0.027] max 0.051 over 16 cells -> old rule passes
+           SV80: 16 statistics, pooled lambda +0.223 [+0.223,+0.223] -> graded departure (pooled lambda within the margin; some statistic not equivalent); MAD +0.028 [+0.028,+0.028] max 0.051 over 16 cells -> old rule passes
+  J-C-G4 mistral7 l= 3 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 mistral7 l= 7 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 mistral7 l=11 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 mistral7 l=15 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G6 mistral7 l= 3 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 mistral7 l= 7 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 mistral7 l=11 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 mistral7 l=15 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G5 mistral7 E1     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E1     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E1     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E1     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E2     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E2     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E2     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E2     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E4     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E4     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E4     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E4     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E5FR   l= 3 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 mistral7 E5FR   l= 7 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 mistral7 E5FR   l=11 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 mistral7 E5FR   l=15 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G1 llama8   16 evaluable cells; all within tolerance -> MET
+  J-C-G2 llama8   sigma(LETTER, 3) - sigma(NONE, 3) +0.948 [+0.948,+0.948] (>= 0.5; H0: <= 0 rejected) -> MET
+  J-C-G8 llama8   sensitivity -> MET
+           T: 16 statistics, pooled lambda +0.000 [+0.000,+0.000] -> equivalent (required equivalent): yes; MAD +0.000 [+0.000,+0.000] max 0.000 over 16 cells -> old rule passes
+           SK50: 16 statistics, pooled lambda -0.916 [-0.916,-0.916] -> R1 copy-only (required a departure, lambda < -log 1.25): yes; MAD +0.109 [+0.109,+0.109] max 0.222 over 16 cells -> old rule passes
+           SV50: 16 statistics, pooled lambda +0.916 [+0.916,+0.916] -> R3 key-flat (required a departure, lambda > log 1.25): yes; MAD +0.111 [+0.111,+0.111] max 0.222 over 16 cells -> old rule passes
+           SK80: 16 statistics, pooled lambda -0.223 [-0.223,-0.223] -> graded departure (pooled lambda within the margin; some statistic not equivalent); MAD +0.027 [+0.027,+0.027] max 0.051 over 16 cells -> old rule passes
+           SV80: 16 statistics, pooled lambda +0.223 [+0.223,+0.223] -> graded departure (pooled lambda within the margin; some statistic not equivalent); MAD +0.028 [+0.028,+0.028] max 0.051 over 16 cells -> old rule passes
+  J-C-G4 llama8   l= 3 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 llama8   l= 7 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 llama8   l=11 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 llama8   l=15 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G6 llama8   l= 3 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 llama8   l= 7 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 llama8   l=11 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 llama8   l=15 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G5 llama8   E1     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E1     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E1     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E1     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E2     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E2     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E2     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E2     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E5FR   l= 3 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 llama8   E5FR   l= 7 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 llama8   E5FR   l=11 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 llama8   E5FR   l=15 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G3 qwen7    l= 3 FVE 0.800 / 0.950 / 0.850 at l-1 / l / l+1 (published 0.93; >= published - 0.05 and above both neighbours); FVE at p 0.500; k_F 8 beta 1.0 -> MET
+  J-C-G3 qwen7    l= 7 FVE 0.800 / 0.950 / 0.850 at l-1 / l / l+1 (published 0.93; >= published - 0.05 and above both neighbours); FVE at p 0.500; k_F 8 beta 1.0 -> MET
+  J-C-G3 qwen7    l=11 FVE 0.800 / 0.950 / 0.850 at l-1 / l / l+1 (published 0.93; >= published - 0.05 and above both neighbours); FVE at p 0.500; k_F 8 beta 1.0 -> MET
+  J-C-G3 qwen7    l=15 FVE 0.800 / 0.950 / 0.850 at l-1 / l / l+1 (published 0.93; >= published - 0.05 and above both neighbours); FVE at p 0.500; k_F 8 beta 1.0 -> MET
+
+PREDICTIONS (code, class, kind, prior, verdict; the numbers it was decided on)
+  J-C1        M A prior 0.80  NOT EVALUABLE the law in Tier 0: E1 at every depth, E2 at l in {3, 7}; Qwen2.5-7B, Mistral-7B
+    qwen7 E1 l in [3, 7, 11, 15]: not evaluable (gates)
+    mistral7 E1 l in [3, 7, 11, 15]: not evaluable (gates)
+    qwen7 E2 l in [3, 7]: not evaluable (gates)
+    mistral7 E2 l in [3, 7]: not evaluable (gates)
+    J-C-G0 not passed: NOT EVALUABLE
+  J-C2        M A prior 0.80  NOT EVALUABLE the law in Tier 1: E2 at l in {11, 15} (Qwen2.5-7B, Mistral-7B); E1, E2 at Llama-3.1-8B
+    qwen7 E2 l in [11, 15]: not evaluable (gates)
+    mistral7 E2 l in [11, 15]: not evaluable (gates)
+    llama8 E1 l in [3, 7, 11, 15]: not evaluable (gates)
+    llama8 E2 l in [3, 7, 11, 15]: not evaluable (gates)
+    J-C-G0 not passed: NOT EVALUABLE
+  J-C3        R A prior 0.55  NOT EVALUABLE the law for E3, third-party SAE features (Qwen2.5-7B)
+    qwen7 E3 l in [3, 7, 11, 15]: not evaluable (gates)
+    J-C-G0 not passed: NOT EVALUABLE
+  J-C4        R A prior 0.35  NOT EVALUABLE the law for E4, the DAS remap at p (Qwen2.5-7B, Mistral-7B; seeds as a level)
+    qwen7 E4 l in [3, 7, 11, 15]: not evaluable (gates)
+    mistral7 E4 l in [3, 7, 11, 15]: not evaluable (gates)
+    J-C-G0 not passed: NOT EVALUABLE
+  J-C5        R A prior 0.35  NOT EVALUABLE the law on the identity-carrying PERP / NONLEX components
+    no identity-carrying component with a lambda statistic
+    J-C-G0 not passed: NOT EVALUABLE
+  J-C-BOUND   R A prior 0.50  NOT EVALUABLE the lexical boundary: a non-lexical identity edit is under-read by keys (lambda <= log 0.5)
+    J-C-G0 not passed: NOT EVALUABLE
+  J-C-READa   M A prior 0.85  NOT EVALUABLE the same reader heads read E1 and E2 (P1, l = 7)
+    qwen7: model not evaluable
+    mistral7: model not evaluable
+    J-C-G0 not passed: NOT EVALUABLE
+  J-C-READb   R A prior 0.60  NOT EVALUABLE the same reader heads read E3 and E4 (P1, l = 7)
+    J-C-G0 not passed: NOT EVALUABLE
+  J-C6        M A prior 0.85  NOT EVALUABLE a CAA identity edit at block 28 is not key-flat (Qwen2.5-14B, Prakash et al.'s material)
+    not run (deadline or no results)
+    J-C-G0 not passed: NOT EVALUABLE
+  J-C-SCREEN  R A prior 0.50  NOT EVALUABLE no overlap window: the binding swap acts only after the identity key route closes
+    qwen7: no screen results
+    llama8: no screen results
+    no screened model is evaluable
+    J-C-G0 not passed: NOT EVALUABLE
+  J-C-WIN     R A prior 0.30  NOT EVALUABLE inside an overlap window the binding swap follows the natural read (H7 and H9)
+    no window in any evaluable screened model
+    J-C-G0 not passed: NOT EVALUABLE
+
+HEADLINE (C-6, pre-committed; the Section-5 outcome of the entry): J-C-G0 not passed: no outcome
+
+REPORTED (no verdict counted)
+  pi(t) diagnostic qwen7 l=3 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic qwen7 l=7 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic qwen7 l=11 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic qwen7 l=15 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic mistral7 l=3 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic mistral7 l=7 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic mistral7 l=11 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic mistral7 l=15 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  lexical-code reading qwen7 E1 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E1 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E1 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E1 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E2 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E2 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E2 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E2 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E3 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E3 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E3 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E3 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E4 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E4 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E4 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E4 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E1 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E1 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E1 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E1 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E2 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E2 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E2 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E2 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E4 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E4 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E4 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E4 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading llama8 E1 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading llama8 E1 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading llama8 E1 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading llama8 E1 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading llama8 E2 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading llama8 E2 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading llama8 E2 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading llama8 E2 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  JC4 depth tracking (consistency check; delta_sigma = sigma(f, 3) - sigma(f, 15) >= 0.25 with both cells evaluable):
+    JC4: 0 of 0 qualifying pairs hold (fewer than 3 pairs: not evaluable)
+
+SUMMARY
+  account lines, class L: 0 lines: 0 MET, 0 NOT MET, 0 MET IN PART, 0 NOT EVALUABLE; observed 0 against expected 0.00; Brier nan
+  account lines, class M: 4 lines: 0 MET, 0 NOT MET, 0 MET IN PART, 4 NOT EVALUABLE; observed 0 against expected 0.00; Brier nan; not evaluable: J-C1, J-C2, J-C-READa, J-C6
+  account lines, class R: 7 lines: 0 MET, 0 NOT MET, 0 MET IN PART, 7 NOT EVALUABLE; observed 0 against expected 0.00; Brier nan; not evaluable: J-C3, J-C4, J-C5, J-C-BOUND, J-C-READb, J-C-SCREEN, J-C-WIN
+  met rate among R account lines with a verdict: 0 of 0 (expected 0.00)
+  measurement-validity lines: none in part C (the T control and the sensitivity rows are gates)
+  Holm sensitivity (analysis/stage8_holm.py; reported, no verdict uses it): step-down at familywise one-sided 0.025 over the 0 interval components of the R-class account lines with a verdict (normal p from the bootstrap SE)
+    J-C3: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-C4: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-C5: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-C-BOUND: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-C-READb: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-C-SCREEN: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-C-WIN: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+  provenance OK; population OK; J-C-G0 NOT MET
+
+######## EXPLORATORY (not scored)
+-- qwen7: kappa against sigma per cell (descriptive, Fig. 4), nu, K/V cosines and the residual cosine (means over stories and targets)
+   LETTER@3: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@3: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@3: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@3: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=3: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@7: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@7: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@7: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@7: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=7: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@11: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@11: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@11: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@11: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=11: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@15: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@15: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@15: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@15: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=15: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+-- qwen7: story-level distance D = mean |ID_K^Z - ID_K^nat| + |ID_V^Z - ID_V^nat| over mean ID_KV^nat (evaluable cells)
+   l=3: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=7: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=11: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=15: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+-- qwen7: O1, first-order prediction of psi_K from the edit's key displacement projected on the natural one (readers' KV groups where known)
+   E1 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+-- qwen7: L-scored lambda pooled over the law statistics
+   E1: mean lambda under L +0.000 vs E +0.000
+   E2: mean lambda under L +0.000 vs E +0.000
+   E3: mean lambda under L +0.000 vs E +0.000
+   E4: mean lambda under L +0.000 vs E +0.000
+-- mistral7: kappa against sigma per cell (descriptive, Fig. 4), nu, K/V cosines and the residual cosine (means over stories and targets)
+   LETTER@3: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@3: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@3: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@3: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=3: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@7: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@7: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@7: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@7: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=7: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@11: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@11: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@11: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@11: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=11: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@15: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@15: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@15: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@15: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=15: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+-- mistral7: story-level distance D = mean |ID_K^Z - ID_K^nat| + |ID_V^Z - ID_V^nat| over mean ID_KV^nat (evaluable cells)
+   l=3: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=7: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=11: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=15: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+-- mistral7: O1, first-order prediction of psi_K from the edit's key displacement projected on the natural one (readers' KV groups where known)
+   E1 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+-- mistral7: L-scored lambda pooled over the law statistics
+   E1: mean lambda under L +0.000 vs E +0.000
+   E2: mean lambda under L +0.000 vs E +0.000
+   E4: mean lambda under L +0.000 vs E +0.000
+-- llama8: kappa against sigma per cell (descriptive, Fig. 4), nu, K/V cosines and the residual cosine (means over stories and targets)
+   LETTER@3: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@3: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@3: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@3: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=3: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@7: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@7: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@7: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@7: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=7: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@11: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@11: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@11: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@11: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=11: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@15: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@15: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@15: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@15: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=15: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+-- llama8: story-level distance D = mean |ID_K^Z - ID_K^nat| + |ID_V^Z - ID_V^nat| over mean ID_KV^nat (evaluable cells)
+   l=3: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=7: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=11: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=15: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+-- llama8: O1, first-order prediction of psi_K from the edit's key displacement projected on the natural one (readers' KV groups where known)
+   E1 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+-- llama8: L-scored lambda pooled over the law statistics
+   E1: mean lambda under L +0.000 vs E +0.000
+   E2: mean lambda under L +0.000 vs E +0.000
+-- qwen7: frames admitted [], dropped 0; E5 alpha None
+Stage 8 part C scoring, preregistration P-2026-10-10-J; results /tmp/pytest-of-root/pytest-2/test_main_on_results_dir0/res
+
+PROVENANCE (the pipeline's COMMIT.txt, ENV.txt, REVISIONS.txt, SKIPPED.txt; every results file)
+  COMMIT.txt: absent
+  ENV.txt: absent
+  REVISIONS.txt: absent
+  SKIPPED.txt: absent
+  calib/qwen7: commit abc, model None (None @ None), dtype -, attn -, device -, transformers None, test_mode None
+  eval/llama8: commit abc, model None (None @ None), dtype torch.bfloat16, attn sdpa, device -, transformers None, test_mode None
+  eval/mistral7: commit abc, model None (None @ None), dtype torch.bfloat16, attn sdpa, device -, transformers None, test_mode None
+  eval/qwen7: commit abc, model None (None @ None), dtype torch.bfloat16, attn sdpa, device -, transformers None, test_mode None
+  readers/mistral7: commit abc, model None (None @ None), dtype -, attn -, device -, transformers None, test_mode None
+  readers/qwen7: commit abc, model None (None @ None), dtype -, attn -, device -, transformers None, test_mode None
+  calibration file of qwen7: sha256 cccccccccccccccc; every later file records it: OK
+  commits: ['abc']
+
+POPULATION (E: the first 80 cores of the Random(8101) stream with pi(S) != B, pi(X) != B, disjoint from U; a model needs >= 60 evaluated stories)
+  eval qwen7: 64 stories (indices 0..63 in order: OK); population hash recorded: OK
+  eval mistral7: 64 stories (indices 0..63 in order: OK); population hash recorded: OK
+  eval llama8: 64 stories (indices 0..63 in order: OK); population hash recorded: OK
+  population: OK
+
+GATES (J-C-G0 before any model; per model J-C-G1 equivalence control, J-C-G2 format effect, J-C-G8 sensitivity; J-C-G3 SAE alignment; J-C-G4 cells; J-C-G5 efficacy; J-C-G6 specificity)
+  J-C-G0  FP32 unit tests: no logs/pytest.log -> NOT EVALUABLE (not run)
+  J-C-G1 qwen7    16 evaluable cells; all within tolerance -> MET
+  J-C-G2 qwen7    sigma(LETTER, 3) - sigma(NONE, 3) +0.948 [+0.948,+0.948] (>= 0.5; H0: <= 0 rejected) -> MET
+  J-C-G8 qwen7    sensitivity -> MET
+           T: 16 statistics, pooled lambda +0.000 [+0.000,+0.000] -> equivalent (required equivalent): yes; MAD +0.000 [+0.000,+0.000] max 0.000 over 16 cells -> old rule passes
+           SK50: 16 statistics, pooled lambda -0.916 [-0.916,-0.916] -> R1 copy-only (required a departure, lambda < -log 1.25): yes; MAD +0.109 [+0.109,+0.109] max 0.222 over 16 cells -> old rule passes
+           SV50: 16 statistics, pooled lambda +0.916 [+0.916,+0.916] -> R3 key-flat (required a departure, lambda > log 1.25): yes; MAD +0.111 [+0.111,+0.111] max 0.222 over 16 cells -> old rule passes
+           SK80: 16 statistics, pooled lambda -0.223 [-0.223,-0.223] -> graded departure (pooled lambda within the margin; some statistic not equivalent); MAD +0.027 [+0.027,+0.027] max 0.051 over 16 cells -> old rule passes
+           SV80: 16 statistics, pooled lambda +0.223 [+0.223,+0.223] -> graded departure (pooled lambda within the margin; some statistic not equivalent); MAD +0.028 [+0.028,+0.028] max 0.051 over 16 cells -> old rule passes
+  J-C-G4 qwen7    l= 3 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 qwen7    l= 7 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 qwen7    l=11 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 qwen7    l=15 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G6 qwen7    l= 3 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 qwen7    l= 7 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 qwen7    l=11 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 qwen7    l=15 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G5 qwen7    E1     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E1     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E1     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E1     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E2     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E2     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E2     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E2     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E3     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E3     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E3     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E3     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E4     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E4     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E4     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E4     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 qwen7    E5FR   l= 3 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 qwen7    E5FR   l= 7 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 qwen7    E5FR   l=11 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 qwen7    E5FR   l=15 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G1 mistral7 16 evaluable cells; all within tolerance -> MET
+  J-C-G2 mistral7 sigma(LETTER, 3) - sigma(NONE, 3) +0.948 [+0.948,+0.948] (>= 0.5; H0: <= 0 rejected) -> MET
+  J-C-G8 mistral7 sensitivity -> MET
+           T: 16 statistics, pooled lambda +0.000 [+0.000,+0.000] -> equivalent (required equivalent): yes; MAD +0.000 [+0.000,+0.000] max 0.000 over 16 cells -> old rule passes
+           SK50: 16 statistics, pooled lambda -0.916 [-0.916,-0.916] -> R1 copy-only (required a departure, lambda < -log 1.25): yes; MAD +0.109 [+0.109,+0.109] max 0.222 over 16 cells -> old rule passes
+           SV50: 16 statistics, pooled lambda +0.916 [+0.916,+0.916] -> R3 key-flat (required a departure, lambda > log 1.25): yes; MAD +0.111 [+0.111,+0.111] max 0.222 over 16 cells -> old rule passes
+           SK80: 16 statistics, pooled lambda -0.223 [-0.223,-0.223] -> graded departure (pooled lambda within the margin; some statistic not equivalent); MAD +0.027 [+0.027,+0.027] max 0.051 over 16 cells -> old rule passes
+           SV80: 16 statistics, pooled lambda +0.223 [+0.223,+0.223] -> graded departure (pooled lambda within the margin; some statistic not equivalent); MAD +0.028 [+0.028,+0.028] max 0.051 over 16 cells -> old rule passes
+  J-C-G4 mistral7 l= 3 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 mistral7 l= 7 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 mistral7 l=11 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 mistral7 l=15 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G6 mistral7 l= 3 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 mistral7 l= 7 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 mistral7 l=11 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 mistral7 l=15 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G5 mistral7 E1     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E1     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E1     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E1     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E2     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E2     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E2     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E2     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E4     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E4     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E4     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E4     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 mistral7 E5FR   l= 3 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 mistral7 E5FR   l= 7 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 mistral7 E5FR   l=11 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 mistral7 E5FR   l=15 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G1 llama8   16 evaluable cells; all within tolerance -> MET
+  J-C-G2 llama8   sigma(LETTER, 3) - sigma(NONE, 3) +0.948 [+0.948,+0.948] (>= 0.5; H0: <= 0 rejected) -> MET
+  J-C-G8 llama8   sensitivity -> MET
+           T: 16 statistics, pooled lambda +0.000 [+0.000,+0.000] -> equivalent (required equivalent): yes; MAD +0.000 [+0.000,+0.000] max 0.000 over 16 cells -> old rule passes
+           SK50: 16 statistics, pooled lambda -0.916 [-0.916,-0.916] -> R1 copy-only (required a departure, lambda < -log 1.25): yes; MAD +0.109 [+0.109,+0.109] max 0.222 over 16 cells -> old rule passes
+           SV50: 16 statistics, pooled lambda +0.916 [+0.916,+0.916] -> R3 key-flat (required a departure, lambda > log 1.25): yes; MAD +0.111 [+0.111,+0.111] max 0.222 over 16 cells -> old rule passes
+           SK80: 16 statistics, pooled lambda -0.223 [-0.223,-0.223] -> graded departure (pooled lambda within the margin; some statistic not equivalent); MAD +0.027 [+0.027,+0.027] max 0.051 over 16 cells -> old rule passes
+           SV80: 16 statistics, pooled lambda +0.223 [+0.223,+0.223] -> graded departure (pooled lambda within the margin; some statistic not equivalent); MAD +0.028 [+0.028,+0.028] max 0.051 over 16 cells -> old rule passes
+  J-C-G4 llama8   l= 3 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 llama8   l= 7 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 llama8   l=11 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G4 llama8   l=15 LETTER:ok P1:ok POST:ok NONE:ok
+  J-C-G6 llama8   l= 3 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 llama8   l= 7 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 llama8   l=11 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G6 llama8   l=15 |ID_KV^R| 0.000 vs 0.1 ID_KV^nat 0.933 -> passed
+  J-C-G5 llama8   E1     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E1     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E1     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E1     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E2     l= 3 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E2     l= 7 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E2     l=11 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E2     l=15 flip 1.00 vs natural 1.00; phi(NONE) +1.000 [+1.000,+1.000] (>= 0.5, lower > 0.3) -> effective
+  J-C-G5 llama8   E5FR   l= 3 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 llama8   E5FR   l= 7 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 llama8   E5FR   l=11 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G5 llama8   E5FR   l=15 phi(NONE) +0.587 [+0.587,+0.587] (>= 0.3, lower > 0) -> effective
+  J-C-G3 qwen7    l= 3 FVE 0.800 / 0.950 / 0.850 at l-1 / l / l+1 (published 0.93; >= published - 0.05 and above both neighbours); FVE at p 0.500; k_F 8 beta 1.0 -> MET
+  J-C-G3 qwen7    l= 7 FVE 0.800 / 0.950 / 0.850 at l-1 / l / l+1 (published 0.93; >= published - 0.05 and above both neighbours); FVE at p 0.500; k_F 8 beta 1.0 -> MET
+  J-C-G3 qwen7    l=11 FVE 0.800 / 0.950 / 0.850 at l-1 / l / l+1 (published 0.93; >= published - 0.05 and above both neighbours); FVE at p 0.500; k_F 8 beta 1.0 -> MET
+  J-C-G3 qwen7    l=15 FVE 0.800 / 0.950 / 0.850 at l-1 / l / l+1 (published 0.93; >= published - 0.05 and above both neighbours); FVE at p 0.500; k_F 8 beta 1.0 -> MET
+
+PREDICTIONS (code, class, kind, prior, verdict; the numbers it was decided on)
+  J-C1        M A prior 0.80  NOT EVALUABLE the law in Tier 0: E1 at every depth, E2 at l in {3, 7}; Qwen2.5-7B, Mistral-7B
+    qwen7 E1 l in [3, 7, 11, 15]: not evaluable (gates)
+    mistral7 E1 l in [3, 7, 11, 15]: not evaluable (gates)
+    qwen7 E2 l in [3, 7]: not evaluable (gates)
+    mistral7 E2 l in [3, 7]: not evaluable (gates)
+    J-C-G0 not passed: NOT EVALUABLE
+  J-C2        M A prior 0.80  NOT EVALUABLE the law in Tier 1: E2 at l in {11, 15} (Qwen2.5-7B, Mistral-7B); E1, E2 at Llama-3.1-8B
+    qwen7 E2 l in [11, 15]: not evaluable (gates)
+    mistral7 E2 l in [11, 15]: not evaluable (gates)
+    llama8 E1 l in [3, 7, 11, 15]: not evaluable (gates)
+    llama8 E2 l in [3, 7, 11, 15]: not evaluable (gates)
+    J-C-G0 not passed: NOT EVALUABLE
+  J-C3        R A prior 0.55  NOT EVALUABLE the law for E3, third-party SAE features (Qwen2.5-7B)
+    qwen7 E3 l in [3, 7, 11, 15]: not evaluable (gates)
+    J-C-G0 not passed: NOT EVALUABLE
+  J-C4        R A prior 0.35  NOT EVALUABLE the law for E4, the DAS remap at p (Qwen2.5-7B, Mistral-7B; seeds as a level)
+    qwen7 E4 l in [3, 7, 11, 15]: not evaluable (gates)
+    mistral7 E4 l in [3, 7, 11, 15]: not evaluable (gates)
+    J-C-G0 not passed: NOT EVALUABLE
+  J-C5        R A prior 0.35  NOT EVALUABLE the law on the identity-carrying PERP / NONLEX components
+    no identity-carrying component with a lambda statistic
+    J-C-G0 not passed: NOT EVALUABLE
+  J-C-BOUND   R A prior 0.50  NOT EVALUABLE the lexical boundary: a non-lexical identity edit is under-read by keys (lambda <= log 0.5)
+    J-C-G0 not passed: NOT EVALUABLE
+  J-C-READa   M A prior 0.85  NOT EVALUABLE the same reader heads read E1 and E2 (P1, l = 7)
+    qwen7: model not evaluable
+    mistral7: model not evaluable
+    J-C-G0 not passed: NOT EVALUABLE
+  J-C-READb   R A prior 0.60  NOT EVALUABLE the same reader heads read E3 and E4 (P1, l = 7)
+    J-C-G0 not passed: NOT EVALUABLE
+  J-C6        M A prior 0.85  NOT EVALUABLE a CAA identity edit at block 28 is not key-flat (Qwen2.5-14B, Prakash et al.'s material)
+    not run (deadline or no results)
+    J-C-G0 not passed: NOT EVALUABLE
+  J-C-SCREEN  R A prior 0.50  NOT EVALUABLE no overlap window: the binding swap acts only after the identity key route closes
+    qwen7: no screen results
+    llama8: no screen results
+    no screened model is evaluable
+    J-C-G0 not passed: NOT EVALUABLE
+  J-C-WIN     R A prior 0.30  NOT EVALUABLE inside an overlap window the binding swap follows the natural read (H7 and H9)
+    no window in any evaluable screened model
+    J-C-G0 not passed: NOT EVALUABLE
+
+HEADLINE (C-6, pre-committed; the Section-5 outcome of the entry): J-C-G0 not passed: no outcome
+
+REPORTED (no verdict counted)
+  pi(t) diagnostic qwen7 l=3 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic qwen7 l=7 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic qwen7 l=11 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic qwen7 l=15 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic mistral7 l=3 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic mistral7 l=7 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic mistral7 l=11 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  pi(t) diagnostic mistral7 l=15 (LETTER, K-only E4 rows): mean d_pi(t) - d_t -10.033 [-10.186,-9.886] -> the key raises t's letter more than pi(t)'s
+  lexical-code reading qwen7 E1 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E1 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E1 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E1 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E2 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E2 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E2 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E2 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E3 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E3 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E3 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E3 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E4 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E4 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E4 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading qwen7 E4 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E1 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E1 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E1 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E1 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E2 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E2 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E2 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E2 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E4 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E4 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E4 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading mistral7 E4 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading llama8 E1 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading llama8 E1 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading llama8 E1 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading llama8 E1 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading llama8 E2 l=3: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading llama8 E2 l=7: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading llama8 E2 l=11: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  lexical-code reading llama8 E2 l=15: phi +1.000, PAR +nan, LEX +nan -> not carried by PAR or LEX alone (not counted for outcome (b): model not evaluable or E3 layer failing J-C-G3)
+  JC4 depth tracking (consistency check; delta_sigma = sigma(f, 3) - sigma(f, 15) >= 0.25 with both cells evaluable):
+    JC4: 0 of 0 qualifying pairs hold (fewer than 3 pairs: not evaluable)
+
+SUMMARY
+  account lines, class L: 0 lines: 0 MET, 0 NOT MET, 0 MET IN PART, 0 NOT EVALUABLE; observed 0 against expected 0.00; Brier nan
+  account lines, class M: 4 lines: 0 MET, 0 NOT MET, 0 MET IN PART, 4 NOT EVALUABLE; observed 0 against expected 0.00; Brier nan; not evaluable: J-C1, J-C2, J-C-READa, J-C6
+  account lines, class R: 7 lines: 0 MET, 0 NOT MET, 0 MET IN PART, 7 NOT EVALUABLE; observed 0 against expected 0.00; Brier nan; not evaluable: J-C3, J-C4, J-C5, J-C-BOUND, J-C-READb, J-C-SCREEN, J-C-WIN
+  met rate among R account lines with a verdict: 0 of 0 (expected 0.00)
+  measurement-validity lines: none in part C (the T control and the sensitivity rows are gates)
+  Holm sensitivity (analysis/stage8_holm.py; reported, no verdict uses it): step-down at familywise one-sided 0.025 over the 0 interval components of the R-class account lines with a verdict (normal p from the bootstrap SE)
+    J-C3: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-C4: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-C5: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-C-BOUND: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-C-READb: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-C-SCREEN: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-C-WIN: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+  provenance OK; population OK; J-C-G0 NOT EVALUABLE
+
+######## EXPLORATORY (not scored)
+-- qwen7: kappa against sigma per cell (descriptive, Fig. 4), nu, K/V cosines and the residual cosine (means over stories and targets)
+   LETTER@3: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@3: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@3: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@3: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=3: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@7: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@7: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@7: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@7: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=7: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@11: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@11: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@11: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@11: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=11: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@15: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@15: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@15: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@15: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=15: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+-- qwen7: story-level distance D = mean |ID_K^Z - ID_K^nat| + |ID_V^Z - ID_V^nat| over mean ID_KV^nat (evaluable cells)
+   l=3: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=7: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=11: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=15: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+-- qwen7: O1, first-order prediction of psi_K from the edit's key displacement projected on the natural one (readers' KV groups where known)
+   E1 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+-- qwen7: L-scored lambda pooled over the law statistics
+   E1: mean lambda under L +0.000 vs E +0.000
+   E2: mean lambda under L +0.000 vs E +0.000
+   E3: mean lambda under L +0.000 vs E +0.000
+   E4: mean lambda under L +0.000 vs E +0.000
+-- mistral7: kappa against sigma per cell (descriptive, Fig. 4), nu, K/V cosines and the residual cosine (means over stories and targets)
+   LETTER@3: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@3: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@3: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@3: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=3: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@7: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@7: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@7: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@7: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=7: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@11: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@11: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@11: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@11: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=11: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@15: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@15: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@15: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@15: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=15: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+-- mistral7: story-level distance D = mean |ID_K^Z - ID_K^nat| + |ID_V^Z - ID_V^nat| over mean ID_KV^nat (evaluable cells)
+   l=3: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=7: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=11: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=15: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+-- mistral7: O1, first-order prediction of psi_K from the edit's key displacement projected on the natural one (readers' KV groups where known)
+   E1 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+-- mistral7: L-scored lambda pooled over the law statistics
+   E1: mean lambda under L +0.000 vs E +0.000
+   E2: mean lambda under L +0.000 vs E +0.000
+   E4: mean lambda under L +0.000 vs E +0.000
+-- llama8: kappa against sigma per cell (descriptive, Fig. 4), nu, K/V cosines and the residual cosine (means over stories and targets)
+   LETTER@3: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@3: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@3: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@3: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=3: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@7: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@7: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@7: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@7: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=7: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@11: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@11: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@11: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@11: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=11: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+   LETTER@15: sigma +0.980; kappa E1 +0.98, E2 +0.98, E3 +0.98, E4a +0.98, E4b +0.98, E5FR +0.94
+   P1@15: sigma +0.667; kappa E1 +0.67, E2 +0.67, E3 +0.67, E4a +0.67, E4b +0.67, E5FR +0.40
+   POST@15: sigma +0.333; kappa E1 +0.33, E2 +0.33, E3 +0.33, E4a +0.33, E4b +0.33, E5FR +0.14
+   NONE@15: sigma +0.032; kappa E1 +0.03, E2 +0.03, E3 +0.03, E4a +0.03, E4b +0.03, E5FR +0.01
+   l=15: E1 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E2 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E3 nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4a nu 0.50 cosK 0.90 cosV 0.90 a 0.90; E4b nu 0.50 cosK 0.90 cosV 0.90 a 0.90
+-- llama8: story-level distance D = mean |ID_K^Z - ID_K^nat| + |ID_V^Z - ID_V^nat| over mean ID_KV^nat (evaluable cells)
+   l=3: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=7: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=11: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+   l=15: LETTER:T 0.000, LETTER:E1 0.000, LETTER:E2 0.000, LETTER:E3 0.000, LETTER:E4a 0.000, P1:T 0.000, P1:E1 0.000, P1:E2 0.000, P1:E3 0.000, P1:E4a 0.000, POST:T 0.000, POST:E1 0.000, POST:E2 0.000, POST:E3 0.000, POST:E4a 0.000, NONE:T 0.000, NONE:E1 0.000, NONE:E2 0.000, NONE:E3 0.000, NONE:E4a 0.000
+-- llama8: O1, first-order prediction of psi_K from the edit's key displacement projected on the natural one (readers' KV groups where known)
+   E1 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=3: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=7: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=11: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E1 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E2 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E3 l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+   E4a l=15: predicted +1.000 (readers) / +1.000 (all heads); observed psi_K(P1) +1.000
+-- llama8: L-scored lambda pooled over the law statistics
+   E1: mean lambda under L +0.000 vs E +0.000
+   E2: mean lambda under L +0.000 vs E +0.000
+-- qwen7: frames admitted [], dropped 0; E5 alpha None
+__________________________________________________________ test_trie_equals_plain_passes_tiny_families[phi3] __________________________________________________________
+------------------------------------------------------------------------ Captured stderr call -------------------------------------------------------------------------
+[transformers] Model config: eos_token_id must be `None` or an integer within the vocabulary (between 0 and 127), got 32000. This may result in unexpected behavior.
+-------------------------------------------------------------------------- Captured log call --------------------------------------------------------------------------
+WARNING  transformers.configuration_utils:logging.py:340 Model config: eos_token_id must be `None` or an integer within the vocabulary (between 0 and 127), got 32000. This may result in unexpected behavior.
+___________________________________________ test_formset_invariants_on_study_tokenizers[unsloth/Meta-Llama-3.1-8B-Instruct] ___________________________________________
+------------------------------------------------------------------------ Captured stderr call -------------------------------------------------------------------------
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+-------------------------------------------------------------------------- Captured log call --------------------------------------------------------------------------
+WARNING  transformers.tokenization_utils_tokenizers:logging.py:340 Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+____________________________________________________________________________ test_kv_sites ____________________________________________________________________________
+------------------------------------------------------------------------ Captured stderr setup ------------------------------------------------------------------------
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+------------------------------------------------------------------------- Captured log setup --------------------------------------------------------------------------
+WARNING  huggingface_hub.utils._http:_http.py:1023 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+________________________________________________________________________ test_resid_patch_rows ________________________________________________________________________
+------------------------------------------------------------------------ Captured stdout call -------------------------------------------------------------------------
+  sweep ID: pairs 2/2 6:0.00
+_________________________________________________________ test_greedy_cache_equals_reference_tiny[<lambda>1] __________________________________________________________
+------------------------------------------------------------------------ Captured stderr call -------------------------------------------------------------------------
+[transformers] Model config: eos_token_id must be `None` or an integer within the vocabulary (between 0 and 96), got 32000. This may result in unexpected behavior.
+-------------------------------------------------------------------------- Captured log call --------------------------------------------------------------------------
+WARNING  transformers.configuration_utils:logging.py:340 Model config: eos_token_id must be `None` or an integer within the vocabulary (between 0 and 96), got 32000. This may result in unexpected behavior.
+======================================================================= short test summary info =======================================================================
+PASSED tests/test_stage8_edits.py::test_populations_and_sentences
+PASSED tests/test_stage8_edits.py::test_no_grad_guard
+PASSED tests/test_stage8_edits.py::test_lemma_natural_write_equals_kv_clamp
+PASSED tests/test_stage8_edits.py::test_lemma_random_edit_equals_clamp_rows
+PASSED tests/test_stage8_edits.py::test_prefix_tables_equal_full_run_and_formats
+PASSED tests/test_stage8_edits.py::test_score_rows_against_reference
+PASSED tests/test_stage8_edits.py::test_T_rows_equal_natural_rows_and_layout
+PASSED tests/test_stage8_edits.py::test_T_tables_bitwise_through_the_eval_passes
+PASSED tests/test_stage8_edits.py::test_components_and_kv_stats_known_answers
+PASSED tests/test_stage8_edits.py::test_reader_rows_headsplice
+PASSED tests/test_stage8_edits.py::test_sae_site_is_the_block_output
+PASSED tests/test_stage8_edits.py::test_das_at
+PASSED tests/test_stage8_edits.py::test_reader_sets_and_columns
+PASSED tests/test_stage8_edits.py::test_families_vectors
+PASSED tests/test_stage8_edits.py::test_prakash_caa_with_natural_difference_equals_id
+PASSED tests/test_sae.py::test_encode_decode_reference
+PASSED tests/test_sae.py::test_load_state_dict_layout_and_hash
+PASSED tests/test_sae.py::test_fve_streaming_equals_direct
+PASSED tests/test_sae.py::test_selectivity_and_select
+PASSED tests/test_sae.py::test_edit_reference_and_kept_latents
+PASSED tests/test_sae.py::test_full_latent_edit_reproduces_target_with_zero_error
+PASSED tests/test_sae.py::test_random_and_pins
+PASSED tests/test_stage8c_score.py::test_bootstrap_two_stage_deterministic_and_seed_level
+PASSED tests/test_stage8c_score.py::test_tost_log_ratio_holm_components
+PASSED tests/test_stage8c_score.py::test_law_equivalent_and_departures
+PASSED tests/test_stage8c_score.py::test_cell_gates_and_efficacy
+PASSED tests/test_stage8c_score.py::test_sensitivity_gate_and_old_rule
+PASSED tests/test_stage8c_score.py::test_lines_law_met_and_not_met
+PASSED tests/test_stage8c_score.py::test_combination_not_met_on_any_evaluable_failure
+PASSED tests/test_stage8c_score.py::test_g0_not_passed_computes_no_line_and_no_outcome
+PASSED tests/test_stage8c_score.py::test_j_c5_and_bound
+PASSED tests/test_stage8c_score.py::test_readers
+PASSED tests/test_stage8c_score.py::test_readers_e3_needs_layer_7_passing_g3
+PASSED tests/test_stage8c_score.py::test_jc6_and_anchor
+PASSED tests/test_stage8c_score.py::test_jc6_bind_usability_decides_evaluability
+PASSED tests/test_stage8c_score.py::test_screen_and_window
+PASSED tests/test_stage8c_score.py::test_lexical_code_counts_only_evaluable_models
+PASSED tests/test_stage8c_score.py::test_holm_sensitivity_family_and_verdicts
+PASSED tests/test_stage8c_score.py::test_headline_outcomes
+PASSED tests/test_stage8c_score.py::test_g0_requires_the_shared_files_the_script_runs
+PASSED tests/test_stage8c_score.py::test_main_on_results_dir
+PASSED tests/test_surface.py::test_trie_equals_plain_passes_clean_and_clamped[sdpa]
+PASSED tests/test_surface.py::test_trie_equals_plain_passes_clean_and_clamped[eager]
+PASSED tests/test_surface.py::test_trie_equals_plain_passes_tiny_families[gemma2]
+PASSED tests/test_surface.py::test_trie_equals_plain_passes_tiny_families[phi3]
+PASSED tests/test_surface.py::test_trie_equals_plain_passes_tiny_families[llama]
+PASSED tests/test_surface.py::test_trie_equals_plain_passes_tiny_families[mistral]
+PASSED tests/test_surface.py::test_formset_invariants_on_study_tokenizers[Qwen/Qwen2.5-7B-Instruct]
+PASSED tests/test_surface.py::test_formset_invariants_on_study_tokenizers[mistralai/Mistral-7B-Instruct-v0.3]
+PASSED tests/test_surface.py::test_formset_invariants_on_study_tokenizers[unsloth/Meta-Llama-3.1-8B-Instruct]
+PASSED tests/test_surface.py::test_formset_invariants_on_study_tokenizers[unsloth/gemma-2-9b-it]
+PASSED tests/test_surface.py::test_formset_invariants_on_study_tokenizers[microsoft/phi-4]
+PASSED tests/test_surface.py::test_formset_invariants_on_study_tokenizers[tiiuae/Falcon3-7B-Instruct]
+PASSED tests/test_surface.py::test_formset_invariants_on_study_tokenizers[allenai/OLMo-2-1124-7B-Instruct]
+PASSED tests/test_clamp.py::test_kv_sites
+PASSED tests/test_clamp.py::test_gpt2_clamp_exact
+PASSED tests/test_clamp.py::test_qwen_clamp_matches_single_position_hooks
+PASSED tests/test_clamp.py::test_format_factorial_regression
+PASSED tests/test_clamp.py::test_row_restricted_regression
+PASSED tests/test_head_splice.py::test_headsplice_all_heads_is_full_clamp_and_empty_is_clean
+PASSED tests/test_head_splice.py::test_headsplice_rows_G_and_group_slices_equal_rowsplice
+PASSED tests/test_head_splice.py::test_headsplice_batched_grid_equals_single_runs
+PASSED tests/test_head_splice.py::test_self_ablation_is_clean
+PASSED tests/test_head_splice.py::test_hopsplice_all_rows_is_plain_clamp
+PASSED tests/test_head_splice.py::test_hopsplice_no_overwrite_and_answer_only_cache
+PASSED tests/test_head_splice.py::test_hop_batch_equals_single_rows
+PASSED tests/test_prakash.py::test_pool_hash_and_release
+PASSED tests/test_prakash.py::test_positions_lengths_qwen
+PASSED tests/test_prakash.py::test_positions_lengths_llama3
+PASSED tests/test_prakash.py::test_preflight
+PASSED tests/test_prakash.py::test_exchange_exact[NO-MENTION]
+PASSED tests/test_prakash.py::test_exchange_exact[OPTIONS-AFTER]
+PASSED tests/test_prakash.py::test_resid_patch_rows
+PASSED tests/test_prakash.py::test_evaluability_rule
+PASSED tests/test_prakash.py::test_tie_rule
+PASSED tests/test_prakash.py::test_scorer_h_read
+PASSED tests/test_prakash.py::test_scorer_h_binding_and_rules
+PASSED tests/test_prakash.py::test_scorer_llama_and_missing
+PASSED tests/test_generate.py::test_greedy_with_cache_equals_stepwise_reference_under_clamps
+PASSED tests/test_generate.py::test_greedy_cache_equals_reference_tiny[<lambda>0]
+PASSED tests/test_generate.py::test_greedy_cache_equals_reference_tiny[<lambda>1]
+PASSED tests/test_generate.py::test_parse_and_frames
+PASSED tests/test_generate.py::test_end_of_turn_tokens_end_an_answer
+PASSED tests/test_stage8_populations.py::test_every_part_computes_U_identically
+PASSED tests/test_stage8_populations.py::test_populations_have_the_expected_sizes
+PASSED tests/test_stage8_populations.py::test_fresh_populations_disjoint_from_U_and_from_each_other
+PASSED tests/test_stage8_populations.py::test_labelled_reuses
+PASSED tests/test_stage8_populations.py::test_no_confirmatory_population_uses_a_pilot_seed
+PASSED tests/test_stage8_holm.py::test_phi_and_p_values
+PASSED tests/test_stage8_holm.py::test_degenerate_and_undefined
+PASSED tests/test_stage8_holm.py::test_holm_hand_worked
+PASSED tests/test_stage8_holm.py::test_directions_mixed_and_passthrough
+PASSED tests/test_stage8_holm.py::test_ties_keep_input_order
+PASSED tests/test_stage8_holm.py::test_adjusted_p_against_brute_force
+PASSED tests/test_stage8_holm.py::test_single_component_equals_the_unadjusted_test
+============================================================== 95 passed, 1 warning in 434.86s (0:07:14) ==============================================================

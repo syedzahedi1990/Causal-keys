@@ -1,0 +1,3 @@
+==== 2026-10-13T16:45:46Z python experiments/stage8_edits.py --out results/gpu_stage8c --stage preflight --model /root/stage8_models/llama8 --key llama8 --sae-dir /root/stage8_models/sae_qwen7
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+preflight OK: E 80, H 200, TSET 1000, THOLD 100; neutral families {'EN': 24, 'FR': 24, 'DE': 24, 'SYN': 24}; E5 unusable []; SAE hub None

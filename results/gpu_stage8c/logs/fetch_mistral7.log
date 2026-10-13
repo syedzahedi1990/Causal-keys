@@ -1,0 +1,13 @@
+==== 2026-10-13T14:47:38Z fetch mistral7 -> /root/stage8_models/mistral7
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+mistral7/generation_config.json: verified (git_blob) from mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71
+mistral7/model-00001-of-00003.safetensors: verified (sha256) from mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71
+mistral7/model-00002-of-00003.safetensors: verified (sha256) from mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71
+mistral7/model-00003-of-00003.safetensors: verified (sha256) from mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71
+mistral7/model.safetensors.index.json: verified (git_blob) from mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71
+mistral7/params.json: verified (git_blob) from mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71
+mistral7/tokenizer.model.v3: verified (git_blob) from mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71
+mistral7: 12 files verified against mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71 -> /root/stage8_models/mistral7/VERIFIED.json
+==== 2026-10-13T14:51:01Z prefetch of mistral7: exit 0
+==== 2026-10-13T15:47:49Z fetch mistral7 -> /root/stage8_models/mistral7
+mistral7: 12 files verified against mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71 -> /root/stage8_models/mistral7/VERIFIED.json

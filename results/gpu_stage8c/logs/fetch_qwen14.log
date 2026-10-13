@@ -1,0 +1,16 @@
+==== 2026-10-13T16:45:34Z fetch qwen14 -> /root/stage8_models/qwen14
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+qwen14/generation_config.json: verified (git_blob) from Qwen/Qwen2.5-14B-Instruct@cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8
+qwen14/model-00001-of-00008.safetensors: verified (sha256) from Qwen/Qwen2.5-14B-Instruct@cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8
+qwen14/model-00002-of-00008.safetensors: verified (sha256) from Qwen/Qwen2.5-14B-Instruct@cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8
+qwen14/model-00003-of-00008.safetensors: verified (sha256) from Qwen/Qwen2.5-14B-Instruct@cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8
+qwen14/model-00004-of-00008.safetensors: verified (sha256) from Qwen/Qwen2.5-14B-Instruct@cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8
+qwen14/model-00005-of-00008.safetensors: verified (sha256) from Qwen/Qwen2.5-14B-Instruct@cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8
+qwen14/model-00006-of-00008.safetensors: verified (sha256) from Qwen/Qwen2.5-14B-Instruct@cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8
+qwen14/model-00007-of-00008.safetensors: verified (sha256) from Qwen/Qwen2.5-14B-Instruct@cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8
+qwen14/model-00008-of-00008.safetensors: verified (sha256) from Qwen/Qwen2.5-14B-Instruct@cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8
+qwen14/model.safetensors.index.json: verified (git_blob) from Qwen/Qwen2.5-14B-Instruct@cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8
+qwen14: 15 files verified against Qwen/Qwen2.5-14B-Instruct@cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8 -> /root/stage8_models/qwen14/VERIFIED.json
+==== 2026-10-13T16:49:53Z prefetch of qwen14: exit 0
+==== 2026-10-13T17:22:15Z fetch qwen14 -> /root/stage8_models/qwen14
+qwen14: 15 files verified against Qwen/Qwen2.5-14B-Instruct@cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8 -> /root/stage8_models/qwen14/VERIFIED.json

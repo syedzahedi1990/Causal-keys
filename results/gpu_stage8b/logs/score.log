@@ -1,0 +1,1063 @@
+==== 2026-10-13T13:51:27Z python analysis/stage8b_score.py --results results/gpu_stage8b
+Stage 8 part B scoring, preregistration P-2026-10-10-J part B; results results/gpu_stage8b
+
+PROVENANCE (the pipeline's COMMIT.txt, ENV.txt, REVISIONS.txt, SKIPPED.txt, FETCH_FAILED.txt, RELEASE.txt; every results file)
+  COMMIT.txt:
+    ==== 2026-10-13T11:24:59Z stage 8 part b TEST_MODE=0 FORCE=0 FORCE_STEPS= DEADLINE_H=4.5 TESTS=1 KEEP_CACHE=0
+    8b74b79b76e06b27bedc0d841c7b1e4a5f671649
+    ?? results/gpu_stage8b/
+    ?? results/gpu_stage8d/
+    preregistration P-2026-10-10-J final at 8b74b79b76e06b27bedc0d841c7b1e4a5f671649; HEAD 8b74b79b76e06b27bedc0d841c7b1e4a5f671649
+  ENV.txt:
+    ==== 2026-10-13T11:25:03Z part b TEST_MODE=0 OUT=results/gpu_stage8b DEV=cuda DTYPE=bfloat16 deadline 2026-10-13T15:54:59Z (DEADLINE_H=4.5)
+    HEAD 8b74b79b76e06b27bedc0d841c7b1e4a5f671649 finalising commit 8b74b79b76e06b27bedc0d841c7b1e4a5f671649
+    manifest scripts/stage8_models.json sha256 b840b71ea644d3f01e634c67ef2c2b9bdb26cdf53d3fe6b45d34c5e78c0cb707; model store /root/stage8_models; HF_TOKEN set: no (the token itself is never recorded)
+    disk at the model store: 198G free of 200G
+    python 3.12.14 torch 2.11.0+cu128 transformers 5.18.0 numpy 2.5.3 huggingface_hub 2.2.0 gpus 1 NVIDIA A100-SXM4-80GB
+    name, memory.total [MiB], driver_version
+    NVIDIA A100-SXM4-80GB, 81920 MiB, 580.159.03
+    2026-10-13T12:13:00Z qwen14 removed from /root/stage8_models/qwen14
+    2026-10-13T12:30:32Z mistral7 removed from /root/stage8_models/mistral7
+    2026-10-13T12:46:15Z olmo7 removed from /root/stage8_models/olmo7
+    2026-10-13T12:53:13Z llama8 removed from /root/stage8_models/llama8
+    2026-10-13T13:01:27Z gemma9 removed from /root/stage8_models/gemma9
+    2026-10-13T13:11:40Z phi4 removed from /root/stage8_models/phi4
+    2026-10-13T13:17:35Z falcon7 removed from /root/stage8_models/falcon7
+    2026-10-13T13:21:24Z gemma2b removed from /root/stage8_models/gemma2b
+    2026-10-13T13:36:09Z mistral24 removed from /root/stage8_models/mistral24
+    2026-10-13T13:38:57Z qwen1.5 removed from /root/stage8_models/qwen1.5
+    2026-10-13T13:42:56Z qwen3b removed from /root/stage8_models/qwen3b
+    2026-10-13T13:51:27Z qwen7 removed from /root/stage8_models/qwen7
+  REVISIONS.txt:
+    # <repo> <revision> key=<key> attn=<impl> token=<used> sources=<where the verified bytes came from>; pins: scripts/stage8_models.json sha256 b840b71ea644d3f01e634c67ef2c2b9bdb26cdf53d3fe6b45d34c5e78c0cb707
+    Qwen/Qwen2.5-7B-Instruct a09a35458c702b33eeacc393d103063234e8bc28 key=qwen7 attn=sdpa token=no sources=Qwen/Qwen2.5-7B-Instruct@a09a35458c
+    Qwen/Qwen2.5-14B-Instruct cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8 key=qwen14 attn=sdpa token=no sources=
+    mistralai/Mistral-7B-Instruct-v0.3 c170c708c41dac9275d15a8fff4eca08d52bab71 key=mistral7 attn=sdpa token=no sources=
+    allenai/OLMo-2-1124-7B-Instruct 470b1fba1ae01581f270116362ee4aa1b97f4c84 key=olmo7 attn=sdpa token=no sources=
+    meta-llama/Llama-3.1-8B-Instruct 0e9e39f249a16976918f6564b8830bc894c89659 key=llama8 attn=sdpa token=no sources=
+    google/gemma-2-9b-it 11c9b309abf73637e4b6f9a3fa1e92e615547819 key=gemma9 attn=eager token=no sources=
+    microsoft/phi-4 2db69c1c3e91a05d2c64a3185acfbaf36f744e25 key=phi4 attn=sdpa token=no sources=
+    tiiuae/Falcon3-7B-Instruct 1e57a0ecd176c7c139f289c60a74e57f887c3dfb key=falcon7 attn=sdpa token=no sources=
+    google/gemma-2-2b-it 299a8560bedf22ed1c72a8a11e7dce4a7f9f51f8 key=gemma2b attn=eager token=no sources=
+    mistralai/Mistral-Small-24B-Instruct-2501 9527884be6e5616bdd54de542f9ae13384489724 key=mistral24 attn=sdpa token=no sources=
+    Qwen/Qwen2.5-1.5B-Instruct 989aa7980e4cf806f80c7fef2b1adb7bc71aa306 key=qwen1.5 attn=sdpa token=no sources=Qwen/Qwen2.5-1.5B-Instruct@989aa7980e
+    Qwen/Qwen2.5-3B-Instruct aa8e72537993ba99e69dfaafa59ed015b17504d1 key=qwen3b attn=sdpa token=no sources=Qwen/Qwen2.5-3B-Instruct@aa8e725379
+    Qwen/Qwen2.5-7B-Instruct a09a35458c702b33eeacc393d103063234e8bc28 key=qwen7 attn=sdpa token=no sources=
+  SKIPPED.txt: absent
+  FETCH_FAILED.txt: absent
+  RELEASE.txt:
+    ==== 2026-10-13T13:24:20Z the release of Anonymous (2026) at /root/paper1/v5.5-reviewer-repository
+    {"release_sha256": "2dea297d508e51f07b927e9eb0571f40e99d25d996ccd7ad3342cb46942d0416", "release_pinned": "2dea297d508e51f07b927e9eb0571f40e99d25d996ccd7ad3342cb46942d0416", "status": "PASS_EXCEPT_README", "bases_sha256": {"m3_101": "6444f90e195a30799b4009f31ccf231e38199e8d45d93986e93cf61ae1944d3b", "m3_102": "6f100591fef7ffa10dfb937789c02ca504344913e4fb3bd4314bd1ab1329789b", "m3_103": "14625533dfb68aabed9cf8fb5b69217eedafea5127f1ceeda81aac7d25554791", "pca_101": "de63064e0cf61b6591f4342942af41f391bc41749c85c2d4067a51611d3fd692", "pca_102": "43079cf1e10d6a8d81a10cdc3bd758562752a028f216e0c5ac98fe542fee28d8", "pca_103": "16d56f309a4499879742bd663fa02202114b8f9df719fb5d24d2861be64b8242", "f_star_101": "b9eb0a4be36e6ac087def95ee5418248a5f5a4a1cfde51c88b06c5d97722ec67", "f_star_102": "8481bea608b25e0d5380a3d8dc85c2ff7bff0d2e2044ca827314b09c44794f7b", "f_star_103": "a22dec297e3ed77b4d10076a2b212857529cb557502873d1110ee2b52d77bd9a"}, "native_sha256": "22af9f5bcd15e89fa3eb804b246507124a6c12990f0356f3527d6e900f25d931", "bases_used": "released original_1000"}
+  eval/falcon7_F.json: commit 8b74b79b76, model /root/stage8_models/falcon7 (key falcon7), revision 1e57a0ecd176c7c139f289c60a74e57f887c3dfb, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer trie, frames fc9e0c0aea75, wrapper {'system_merged': False}
+  eval/gemma2b_F.json: commit 8b74b79b76, model /root/stage8_models/gemma2b (key gemma2b), revision 299a8560bedf22ed1c72a8a11e7dce4a7f9f51f8, dtype torch.bfloat16, attn eager, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer trie, frames 506bc2716631, wrapper {'system_merged': True}
+  eval/gemma9_F.json: commit 8b74b79b76, model /root/stage8_models/gemma9 (key gemma9), revision 11c9b309abf73637e4b6f9a3fa1e92e615547819, dtype torch.bfloat16, attn eager, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer trie, frames 18a4778a52c4, wrapper {'system_merged': True}
+  eval/llama8_F.json: commit 8b74b79b76, model /root/stage8_models/llama8 (key llama8), revision 0e9e39f249a16976918f6564b8830bc894c89659, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer trie, frames da3daabc1b59, wrapper {'system_merged': False}
+  eval/mistral7_F.json: commit 8b74b79b76, model /root/stage8_models/mistral7 (key mistral7), revision c170c708c41dac9275d15a8fff4eca08d52bab71, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer trie, frames 9434618bf9d1, wrapper {'system_merged': False}
+  eval/mistral7_S0.json: commit 8b74b79b76, model /root/stage8_models/mistral7 (key mistral7), revision c170c708c41dac9275d15a8fff4eca08d52bab71, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer trie, frames 9434618bf9d1, wrapper {'system_merged': False}
+  eval/olmo7_F.json: commit 8b74b79b76, model /root/stage8_models/olmo7 (key olmo7), revision 470b1fba1ae01581f270116362ee4aa1b97f4c84, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer trie, frames fba83c5dfbd5, wrapper {'system_merged': False}
+  eval/olmo7_S0.json: commit 8b74b79b76, model /root/stage8_models/olmo7 (key olmo7), revision 470b1fba1ae01581f270116362ee4aa1b97f4c84, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer trie, frames fba83c5dfbd5, wrapper {'system_merged': False}
+  eval/phi4_F.json: commit 8b74b79b76, model /root/stage8_models/phi4 (key phi4), revision 2db69c1c3e91a05d2c64a3185acfbaf36f744e25, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer trie, frames 9390d9db19b7, wrapper {'system_merged': False}
+  eval/qwen1.5_S0.json: commit 8b74b79b76, model /root/stage8_models/qwen1.5 (key qwen1.5), revision 989aa7980e4cf806f80c7fef2b1adb7bc71aa306, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer trie, frames b53e2c580474, wrapper {'system_merged': False}
+  eval/qwen14_F.json: commit 8b74b79b76, model /root/stage8_models/qwen14 (key qwen14), revision cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer trie, frames 737efdd268a1, wrapper {'system_merged': False}
+  eval/qwen14_S0.json: commit 8b74b79b76, model /root/stage8_models/qwen14 (key qwen14), revision cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer trie, frames 737efdd268a1, wrapper {'system_merged': False}
+  eval/qwen3b_S0.json: commit 8b74b79b76, model /root/stage8_models/qwen3b (key qwen3b), revision aa8e72537993ba99e69dfaafa59ed015b17504d1, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer trie, frames f32c2351789e, wrapper {'system_merged': False}
+  eval/qwen7_F.json: commit 8b74b79b76, model /root/stage8_models/qwen7 (key qwen7), revision a09a35458c702b33eeacc393d103063234e8bc28, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer trie, frames ae18b810014a, wrapper {'system_merged': False}
+  eval/qwen7_S0.json: commit 8b74b79b76, model /root/stage8_models/qwen7 (key qwen7), revision a09a35458c702b33eeacc393d103063234e8bc28, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer trie, frames ae18b810014a, wrapper {'system_merged': False}
+  eval/qwen7_x1eager_S0.json: commit 8b74b79b76, model /root/stage8_models/qwen7 (key qwen7), revision a09a35458c702b33eeacc393d103063234e8bc28, dtype torch.bfloat16, attn eager, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer trie, frames ae18b810014a, wrapper {'system_merged': False}
+  eval/qwen7_x1fp32_S0.json: commit 8b74b79b76, model /root/stage8_models/qwen7 (key qwen7), revision a09a35458c702b33eeacc393d103063234e8bc28, dtype torch.float32, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer trie, frames ae18b810014a, wrapper {'system_merged': False}
+  frames/falcon7.json: commit 8b74b79b76, model /root/stage8_models/falcon7 (key falcon7), revision 1e57a0ecd176c7c139f289c60a74e57f887c3dfb, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': False}
+  frames/gemma2b.json: commit 8b74b79b76, model /root/stage8_models/gemma2b (key gemma2b), revision 299a8560bedf22ed1c72a8a11e7dce4a7f9f51f8, dtype torch.bfloat16, attn eager, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': True}
+  frames/gemma9.json: commit 8b74b79b76, model /root/stage8_models/gemma9 (key gemma9), revision 11c9b309abf73637e4b6f9a3fa1e92e615547819, dtype torch.bfloat16, attn eager, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': True}
+  frames/llama8.json: commit 8b74b79b76, model /root/stage8_models/llama8 (key llama8), revision 0e9e39f249a16976918f6564b8830bc894c89659, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': False}
+  frames/mistral24.json: commit 8b74b79b76, model /root/stage8_models/mistral24 (key mistral24), revision 9527884be6e5616bdd54de542f9ae13384489724, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': False}
+  frames/mistral7.json: commit 8b74b79b76, model /root/stage8_models/mistral7 (key mistral7), revision c170c708c41dac9275d15a8fff4eca08d52bab71, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': False}
+  frames/olmo7.json: commit 8b74b79b76, model /root/stage8_models/olmo7 (key olmo7), revision 470b1fba1ae01581f270116362ee4aa1b97f4c84, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': False}
+  frames/phi4.json: commit 8b74b79b76, model /root/stage8_models/phi4 (key phi4), revision 2db69c1c3e91a05d2c64a3185acfbaf36f744e25, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': False}
+  frames/qwen1.5.json: commit 8b74b79b76, model /root/stage8_models/qwen1.5 (key qwen1.5), revision 989aa7980e4cf806f80c7fef2b1adb7bc71aa306, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': False}
+  frames/qwen14.json: commit 8b74b79b76, model /root/stage8_models/qwen14 (key qwen14), revision cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': False}
+  frames/qwen3b.json: commit 8b74b79b76, model /root/stage8_models/qwen3b (key qwen3b), revision aa8e72537993ba99e69dfaafa59ed015b17504d1, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': False}
+  frames/qwen7.json: commit 8b74b79b76, model /root/stage8_models/qwen7 (key qwen7), revision a09a35458c702b33eeacc393d103063234e8bc28, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': False}
+  g3/falcon7.json: commit 8b74b79b76, model /root/stage8_models/falcon7 (key falcon7), revision 1e57a0ecd176c7c139f289c60a74e57f887c3dfb, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames fc9e0c0aea75, wrapper {'system_merged': False}
+  g3/gemma2b.json: commit 8b74b79b76, model /root/stage8_models/gemma2b (key gemma2b), revision 299a8560bedf22ed1c72a8a11e7dce4a7f9f51f8, dtype torch.bfloat16, attn eager, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames 506bc2716631, wrapper {'system_merged': True}
+  g3/gemma9.json: commit 8b74b79b76, model /root/stage8_models/gemma9 (key gemma9), revision 11c9b309abf73637e4b6f9a3fa1e92e615547819, dtype torch.bfloat16, attn eager, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames 18a4778a52c4, wrapper {'system_merged': True}
+  g3/llama8.json: commit 8b74b79b76, model /root/stage8_models/llama8 (key llama8), revision 0e9e39f249a16976918f6564b8830bc894c89659, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames da3daabc1b59, wrapper {'system_merged': False}
+  g3/mistral7.json: commit 8b74b79b76, model /root/stage8_models/mistral7 (key mistral7), revision c170c708c41dac9275d15a8fff4eca08d52bab71, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames 9434618bf9d1, wrapper {'system_merged': False}
+  g3/olmo7.json: commit 8b74b79b76, model /root/stage8_models/olmo7 (key olmo7), revision 470b1fba1ae01581f270116362ee4aa1b97f4c84, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames fba83c5dfbd5, wrapper {'system_merged': False}
+  g3/phi4.json: commit 8b74b79b76, model /root/stage8_models/phi4 (key phi4), revision 2db69c1c3e91a05d2c64a3185acfbaf36f744e25, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames 9390d9db19b7, wrapper {'system_merged': False}
+  g3/qwen1.5.json: commit 8b74b79b76, model /root/stage8_models/qwen1.5 (key qwen1.5), revision 989aa7980e4cf806f80c7fef2b1adb7bc71aa306, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames b53e2c580474, wrapper {'system_merged': False}
+  g3/qwen14.json: commit 8b74b79b76, model /root/stage8_models/qwen14 (key qwen14), revision cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames 737efdd268a1, wrapper {'system_merged': False}
+  g3/qwen3b.json: commit 8b74b79b76, model /root/stage8_models/qwen3b (key qwen3b), revision aa8e72537993ba99e69dfaafa59ed015b17504d1, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames f32c2351789e, wrapper {'system_merged': False}
+  g3/qwen7.json: commit 8b74b79b76, model /root/stage8_models/qwen7 (key qwen7), revision a09a35458c702b33eeacc393d103063234e8bc28, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames ae18b810014a, wrapper {'system_merged': False}
+  jb8/mistral.json: repo /root/stage8_models/mistral24, revision None, score E, frames sha256 5a74b1bf09f5, dtype torch.bfloat16, attn sdpa, verified 9527884be6e5616bdd54de542f9ae13384489724
+  tokcheck/falcon7.json: commit 8b74b79b76, model /root/stage8_models/falcon7 (key falcon7), revision 1e57a0ecd176c7c139f289c60a74e57f887c3dfb, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': False}
+  tokcheck/gemma2b.json: commit 8b74b79b76, model /root/stage8_models/gemma2b (key gemma2b), revision 299a8560bedf22ed1c72a8a11e7dce4a7f9f51f8, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': True}
+  tokcheck/gemma9.json: commit 8b74b79b76, model /root/stage8_models/gemma9 (key gemma9), revision 11c9b309abf73637e4b6f9a3fa1e92e615547819, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': True}
+  tokcheck/llama8.json: commit 8b74b79b76, model /root/stage8_models/llama8 (key llama8), revision 0e9e39f249a16976918f6564b8830bc894c89659, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': False}
+  tokcheck/mistral24.json: commit 8b74b79b76, model /root/stage8_models/mistral24 (key mistral24), revision 9527884be6e5616bdd54de542f9ae13384489724, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': False}
+  tokcheck/mistral7.json: commit 8b74b79b76, model /root/stage8_models/mistral7 (key mistral7), revision c170c708c41dac9275d15a8fff4eca08d52bab71, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': False}
+  tokcheck/olmo7.json: commit 8b74b79b76, model /root/stage8_models/olmo7 (key olmo7), revision 470b1fba1ae01581f270116362ee4aa1b97f4c84, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': False}
+  tokcheck/phi4.json: commit 8b74b79b76, model /root/stage8_models/phi4 (key phi4), revision 2db69c1c3e91a05d2c64a3185acfbaf36f744e25, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': False}
+  tokcheck/qwen1.5.json: commit 8b74b79b76, model /root/stage8_models/qwen1.5 (key qwen1.5), revision 989aa7980e4cf806f80c7fef2b1adb7bc71aa306, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': False}
+  tokcheck/qwen14.json: commit 8b74b79b76, model /root/stage8_models/qwen14 (key qwen14), revision cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': False}
+  tokcheck/qwen3b.json: commit 8b74b79b76, model /root/stage8_models/qwen3b (key qwen3b), revision aa8e72537993ba99e69dfaafa59ed015b17504d1, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': False}
+  tokcheck/qwen7.json: commit 8b74b79b76, model /root/stage8_models/qwen7 (key qwen7), revision a09a35458c702b33eeacc393d103063234e8bc28, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, scorer -, frames -, wrapper {'system_merged': False}
+  commits: ['8b74b79b76']
+
+POPULATION (F = 150 fresh cores (seed 20261013), S0 = make_cores(150, Random(0)); items valid in every arm; hashes pinned)
+  falcon7 F: 150 items valid in every arm run (AFTER, BEFORE, NONE, POST, PRE, POST-NULL), 0 skipped (none), arms not run none; population sha256 OK; valid + skipped = 150 OK; clusters 55
+  gemma2b F: 150 items valid in every arm run (AFTER, BEFORE, NONE, POST, PRE, POST-NULL), 0 skipped (none), arms not run none; population sha256 OK; valid + skipped = 150 OK; clusters 55
+  gemma9 F: 150 items valid in every arm run (AFTER, BEFORE, NONE, POST, PRE, POST-NULL), 0 skipped (none), arms not run none; population sha256 OK; valid + skipped = 150 OK; clusters 55
+  llama8 F: 150 items valid in every arm run (AFTER, BEFORE, NONE, POST, PRE, POST-NULL), 0 skipped (none), arms not run none; population sha256 OK; valid + skipped = 150 OK; clusters 55
+  mistral7 F: 150 items valid in every arm run (AFTER, BEFORE, NONE, POST, PRE, POST-NULL), 0 skipped (none), arms not run none; population sha256 OK; valid + skipped = 150 OK; clusters 55
+  mistral7 S0: 150 items valid in every arm run (P1, AFTER, BEFORE, POST, PRE, NONE), 0 skipped (none), arms not run none; population sha256 OK; valid + skipped = 150 OK; clusters 30
+  olmo7 F: 150 items valid in every arm run (AFTER, BEFORE, NONE, POST, PRE, POST-NULL), 0 skipped (none), arms not run none; population sha256 OK; valid + skipped = 150 OK; clusters 55
+  olmo7 S0: 150 items valid in every arm run (P1, AFTER, BEFORE, POST, PRE, NONE), 0 skipped (none), arms not run none; population sha256 OK; valid + skipped = 150 OK; clusters 30
+  phi4 F: 150 items valid in every arm run (AFTER, BEFORE, NONE, POST, PRE, POST-NULL), 0 skipped (none), arms not run none; population sha256 OK; valid + skipped = 150 OK; clusters 55
+  qwen1.5 S0: 150 items valid in every arm run (P1, AFTER, POST, NONE), 0 skipped (none), arms not run none; population sha256 OK; valid + skipped = 150 OK; clusters 30
+  qwen14 F: 150 items valid in every arm run (AFTER, BEFORE, NONE, POST, PRE, POST-NULL), 0 skipped (none), arms not run none; population sha256 OK; valid + skipped = 150 OK; clusters 55
+  qwen14 S0: 150 items valid in every arm run (P1, AFTER, BEFORE, POST, PRE, NONE), 0 skipped (none), arms not run none; population sha256 OK; valid + skipped = 150 OK; clusters 30
+  qwen3b S0: 150 items valid in every arm run (P1, AFTER, POST, NONE), 0 skipped (none), arms not run none; population sha256 OK; valid + skipped = 150 OK; clusters 30
+  qwen7 F: 150 items valid in every arm run (AFTER, BEFORE, NONE, POST, PRE, POST-NULL), 0 skipped (none), arms not run none; population sha256 OK; valid + skipped = 150 OK; clusters 55
+  qwen7 S0: 150 items valid in every arm run (P1, AFTER, BEFORE, POST, PRE, NONE), 0 skipped (none), arms not run none; population sha256 OK; valid + skipped = 150 OK; clusters 30
+  population: OK
+
+GATES (J-B-G0 before any model; J-B-G0b tokenizer check, J-B-G1 files, J-B-G3 trie floor per model; J-B-G4 coverage and floor per cell; J-B-G5 competence per arm and anchor per model; J-B-G2 reproduction, flagged only)
+  N4 slots: {'llama8': 'llama8', 'gemma9': 'gemma9', 'phi4': 'phi4', 'falcon7': 'falcon7'}
+  qwen7     model-level gates (J-B-G0, G0b, G1, G3, frames hash): OK
+  qwen14    model-level gates (J-B-G0, G0b, G1, G3, frames hash): OK
+  mistral7  model-level gates (J-B-G0, G0b, G1, G3, frames hash): OK
+  olmo7     model-level gates (J-B-G0, G0b, G1, G3, frames hash): OK
+  llama8    model-level gates (J-B-G0, G0b, G1, G3, frames hash): OK
+  gemma9    model-level gates (J-B-G0, G0b, G1, G3, frames hash): OK
+  phi4      model-level gates (J-B-G0, G0b, G1, G3, frames hash): OK
+  falcon7   model-level gates (J-B-G0, G0b, G1, G3, frames hash): OK
+  gemma2b   model-level gates (J-B-G0, G0b, G1, G3, frames hash): OK
+  qwen1.5   model-level gates (J-B-G0, G0b, G1, G3, frames hash): OK
+  qwen3b    model-level gates (J-B-G0, G0b, G1, G3, frames hash): OK
+  J-B-G0  FP32 exactness (pytest.log, its last session that ran them; skips allowed only for the cached-tokenizer tests, which J-B-G0b repeats per model): tests/test_fresh.py 24 passed, 0 failed, 0 skipped (>= 24); tests/test_fresh_factorial.py 12 passed, 0 failed, 0 skipped (>= 12); tests/test_stage8b_score.py 20 passed, 0 failed, 0 skipped (>= 20); tests/test_surface.py 13 passed, 0 failed, 0 skipped (>= 13); tests/test_generate.py 5 passed, 0 failed, 0 skipped (>= 5); tests/test_clamp_families.py 5 passed, 0 failed, 0 skipped (>= 5); tests/test_stage8_populations.py 5 passed, 0 failed, 0 skipped (>= 5); tests/test_stage8_holm.py 7 passed, 0 failed, 0 skipped (>= 7) -> MET
+  falcon7   J-B-G0b tokenizer check: MET; ROOM 21 tokens, sentences {'0': [23], '1': [22], '2': [23], '3': [22], '4': [21], '5': [21], '6': [21], '7': [22]}, trie nodes {'F': [29, 32], 'C': [29, 32], 'S0': [32, 32]}
+  gemma2b   J-B-G0b tokenizer check: MET; ROOM 21 tokens, sentences {'0': [23], '1': [22], '2': [23], '3': [22], '4': [21], '5': [21], '6': [21], '7': [22]}, trie nodes {'F': [25, 25], 'C': [25, 25], 'S0': [25, 25]}
+  gemma9    J-B-G0b tokenizer check: MET; ROOM 21 tokens, sentences {'0': [23], '1': [22], '2': [23], '3': [22], '4': [21], '5': [21], '6': [21], '7': [22]}, trie nodes {'F': [25, 25], 'C': [25, 25], 'S0': [25, 25]}
+  llama8    J-B-G0b tokenizer check: MET; ROOM 21 tokens, sentences {'0': [23], '1': [22], '2': [23], '3': [22], '4': [21], '5': [21], '6': [21], '7': [22]}, trie nodes {'F': [31, 37], 'C': [31, 37], 'S0': [37, 37]}
+  mistral24 J-B-G0b tokenizer check: MET; ROOM 21 tokens, sentences {'0': [23], '1': [22], '2': [23], '3': [22], '4': [21], '5': [22], '6': [22], '7': [22]}, trie nodes {'F': [79, 88], 'C': [79, 88], 'S0': [88, 88]}
+  mistral7  J-B-G0b tokenizer check: MET; ROOM 21 tokens, sentences {'0': [23], '1': [22], '2': [23], '3': [22], '4': [21], '5': [22], '6': [22], '7': [22]}, trie nodes {'F': [83, 116], 'C': [83, 116], 'S0': [116, 116]}
+  olmo7     J-B-G0b tokenizer check: MET; ROOM 21 tokens, sentences {'0': [23], '1': [22], '2': [23], '3': [22], '4': [21], '5': [21], '6': [21], '7': [22]}, trie nodes {'F': [31, 37], 'C': [31, 37], 'S0': [37, 37]}
+  phi4      J-B-G0b tokenizer check: MET; ROOM 21 tokens, sentences {'0': [23], '1': [22], '2': [23], '3': [22], '4': [21], '5': [21], '6': [21], '7': [22]}, trie nodes {'F': [31, 37], 'C': [31, 37], 'S0': [37, 37]}
+  qwen1.5   J-B-G0b tokenizer check: MET; ROOM 21 tokens, sentences {'0': [23], '1': [22], '2': [23], '3': [22], '4': [21], '5': [21], '6': [21], '7': [22]}, trie nodes {'F': [31, 37], 'C': [31, 37], 'S0': [37, 37]}
+  qwen14    J-B-G0b tokenizer check: MET; ROOM 21 tokens, sentences {'0': [23], '1': [22], '2': [23], '3': [22], '4': [21], '5': [21], '6': [21], '7': [22]}, trie nodes {'F': [31, 37], 'C': [31, 37], 'S0': [37, 37]}
+  qwen3b    J-B-G0b tokenizer check: MET; ROOM 21 tokens, sentences {'0': [23], '1': [22], '2': [23], '3': [22], '4': [21], '5': [21], '6': [21], '7': [22]}, trie nodes {'F': [31, 37], 'C': [31, 37], 'S0': [37, 37]}
+  qwen7     J-B-G0b tokenizer check: MET; ROOM 21 tokens, sentences {'0': [23], '1': [22], '2': [23], '3': [22], '4': [21], '5': [21], '6': [21], '7': [22]}, trie nodes {'F': [31, 37], 'C': [31, 37], 'S0': [37, 37]}
+  falcon7   J-B-G1 files verified: tiiuae/Falcon3-7B-Instruct at 1e57a0ecd176c7c139f289c60a74e57f887c3dfb, 10 files
+  gemma2b   J-B-G1 files verified: google/gemma-2-2b-it at 299a8560bedf22ed1c72a8a11e7dce4a7f9f51f8, 9 files
+  gemma9    J-B-G1 files verified: google/gemma-2-9b-it at 11c9b309abf73637e4b6f9a3fa1e92e615547819, 11 files
+  llama8    J-B-G1 files verified: meta-llama/Llama-3.1-8B-Instruct at 0e9e39f249a16976918f6564b8830bc894c89659, 10 files
+  mistral24 J-B-G1 files verified: mistralai/Mistral-Small-24B-Instruct-2501 at 9527884be6e5616bdd54de542f9ae13384489724, 19 files
+  mistral7  J-B-G1 files verified: mistralai/Mistral-7B-Instruct-v0.3 at c170c708c41dac9275d15a8fff4eca08d52bab71, 12 files
+  olmo7     J-B-G1 files verified: allenai/OLMo-2-1124-7B-Instruct at 470b1fba1ae01581f270116362ee4aa1b97f4c84, 11 files
+  phi4      J-B-G1 files verified: microsoft/phi-4 at 2db69c1c3e91a05d2c64a3185acfbaf36f744e25, 15 files
+  qwen1.5   J-B-G1 files verified: Qwen/Qwen2.5-1.5B-Instruct at 989aa7980e4cf806f80c7fef2b1adb7bc71aa306, 7 files
+  qwen14    J-B-G1 files verified: Qwen/Qwen2.5-14B-Instruct at cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8, 15 files
+  qwen3b    J-B-G1 files verified: Qwen/Qwen2.5-3B-Instruct at aa8e72537993ba99e69dfaafa59ed015b17504d1, 9 files
+  qwen7     J-B-G1 files verified: Qwen/Qwen2.5-7B-Instruct at a09a35458c702b33eeacc393d103063234e8bc28, 11 files
+  qwen7     J-B-G3 (first 30 F cores): NONE |ds| 0.0001 (<= 0.02), mean|dL| 0.1709 (<= 1.126); POST |ds| 0.0016 (<= 0.02), mean|dL| 0.2061 (<= 0.884); AFTER |ds| 0.0018 (<= 0.02), mean|dL| 0.1596 (<= 1.228) -> MET; scorer used: trie
+  qwen7     AFTER     J-B-G4 coverage 1.000 (min at V_X@0; >= 0.8 for E) floor 0.1365 (<= 1.1167) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  qwen7     BEFORE    J-B-G4 coverage 1.000 (min at K_S@8; >= 0.8 for E) floor 0.1753 (<= 1.1167) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 0.993, other(B) 0.000
+  qwen7     NONE      J-B-G4 coverage 0.998 (min at K_X@0; >= 0.8 for E) floor 0.1330 (<= 1.1167) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  qwen7     POST      J-B-G4 coverage 0.998 (min at V_X@0; >= 0.8 for E) floor 0.1550 (<= 1.1167) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 0.993, other(B) 0.000
+  qwen7     PRE       J-B-G4 coverage 0.999 (min at V_S@0; >= 0.8 for E) floor 0.1345 (<= 1.1167) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  qwen7     POST-NULL J-B-G4 coverage 0.995 (min at K_X@0; >= 0.8 for E) floor 0.1457 (<= 1.1167) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  qwen7     J-B-G5 anchor under E: holds
+  qwen7     J-B-G5 anchor under beta: holds
+  qwen14    J-B-G3 (first 30 F cores): NONE |ds| 0.0004 (<= 0.02), mean|dL| 0.1456 (<= 1.527); POST |ds| 0.0017 (<= 0.02), mean|dL| 0.1930 (<= 1.488); AFTER |ds| 0.0018 (<= 0.02), mean|dL| 0.1852 (<= 1.984) -> MET; scorer used: trie
+  qwen14    AFTER     J-B-G4 coverage 1.000 (min at B; >= 0.8 for E) floor 0.2158 (<= 1.8392) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  qwen14    BEFORE    J-B-G4 coverage 1.000 (min at X; >= 0.8 for E) floor 0.1855 (<= 1.8392) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  qwen14    NONE      J-B-G4 coverage 0.997 (min at V_S@14; >= 0.8 for E) floor 0.1366 (<= 1.8392) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  qwen14    POST      J-B-G4 coverage 0.999 (min at K_X@0; >= 0.8 for E) floor 0.1508 (<= 1.8392) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  qwen14    PRE       J-B-G4 coverage 1.000 (min at X; >= 0.8 for E) floor 0.1471 (<= 1.8392) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  qwen14    POST-NULL J-B-G4 coverage 0.961 (min at K_X@0; >= 0.8 for E) floor 0.1491 (<= 1.8392) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  qwen14    J-B-G5 anchor under E: holds
+  qwen14    J-B-G5 anchor under beta: holds
+  mistral7  J-B-G3 (first 30 F cores): NONE |ds| 0.0007 (<= 0.02), mean|dL| 0.0856 (<= 0.807); POST |ds| 0.0016 (<= 0.02), mean|dL| 0.0997 (<= 0.809); AFTER |ds| 0.0009 (<= 0.02), mean|dL| 0.0717 (<= 0.851) -> MET; scorer used: trie
+  mistral7  AFTER     J-B-G4 coverage 0.997 (min at K_S@2; >= 0.8 for E) floor 0.0312 (<= 0.7848) -> E; J-B-G5 acc_B 0.993 (>= 0.8), acc_S 1.000, other(B) 0.000
+  mistral7  BEFORE    J-B-G4 coverage 0.997 (min at V_S@10; >= 0.8 for E) floor 0.0322 (<= 0.7848) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  mistral7  NONE      J-B-G4 coverage 0.906 (min at K_S@2; >= 0.8 for E) floor 0.0564 (<= 0.7848) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  mistral7  POST      J-B-G4 coverage 0.943 (min at V_S@2; >= 0.8 for E) floor 0.0317 (<= 0.7848) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  mistral7  PRE       J-B-G4 coverage 0.924 (min at ID@0; >= 0.8 for E) floor 0.0375 (<= 0.7848) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  mistral7  POST-NULL J-B-G4 coverage 0.923 (min at K_S@0; >= 0.8 for E) floor 0.0341 (<= 0.7848) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  mistral7  J-B-G5 anchor under E: holds
+  mistral7  J-B-G5 anchor under beta: holds
+  olmo7     J-B-G3 (first 30 F cores): NONE |ds| 0.0002 (<= 0.02), mean|dL| 0.0477 (<= 0.685); POST |ds| 0.0001 (<= 0.02), mean|dL| 0.0582 (<= 0.504); AFTER |ds| 0.0010 (<= 0.02), mean|dL| 0.0573 (<= 0.576) -> MET; scorer used: trie
+  olmo7     AFTER     J-B-G4 coverage 0.987 (min at K_S@2; >= 0.8 for E) floor 0.0558 (<= 0.4465) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  olmo7     BEFORE    J-B-G4 coverage 0.996 (min at V_S@10; >= 0.8 for E) floor 0.0552 (<= 0.4465) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  olmo7     NONE      J-B-G4 coverage 0.949 (min at V_S@10; >= 0.8 for E) floor 0.0437 (<= 0.4465) -> E; J-B-G5 acc_B 0.993 (>= 0.8), acc_S 1.000, other(B) 0.000
+  olmo7     POST      J-B-G4 coverage 0.980 (min at V_S@2; >= 0.8 for E) floor 0.0616 (<= 0.4465) -> E; J-B-G5 acc_B 0.993 (>= 0.8), acc_S 1.000, other(B) 0.000
+  olmo7     PRE       J-B-G4 coverage 0.992 (min at V_S@10; >= 0.8 for E) floor 0.0573 (<= 0.4465) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  olmo7     POST-NULL J-B-G4 coverage 0.858 (min at V_X@0; >= 0.8 for E) floor 0.0427 (<= 0.4465) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  olmo7     J-B-G5 anchor under E: holds
+  olmo7     J-B-G5 anchor under beta: holds
+  llama8    J-B-G3 (first 30 F cores): NONE |ds| 0.0001 (<= 0.02), mean|dL| 0.0737 (<= 0.503); POST |ds| 0.0001 (<= 0.02), mean|dL| 0.0781 (<= 0.368); AFTER |ds| 0.0022 (<= 0.02), mean|dL| 0.0848 (<= 0.471) -> MET; scorer used: trie
+  llama8    AFTER     J-B-G4 coverage 0.984 (min at V_S@10; >= 0.8 for E) floor 0.1170 (<= 0.2996) -> E; J-B-G5 acc_B 0.993 (>= 0.8), acc_S 1.000, other(B) 0.000
+  llama8    BEFORE    J-B-G4 coverage 0.988 (min at K_X@0; >= 0.8 for E) floor 0.0882 (<= 0.2996) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  llama8    NONE      J-B-G4 coverage 0.918 (min at K_X@0; >= 0.8 for E) floor 0.0616 (<= 0.2996) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  llama8    POST      J-B-G4 coverage 0.954 (min at V_S@10; >= 0.8 for E) floor 0.0763 (<= 0.2996) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  llama8    PRE       J-B-G4 coverage 0.975 (min at K_X@0; >= 0.8 for E) floor 0.0808 (<= 0.2996) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  llama8    POST-NULL J-B-G4 coverage 0.889 (min at K_X@0; >= 0.8 for E) floor 0.0568 (<= 0.2996) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  llama8    J-B-G5 anchor under E: holds
+  llama8    J-B-G5 anchor under beta: holds
+  gemma9    J-B-G3 (first 30 F cores): NONE |ds| 0.0003 (<= 0.02), mean|dL| 0.1035 (<= 0.862); POST |ds| 0.0001 (<= 0.02), mean|dL| 0.1002 (<= 0.794); AFTER |ds| 0.0001 (<= 0.02), mean|dL| 0.0614 (<= 0.756) -> MET; scorer used: trie
+  gemma9    AFTER     J-B-G4 coverage 0.997 (min at K_S@13; >= 0.8 for E) floor 0.0652 (<= 0.7213) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  gemma9    BEFORE    J-B-G4 coverage 0.998 (min at V_X@0; >= 0.8 for E) floor 0.0624 (<= 0.7213) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  gemma9    NONE      J-B-G4 coverage 0.998 (min at K_X@0; >= 0.8 for E) floor 0.0661 (<= 0.7213) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  gemma9    POST      J-B-G4 coverage 0.997 (min at K_S@0; >= 0.8 for E) floor 0.0590 (<= 0.7213) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  gemma9    PRE       J-B-G4 coverage 0.999 (min at V_X@0; >= 0.8 for E) floor 0.0690 (<= 0.7213) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  gemma9    POST-NULL J-B-G4 coverage 0.998 (min at K_X@0; >= 0.8 for E) floor 0.0569 (<= 0.7213) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  gemma9    J-B-G5 anchor under E: holds
+  gemma9    J-B-G5 anchor under beta: holds
+  phi4      J-B-G3 (first 30 F cores): NONE |ds| 0.0003 (<= 0.02), mean|dL| 0.0884 (<= 0.793); POST |ds| 0.0003 (<= 0.02), mean|dL| 0.0962 (<= 0.665); AFTER |ds| 0.0017 (<= 0.02), mean|dL| 0.0659 (<= 0.806) -> MET; scorer used: trie
+  phi4      AFTER     J-B-G4 coverage 0.998 (min at V_S@12; >= 0.8 for E) floor 0.0619 (<= 0.6883) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  phi4      BEFORE    J-B-G4 coverage 0.999 (min at V_S@0; >= 0.8 for E) floor 0.0965 (<= 0.6883) -> E; J-B-G5 acc_B 0.987 (>= 0.8), acc_S 0.980, other(B) 0.000
+  phi4      NONE      J-B-G4 coverage 0.996 (min at V_X@0; >= 0.8 for E) floor 0.0527 (<= 0.6883) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  phi4      POST      J-B-G4 coverage 0.997 (min at K_X@0; >= 0.8 for E) floor 0.0643 (<= 0.6883) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  phi4      PRE       J-B-G4 coverage 0.999 (min at V_S@12; >= 0.8 for E) floor 0.0649 (<= 0.6883) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  phi4      POST-NULL J-B-G4 coverage 0.994 (min at K_X@0; >= 0.8 for E) floor 0.0679 (<= 0.6883) -> E; J-B-G5 acc_B 0.993 (>= 0.8), acc_S 1.000, other(B) 0.000
+  phi4      J-B-G5 anchor under E: holds
+  phi4      J-B-G5 anchor under beta: holds
+  falcon7   J-B-G3 (first 30 F cores): NONE |ds| 0.0002 (<= 0.02), mean|dL| 0.0858 (<= 0.758); POST |ds| 0.0008 (<= 0.02), mean|dL| 0.0886 (<= 0.535); AFTER |ds| 0.0002 (<= 0.02), mean|dL| 0.0661 (<= 0.655) -> MET; scorer used: trie
+  falcon7   AFTER     J-B-G4 coverage 0.999 (min at KV_S@8; >= 0.8 for E) floor 0.0712 (<= 0.6148) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  falcon7   BEFORE    J-B-G4 coverage 0.999 (min at K_X@0; >= 0.8 for E) floor 0.0775 (<= 0.6148) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  falcon7   NONE      J-B-G4 coverage 0.997 (min at K_X@0; >= 0.8 for E) floor 0.0527 (<= 0.6148) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  falcon7   POST      J-B-G4 coverage 0.995 (min at K_S@0; >= 0.8 for E) floor 0.0662 (<= 0.6148) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  falcon7   PRE       J-B-G4 coverage 0.998 (min at K_S@2; >= 0.8 for E) floor 0.0761 (<= 0.6148) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  falcon7   POST-NULL J-B-G4 coverage 0.990 (min at K_X@0; >= 0.8 for E) floor 0.0464 (<= 0.6148) -> E; J-B-G5 acc_B 1.000 (>= 0.8), acc_S 1.000, other(B) 0.000
+  falcon7   J-B-G5 anchor under E: holds
+  falcon7   J-B-G5 anchor under beta: holds
+  gemma2b   J-B-G3 (first 30 F cores): NONE |ds| 0.0009 (<= 0.02), mean|dL| 0.1333 (<= 0.640); POST |ds| 0.0000 (<= 0.02), mean|dL| 0.1434 (<= 0.533); AFTER |ds| 0.0006 (<= 0.02), mean|dL| 0.1117 (<= 0.533) -> MET; scorer used: trie
+  gemma2b   AFTER     J-B-G4 coverage 0.992 (min at V_S@2; >= 0.8 for E) floor 0.1273 (<= 0.3313) -> E; J-B-G5 acc_B 0.773 (>= 0.8), acc_S 0.787, other(B) 0.000
+  gemma2b   BEFORE    J-B-G4 coverage 0.992 (min at V_S@0; >= 0.8 for E) floor 0.1368 (<= 0.3313) -> E; J-B-G5 acc_B 0.640 (>= 0.8), acc_S 0.653, other(B) 0.000
+  gemma2b   NONE      J-B-G4 coverage 0.987 (min at K_S@2; >= 0.8 for E) floor 0.1102 (<= 0.3313) -> E; J-B-G5 acc_B 0.680 (>= 0.8), acc_S 0.653, other(B) 0.000
+  gemma2b   POST      J-B-G4 coverage 0.989 (min at K_S@8; >= 0.8 for E) floor 0.0001 (<= 0.3313) -> E; J-B-G5 acc_B 0.687 (>= 0.8), acc_S 0.660, other(B) 0.000
+  gemma2b   PRE       J-B-G4 coverage 0.992 (min at V_S@8; >= 0.8 for E) floor 0.0000 (<= 0.3313) -> E; J-B-G5 acc_B 0.900 (>= 0.8), acc_S 0.873, other(B) 0.000
+  gemma2b   POST-NULL J-B-G4 coverage 0.986 (min at K_S@8; >= 0.8 for E) floor 0.0001 (<= 0.3313) -> E; J-B-G5 acc_B 0.647 (>= 0.8), acc_S 0.580, other(B) 0.000
+  gemma2b   J-B-G5 anchor under E: holds
+  gemma2b   J-B-G5 anchor under beta: holds
+  qwen1.5   J-B-G3 (first 30 F cores): NONE |ds| 0.0002 (<= 0.02), mean|dL| 0.0959 (<= 0.607); POST |ds| 0.0036 (<= 0.02), mean|dL| 0.0826 (<= 0.387); AFTER |ds| 0.0011 (<= 0.02), mean|dL| 0.0899 (<= 0.456) -> MET; scorer used: trie
+  qwen3b    J-B-G3 (first 30 F cores): NONE |ds| 0.0004 (<= 0.02), mean|dL| 0.2366 (<= 1.179); POST |ds| 0.0053 (<= 0.02), mean|dL| 0.2876 (<= 0.748); AFTER |ds| 0.0008 (<= 0.02), mean|dL| 0.2484 (<= 0.830) -> MET; scorer used: trie
+  J-B-G2  reproduction (S0, P4; the published-path pass against the committed stage-1 / 3b files): per arm |ds_ID^L| <= 0.03 and |dr^L| <= 0.03 (a failure is flagged; J-B6 is a same-pass comparison and is still scored)
+    qwen7: P1 s +0.786 vs +0.786, r +1.027 vs +1.027 ok; AFTER s +0.777 vs +0.777, r +1.000 vs +1.000 ok; BEFORE s -0.009 vs -0.009, r -0.007 vs -0.007 ok; POST s +0.317 vs +0.317, r +0.268 vs +0.268 ok; PRE s -0.002 vs -0.002, r -0.001 vs -0.001 ok; NONE s +0.059 vs +0.059, r +0.051 vs +0.051 ok -> MET
+    qwen14: P1 s +0.878 vs +0.878, r +1.089 vs +1.089 ok; AFTER s +0.863 vs +0.863, r +1.000 vs +1.000 ok; BEFORE s -0.004 vs -0.004, r -0.004 vs -0.004 ok; POST s +0.396 vs +0.396, r +0.337 vs +0.337 ok; PRE s -0.003 vs -0.003, r -0.002 vs -0.002 ok; NONE s +0.052 vs +0.052, r +0.029 vs +0.029 ok -> MET
+    mistral7: P1 s +0.866 vs +0.866, r +0.959 vs +0.959 ok; AFTER s +0.819 vs +0.819, r +1.000 vs +1.000 ok; BEFORE s +0.000 vs +0.000, r +0.000 vs +0.000 ok; POST s +0.407 vs +0.407, r +0.506 vs +0.506 ok; PRE s -0.000 vs -0.000, r -0.000 vs -0.000 ok; NONE s +0.039 vs +0.039, r +0.036 vs +0.036 ok -> MET
+    olmo7: P1 s +0.691 vs +0.691, r +0.948 vs +0.948 ok; AFTER s +0.593 vs +0.593, r +1.000 vs +1.000 ok; BEFORE s -0.028 vs -0.028, r -0.035 vs -0.035 ok; POST s +0.189 vs +0.189, r +0.233 vs +0.233 ok; PRE s -0.023 vs -0.023, r -0.026 vs -0.026 ok; NONE s +0.033 vs +0.033, r +0.044 vs +0.044 ok -> MET
+
+PREDICTIONS (code [class, kind (A account, V measurement validity), recorded prior P(met)] title -> verdict; then per model: verdict, numbers and bounds; P4f: 95 % intervals, every evaluable model (NOT MET if one fails, else >= 3 evaluable); N4: 98.75 %, 3 of 4)
+  J-B1-P4f      [L, A, prior 0.90] the list after the story opens a key read that carries most of the identity -> MET (4 of 4 evaluable met; 4 slots)
+      qwen7: MET  n=150 scoring E
+          s_ID^E(AFTER) +0.791 >= 0.5 (point): yes
+          H0 s_ID^E(AFTER) <= 0.4 rejected at 95% (lower bound +0.774 > 0.4): yes
+          H0 ID_K^E(AFTER) <= 0 rejected at 95% (lower bound +21.663 > 0): yes
+      qwen14: MET  n=150 scoring E
+          s_ID^E(AFTER) +0.877 >= 0.5 (point): yes
+          H0 s_ID^E(AFTER) <= 0.4 rejected at 95% (lower bound +0.862 > 0.4): yes
+          H0 ID_K^E(AFTER) <= 0 rejected at 95% (lower bound +35.641 > 0): yes
+      mistral7: MET  n=150 scoring E
+          s_ID^E(AFTER) +0.800 >= 0.5 (point): yes
+          H0 s_ID^E(AFTER) <= 0.4 rejected at 95% (lower bound +0.782 > 0.4): yes
+          H0 ID_K^E(AFTER) <= 0 rejected at 95% (lower bound +15.013 > 0): yes
+      olmo7: MET  n=150 scoring E
+          s_ID^E(AFTER) +0.628 >= 0.5 (point): yes
+          H0 s_ID^E(AFTER) <= 0.4 rejected at 95% (lower bound +0.608 > 0.4): yes
+          H0 ID_K^E(AFTER) <= 0 rejected at 95% (lower bound +8.565 > 0): yes
+  J-B1-N4       [M, A, prior 0.85] the list after the story opens a key read that carries most of the identity -> MET (4 of 4 evaluable met; 4 slots)
+      llama8: MET  n=150 scoring E
+          s_ID^E(AFTER) +0.612 >= 0.5 (point): yes
+          H0 s_ID^E(AFTER) <= 0.4 rejected at 98.75% (lower bound +0.582 > 0.4): yes
+          H0 ID_K^E(AFTER) <= 0 rejected at 98.75% (lower bound +5.357 > 0): yes
+      gemma9: MET  n=150 scoring E
+          s_ID^E(AFTER) +0.700 >= 0.5 (point): yes
+          H0 s_ID^E(AFTER) <= 0.4 rejected at 98.75% (lower bound +0.688 > 0.4): yes
+          H0 ID_K^E(AFTER) <= 0 rejected at 98.75% (lower bound +13.907 > 0): yes
+      phi4: MET  n=150 scoring E
+          s_ID^E(AFTER) +0.721 >= 0.5 (point): yes
+          H0 s_ID^E(AFTER) <= 0.4 rejected at 98.75% (lower bound +0.702 > 0.4): yes
+          H0 ID_K^E(AFTER) <= 0 rejected at 98.75% (lower bound +13.169 > 0): yes
+      falcon7: MET  n=150 scoring E
+          s_ID^E(AFTER) +0.784 >= 0.5 (point): yes
+          H0 s_ID^E(AFTER) <= 0.4 rejected at 98.75% (lower bound +0.771 > 0.4): yes
+          H0 ID_K^E(AFTER) <= 0 rejected at 98.75% (lower bound +11.927 > 0): yes
+  J-B2-P4f      [L, A, prior 0.90] the same list or sentence before the writing token adds no key read over no mention -> MET (4 of 4 evaluable met; 4 slots)
+      qwen7: MET  n=150
+          H0 r^E(BEFORE) - r^E(NONE) >= 0.05 rejected at 95% (upper bound -0.038 < 0.05): yes
+          H0 r^E(PRE) - r^E(NONE) >= 0.05 rejected at 95% (upper bound -0.037 < 0.05): yes
+          H0 s_ID^E(BEFORE) >= 0.1 rejected at 95% (upper bound -0.014 < 0.1): yes
+          H0 s_ID^E(PRE) >= 0.1 rejected at 95% (upper bound -0.010 < 0.1): yes
+      qwen14: MET  n=150
+          H0 r^E(BEFORE) - r^E(NONE) >= 0.05 rejected at 95% (upper bound -0.028 < 0.05): yes
+          H0 r^E(PRE) - r^E(NONE) >= 0.05 rejected at 95% (upper bound -0.029 < 0.05): yes
+          H0 s_ID^E(BEFORE) >= 0.1 rejected at 95% (upper bound +0.001 < 0.1): yes
+          H0 s_ID^E(PRE) >= 0.1 rejected at 95% (upper bound +0.002 < 0.1): yes
+      mistral7: MET  n=150
+          H0 r^E(BEFORE) - r^E(NONE) >= 0.05 rejected at 95% (upper bound -0.008 < 0.05): yes
+          H0 r^E(PRE) - r^E(NONE) >= 0.05 rejected at 95% (upper bound -0.019 < 0.05): yes
+          H0 s_ID^E(BEFORE) >= 0.1 rejected at 95% (upper bound -0.013 < 0.1): yes
+          H0 s_ID^E(PRE) >= 0.1 rejected at 95% (upper bound -0.022 < 0.1): yes
+      olmo7: MET  n=150
+          H0 r^E(BEFORE) - r^E(NONE) >= 0.05 rejected at 95% (upper bound -0.092 < 0.05): yes
+          H0 r^E(PRE) - r^E(NONE) >= 0.05 rejected at 95% (upper bound -0.102 < 0.05): yes
+          H0 s_ID^E(BEFORE) >= 0.1 rejected at 95% (upper bound -0.026 < 0.1): yes
+          H0 s_ID^E(PRE) >= 0.1 rejected at 95% (upper bound -0.038 < 0.1): yes
+  J-B2-N4       [M, A, prior 0.85] the same list or sentence before the writing token adds no key read over no mention -> MET (4 of 4 evaluable met; 4 slots)
+      llama8: MET  n=150
+          H0 r^E(BEFORE) - r^E(NONE) >= 0.05 rejected at 98.75% (upper bound -0.142 < 0.05): yes
+          H0 r^E(PRE) - r^E(NONE) >= 0.05 rejected at 98.75% (upper bound -0.112 < 0.05): yes
+          H0 s_ID^E(BEFORE) >= 0.1 rejected at 98.75% (upper bound -0.037 < 0.1): yes
+          H0 s_ID^E(PRE) >= 0.1 rejected at 98.75% (upper bound -0.007 < 0.1): yes
+      gemma9: MET  n=150
+          H0 r^E(BEFORE) - r^E(NONE) >= 0.05 rejected at 98.75% (upper bound -0.014 < 0.05): yes
+          H0 r^E(PRE) - r^E(NONE) >= 0.05 rejected at 98.75% (upper bound -0.016 < 0.05): yes
+          H0 s_ID^E(BEFORE) >= 0.1 rejected at 98.75% (upper bound -0.014 < 0.1): yes
+          H0 s_ID^E(PRE) >= 0.1 rejected at 98.75% (upper bound -0.014 < 0.1): yes
+      phi4: MET  n=150
+          H0 r^E(BEFORE) - r^E(NONE) >= 0.05 rejected at 98.75% (upper bound -0.040 < 0.05): yes
+          H0 r^E(PRE) - r^E(NONE) >= 0.05 rejected at 98.75% (upper bound -0.021 < 0.05): yes
+          H0 s_ID^E(BEFORE) >= 0.1 rejected at 98.75% (upper bound -0.049 < 0.1): yes
+          H0 s_ID^E(PRE) >= 0.1 rejected at 98.75% (upper bound -0.019 < 0.1): yes
+      falcon7: MET  n=150
+          H0 r^E(BEFORE) - r^E(NONE) >= 0.05 rejected at 98.75% (upper bound -0.046 < 0.05): yes
+          H0 r^E(PRE) - r^E(NONE) >= 0.05 rejected at 98.75% (upper bound -0.040 < 0.05): yes
+          H0 s_ID^E(BEFORE) >= 0.1 rejected at 98.75% (upper bound -0.018 < 0.1): yes
+          H0 s_ID^E(PRE) >= 0.1 rejected at 98.75% (upper bound -0.006 < 0.1): yes
+  J-B3-P4f      [M, A, prior 0.80] a neutral sentence after the story opens an intermediate key read -> MET (4 of 4 evaluable met; 4 slots)
+      qwen7: MET  n=150
+          r^E(POST) +0.270 >= 0.15 (point): yes
+          H0 r^E(POST) <= 0.1 rejected at 95% (lower bound +0.243 > 0.1): yes
+          r^E(POST) <= 0.75 (point): yes
+          H0 r^E(POST) >= 1 rejected at 95% (upper bound +0.297 < 1): yes
+          H0 delta^E(POST - PRE) <= 0 rejected at 95% (lower bound +0.256 > 0): yes
+          H0 delta^E(POST - NONE) <= 0 rejected at 95% (lower bound +0.210 > 0): yes
+          H0 s_ID^E(POST) <= 0.1 rejected at 95% (lower bound +0.301 > 0.1): yes
+          H0 s_ID^E(POST) - s_ID^E(NONE) <= 0 rejected at 95% (lower bound +0.263 > 0): yes
+          competent-only (n=149) delta^E(POST - PRE) +0.285 > 0 (point): yes
+          competent-only (n=149) delta^E(POST - NONE) +0.241 > 0 (point): yes
+          competent-only (n=149) s_ID^E(POST) - s_ID^E(NONE) +0.293 > 0 (point): yes
+      qwen14: MET  n=150
+          r^E(POST) +0.392 >= 0.15 (point): yes
+          H0 r^E(POST) <= 0.1 rejected at 95% (lower bound +0.355 > 0.1): yes
+          r^E(POST) <= 0.75 (point): yes
+          H0 r^E(POST) >= 1 rejected at 95% (upper bound +0.428 < 1): yes
+          H0 delta^E(POST - PRE) <= 0 rejected at 95% (lower bound +0.357 > 0): yes
+          H0 delta^E(POST - NONE) <= 0 rejected at 95% (lower bound +0.322 > 0): yes
+          H0 s_ID^E(POST) <= 0.1 rejected at 95% (lower bound +0.360 > 0.1): yes
+          H0 s_ID^E(POST) - s_ID^E(NONE) <= 0 rejected at 95% (lower bound +0.310 > 0): yes
+          competent-only (n=150) delta^E(POST - PRE) +0.394 > 0 (point): yes
+          competent-only (n=150) delta^E(POST - NONE) +0.359 > 0 (point): yes
+          competent-only (n=150) s_ID^E(POST) - s_ID^E(NONE) +0.338 > 0 (point): yes
+      mistral7: MET  n=150
+          r^E(POST) +0.569 >= 0.15 (point): yes
+          H0 r^E(POST) <= 0.1 rejected at 95% (lower bound +0.503 > 0.1): yes
+          r^E(POST) <= 0.75 (point): yes
+          H0 r^E(POST) >= 1 rejected at 95% (upper bound +0.634 < 1): yes
+          H0 delta^E(POST - PRE) <= 0 rejected at 95% (lower bound +0.535 > 0): yes
+          H0 delta^E(POST - NONE) <= 0 rejected at 95% (lower bound +0.503 > 0): yes
+          H0 s_ID^E(POST) <= 0.1 rejected at 95% (lower bound +0.370 > 0.1): yes
+          H0 s_ID^E(POST) - s_ID^E(NONE) <= 0 rejected at 95% (lower bound +0.369 > 0): yes
+          competent-only (n=149) delta^E(POST - PRE) +0.601 > 0 (point): yes
+          competent-only (n=149) delta^E(POST - NONE) +0.570 > 0 (point): yes
+          competent-only (n=149) s_ID^E(POST) - s_ID^E(NONE) +0.401 > 0 (point): yes
+      olmo7: MET  n=150
+          r^E(POST) +0.180 >= 0.15 (point): yes
+          H0 r^E(POST) <= 0.1 rejected at 95% (lower bound +0.141 > 0.1): yes
+          r^E(POST) <= 0.75 (point): yes
+          H0 r^E(POST) >= 1 rejected at 95% (upper bound +0.218 < 1): yes
+          H0 delta^E(POST - PRE) <= 0 rejected at 95% (lower bound +0.196 > 0): yes
+          H0 delta^E(POST - NONE) <= 0 rejected at 95% (lower bound +0.069 > 0): yes
+          H0 s_ID^E(POST) <= 0.1 rejected at 95% (lower bound +0.130 > 0.1): yes
+          H0 s_ID^E(POST) - s_ID^E(NONE) <= 0 rejected at 95% (lower bound +0.077 > 0): yes
+          competent-only (n=149) delta^E(POST - PRE) +0.234 > 0 (point): yes
+          competent-only (n=149) delta^E(POST - NONE) +0.114 > 0 (point): yes
+          competent-only (n=149) s_ID^E(POST) - s_ID^E(NONE) +0.112 > 0 (point): yes
+  J-B3-N4       [R, A, prior 0.50] a neutral sentence after the story opens an intermediate key read -> MET (4 of 4 evaluable met; 4 slots)
+      llama8: MET  n=150
+          r^E(POST) +0.396 >= 0.15 (point): yes
+          H0 r^E(POST) <= 0.1 rejected at 98.75% (lower bound +0.337 > 0.1): yes
+          r^E(POST) <= 0.75 (point): yes
+          H0 r^E(POST) >= 1 rejected at 98.75% (upper bound +0.458 < 1): yes
+          H0 delta^E(POST - PRE) <= 0 rejected at 98.75% (lower bound +0.368 > 0): yes
+          H0 delta^E(POST - NONE) <= 0 rejected at 98.75% (lower bound +0.220 > 0): yes
+          H0 s_ID^E(POST) <= 0.1 rejected at 98.75% (lower bound +0.252 > 0.1): yes
+          H0 s_ID^E(POST) - s_ID^E(NONE) <= 0 rejected at 98.75% (lower bound +0.174 > 0): yes
+          competent-only (n=149) delta^E(POST - PRE) +0.425 > 0 (point): yes
+          competent-only (n=149) delta^E(POST - NONE) +0.283 > 0 (point): yes
+          competent-only (n=149) s_ID^E(POST) - s_ID^E(NONE) +0.215 > 0 (point): yes
+      gemma9: MET  n=150
+          r^E(POST) +0.512 >= 0.15 (point): yes
+          H0 r^E(POST) <= 0.1 rejected at 98.75% (lower bound +0.459 > 0.1): yes
+          r^E(POST) <= 0.75 (point): yes
+          H0 r^E(POST) >= 1 rejected at 98.75% (upper bound +0.566 < 1): yes
+          H0 delta^E(POST - PRE) <= 0 rejected at 98.75% (lower bound +0.476 > 0): yes
+          H0 delta^E(POST - NONE) <= 0 rejected at 98.75% (lower bound +0.452 > 0): yes
+          H0 s_ID^E(POST) <= 0.1 rejected at 98.75% (lower bound +0.330 > 0.1): yes
+          H0 s_ID^E(POST) - s_ID^E(NONE) <= 0 rejected at 98.75% (lower bound +0.325 > 0): yes
+          competent-only (n=150) delta^E(POST - PRE) +0.532 > 0 (point): yes
+          competent-only (n=150) delta^E(POST - NONE) +0.507 > 0 (point): yes
+          competent-only (n=150) s_ID^E(POST) - s_ID^E(NONE) +0.353 > 0 (point): yes
+      phi4: MET  n=150
+          r^E(POST) +0.334 >= 0.15 (point): yes
+          H0 r^E(POST) <= 0.1 rejected at 98.75% (lower bound +0.287 > 0.1): yes
+          r^E(POST) <= 0.75 (point): yes
+          H0 r^E(POST) >= 1 rejected at 98.75% (upper bound +0.383 < 1): yes
+          H0 delta^E(POST - PRE) <= 0 rejected at 98.75% (lower bound +0.314 > 0): yes
+          H0 delta^E(POST - NONE) <= 0 rejected at 98.75% (lower bound +0.280 > 0): yes
+          H0 s_ID^E(POST) <= 0.1 rejected at 98.75% (lower bound +0.249 > 0.1): yes
+          H0 s_ID^E(POST) - s_ID^E(NONE) <= 0 rejected at 98.75% (lower bound +0.242 > 0): yes
+          competent-only (n=149) delta^E(POST - PRE) +0.360 > 0 (point): yes
+          competent-only (n=149) delta^E(POST - NONE) +0.328 > 0 (point): yes
+          competent-only (n=149) s_ID^E(POST) - s_ID^E(NONE) +0.274 > 0 (point): yes
+      falcon7: MET  n=150
+          r^E(POST) +0.449 >= 0.15 (point): yes
+          H0 r^E(POST) <= 0.1 rejected at 98.75% (lower bound +0.408 > 0.1): yes
+          r^E(POST) <= 0.75 (point): yes
+          H0 r^E(POST) >= 1 rejected at 98.75% (upper bound +0.488 < 1): yes
+          H0 delta^E(POST - PRE) <= 0 rejected at 98.75% (lower bound +0.423 > 0): yes
+          H0 delta^E(POST - NONE) <= 0 rejected at 98.75% (lower bound +0.373 > 0): yes
+          H0 s_ID^E(POST) <= 0.1 rejected at 98.75% (lower bound +0.366 > 0.1): yes
+          H0 s_ID^E(POST) - s_ID^E(NONE) <= 0 rejected at 98.75% (lower bound +0.339 > 0): yes
+          competent-only (n=150) delta^E(POST - PRE) +0.464 > 0 (point): yes
+          competent-only (n=150) delta^E(POST - NONE) +0.415 > 0 (point): yes
+          competent-only (n=150) s_ID^E(POST) - s_ID^E(NONE) +0.366 > 0 (point): yes
+  J-B4-P4f      [L, A, prior 0.90] without a later mention the identity is copied through the value -> MET (4 of 4 evaluable met; 4 slots)
+      qwen7: MET  n=150
+          s_ID^E(NONE) +0.035 <= 0.10 (point): yes
+          H0 s_ID^E(NONE) >= 0.15 rejected at 95% (upper bound +0.044 < 0.15): yes
+          H0 ID_V^E(NONE) <= 0 rejected at 95% (lower bound +17.777 > 0): yes
+      qwen14: MET  n=150
+          s_ID^E(NONE) +0.048 <= 0.10 (point): yes
+          H0 s_ID^E(NONE) >= 0.15 rejected at 95% (upper bound +0.057 < 0.15): yes
+          H0 ID_V^E(NONE) <= 0 rejected at 95% (lower bound +22.660 > 0): yes
+      mistral7: MET  n=150
+          s_ID^E(NONE) -0.002 <= 0.10 (point): yes
+          H0 s_ID^E(NONE) >= 0.15 rejected at 95% (upper bound +0.010 < 0.15): yes
+          H0 ID_V^E(NONE) <= 0 rejected at 95% (lower bound +15.375 > 0): yes
+      olmo7: MET  n=150
+          s_ID^E(NONE) +0.051 <= 0.10 (point): yes
+          H0 s_ID^E(NONE) >= 0.15 rejected at 95% (upper bound +0.063 < 0.15): yes
+          H0 ID_V^E(NONE) <= 0 rejected at 95% (lower bound +10.736 > 0): yes
+  J-B4-N4       [M, A, prior 0.85] without a later mention the identity is copied through the value -> MET (4 of 4 evaluable met; 4 slots)
+      llama8: MET  n=150
+          s_ID^E(NONE) +0.074 <= 0.10 (point): yes
+          H0 s_ID^E(NONE) >= 0.15 rejected at 98.75% (upper bound +0.092 < 0.15): yes
+          H0 ID_V^E(NONE) <= 0 rejected at 98.75% (lower bound +7.940 > 0): yes
+      gemma9: MET  n=150
+          s_ID^E(NONE) +0.005 <= 0.10 (point): yes
+          H0 s_ID^E(NONE) >= 0.15 rejected at 98.75% (upper bound +0.012 < 0.15): yes
+          H0 ID_V^E(NONE) <= 0 rejected at 98.75% (lower bound +16.228 > 0): yes
+      phi4: MET  n=150
+          s_ID^E(NONE) +0.005 <= 0.10 (point): yes
+          H0 s_ID^E(NONE) >= 0.15 rejected at 98.75% (upper bound +0.016 < 0.15): yes
+          H0 ID_V^E(NONE) <= 0 rejected at 98.75% (lower bound +14.301 > 0): yes
+      falcon7: MET  n=150
+          s_ID^E(NONE) +0.026 <= 0.10 (point): yes
+          H0 s_ID^E(NONE) >= 0.15 rejected at 98.75% (upper bound +0.036 < 0.15): yes
+          H0 ID_V^E(NONE) <= 0 rejected at 98.75% (lower bound +14.532 > 0): yes
+  J-B5-P4f      [M, A, prior 0.85] the channel that decides the generated answer flips with a later list -> MET (4 of 4 evaluable met; 4 slots)
+      qwen7: MET  n=150
+          beta_K(AFTER) +0.993 >= 0.5 (point): yes
+          H0 beta_K(AFTER) <= 0.4 rejected at 95% (lower bound +0.979 > 0.4): yes
+          beta_V(NONE) +0.973 >= 0.5 (point): yes
+          H0 beta_V(NONE) <= 0.4 rejected at 95% (lower bound +0.948 > 0.4): yes
+          H0 beta_K(NONE) >= 0.1 rejected at 95% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(BEFORE) >= 0.1 rejected at 95% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(PRE) >= 0.1 rejected at 95% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(AFTER) - beta_V(AFTER) <= 0 rejected at 95% (lower bound +0.979 > 0): yes
+      qwen14: MET  n=150
+          beta_K(AFTER) +1.000 >= 0.5 (point): yes
+          H0 beta_K(AFTER) <= 0.4 rejected at 95% (lower bound +1.000 > 0.4): yes
+          beta_V(NONE) +0.990 >= 0.5 (point): yes
+          H0 beta_V(NONE) <= 0.4 rejected at 95% (lower bound +0.971 > 0.4): yes
+          H0 beta_K(NONE) >= 0.1 rejected at 95% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(BEFORE) >= 0.1 rejected at 95% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(PRE) >= 0.1 rejected at 95% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(AFTER) - beta_V(AFTER) <= 0 rejected at 95% (lower bound +1.000 > 0): yes
+      mistral7: MET  n=150
+          beta_K(AFTER) +0.950 >= 0.5 (point): yes
+          H0 beta_K(AFTER) <= 0.4 rejected at 95% (lower bound +0.906 > 0.4): yes
+          beta_V(NONE) +0.967 >= 0.5 (point): yes
+          H0 beta_V(NONE) <= 0.4 rejected at 95% (lower bound +0.938 > 0.4): yes
+          H0 beta_K(NONE) >= 0.1 rejected at 95% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(BEFORE) >= 0.1 rejected at 95% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(PRE) >= 0.1 rejected at 95% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(AFTER) - beta_V(AFTER) <= 0 rejected at 95% (lower bound +0.841 > 0): yes
+      olmo7: MET  n=150
+          beta_K(AFTER) +0.860 >= 0.5 (point): yes
+          H0 beta_K(AFTER) <= 0.4 rejected at 95% (lower bound +0.798 > 0.4): yes
+          beta_V(NONE) +0.813 >= 0.5 (point): yes
+          H0 beta_V(NONE) <= 0.4 rejected at 95% (lower bound +0.740 > 0.4): yes
+          H0 beta_K(NONE) >= 0.1 rejected at 95% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(BEFORE) >= 0.1 rejected at 95% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(PRE) >= 0.1 rejected at 95% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(AFTER) - beta_V(AFTER) <= 0 rejected at 95% (lower bound +0.643 > 0): yes
+  J-B5-N4       [M, A, prior 0.80] the channel that decides the generated answer flips with a later list -> MET (4 of 4 evaluable met; 4 slots)
+      llama8: MET  n=150
+          beta_K(AFTER) +0.760 >= 0.5 (point): yes
+          H0 beta_K(AFTER) <= 0.4 rejected at 98.75% (lower bound +0.674 > 0.4): yes
+          beta_V(NONE) +0.877 >= 0.5 (point): yes
+          H0 beta_V(NONE) <= 0.4 rejected at 98.75% (lower bound +0.794 > 0.4): yes
+          H0 beta_K(NONE) >= 0.1 rejected at 98.75% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(BEFORE) >= 0.1 rejected at 98.75% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(PRE) >= 0.1 rejected at 98.75% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(AFTER) - beta_V(AFTER) <= 0 rejected at 98.75% (lower bound +0.500 > 0): yes
+      gemma9: MET  n=150
+          beta_K(AFTER) +0.997 >= 0.5 (point): yes
+          H0 beta_K(AFTER) <= 0.4 rejected at 98.75% (lower bound +0.982 > 0.4): yes
+          beta_V(NONE) +1.000 >= 0.5 (point): yes
+          H0 beta_V(NONE) <= 0.4 rejected at 98.75% (lower bound +1.000 > 0.4): yes
+          H0 beta_K(NONE) >= 0.1 rejected at 98.75% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(BEFORE) >= 0.1 rejected at 98.75% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(PRE) >= 0.1 rejected at 98.75% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(AFTER) - beta_V(AFTER) <= 0 rejected at 98.75% (lower bound +0.982 > 0): yes
+      phi4: MET  n=150
+          beta_K(AFTER) +0.987 >= 0.5 (point): yes
+          H0 beta_K(AFTER) <= 0.4 rejected at 98.75% (lower bound +0.961 > 0.4): yes
+          beta_V(NONE) +0.990 >= 0.5 (point): yes
+          H0 beta_V(NONE) <= 0.4 rejected at 98.75% (lower bound +0.963 > 0.4): yes
+          H0 beta_K(NONE) >= 0.1 rejected at 98.75% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(BEFORE) >= 0.1 rejected at 98.75% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(PRE) >= 0.1 rejected at 98.75% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(AFTER) - beta_V(AFTER) <= 0 rejected at 98.75% (lower bound +0.933 > 0): yes
+      falcon7: MET  n=150
+          beta_K(AFTER) +1.000 >= 0.5 (point): yes
+          H0 beta_K(AFTER) <= 0.4 rejected at 98.75% (lower bound +1.000 > 0.4): yes
+          beta_V(NONE) +0.997 >= 0.5 (point): yes
+          H0 beta_V(NONE) <= 0.4 rejected at 98.75% (lower bound +0.981 > 0.4): yes
+          H0 beta_K(NONE) >= 0.1 rejected at 98.75% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(BEFORE) >= 0.1 rejected at 98.75% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(PRE) >= 0.1 rejected at 98.75% (upper bound +0.000 < 0.1): yes
+          H0 beta_K(AFTER) - beta_V(AFTER) <= 0 rejected at 98.75% (lower bound +1.000 > 0): yes
+  J-B5b-P4f     [R, A, prior 0.45] the sentence read changes generated answers: beta_K(POST) > beta_K(PRE) -> NOT MET (3 of 4 evaluable met; 4 slots)
+      qwen7: MET  n=150; flip rate POST 0.107, PRE 0.000
+          H0 beta_K(POST) - beta_K(PRE) <= 0 rejected at 95% (lower bound +0.059 > 0): yes
+      qwen14: MET  n=150; flip rate POST 0.233, PRE 0.000
+          H0 beta_K(POST) - beta_K(PRE) <= 0 rejected at 95% (lower bound +0.162 > 0): yes
+      mistral7: MET  n=150; flip rate POST 0.313, PRE 0.000
+          H0 beta_K(POST) - beta_K(PRE) <= 0 rejected at 95% (lower bound +0.235 > 0): yes
+      olmo7: NOT MET  n=150; flip rate POST 0.010, PRE 0.000
+          H0 beta_K(POST) - beta_K(PRE) <= 0 rejected at 95% (lower bound +0.000 > 0): no
+  J-B5b-N4      [R, A, prior 0.40] the sentence read changes generated answers: beta_K(POST) > beta_K(PRE) -> MET (4 of 4 evaluable met; 4 slots)
+      llama8: MET  n=150; flip rate POST 0.087, PRE 0.000
+          H0 beta_K(POST) - beta_K(PRE) <= 0 rejected at 98.75% (lower bound +0.036 > 0): yes
+      gemma9: MET  n=150; flip rate POST 0.133, PRE 0.000
+          H0 beta_K(POST) - beta_K(PRE) <= 0 rejected at 98.75% (lower bound +0.073 > 0): yes
+      phi4: MET  n=150; flip rate POST 0.033, PRE 0.000
+          H0 beta_K(POST) - beta_K(PRE) <= 0 rejected at 98.75% (lower bound +0.004 > 0): yes
+      falcon7: MET  n=150; flip rate POST 0.303, PRE 0.000
+          H0 beta_K(POST) - beta_K(PRE) <= 0 rejected at 98.75% (lower bound +0.220 > 0): yes
+  J-B-NULL-P4f  [M, A, prior 0.80] a sentence naming no candidate opens no key read; the re-mention does -> MET (4 of 4 evaluable met; 4 slots)
+      qwen7: MET  n=150
+          H0 r^E(POST-NULL) >= 0.1 rejected at 95% (upper bound +0.038 < 0.1): yes
+          H0 s_ID^E(POST-NULL) >= 0.1 rejected at 95% (upper bound +0.049 < 0.1): yes
+          H0 delta^E(POST - POST-NULL) <= 0 rejected at 95% (lower bound +0.209 > 0): yes
+      qwen14: MET  n=150
+          H0 r^E(POST-NULL) >= 0.1 rejected at 95% (upper bound +0.038 < 0.1): yes
+          H0 s_ID^E(POST-NULL) >= 0.1 rejected at 95% (upper bound +0.057 < 0.1): yes
+          H0 delta^E(POST - POST-NULL) <= 0 rejected at 95% (lower bound +0.324 > 0): yes
+      mistral7: MET  n=150
+          H0 r^E(POST-NULL) >= 0.1 rejected at 95% (upper bound +0.008 < 0.1): yes
+          H0 s_ID^E(POST-NULL) >= 0.1 rejected at 95% (upper bound +0.007 < 0.1): yes
+          H0 delta^E(POST - POST-NULL) <= 0 rejected at 95% (lower bound +0.505 > 0): yes
+      olmo7: MET  n=150
+          H0 r^E(POST-NULL) >= 0.1 rejected at 95% (upper bound +0.093 < 0.1): yes
+          H0 s_ID^E(POST-NULL) >= 0.1 rejected at 95% (upper bound +0.074 < 0.1): yes
+          H0 delta^E(POST - POST-NULL) <= 0 rejected at 95% (lower bound +0.061 > 0): yes
+  J-B-NULL-N4   [R, A, prior 0.55] a sentence naming no candidate opens no key read; the re-mention does -> MET (3 of 4 evaluable met; 4 slots)
+      llama8: NOT MET  n=150
+          H0 r^E(POST-NULL) >= 0.1 rejected at 98.75% (upper bound +0.154 < 0.1): no
+          H0 s_ID^E(POST-NULL) >= 0.1 rejected at 98.75% (upper bound +0.093 < 0.1): yes
+          H0 delta^E(POST - POST-NULL) <= 0 rejected at 98.75% (lower bound +0.215 > 0): yes
+      gemma9: MET  n=150
+          H0 r^E(POST-NULL) >= 0.1 rejected at 98.75% (upper bound +0.012 < 0.1): yes
+          H0 s_ID^E(POST-NULL) >= 0.1 rejected at 98.75% (upper bound +0.010 < 0.1): yes
+          H0 delta^E(POST - POST-NULL) <= 0 rejected at 98.75% (lower bound +0.454 > 0): yes
+      phi4: MET  n=150
+          H0 r^E(POST-NULL) >= 0.1 rejected at 98.75% (upper bound +0.017 < 0.1): yes
+          H0 s_ID^E(POST-NULL) >= 0.1 rejected at 98.75% (upper bound +0.017 < 0.1): yes
+          H0 delta^E(POST - POST-NULL) <= 0 rejected at 98.75% (lower bound +0.281 > 0): yes
+      falcon7: MET  n=150
+          H0 r^E(POST-NULL) >= 0.1 rejected at 98.75% (upper bound +0.040 < 0.1): yes
+          H0 s_ID^E(POST-NULL) >= 0.1 rejected at 98.75% (upper bound +0.033 < 0.1): yes
+          H0 delta^E(POST - POST-NULL) <= 0 rejected at 98.75% (lower bound +0.378 > 0): yes
+  J-B-LB-N4     [R, A, prior 0.65] the list before the story gives a key read below no mention -> MET (4 of 4 evaluable met; 4 slots)
+      llama8: MET  n=150
+          H0 ID_K^E(BEFORE) - ID_K^E(NONE) >= 0 rejected at 98.75% (upper bound -0.885 < 0): yes
+      gemma9: MET  n=150
+          H0 ID_K^E(BEFORE) - ID_K^E(NONE) >= 0 rejected at 98.75% (upper bound -0.205 < 0): yes
+      phi4: MET  n=150
+          H0 ID_K^E(BEFORE) - ID_K^E(NONE) >= 0 rejected at 98.75% (upper bound -0.552 < 0): yes
+      falcon7: MET  n=150
+          H0 ID_K^E(BEFORE) - ID_K^E(NONE) >= 0 rejected at 98.75% (upper bound -0.572 < 0): yes
+  J-B-SMALL     [R, A, prior 0.40] no sentence read at 2B in a new family (Gemma-2-2B) -> NOT EVALUABLE (0 of 0 evaluable met; 1 slots)
+      gemma2b: NOT EVALUABLE    [not evaluable: competence: generated acc_B < 0.8 under AFTER 0.77, NONE 0.68, POST 0.69]
+  J-B6a         [R, V, prior 0.50] S0: the emitted forms cover >= 0.8 of the mass in every row of every cell -> MET (4 of 4 evaluable met; 4 slots)
+      qwen7: MET  n=150
+          P1: coverage 1.000 >= 0.80 (min at K_S@2) (point): yes
+          AFTER: coverage 1.000 >= 0.80 (min at K_S@2) (point): yes
+          BEFORE: coverage 1.000 >= 0.80 (min at V_S@0) (point): yes
+          POST: coverage 0.999 >= 0.80 (min at V_S@8) (point): yes
+          PRE: coverage 0.999 >= 0.80 (min at V_S@8) (point): yes
+          NONE: coverage 0.997 >= 0.80 (min at V_S@0) (point): yes
+      qwen14: MET  n=150
+          P1: coverage 1.000 >= 0.80 (min at K_S@14) (point): yes
+          AFTER: coverage 1.000 >= 0.80 (min at B) (point): yes
+          BEFORE: coverage 1.000 >= 0.80 (min at ID@0) (point): yes
+          POST: coverage 0.999 >= 0.80 (min at V_S@3) (point): yes
+          PRE: coverage 1.000 >= 0.80 (min at ID@0) (point): yes
+          NONE: coverage 0.989 >= 0.80 (min at V_S@3) (point): yes
+      mistral7: MET  n=150
+          P1: coverage 0.998 >= 0.80 (min at K_X@0) (point): yes
+          AFTER: coverage 0.998 >= 0.80 (min at KV_S@10) (point): yes
+          BEFORE: coverage 0.998 >= 0.80 (min at V_S@0) (point): yes
+          POST: coverage 0.998 >= 0.80 (min at V_S@2) (point): yes
+          PRE: coverage 1.000 >= 0.80 (min at K_X@0) (point): yes
+          NONE: coverage 0.982 >= 0.80 (min at K_X@0) (point): yes
+      olmo7: MET  n=150
+          P1: coverage 0.873 >= 0.80 (min at K_X@0) (point): yes
+          AFTER: coverage 0.985 >= 0.80 (min at K_X@0) (point): yes
+          BEFORE: coverage 0.993 >= 0.80 (min at K_S@0) (point): yes
+          POST: coverage 0.979 >= 0.80 (min at V_S@0) (point): yes
+          PRE: coverage 0.991 >= 0.80 (min at V_S@10) (point): yes
+          NONE: coverage 0.956 >= 0.80 (min at V_S@10) (point): yes
+  J-B6b         [R, V, prior 0.45] S0: s_ID and r unchanged by the scoring (E vs L within +-0.05) in the low-L-mass cells -> NOT MET (1 of 3 evaluable met; 4 slots)
+      qwen7: MET  n=150; low-L-mass cells ['POST', 'PRE', 'NONE']
+          H0 s_ID^E(POST) - s_ID^L(POST) [M^L 0.007] outside (-0.05, 0.05) rejected at 95% (interval [-0.003,+0.004]): yes
+          H0 r^E(POST) - r^L(POST) outside (-0.05, 0.05) rejected at 95% (interval [+0.003,+0.014]): yes
+          H0 s_ID^E(PRE) - s_ID^L(PRE) [M^L 0.004] outside (-0.05, 0.05) rejected at 95% (interval [-0.009,-0.000]): yes
+          H0 r^E(PRE) - r^L(PRE) outside (-0.05, 0.05) rejected at 95% (interval [-0.007,-0.001]): yes
+          H0 s_ID^E(NONE) - s_ID^L(NONE) [M^L 0.005] outside (-0.05, 0.05) rejected at 95% (interval [-0.020,-0.009]): yes
+          H0 r^E(NONE) - r^L(NONE) outside (-0.05, 0.05) rejected at 95% (interval [-0.017,-0.007]): yes
+      qwen14: NOT MET  n=150; low-L-mass cells ['BEFORE', 'POST', 'PRE', 'NONE']
+          H0 s_ID^E(BEFORE) - s_ID^L(BEFORE) [M^L 0.357] outside (-0.05, 0.05) rejected at 95% (interval [-0.001,+0.003]): yes
+          H0 r^E(BEFORE) - r^L(BEFORE) outside (-0.05, 0.05) rejected at 95% (interval [-0.001,+0.003]): yes
+          H0 s_ID^E(POST) - s_ID^L(POST) [M^L 0.000] outside (-0.05, 0.05) rejected at 95% (interval [-0.007,+0.000]): yes
+          H0 r^E(POST) - r^L(POST) outside (-0.05, 0.05) rejected at 95% (interval [+0.039,+0.058]): no
+          H0 s_ID^E(PRE) - s_ID^L(PRE) [M^L 0.000] outside (-0.05, 0.05) rejected at 95% (interval [-0.002,+0.002]): yes
+          H0 r^E(PRE) - r^L(PRE) outside (-0.05, 0.05) rejected at 95% (interval [-0.002,+0.001]): yes
+          H0 s_ID^E(NONE) - s_ID^L(NONE) [M^L 0.000] outside (-0.05, 0.05) rejected at 95% (interval [-0.014,-0.003]): yes
+          H0 r^E(NONE) - r^L(NONE) outside (-0.05, 0.05) rejected at 95% (interval [-0.004,+0.004]): yes
+      mistral7: NOT MET  n=150; low-L-mass cells ['BEFORE', 'POST', 'PRE', 'NONE']
+          H0 s_ID^E(BEFORE) - s_ID^L(BEFORE) [M^L 0.149] outside (-0.05, 0.05) rejected at 95% (interval [-0.003,+0.003]): yes
+          H0 r^E(BEFORE) - r^L(BEFORE) outside (-0.05, 0.05) rejected at 95% (interval [-0.003,+0.003]): yes
+          H0 s_ID^E(POST) - s_ID^L(POST) [M^L 0.027] outside (-0.05, 0.05) rejected at 95% (interval [+0.010,+0.017]): yes
+          H0 r^E(POST) - r^L(POST) outside (-0.05, 0.05) rejected at 95% (interval [+0.068,+0.105]): no
+          H0 s_ID^E(PRE) - s_ID^L(PRE) [M^L 0.006] outside (-0.05, 0.05) rejected at 95% (interval [-0.015,-0.006]): yes
+          H0 r^E(PRE) - r^L(PRE) outside (-0.05, 0.05) rejected at 95% (interval [-0.016,-0.006]): yes
+          H0 s_ID^E(NONE) - s_ID^L(NONE) [M^L 0.029] outside (-0.05, 0.05) rejected at 95% (interval [-0.027,-0.012]): yes
+          H0 r^E(NONE) - r^L(NONE) outside (-0.05, 0.05) rejected at 95% (interval [-0.023,-0.009]): yes
+      olmo7: NOT EVALUABLE    [not evaluable: no S0 cell with M^L(clean B) < 0.5]
+  J-B6c         [R, V, prior 0.75] S0: the published verdicts (E1a-c, B2, C4's BEFORE bound) unchanged under E (primary JB6) -> MET (1 of 1 evaluable met; 1 slots)
+      P4: MET  per-model components changed by E: none
+          E1a: under L MET, under E MET: yes
+          E1b: under L MET, under E MET: yes
+          E1c: under L MET, under E MET: yes
+          B2: under L MET, under E MET: yes
+          C4-BEFORE: under L MET, under E MET: yes
+  J-B7          [R, V, prior 0.35] the emitted-form score agrees with generation and covers the mass on F -> MET (8 of 8 evaluable met; 8 slots)
+      P4 qwen7: MET  n=150
+          AFTER: A 0.999 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 1.000 >= 0.80 (min at V_X@0) (points): yes
+          BEFORE: A 0.998 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 1.000 >= 0.80 (min at K_S@8) (points): yes
+          NONE: A 0.998 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.998 >= 0.80 (min at K_X@0) (points): yes
+          POST: A 0.989 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.998 >= 0.80 (min at V_X@0) (points): yes
+          PRE: A 1.000 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.999 >= 0.80 (min at V_S@0) (points): yes
+          POST-NULL: A 0.994 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.995 >= 0.80 (min at K_X@0) (points): yes
+      P4 qwen14: MET  n=150
+          AFTER: A 1.000 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 1.000 >= 0.80 (min at B) (points): yes
+          BEFORE: A 1.000 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 1.000 >= 0.80 (min at X) (points): yes
+          NONE: A 0.998 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.997 >= 0.80 (min at V_S@14) (points): yes
+          POST: A 0.998 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.999 >= 0.80 (min at K_X@0) (points): yes
+          PRE: A 1.000 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 1.000 >= 0.80 (min at X) (points): yes
+          POST-NULL: A 0.999 >= 0.95 (n=1191), other(B) 0.000 <= 0.10, coverage 0.961 >= 0.80 (min at K_X@0) (points): yes
+      P4 mistral7: MET  n=150
+          AFTER: A 0.998 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.997 >= 0.80 (min at K_S@2) (points): yes
+          BEFORE: A 0.999 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.997 >= 0.80 (min at V_S@10) (points): yes
+          NONE: A 0.998 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.906 >= 0.80 (min at K_S@2) (points): yes
+          POST: A 0.988 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.943 >= 0.80 (min at V_S@2) (points): yes
+          PRE: A 0.999 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.924 >= 0.80 (min at ID@0) (points): yes
+          POST-NULL: A 0.996 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.923 >= 0.80 (min at K_S@0) (points): yes
+      P4 olmo7: MET  n=150
+          AFTER: A 0.999 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.987 >= 0.80 (min at K_S@2) (points): yes
+          BEFORE: A 0.999 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.996 >= 0.80 (min at V_S@10) (points): yes
+          NONE: A 0.985 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.949 >= 0.80 (min at V_S@10) (points): yes
+          POST: A 0.998 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.980 >= 0.80 (min at V_S@2) (points): yes
+          PRE: A 1.000 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.992 >= 0.80 (min at V_S@10) (points): yes
+          POST-NULL: A 0.984 >= 0.95 (n=1191), other(B) 0.000 <= 0.10, coverage 0.858 >= 0.80 (min at V_X@0) (points): yes
+      N4 llama8: MET  n=150
+          AFTER: A 0.987 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.984 >= 0.80 (min at V_S@10) (points): yes
+          BEFORE: A 1.000 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.988 >= 0.80 (min at K_X@0) (points): yes
+          NONE: A 0.987 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.918 >= 0.80 (min at K_X@0) (points): yes
+          POST: A 0.990 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.954 >= 0.80 (min at V_S@10) (points): yes
+          PRE: A 1.000 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.975 >= 0.80 (min at K_X@0) (points): yes
+          POST-NULL: A 0.989 >= 0.95 (n=1196), other(B) 0.000 <= 0.10, coverage 0.889 >= 0.80 (min at K_X@0) (points): yes
+      N4 gemma9: MET  n=150
+          AFTER: A 1.000 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.997 >= 0.80 (min at K_S@13) (points): yes
+          BEFORE: A 1.000 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.998 >= 0.80 (min at V_X@0) (points): yes
+          NONE: A 1.000 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.998 >= 0.80 (min at K_X@0) (points): yes
+          POST: A 0.998 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.997 >= 0.80 (min at K_S@0) (points): yes
+          PRE: A 1.000 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.999 >= 0.80 (min at V_X@0) (points): yes
+          POST-NULL: A 1.000 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.998 >= 0.80 (min at K_X@0) (points): yes
+      N4 phi4: MET  n=150
+          AFTER: A 1.000 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.998 >= 0.80 (min at V_S@12) (points): yes
+          BEFORE: A 0.999 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.999 >= 0.80 (min at V_S@0) (points): yes
+          NONE: A 1.000 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.996 >= 0.80 (min at V_X@0) (points): yes
+          POST: A 0.998 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.997 >= 0.80 (min at K_X@0) (points): yes
+          PRE: A 1.000 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.999 >= 0.80 (min at V_S@12) (points): yes
+          POST-NULL: A 0.999 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.994 >= 0.80 (min at K_X@0) (points): yes
+      N4 falcon7: MET  n=150
+          AFTER: A 1.000 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.999 >= 0.80 (min at KV_S@8) (points): yes
+          BEFORE: A 0.999 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.999 >= 0.80 (min at K_X@0) (points): yes
+          NONE: A 1.000 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.997 >= 0.80 (min at K_X@0) (points): yes
+          POST: A 0.990 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.995 >= 0.80 (min at K_S@0) (points): yes
+          PRE: A 1.000 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.998 >= 0.80 (min at K_S@2) (points): yes
+          POST-NULL: A 0.999 >= 0.95 (n=1200), other(B) 0.000 <= 0.10, coverage 0.990 >= 0.80 (min at K_X@0) (points): yes
+  J-B8          [R, V, prior 0.55] the 24B intervention frames are invariant to the scoring -> MET (1 of 1 evaluable met; 1 slots)
+      mistral24: MET  96 cores
+          H0 P1: phi^E - phi^L outside (-0.05, 0.05) rejected at 95% (interval [+0.001,+0.003]): yes
+          H0 P1: psi_K^E - psi_K^L outside (-0.05, 0.05) rejected at 95% (interval [-0.002,-0.000]): yes
+          H0 P1: psi_V^E - psi_V^L outside (-0.05, 0.05) rejected at 95% (interval [-0.005,-0.002]): yes
+          P1: M^E(natural B) 0.990 >= 0.80 (point): yes
+          H0 NONE: phi^E - phi^L outside (-0.05, 0.05) rejected at 95% (interval [+0.007,+0.018]): yes
+          H0 NONE: psi_K^E - psi_K^L outside (-0.05, 0.05) rejected at 95% (interval [-0.000,+0.005]): yes
+          H0 NONE: psi_V^E - psi_V^L outside (-0.05, 0.05) rejected at 95% (interval [-0.013,-0.006]): yes
+          NONE: M^E(natural B) 0.961 >= 0.80 (point): yes
+          H0 BEFORE: phi^E - phi^L outside (-0.05, 0.05) rejected at 95% (interval [+0.005,+0.009]): yes
+          H0 BEFORE: psi_K^E - psi_K^L outside (-0.05, 0.05) rejected at 95% (interval [+0.000,+0.002]): yes
+          H0 BEFORE: psi_V^E - psi_V^L outside (-0.05, 0.05) rejected at 95% (interval [-0.007,-0.004]): yes
+          BEFORE: M^E(natural B) 0.982 >= 0.80 (point): yes
+          H0 POST: phi^E - phi^L outside (-0.05, 0.05) rejected at 95% (interval [+0.008,+0.018]): yes
+          H0 POST: psi_K^E - psi_K^L outside (-0.05, 0.05) rejected at 95% (interval [-0.003,+0.001]): yes
+          H0 POST: psi_V^E - psi_V^L outside (-0.05, 0.05) rejected at 95% (interval [-0.012,-0.006]): yes
+          POST: M^E(natural B) 0.966 >= 0.80 (point): yes
+
+REPORTED (no verdicts)
+  Numbers per model on F (E unless a cell's coverage is below 0.8; 95 % cluster intervals): r(f), s_ID(f), beta_K(f), beta_V(f) -- the behavioural crossover figure
+    qwen7     AFTER     [E] r +1.000 [+1.000,+1.000]  s_ID +0.791 [+0.774,+0.808]  beta_K +0.993 [+0.979,+1.000]  beta_V +0.000 [+0.000,+0.000]  ID_K^E +22.33  ID_V^E +5.88  flip 0.993
+    qwen7     BEFORE    [E] r -0.016 [-0.022,-0.011]  s_ID -0.022 [-0.031,-0.014]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.963 [+0.932,+0.989]  ID_K^E -0.36  ID_V^E +16.52  flip 0.000
+    qwen7     NONE      [E] r +0.030 [+0.023,+0.037]  s_ID +0.035 [+0.027,+0.044]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.973 [+0.948,+0.993]  ID_K^E +0.67  ID_V^E +18.44  flip 0.000
+    qwen7     POST      [E] r +0.270 [+0.243,+0.297]  s_ID +0.328 [+0.301,+0.353]  beta_K +0.107 [+0.059,+0.161]  beta_V +0.857 [+0.787,+0.919]  ID_K^E +6.03  ID_V^E +12.38  flip 0.107
+    qwen7     PRE       [E] r -0.014 [-0.021,-0.008]  s_ID -0.018 [-0.027,-0.010]  beta_K +0.000 [+0.000,+0.000]  beta_V +1.000 [+1.000,+1.000]  ID_K^E -0.31  ID_V^E +17.34  flip 0.000
+    qwen7     POST-NULL [E] r +0.031 [+0.024,+0.038]  s_ID +0.040 [+0.031,+0.049]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.917 [+0.858,+0.963]  ID_K^E +0.69  ID_V^E +16.78  flip 0.000
+    qwen14    AFTER     [E] r +1.000 [+1.000,+1.000]  s_ID +0.877 [+0.862,+0.891]  beta_K +1.000 [+1.000,+1.000]  beta_V +0.000 [+0.000,+0.000]  ID_K^E +36.78  ID_V^E +5.16  flip 1.000
+    qwen14    BEFORE    [E] r -0.003 [-0.006,+0.001]  s_ID -0.003 [-0.007,+0.001]  beta_K +0.000 [+0.000,+0.000]  beta_V +1.000 [+1.000,+1.000]  ID_K^E -0.09  ID_V^E +32.37  flip 0.000
+    qwen14    NONE      [E] r +0.033 [+0.025,+0.040]  s_ID +0.048 [+0.037,+0.057]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.990 [+0.971,+1.000]  ID_K^E +1.20  ID_V^E +23.87  flip 0.000
+    qwen14    POST      [E] r +0.392 [+0.355,+0.428]  s_ID +0.386 [+0.360,+0.411]  beta_K +0.233 [+0.162,+0.311]  beta_V +0.750 [+0.664,+0.831]  ID_K^E +14.41  ID_V^E +22.90  flip 0.233
+    qwen14    PRE       [E] r -0.002 [-0.007,+0.001]  s_ID -0.003 [-0.008,+0.002]  beta_K +0.000 [+0.000,+0.000]  beta_V +1.000 [+1.000,+1.000]  ID_K^E -0.09  ID_V^E +29.69  flip 0.000
+    qwen14    POST-NULL [E] r +0.031 [+0.024,+0.038]  s_ID +0.047 [+0.037,+0.057]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.987 [+0.965,+1.000]  ID_K^E +1.14  ID_V^E +23.04  flip 0.000
+    mistral7  AFTER     [E] r +1.000 [+1.000,+1.000]  s_ID +0.800 [+0.782,+0.817]  beta_K +0.950 [+0.906,+0.983]  beta_V +0.053 [+0.022,+0.090]  ID_K^E +15.70  ID_V^E +3.92  flip 0.950
+    mistral7  BEFORE    [E] r -0.021 [-0.029,-0.013]  s_ID -0.020 [-0.029,-0.013]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.980 [+0.958,+0.997]  ID_K^E -0.32  ID_V^E +16.14  flip 0.000
+    mistral7  NONE      [E] r -0.002 [-0.013,+0.011]  s_ID -0.002 [-0.013,+0.010]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.967 [+0.938,+0.990]  ID_K^E -0.02  ID_V^E +15.96  flip 0.000
+    mistral7  POST      [E] r +0.569 [+0.503,+0.634]  s_ID +0.400 [+0.370,+0.427]  beta_K +0.313 [+0.235,+0.396]  beta_V +0.710 [+0.625,+0.792]  ID_K^E +8.93  ID_V^E +13.38  flip 0.313
+    mistral7  PRE       [E] r -0.033 [-0.045,-0.022]  s_ID -0.033 [-0.047,-0.022]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.990 [+0.966,+1.000]  ID_K^E -0.51  ID_V^E +15.90  flip 0.000
+    mistral7  POST-NULL [E] r -0.003 [-0.013,+0.008]  s_ID -0.003 [-0.013,+0.007]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.930 [+0.880,+0.971]  ID_K^E -0.05  ID_V^E +16.46  flip 0.000
+    olmo7     AFTER     [E] r +1.000 [+1.000,+1.000]  s_ID +0.628 [+0.608,+0.649]  beta_K +0.860 [+0.798,+0.920]  beta_V +0.130 [+0.072,+0.195]  ID_K^E +8.93  ID_V^E +5.29  flip 0.860
+    olmo7     BEFORE    [E] r -0.043 [-0.055,-0.032]  s_ID -0.035 [-0.046,-0.026]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.997 [+0.986,+1.000]  ID_K^E -0.38  ID_V^E +11.20  flip 0.000
+    olmo7     NONE      [E] r +0.068 [+0.050,+0.085]  s_ID +0.051 [+0.039,+0.063]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.813 [+0.740,+0.883]  ID_K^E +0.60  ID_V^E +11.23  flip 0.000
+    olmo7     POST      [E] r +0.180 [+0.141,+0.218]  s_ID +0.163 [+0.130,+0.193]  beta_K +0.010 [+0.000,+0.027]  beta_V +0.963 [+0.934,+0.987]  ID_K^E +1.61  ID_V^E +8.29  flip 0.010
+    olmo7     PRE       [E] r -0.053 [-0.065,-0.042]  s_ID -0.048 [-0.061,-0.038]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.997 [+0.985,+1.000]  ID_K^E -0.47  ID_V^E +10.24  flip 0.000
+    olmo7     POST-NULL [E] r +0.074 [+0.055,+0.093]  s_ID +0.061 [+0.047,+0.074]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.740 [+0.660,+0.815]  ID_K^E +0.66  ID_V^E +10.20  flip 0.000
+    llama8    AFTER     [E] r +1.000 [+1.000,+1.000]  s_ID +0.612 [+0.588,+0.634]  beta_K +0.760 [+0.694,+0.825]  beta_V +0.143 [+0.082,+0.216]  ID_K^E +5.99  ID_V^E +3.81  flip 0.760
+    llama8    BEFORE    [E] r -0.065 [-0.082,-0.050]  s_ID -0.052 [-0.066,-0.040]  beta_K +0.000 [+0.000,+0.000]  beta_V +1.000 [+1.000,+1.000]  ID_K^E -0.39  ID_V^E +7.83  flip 0.000
+    llama8    NONE      [E] r +0.113 [+0.085,+0.141]  s_ID +0.074 [+0.058,+0.088]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.877 [+0.812,+0.930]  ID_K^E +0.68  ID_V^E +8.50  flip 0.000
+    llama8    POST      [E] r +0.396 [+0.350,+0.443]  s_ID +0.289 [+0.260,+0.315]  beta_K +0.087 [+0.045,+0.134]  beta_V +0.880 [+0.817,+0.938]  ID_K^E +2.37  ID_V^E +5.85  flip 0.087
+    llama8    PRE       [E] r -0.029 [-0.047,-0.013]  s_ID -0.023 [-0.036,-0.010]  beta_K +0.000 [+0.000,+0.000]  beta_V +1.000 [+1.000,+1.000]  ID_K^E -0.18  ID_V^E +7.94  flip 0.000
+    llama8    POST-NULL [E] r +0.118 [+0.089,+0.147]  s_ID +0.075 [+0.060,+0.090]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.900 [+0.839,+0.949]  ID_K^E +0.71  ID_V^E +8.66  flip 0.000
+    gemma9    AFTER     [E] r +1.000 [+1.000,+1.000]  s_ID +0.700 [+0.691,+0.709]  beta_K +0.997 [+0.986,+1.000]  beta_V +0.000 [+0.000,+0.000]  ID_K^E +14.43  ID_V^E +6.19  flip 0.997
+    gemma9    BEFORE    [E] r -0.018 [-0.023,-0.014]  s_ID -0.020 [-0.026,-0.015]  beta_K +0.000 [+0.000,+0.000]  beta_V +1.000 [+1.000,+1.000]  ID_K^E -0.26  ID_V^E +13.36  flip 0.000
+    gemma9    NONE      [E] r +0.005 [-0.001,+0.012]  s_ID +0.005 [-0.001,+0.010]  beta_K +0.000 [+0.000,+0.000]  beta_V +1.000 [+1.000,+1.000]  ID_K^E +0.08  ID_V^E +16.77  flip 0.000
+    gemma9    POST      [E] r +0.512 [+0.471,+0.554]  s_ID +0.358 [+0.337,+0.378]  beta_K +0.133 [+0.087,+0.186]  beta_V +0.837 [+0.772,+0.895]  ID_K^E +7.39  ID_V^E +13.26  flip 0.133
+    gemma9    PRE       [E] r -0.020 [-0.026,-0.015]  s_ID -0.021 [-0.027,-0.015]  beta_K +0.000 [+0.000,+0.000]  beta_V +1.000 [+1.000,+1.000]  ID_K^E -0.29  ID_V^E +14.23  flip 0.000
+    gemma9    POST-NULL [E] r +0.003 [-0.004,+0.010]  s_ID +0.003 [-0.003,+0.009]  beta_K +0.000 [+0.000,+0.000]  beta_V +1.000 [+1.000,+1.000]  ID_K^E +0.05  ID_V^E +16.73  flip 0.000
+    phi4      AFTER     [E] r +1.000 [+1.000,+1.000]  s_ID +0.721 [+0.706,+0.737]  beta_K +0.987 [+0.968,+1.000]  beta_V +0.017 [+0.000,+0.042]  ID_K^E +13.77  ID_V^E +5.32  flip 0.987
+    phi4      BEFORE    [E] r -0.047 [-0.055,-0.039]  s_ID -0.064 [-0.076,-0.052]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.957 [+0.919,+0.987]  ID_K^E -0.65  ID_V^E +10.81  flip 0.000
+    phi4      NONE      [E] r +0.006 [-0.003,+0.015]  s_ID +0.005 [-0.003,+0.014]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.990 [+0.970,+1.000]  ID_K^E +0.08  ID_V^E +14.92  flip 0.000
+    phi4      POST      [E] r +0.334 [+0.297,+0.372]  s_ID +0.281 [+0.256,+0.305]  beta_K +0.033 [+0.009,+0.062]  beta_V +0.970 [+0.936,+0.994]  ID_K^E +4.60  ID_V^E +11.79  flip 0.033
+    phi4      PRE       [E] r -0.026 [-0.032,-0.021]  s_ID -0.027 [-0.033,-0.021]  beta_K +0.000 [+0.000,+0.000]  beta_V +1.000 [+1.000,+1.000]  ID_K^E -0.36  ID_V^E +13.80  flip 0.000
+    phi4      POST-NULL [E] r +0.004 [-0.005,+0.014]  s_ID +0.004 [-0.005,+0.014]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.967 [+0.921,+0.997]  ID_K^E +0.06  ID_V^E +13.69  flip 0.000
+    falcon7   AFTER     [E] r +1.000 [+1.000,+1.000]  s_ID +0.784 [+0.774,+0.795]  beta_K +1.000 [+1.000,+1.000]  beta_V +0.000 [+0.000,+0.000]  ID_K^E +12.30  ID_V^E +3.38  flip 1.000
+    falcon7   BEFORE    [E] r -0.023 [-0.029,-0.017]  s_ID -0.028 [-0.035,-0.020]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.990 [+0.973,+1.000]  ID_K^E -0.28  ID_V^E +10.61  flip 0.000
+    falcon7   NONE      [E] r +0.033 [+0.024,+0.043]  s_ID +0.026 [+0.019,+0.034]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.997 [+0.985,+1.000]  ID_K^E +0.41  ID_V^E +15.17  flip 0.000
+    falcon7   POST      [E] r +0.449 [+0.417,+0.480]  s_ID +0.392 [+0.372,+0.412]  beta_K +0.303 [+0.237,+0.372]  beta_V +0.717 [+0.629,+0.803]  ID_K^E +5.52  ID_V^E +8.55  flip 0.303
+    falcon7   PRE       [E] r -0.016 [-0.023,-0.008]  s_ID -0.016 [-0.024,-0.009]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.983 [+0.963,+0.997]  ID_K^E -0.19  ID_V^E +12.02  flip 0.000
+    falcon7   POST-NULL [E] r +0.028 [+0.019,+0.038]  s_ID +0.023 [+0.016,+0.031]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.990 [+0.974,+1.000]  ID_K^E +0.35  ID_V^E +14.50  flip 0.000
+    gemma2b   AFTER     [E] r +1.000 [+1.000,+1.000]  s_ID +0.486 [+0.458,+0.513]  beta_K +0.377 [+0.287,+0.469]  beta_V +0.247 [+0.168,+0.337]  ID_K^E +6.63  ID_V^E +7.00  flip 0.377
+    gemma2b   BEFORE    [E] r -0.018 [-0.029,-0.009]  s_ID -0.013 [-0.020,-0.006]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.600 [+0.497,+0.697]  ID_K^E -0.12  ID_V^E +9.26  flip 0.000
+    gemma2b   NONE      [E] r +0.008 [-0.002,+0.018]  s_ID +0.004 [-0.001,+0.010]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.640 [+0.538,+0.736]  ID_K^E +0.05  ID_V^E +12.34  flip 0.000
+    gemma2b   POST      [E] r +0.097 [+0.066,+0.126]  s_ID +0.060 [+0.041,+0.078]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.640 [+0.542,+0.732]  ID_K^E +0.64  ID_V^E +10.04  flip 0.000
+    gemma2b   PRE       [E] r -0.018 [-0.026,-0.010]  s_ID -0.010 [-0.015,-0.006]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.873 [+0.803,+0.932]  ID_K^E -0.12  ID_V^E +11.32  flip 0.000
+    gemma2b   POST-NULL [E] r +0.007 [-0.002,+0.018]  s_ID +0.004 [-0.001,+0.010]  beta_K +0.000 [+0.000,+0.000]  beta_V +0.547 [+0.447,+0.644]  ID_K^E +0.05  ID_V^E +11.49  flip 0.000
+  S0 relative changes of ID_K and ID_V, E against L (tolerance 0.15; J-B6, reported), and the list cells:
+    qwen7     P1      M^L(B) 1.000  ID_K +21.15 -> +21.15 (-0.0%, within 15%)  ID_V +5.76 -> +5.76 (-0.0%, within 15%)  [list cell]
+    qwen7     AFTER   M^L(B) 0.998  ID_K +20.61 -> +20.56 (-0.3%, within 15%)  ID_V +5.92 -> +5.90 (-0.4%, within 15%)  [list cell]
+    qwen7     BEFORE  M^L(B) 0.999  ID_K -0.15 -> -0.15 (-0.7%, within 15%)  ID_V +15.91 -> +15.89 (-0.1%, within 15%)  [list cell]
+    qwen7     POST    M^L(B) 0.007  ID_K +5.50 -> +5.66 (+2.9%, within 15%)  ID_V +11.95 -> +12.28 (+2.8%, within 15%)
+    qwen7     PRE     M^L(B) 0.004  ID_K -0.02 -> -0.10 (+304.3%, beyond 15%)  ID_V +15.94 -> +16.57 (+3.9%, within 15%)
+    qwen7     NONE    M^L(B) 0.005  ID_K +1.05 -> +0.81 (-22.9%, beyond 15%)  ID_V +16.63 -> +17.27 (+3.9%, within 15%)
+    qwen14    P1      M^L(B) 1.000  ID_K +38.99 -> +38.99 (-0.0%, within 15%)  ID_V +5.52 -> +5.52 (-0.0%, within 15%)  [list cell]
+    qwen14    AFTER   M^L(B) 0.850  ID_K +35.75 -> +34.98 (-2.2%, within 15%)  ID_V +5.75 -> +5.66 (-1.7%, within 15%)  [list cell]
+    qwen14    BEFORE  M^L(B) 0.357  ID_K -0.13 -> -0.10 (-19.9%, beyond 15%)  ID_V +31.13 -> +30.66 (-1.5%, within 15%)  [list cell]
+    qwen14    POST    M^L(B) 0.000  ID_K +11.98 -> +13.41 (+11.9%, within 15%)  ID_V +18.53 -> +21.00 (+13.3%, within 15%)
+    qwen14    PRE     M^L(B) 0.000  ID_K -0.06 -> -0.08 (+18.6%, beyond 15%)  ID_V +24.75 -> +28.08 (+13.5%, within 15%)
+    qwen14    NONE    M^L(B) 0.000  ID_K +1.04 -> +1.02 (-1.9%, within 15%)  ID_V +19.15 -> +22.96 (+19.9%, beyond 15%)
+    mistral7  P1      M^L(B) 0.976  ID_K +14.92 -> +14.90 (-0.1%, within 15%)  ID_V +2.30 -> +2.35 (+2.4%, within 15%)  [list cell]
+    mistral7  AFTER   M^L(B) 0.832  ID_K +15.56 -> +15.57 (+0.1%, within 15%)  ID_V +3.44 -> +3.45 (+0.4%, within 15%)  [list cell]
+    mistral7  BEFORE  M^L(B) 0.149  ID_K +0.00 -> +0.00 (+11.9%, within 15%)  ID_V +14.61 -> +15.19 (+4.0%, within 15%)  [list cell]
+    mistral7  POST    M^L(B) 0.027  ID_K +7.88 -> +9.23 (+17.2%, beyond 15%)  ID_V +11.45 -> +12.67 (+10.7%, within 15%)
+    mistral7  PRE     M^L(B) 0.006  ID_K +0.00 -> -0.16 (-3381.7%, beyond 15%)  ID_V +13.85 -> +16.15 (+16.6%, beyond 15%)
+    mistral7  NONE    M^L(B) 0.029  ID_K +0.55 -> +0.31 (-44.4%, beyond 15%)  ID_V +13.64 -> +14.86 (+9.0%, within 15%)
+    olmo7     P1      M^L(B) 0.960  ID_K +8.20 -> +8.05 (-1.8%, within 15%)  ID_V +3.68 -> +3.75 (+1.9%, within 15%)  [list cell]
+    olmo7     AFTER   M^L(B) 0.996  ID_K +8.65 -> +8.55 (-1.2%, within 15%)  ID_V +5.92 -> +5.84 (-1.5%, within 15%)  [list cell]
+    olmo7     BEFORE  M^L(B) 0.983  ID_K -0.31 -> -0.31 (+1.0%, within 15%)  ID_V +11.20 -> +11.09 (-0.9%, within 15%)  [list cell]
+    olmo7     POST    M^L(B) 0.875  ID_K +2.02 -> +1.93 (-4.4%, within 15%)  ID_V +8.63 -> +8.38 (-2.8%, within 15%)
+    olmo7     PRE     M^L(B) 0.853  ID_K -0.22 -> -0.23 (+6.0%, within 15%)  ID_V +10.11 -> +9.94 (-1.7%, within 15%)
+    olmo7     NONE    M^L(B) 0.843  ID_K +0.38 -> +0.39 (+2.0%, within 15%)  ID_V +10.97 -> +10.82 (-1.4%, within 15%)
+  J-B8 detail (L -> E): P1: phi +0.703 -> +0.705, psi_K +0.529 -> +0.528, psi_V +0.230 -> +0.227, M^E 0.990; NONE: phi +0.710 -> +0.722, psi_K +0.071 -> +0.073, psi_V +0.802 -> +0.793, M^E 0.961; BEFORE: phi +0.738 -> +0.745, psi_K +0.002 -> +0.003, psi_V +0.970 -> +0.964, M^E 0.982; POST: phi +0.717 -> +0.730, psi_K +0.197 -> +0.196, psi_V +0.523 -> +0.515, M^E 0.966; LETTER: phi +0.747 -> +0.747, psi_K +0.776 -> +0.776, psi_V +0.019 -> +0.019, M^E 0.993
+  Per-family verdicts of the N4 lines (B-12; the entry's pre-written sentence for the number of new families not meeting):
+    J-B1-N4: Llama-3.1-8B MET, Gemma-2-9B MET, Phi-4 MET, Falcon3-7B MET; not meeting: none (-)
+    J-B2-N4: Llama-3.1-8B MET, Gemma-2-9B MET, Phi-4 MET, Falcon3-7B MET; not meeting: none (-)
+    J-B3-N4: Llama-3.1-8B MET, Gemma-2-9B MET, Phi-4 MET, Falcon3-7B MET; not meeting: none (-)
+    J-B4-N4: Llama-3.1-8B MET, Gemma-2-9B MET, Phi-4 MET, Falcon3-7B MET; not meeting: none (-)
+    J-B5-N4: Llama-3.1-8B MET, Gemma-2-9B MET, Phi-4 MET, Falcon3-7B MET; not meeting: none (-)
+    J-B5b-N4: Llama-3.1-8B MET, Gemma-2-9B MET, Phi-4 MET, Falcon3-7B MET; not meeting: none (-)
+    J-B-NULL-N4: Llama-3.1-8B NOT MET, Gemma-2-9B MET, Phi-4 MET, Falcon3-7B MET; not meeting: exactly one (llama8)
+    J-B-LB-N4: Llama-3.1-8B MET, Gemma-2-9B MET, Phi-4 MET, Falcon3-7B MET; not meeting: none (-)
+
+SUMMARY (G4: per class and kind; expected = the sum of the recorded priors of the lines with a verdict; Brier = mean (prior - 1[MET])^2 over the same lines; NOT EVALUABLE lines are left out of both and listed)
+  account lines, class L: 3 lines: 3 MET, 0 NOT MET, 0 MET IN PART, 0 NOT EVALUABLE; observed 3 against expected 2.70; Brier 0.010
+  account lines, class M: 7 lines: 7 MET, 0 NOT MET, 0 MET IN PART, 0 NOT EVALUABLE; observed 7 against expected 5.80; Brier 0.030
+  account lines, class R: 6 lines: 4 MET, 1 NOT MET, 0 MET IN PART, 1 NOT EVALUABLE; observed 4 against expected 2.55; Brier 0.227; not evaluable: J-B-SMALL
+  measurement-validity lines, class R: 5 lines: 4 MET, 1 NOT MET, 0 MET IN PART, 0 NOT EVALUABLE; observed 4 against expected 2.60; Brier 0.228
+  met rate among R account lines with a verdict: 4 of 5 (expected 2.55)
+  Holm sensitivity (analysis/stage8_holm.py: one-sided p from the bootstrap SE, step-down at familywise 0.025 over the 48 interval components of the R-class account lines, in the models where the line is evaluable; reported, no verdict uses it):
+    J-B3-N4: 24 components; decisions changed by Holm: none; verdict MET (unchanged under Holm)
+    J-B5b-P4f: 4 components; decisions changed by Holm: none; verdict NOT MET (unchanged under Holm)
+    J-B5b-N4: 4 components; decisions changed by Holm: none; verdict MET (unchanged under Holm)
+    J-B-NULL-N4: 12 components; decisions changed by Holm: none; verdict MET (unchanged under Holm)
+    J-B-LB-N4: 4 components; decisions changed by Holm: none; verdict MET (unchanged under Holm)
+    J-B-SMALL: 0 components; decisions changed by Holm: none; verdict NOT EVALUABLE (unchanged under Holm)
+  overall: 18 MET, 2 NOT MET, 1 NOT EVALUABLE of 21 lines; provenance OK; population OK
+
+######## EXPLORATORY (not scored)
+  [qwen7 F] Sigma and L versions; competent-only; onsets; uncovered first-token mass of clean B
+    AFTER     s_ID L/Sigma/E +0.791/+0.791/+0.791  r +1.000/+1.000/+1.000  mass(B) 0.999/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E +0.791  l0=0/28 s_K +0.832; l0=2/28 s_K +0.832; l0=8/28 s_K +0.658
+    BEFORE    s_ID L/Sigma/E -0.022/-0.022/-0.022  r -0.016/-0.016/-0.016  mass(B) 1.000/1.000/1.000  gap(B) 0.000  competent n=149 s_ID^E -0.022  l0=0/28 s_K +0.050; l0=2/28 s_K +0.050; l0=8/28 s_K +0.050
+    NONE      s_ID L/Sigma/E +0.047/+0.035/+0.035  r +0.039/+0.030/+0.030  mass(B) 0.040/0.999/0.999  gap(B) 0.001  competent n=150 s_ID^E +0.035  l0=0/28 s_K +0.107; l0=2/28 s_K +0.107; l0=8/28 s_K +0.107
+    POST      s_ID L/Sigma/E +0.335/+0.328/+0.328  r +0.272/+0.270/+0.270  mass(B) 0.051/0.999/1.000  gap(B) 0.000  competent n=149 s_ID^E +0.328  l0=0/28 s_K +0.312; l0=2/28 s_K +0.312; l0=8/28 s_K +0.152
+    PRE       s_ID L/Sigma/E -0.013/-0.018/-0.018  r -0.009/-0.014/-0.014  mass(B) 0.021/0.999/1.000  gap(B) 0.000  competent n=150 s_ID^E -0.018  l0=0/28 s_K +0.058; l0=2/28 s_K +0.058; l0=8/28 s_K +0.058
+    POST-NULL s_ID L/Sigma/E +0.052/+0.040/+0.040  r +0.040/+0.031/+0.031  mass(B) 0.067/0.998/0.999  gap(B) 0.001  competent n=150 s_ID^E +0.040  l0=0/28 s_K +0.119; l0=2/28 s_K +0.119; l0=8/28 s_K +0.119
+    per level lexicon 1   (n=75): r^E(POST) +0.256  s_ID^E(POST) +0.301  s_ID^E(AFTER) +0.782
+    per level lexicon 2   (n=75): r^E(POST) +0.282  s_ID^E(POST) +0.353  s_ID^E(AFTER) +0.800
+    per level sentence 0  (n=19): r^E(POST) +0.300  s_ID^E(POST) +0.378  s_ID^E(AFTER) +0.794
+    per level sentence 1  (n=19): r^E(POST) +0.239  s_ID^E(POST) +0.300  s_ID^E(AFTER) +0.776
+    per level sentence 2  (n=19): r^E(POST) +0.281  s_ID^E(POST) +0.330  s_ID^E(AFTER) +0.808
+    per level sentence 3  (n=19): r^E(POST) +0.279  s_ID^E(POST) +0.338  s_ID^E(AFTER) +0.787
+    per level sentence 4  (n=19): r^E(POST) +0.295  s_ID^E(POST) +0.334  s_ID^E(AFTER) +0.773
+    per level sentence 5  (n=19): r^E(POST) +0.297  s_ID^E(POST) +0.340  s_ID^E(AFTER) +0.779
+    per level sentence 6  (n=18): r^E(POST) +0.281  s_ID^E(POST) +0.344  s_ID^E(AFTER) +0.815
+    per level sentence 7  (n=18): r^E(POST) +0.192  s_ID^E(POST) +0.252  s_ID^E(AFTER) +0.803
+    LIST-BEFORE sign: ID_K^E(BEFORE) - ID_K^E(NONE) -1.030; b_ID(POST) +0.111
+  [qwen7 S0] Sigma and L versions; competent-only; onsets; uncovered first-token mass of clean B
+    P1        s_ID L/Sigma/E +0.786/+0.786/+0.786  r +1.026/+1.029/+1.029  mass(B) 1.000/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E +0.786  l0=0/28 s_K +0.821; l0=2/28 s_K +0.821; l0=8/28 s_K +0.664
+    AFTER     s_ID L/Sigma/E +0.777/+0.777/+0.777  r +1.000/+1.000/+1.000  mass(B) 0.998/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E +0.777  l0=0/28 s_K +0.811; l0=2/28 s_K +0.811; l0=8/28 s_K +0.646
+    BEFORE    s_ID L/Sigma/E -0.009/-0.009/-0.009  r -0.007/-0.007/-0.007  mass(B) 0.999/1.000/1.000  gap(B) 0.000  competent n=148 s_ID^E -0.010  l0=0/28 s_K +0.064; l0=2/28 s_K +0.063; l0=8/28 s_K +0.065
+    POST      s_ID L/Sigma/E +0.315/+0.316/+0.316  r +0.267/+0.275/+0.276  mass(B) 0.007/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E +0.316  l0=0/28 s_K +0.317; l0=2/28 s_K +0.318; l0=8/28 s_K +0.194
+    PRE       s_ID L/Sigma/E -0.002/-0.006/-0.006  r -0.001/-0.005/-0.005  mass(B) 0.004/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E -0.006  l0=0/28 s_K +0.072; l0=2/28 s_K +0.072; l0=8/28 s_K +0.073
+    NONE      s_ID L/Sigma/E +0.059/+0.045/+0.045  r +0.051/+0.039/+0.039  mass(B) 0.005/0.999/1.000  gap(B) 0.000  competent n=150 s_ID^E +0.045  l0=0/28 s_K +0.120; l0=2/28 s_K +0.120; l0=8/28 s_K +0.120
+  [qwen14 F] Sigma and L versions; competent-only; onsets; uncovered first-token mass of clean B
+    AFTER     s_ID L/Sigma/E +0.878/+0.877/+0.877  r +1.000/+1.000/+1.000  mass(B) 0.890/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E +0.877  l0=0/48 s_K +0.910; l0=3/48 s_K +0.910; l0=14/48 s_K +0.829
+    BEFORE    s_ID L/Sigma/E -0.005/-0.003/-0.003  r -0.004/-0.003/-0.003  mass(B) 0.247/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E -0.003  l0=0/48 s_K +0.037; l0=3/48 s_K +0.037; l0=14/48 s_K +0.037
+    NONE      s_ID L/Sigma/E +0.062/+0.048/+0.048  r +0.035/+0.033/+0.033  mass(B) 0.000/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E +0.048  l0=0/48 s_K +0.167; l0=3/48 s_K +0.167; l0=14/48 s_K +0.167
+    POST      s_ID L/Sigma/E +0.396/+0.386/+0.386  r +0.351/+0.392/+0.392  mass(B) 0.000/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E +0.386  l0=0/48 s_K +0.366; l0=3/48 s_K +0.365; l0=14/48 s_K +0.160
+    PRE       s_ID L/Sigma/E -0.004/-0.003/-0.003  r -0.002/-0.002/-0.002  mass(B) 0.000/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E -0.003  l0=0/48 s_K +0.051; l0=3/48 s_K +0.051; l0=14/48 s_K +0.051
+    POST-NULL s_ID L/Sigma/E +0.061/+0.047/+0.047  r +0.033/+0.031/+0.031  mass(B) 0.000/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E +0.047  l0=0/48 s_K +0.181; l0=3/48 s_K +0.181; l0=14/48 s_K +0.181
+    per level lexicon 1   (n=75): r^E(POST) +0.317  s_ID^E(POST) +0.329  s_ID^E(AFTER) +0.859
+    per level lexicon 2   (n=75): r^E(POST) +0.457  s_ID^E(POST) +0.431  s_ID^E(AFTER) +0.893
+    per level sentence 0  (n=19): r^E(POST) +0.464  s_ID^E(POST) +0.433  s_ID^E(AFTER) +0.861
+    per level sentence 1  (n=19): r^E(POST) +0.401  s_ID^E(POST) +0.382  s_ID^E(AFTER) +0.887
+    per level sentence 2  (n=19): r^E(POST) +0.387  s_ID^E(POST) +0.393  s_ID^E(AFTER) +0.891
+    per level sentence 3  (n=19): r^E(POST) +0.343  s_ID^E(POST) +0.356  s_ID^E(AFTER) +0.880
+    per level sentence 4  (n=19): r^E(POST) +0.408  s_ID^E(POST) +0.411  s_ID^E(AFTER) +0.873
+    per level sentence 5  (n=19): r^E(POST) +0.393  s_ID^E(POST) +0.383  s_ID^E(AFTER) +0.860
+    per level sentence 6  (n=18): r^E(POST) +0.437  s_ID^E(POST) +0.407  s_ID^E(AFTER) +0.887
+    per level sentence 7  (n=18): r^E(POST) +0.297  s_ID^E(POST) +0.313  s_ID^E(AFTER) +0.878
+    LIST-BEFORE sign: ID_K^E(BEFORE) - ID_K^E(NONE) -1.293; b_ID(POST) +0.237
+  [qwen14 S0] Sigma and L versions; competent-only; onsets; uncovered first-token mass of clean B
+    P1        s_ID L/Sigma/E +0.876/+0.876/+0.876  r +1.091/+1.115/+1.115  mass(B) 1.000/1.000/1.000  gap(B) -0.000  competent n=150 s_ID^E +0.876  l0=0/48 s_K +0.904; l0=3/48 s_K +0.904; l0=14/48 s_K +0.831
+    AFTER     s_ID L/Sigma/E +0.861/+0.861/+0.861  r +1.000/+1.000/+1.000  mass(B) 0.850/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E +0.861  l0=0/48 s_K +0.893; l0=3/48 s_K +0.893; l0=14/48 s_K +0.806
+    BEFORE    s_ID L/Sigma/E -0.004/-0.003/-0.003  r -0.004/-0.003/-0.003  mass(B) 0.357/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E -0.003  l0=0/48 s_K +0.033; l0=3/48 s_K +0.033; l0=14/48 s_K +0.033
+    POST      s_ID L/Sigma/E +0.393/+0.390/+0.390  r +0.335/+0.383/+0.383  mass(B) 0.000/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E +0.390  l0=0/48 s_K +0.385; l0=3/48 s_K +0.386; l0=14/48 s_K +0.163
+    PRE       s_ID L/Sigma/E -0.003/-0.003/-0.003  r -0.002/-0.002/-0.002  mass(B) 0.000/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E -0.003  l0=0/48 s_K +0.046; l0=3/48 s_K +0.046; l0=14/48 s_K +0.046
+    NONE      s_ID L/Sigma/E +0.052/+0.043/+0.043  r +0.029/+0.029/+0.029  mass(B) 0.000/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E +0.043  l0=0/48 s_K +0.161; l0=3/48 s_K +0.161; l0=14/48 s_K +0.161
+  [mistral7 F] Sigma and L versions; competent-only; onsets; uncovered first-token mass of clean B
+    AFTER     s_ID L/Sigma/E +0.801/+0.800/+0.800  r +1.000/+1.000/+1.000  mass(B) 0.890/0.999/0.999  gap(B) 0.001  competent n=149 s_ID^E +0.800  l0=0/32 s_K +0.849; l0=2/32 s_K +0.861; l0=10/32 s_K +0.240
+    BEFORE    s_ID L/Sigma/E -0.007/-0.020/-0.020  r -0.007/-0.021/-0.021  mass(B) 0.274/0.998/0.998  gap(B) 0.002  competent n=150 s_ID^E -0.020  l0=0/32 s_K +0.032; l0=2/32 s_K +0.032; l0=10/32 s_K +0.032
+    NONE      s_ID L/Sigma/E +0.021/-0.002/-0.002  r +0.020/-0.002/-0.002  mass(B) 0.053/0.947/0.948  gap(B) 0.052  competent n=150 s_ID^E -0.002  l0=0/32 s_K +0.061; l0=2/32 s_K +0.062; l0=10/32 s_K +0.064
+    POST      s_ID L/Sigma/E +0.395/+0.400/+0.400  r +0.509/+0.569/+0.569  mass(B) 0.056/0.968/0.968  gap(B) 0.031  competent n=149 s_ID^E +0.399  l0=0/32 s_K +0.383; l0=2/32 s_K +0.365; l0=10/32 s_K +0.024
+    PRE       s_ID L/Sigma/E -0.010/-0.033/-0.033  r -0.009/-0.033/-0.033  mass(B) 0.020/0.922/0.925  gap(B) 0.075  competent n=150 s_ID^E -0.033  l0=0/32 s_K +0.023; l0=2/32 s_K +0.022; l0=10/32 s_K +0.022
+    POST-NULL s_ID L/Sigma/E +0.017/-0.003/-0.003  r +0.016/-0.003/-0.003  mass(B) 0.038/0.943/0.943  gap(B) 0.057  competent n=149 s_ID^E -0.003  l0=0/32 s_K +0.059; l0=2/32 s_K +0.059; l0=10/32 s_K +0.061
+    per level lexicon 1   (n=75): r^E(POST) +0.555  s_ID^E(POST) +0.371  s_ID^E(AFTER) +0.804
+    per level lexicon 2   (n=75): r^E(POST) +0.581  s_ID^E(POST) +0.429  s_ID^E(AFTER) +0.797
+    per level sentence 0  (n=19): r^E(POST) +0.640  s_ID^E(POST) +0.449  s_ID^E(AFTER) +0.805
+    per level sentence 1  (n=19): r^E(POST) +0.430  s_ID^E(POST) +0.323  s_ID^E(AFTER) +0.835
+    per level sentence 2  (n=19): r^E(POST) +0.541  s_ID^E(POST) +0.410  s_ID^E(AFTER) +0.820
+    per level sentence 3  (n=19): r^E(POST) +0.513  s_ID^E(POST) +0.377  s_ID^E(AFTER) +0.795
+    per level sentence 4  (n=19): r^E(POST) +0.665  s_ID^E(POST) +0.450  s_ID^E(AFTER) +0.776
+    per level sentence 5  (n=19): r^E(POST) +0.638  s_ID^E(POST) +0.426  s_ID^E(AFTER) +0.791
+    per level sentence 6  (n=18): r^E(POST) +0.587  s_ID^E(POST) +0.384  s_ID^E(AFTER) +0.787
+    per level sentence 7  (n=18): r^E(POST) +0.550  s_ID^E(POST) +0.380  s_ID^E(AFTER) +0.791
+    LIST-BEFORE sign: ID_K^E(BEFORE) - ID_K^E(NONE) -0.298; b_ID(POST) +0.306
+  [mistral7 S0] Sigma and L versions; competent-only; onsets; uncovered first-token mass of clean B
+    P1        s_ID L/Sigma/E +0.867/+0.865/+0.864  r +0.959/+0.957/+0.957  mass(B) 0.976/0.999/0.999  gap(B) 0.001  competent n=149 s_ID^E +0.866  l0=0/32 s_K +0.913; l0=2/32 s_K +0.913; l0=10/32 s_K +0.532
+    AFTER     s_ID L/Sigma/E +0.819/+0.819/+0.819  r +1.000/+1.000/+1.000  mass(B) 0.832/0.999/0.999  gap(B) 0.001  competent n=149 s_ID^E +0.820  l0=0/32 s_K +0.875; l0=2/32 s_K +0.874; l0=10/32 s_K +0.397
+    BEFORE    s_ID L/Sigma/E +0.000/+0.000/+0.000  r +0.000/+0.000/+0.000  mass(B) 0.149/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E +0.000  l0=0/32 s_K +0.055; l0=2/32 s_K +0.055; l0=10/32 s_K +0.054
+    POST      s_ID L/Sigma/E +0.408/+0.422/+0.421  r +0.506/+0.593/+0.593  mass(B) 0.027/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E +0.421  l0=0/32 s_K +0.413; l0=2/32 s_K +0.394; l0=10/32 s_K +0.057
+    PRE       s_ID L/Sigma/E +0.000/-0.010/-0.010  r +0.000/-0.010/-0.010  mass(B) 0.006/0.999/1.000  gap(B) 0.000  competent n=149 s_ID^E -0.010  l0=0/32 s_K +0.038; l0=2/32 s_K +0.038; l0=10/32 s_K +0.038
+    NONE      s_ID L/Sigma/E +0.039/+0.021/+0.020  r +0.036/+0.020/+0.020  mass(B) 0.029/0.999/1.000  gap(B) 0.000  competent n=150 s_ID^E +0.020  l0=0/32 s_K +0.090; l0=2/32 s_K +0.091; l0=10/32 s_K +0.092
+  [olmo7 F] Sigma and L versions; competent-only; onsets; uncovered first-token mass of clean B
+    AFTER     s_ID L/Sigma/E +0.627/+0.628/+0.628  r +1.000/+1.000/+1.000  mass(B) 0.996/0.998/0.998  gap(B) 0.002  competent n=150 s_ID^E +0.628  l0=0/32 s_K +0.654; l0=2/32 s_K +0.640; l0=10/32 s_K +0.002
+    BEFORE    s_ID L/Sigma/E -0.033/-0.035/-0.035  r -0.041/-0.043/-0.043  mass(B) 0.987/0.997/0.997  gap(B) 0.002  competent n=150 s_ID^E -0.035  l0=0/32 s_K +0.008; l0=2/32 s_K +0.008; l0=10/32 s_K +0.007
+    NONE      s_ID L/Sigma/E +0.051/+0.051/+0.051  r +0.068/+0.068/+0.068  mass(B) 0.834/0.983/0.989  gap(B) 0.008  competent n=150 s_ID^E +0.051  l0=0/32 s_K +0.102; l0=2/32 s_K +0.102; l0=10/32 s_K +0.101
+    POST      s_ID L/Sigma/E +0.157/+0.164/+0.163  r +0.175/+0.184/+0.180  mass(B) 0.865/0.987/0.991  gap(B) 0.007  competent n=149 s_ID^E +0.163  l0=0/32 s_K +0.157; l0=2/32 s_K +0.163; l0=10/32 s_K +0.023
+    PRE       s_ID L/Sigma/E -0.046/-0.048/-0.048  r -0.051/-0.052/-0.053  mass(B) 0.850/0.991/0.994  gap(B) 0.005  competent n=150 s_ID^E -0.048  l0=0/32 s_K +0.027; l0=2/32 s_K +0.027; l0=10/32 s_K +0.027
+    POST-NULL s_ID L/Sigma/E +0.062/+0.061/+0.061  r +0.074/+0.074/+0.074  mass(B) 0.828/0.976/0.982  gap(B) 0.012  competent n=150 s_ID^E +0.061  l0=0/32 s_K +0.137; l0=2/32 s_K +0.137; l0=10/32 s_K +0.137
+    per level lexicon 1   (n=75): r^E(POST) +0.172  s_ID^E(POST) +0.145  s_ID^E(AFTER) +0.600
+    per level lexicon 2   (n=75): r^E(POST) +0.188  s_ID^E(POST) +0.182  s_ID^E(AFTER) +0.657
+    per level sentence 0  (n=19): r^E(POST) +0.160  s_ID^E(POST) +0.161  s_ID^E(AFTER) +0.638
+    per level sentence 1  (n=19): r^E(POST) +0.168  s_ID^E(POST) +0.155  s_ID^E(AFTER) +0.654
+    per level sentence 2  (n=19): r^E(POST) +0.155  s_ID^E(POST) +0.139  s_ID^E(AFTER) +0.646
+    per level sentence 3  (n=19): r^E(POST) +0.102  s_ID^E(POST) +0.100  s_ID^E(AFTER) +0.630
+    per level sentence 4  (n=19): r^E(POST) +0.199  s_ID^E(POST) +0.175  s_ID^E(AFTER) +0.606
+    per level sentence 5  (n=19): r^E(POST) +0.310  s_ID^E(POST) +0.246  s_ID^E(AFTER) +0.598
+    per level sentence 6  (n=18): r^E(POST) +0.170  s_ID^E(POST) +0.150  s_ID^E(AFTER) +0.633
+    per level sentence 7  (n=18): r^E(POST) +0.172  s_ID^E(POST) +0.151  s_ID^E(AFTER) +0.622
+    LIST-BEFORE sign: ID_K^E(BEFORE) - ID_K^E(NONE) -0.988; b_ID(POST) +0.010
+  [olmo7 S0] Sigma and L versions; competent-only; onsets; uncovered first-token mass of clean B
+    P1        s_ID L/Sigma/E +0.690/+0.683/+0.682  r +0.948/+0.943/+0.942  mass(B) 0.960/0.967/0.967  gap(B) 0.028  competent n=150 s_ID^E +0.682  l0=0/32 s_K +0.719; l0=2/32 s_K +0.716; l0=10/32 s_K +0.030
+    AFTER     s_ID L/Sigma/E +0.593/+0.594/+0.594  r +1.000/+1.000/+1.000  mass(B) 0.996/0.997/0.998  gap(B) 0.002  competent n=150 s_ID^E +0.594  l0=0/32 s_K +0.624; l0=2/32 s_K +0.617; l0=10/32 s_K +0.025
+    BEFORE    s_ID L/Sigma/E -0.028/-0.028/-0.029  r -0.035/-0.036/-0.036  mass(B) 0.983/0.995/0.996  gap(B) 0.002  competent n=150 s_ID^E -0.029  l0=0/32 s_K +0.007; l0=2/32 s_K +0.007; l0=10/32 s_K +0.006
+    POST      s_ID L/Sigma/E +0.190/+0.192/+0.187  r +0.234/+0.235/+0.226  mass(B) 0.875/0.985/0.990  gap(B) 0.008  competent n=150 s_ID^E +0.187  l0=0/32 s_K +0.185; l0=2/32 s_K +0.194; l0=10/32 s_K +0.035
+    PRE       s_ID L/Sigma/E -0.022/-0.023/-0.024  r -0.025/-0.026/-0.027  mass(B) 0.853/0.991/0.993  gap(B) 0.005  competent n=150 s_ID^E -0.024  l0=0/32 s_K +0.041; l0=2/32 s_K +0.041; l0=10/32 s_K +0.040
+    NONE      s_ID L/Sigma/E +0.033/+0.035/+0.034  r +0.044/+0.046/+0.045  mass(B) 0.843/0.983/0.989  gap(B) 0.009  competent n=150 s_ID^E +0.034  l0=0/32 s_K +0.102; l0=2/32 s_K +0.102; l0=10/32 s_K +0.102
+  [llama8 F] Sigma and L versions; competent-only; onsets; uncovered first-token mass of clean B
+    AFTER     s_ID L/Sigma/E +0.611/+0.612/+0.612  r +1.000/+1.000/+1.000  mass(B) 0.909/0.994/0.994  gap(B) 0.006  competent n=149 s_ID^E +0.612  l0=0/32 s_K +0.621; l0=2/32 s_K +0.690; l0=10/32 s_K +0.313
+    BEFORE    s_ID L/Sigma/E -0.051/-0.052/-0.052  r -0.063/-0.065/-0.065  mass(B) 0.518/0.990/0.990  gap(B) 0.009  competent n=150 s_ID^E -0.052  l0=0/32 s_K +0.023; l0=2/32 s_K +0.023; l0=10/32 s_K +0.024
+    NONE      s_ID L/Sigma/E +0.080/+0.074/+0.074  r +0.117/+0.113/+0.113  mass(B) 0.058/0.968/0.970  gap(B) 0.024  competent n=150 s_ID^E +0.074  l0=0/32 s_K +0.130; l0=2/32 s_K +0.130; l0=10/32 s_K +0.131
+    POST      s_ID L/Sigma/E +0.281/+0.289/+0.289  r +0.357/+0.396/+0.396  mass(B) 0.085/0.974/0.975  gap(B) 0.023  competent n=150 s_ID^E +0.289  l0=0/32 s_K +0.277; l0=2/32 s_K +0.275; l0=10/32 s_K +0.099
+    PRE       s_ID L/Sigma/E -0.021/-0.022/-0.023  r -0.025/-0.029/-0.029  mass(B) 0.077/0.979/0.981  gap(B) 0.018  competent n=150 s_ID^E -0.023  l0=0/32 s_K +0.055; l0=2/32 s_K +0.055; l0=10/32 s_K +0.056
+    POST-NULL s_ID L/Sigma/E +0.080/+0.075/+0.075  r +0.119/+0.118/+0.118  mass(B) 0.081/0.969/0.972  gap(B) 0.025  competent n=150 s_ID^E +0.075  l0=0/32 s_K +0.148; l0=2/32 s_K +0.148; l0=10/32 s_K +0.149
+    per level lexicon 1   (n=75): r^E(POST) +0.330  s_ID^E(POST) +0.270  s_ID^E(AFTER) +0.656
+    per level lexicon 2   (n=75): r^E(POST) +0.479  s_ID^E(POST) +0.307  s_ID^E(AFTER) +0.563
+    per level sentence 0  (n=19): r^E(POST) +0.440  s_ID^E(POST) +0.342  s_ID^E(AFTER) +0.602
+    per level sentence 1  (n=19): r^E(POST) +0.431  s_ID^E(POST) +0.288  s_ID^E(AFTER) +0.621
+    per level sentence 2  (n=19): r^E(POST) +0.254  s_ID^E(POST) +0.182  s_ID^E(AFTER) +0.610
+    per level sentence 3  (n=19): r^E(POST) +0.404  s_ID^E(POST) +0.297  s_ID^E(AFTER) +0.615
+    per level sentence 4  (n=19): r^E(POST) +0.438  s_ID^E(POST) +0.324  s_ID^E(AFTER) +0.607
+    per level sentence 5  (n=19): r^E(POST) +0.423  s_ID^E(POST) +0.308  s_ID^E(AFTER) +0.607
+    per level sentence 6  (n=18): r^E(POST) +0.496  s_ID^E(POST) +0.316  s_ID^E(AFTER) +0.609
+    per level sentence 7  (n=18): r^E(POST) +0.260  s_ID^E(POST) +0.227  s_ID^E(AFTER) +0.622
+    LIST-BEFORE sign: ID_K^E(BEFORE) - ID_K^E(NONE) -1.064; b_ID(POST) +0.090
+  [gemma9 F] Sigma and L versions; competent-only; onsets; uncovered first-token mass of clean B
+    AFTER     s_ID L/Sigma/E +0.700/+0.700/+0.700  r +1.000/+1.000/+1.000  mass(B) 0.965/0.998/0.999  gap(B) 0.001  competent n=150 s_ID^E +0.700  l0=0/42 s_K +0.769; l0=3/42 s_K +0.771; l0=13/42 s_K +0.330
+    BEFORE    s_ID L/Sigma/E -0.020/-0.020/-0.020  r -0.018/-0.018/-0.018  mass(B) 0.836/0.997/0.999  gap(B) 0.001  competent n=150 s_ID^E -0.020  l0=0/42 s_K +0.044; l0=3/42 s_K +0.044; l0=13/42 s_K +0.044
+    NONE      s_ID L/Sigma/E +0.006/+0.005/+0.005  r +0.007/+0.005/+0.005  mass(B) 0.002/0.999/0.999  gap(B) 0.001  competent n=150 s_ID^E +0.005  l0=0/42 s_K +0.009; l0=3/42 s_K +0.009; l0=13/42 s_K +0.009
+    POST      s_ID L/Sigma/E +0.343/+0.358/+0.358  r +0.512/+0.512/+0.512  mass(B) 0.002/0.999/0.999  gap(B) 0.001  competent n=150 s_ID^E +0.358  l0=0/42 s_K +0.317; l0=3/42 s_K +0.318; l0=13/42 s_K +0.091
+    PRE       s_ID L/Sigma/E -0.024/-0.021/-0.021  r -0.023/-0.020/-0.020  mass(B) 0.005/0.999/0.999  gap(B) 0.001  competent n=150 s_ID^E -0.021  l0=0/42 s_K +0.037; l0=3/42 s_K +0.037; l0=13/42 s_K +0.037
+    POST-NULL s_ID L/Sigma/E +0.004/+0.003/+0.003  r +0.006/+0.003/+0.003  mass(B) 0.002/0.999/0.999  gap(B) 0.001  competent n=150 s_ID^E +0.003  l0=0/42 s_K +0.012; l0=3/42 s_K +0.012; l0=13/42 s_K +0.012
+    per level lexicon 1   (n=75): r^E(POST) +0.479  s_ID^E(POST) +0.334  s_ID^E(AFTER) +0.691
+    per level lexicon 2   (n=75): r^E(POST) +0.542  s_ID^E(POST) +0.379  s_ID^E(AFTER) +0.708
+    per level sentence 0  (n=19): r^E(POST) +0.601  s_ID^E(POST) +0.406  s_ID^E(AFTER) +0.704
+    per level sentence 1  (n=19): r^E(POST) +0.486  s_ID^E(POST) +0.340  s_ID^E(AFTER) +0.700
+    per level sentence 2  (n=19): r^E(POST) +0.479  s_ID^E(POST) +0.339  s_ID^E(AFTER) +0.706
+    per level sentence 3  (n=19): r^E(POST) +0.508  s_ID^E(POST) +0.359  s_ID^E(AFTER) +0.694
+    per level sentence 4  (n=19): r^E(POST) +0.546  s_ID^E(POST) +0.380  s_ID^E(AFTER) +0.708
+    per level sentence 5  (n=19): r^E(POST) +0.550  s_ID^E(POST) +0.374  s_ID^E(AFTER) +0.690
+    per level sentence 6  (n=18): r^E(POST) +0.462  s_ID^E(POST) +0.327  s_ID^E(AFTER) +0.698
+    per level sentence 7  (n=18): r^E(POST) +0.462  s_ID^E(POST) +0.333  s_ID^E(AFTER) +0.699
+    LIST-BEFORE sign: ID_K^E(BEFORE) - ID_K^E(NONE) -0.339; b_ID(POST) +0.137
+  [phi4 F] Sigma and L versions; competent-only; onsets; uncovered first-token mass of clean B
+    AFTER     s_ID L/Sigma/E +0.722/+0.721/+0.721  r +1.000/+1.000/+1.000  mass(B) 0.953/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E +0.721  l0=0/40 s_K +0.761; l0=2/40 s_K +0.752; l0=12/40 s_K +0.223
+    BEFORE    s_ID L/Sigma/E -0.063/-0.064/-0.064  r -0.047/-0.047/-0.047  mass(B) 0.919/0.999/0.999  gap(B) 0.001  competent n=145 s_ID^E -0.062  l0=0/40 s_K +0.019; l0=2/40 s_K +0.019; l0=12/40 s_K +0.018
+    NONE      s_ID L/Sigma/E +0.009/+0.005/+0.005  r +0.010/+0.006/+0.006  mass(B) 0.010/0.999/1.000  gap(B) 0.000  competent n=150 s_ID^E +0.005  l0=0/40 s_K +0.049; l0=2/40 s_K +0.049; l0=12/40 s_K +0.049
+    POST      s_ID L/Sigma/E +0.280/+0.281/+0.281  r +0.315/+0.334/+0.334  mass(B) 0.014/0.999/0.999  gap(B) 0.001  competent n=149 s_ID^E +0.280  l0=0/40 s_K +0.241; l0=2/40 s_K +0.224; l0=12/40 s_K +0.039
+    PRE       s_ID L/Sigma/E -0.025/-0.027/-0.027  r -0.023/-0.026/-0.026  mass(B) 0.013/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E -0.027  l0=0/40 s_K +0.031; l0=2/40 s_K +0.031; l0=12/40 s_K +0.031
+    POST-NULL s_ID L/Sigma/E +0.009/+0.004/+0.004  r +0.009/+0.004/+0.004  mass(B) 0.012/0.999/0.999  gap(B) 0.001  competent n=149 s_ID^E +0.004  l0=0/40 s_K +0.052; l0=2/40 s_K +0.051; l0=12/40 s_K +0.052
+    per level lexicon 1   (n=75): r^E(POST) +0.275  s_ID^E(POST) +0.241  s_ID^E(AFTER) +0.729
+    per level lexicon 2   (n=75): r^E(POST) +0.386  s_ID^E(POST) +0.314  s_ID^E(AFTER) +0.714
+    per level sentence 0  (n=19): r^E(POST) +0.414  s_ID^E(POST) +0.329  s_ID^E(AFTER) +0.720
+    per level sentence 1  (n=19): r^E(POST) +0.289  s_ID^E(POST) +0.246  s_ID^E(AFTER) +0.724
+    per level sentence 2  (n=19): r^E(POST) +0.298  s_ID^E(POST) +0.248  s_ID^E(AFTER) +0.710
+    per level sentence 3  (n=19): r^E(POST) +0.300  s_ID^E(POST) +0.260  s_ID^E(AFTER) +0.734
+    per level sentence 4  (n=19): r^E(POST) +0.400  s_ID^E(POST) +0.320  s_ID^E(AFTER) +0.713
+    per level sentence 5  (n=19): r^E(POST) +0.415  s_ID^E(POST) +0.330  s_ID^E(AFTER) +0.706
+    per level sentence 6  (n=18): r^E(POST) +0.254  s_ID^E(POST) +0.238  s_ID^E(AFTER) +0.722
+    per level sentence 7  (n=18): r^E(POST) +0.309  s_ID^E(POST) +0.264  s_ID^E(AFTER) +0.741
+    LIST-BEFORE sign: ID_K^E(BEFORE) - ID_K^E(NONE) -0.730; b_ID(POST) +0.033
+  [falcon7 F] Sigma and L versions; competent-only; onsets; uncovered first-token mass of clean B
+    AFTER     s_ID L/Sigma/E +0.786/+0.785/+0.784  r +1.000/+1.000/+1.000  mass(B) 0.995/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E +0.784  l0=0/28 s_K +0.840; l0=2/28 s_K +0.841; l0=8/28 s_K +0.702
+    BEFORE    s_ID L/Sigma/E -0.028/-0.028/-0.028  r -0.024/-0.023/-0.023  mass(B) 0.870/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E -0.028  l0=0/28 s_K +0.034; l0=2/28 s_K +0.034; l0=8/28 s_K +0.034
+    NONE      s_ID L/Sigma/E +0.023/+0.026/+0.026  r +0.028/+0.033/+0.033  mass(B) 0.012/0.997/0.999  gap(B) 0.001  competent n=150 s_ID^E +0.026  l0=0/28 s_K +0.036; l0=2/28 s_K +0.036; l0=8/28 s_K +0.036
+    POST      s_ID L/Sigma/E +0.386/+0.392/+0.392  r +0.416/+0.449/+0.449  mass(B) 0.021/0.999/0.999  gap(B) 0.001  competent n=150 s_ID^E +0.392  l0=0/28 s_K +0.365; l0=2/28 s_K +0.370; l0=8/28 s_K +0.256
+    PRE       s_ID L/Sigma/E -0.021/-0.016/-0.016  r -0.019/-0.016/-0.016  mass(B) 0.019/0.999/0.999  gap(B) 0.000  competent n=150 s_ID^E -0.016  l0=0/28 s_K +0.045; l0=2/28 s_K +0.045; l0=8/28 s_K +0.045
+    POST-NULL s_ID L/Sigma/E +0.021/+0.023/+0.023  r +0.024/+0.028/+0.028  mass(B) 0.017/0.996/0.999  gap(B) 0.001  competent n=150 s_ID^E +0.023  l0=0/28 s_K +0.042; l0=2/28 s_K +0.042; l0=8/28 s_K +0.042
+    per level lexicon 1   (n=75): r^E(POST) +0.413  s_ID^E(POST) +0.368  s_ID^E(AFTER) +0.789
+    per level lexicon 2   (n=75): r^E(POST) +0.483  s_ID^E(POST) +0.415  s_ID^E(AFTER) +0.780
+    per level sentence 0  (n=19): r^E(POST) +0.456  s_ID^E(POST) +0.425  s_ID^E(AFTER) +0.791
+    per level sentence 1  (n=19): r^E(POST) +0.417  s_ID^E(POST) +0.368  s_ID^E(AFTER) +0.786
+    per level sentence 2  (n=19): r^E(POST) +0.389  s_ID^E(POST) +0.358  s_ID^E(AFTER) +0.795
+    per level sentence 3  (n=19): r^E(POST) +0.444  s_ID^E(POST) +0.403  s_ID^E(AFTER) +0.780
+    per level sentence 4  (n=19): r^E(POST) +0.539  s_ID^E(POST) +0.438  s_ID^E(AFTER) +0.781
+    per level sentence 5  (n=19): r^E(POST) +0.483  s_ID^E(POST) +0.402  s_ID^E(AFTER) +0.771
+    per level sentence 6  (n=18): r^E(POST) +0.425  s_ID^E(POST) +0.364  s_ID^E(AFTER) +0.782
+    per level sentence 7  (n=18): r^E(POST) +0.436  s_ID^E(POST) +0.375  s_ID^E(AFTER) +0.788
+    LIST-BEFORE sign: ID_K^E(BEFORE) - ID_K^E(NONE) -0.696; b_ID(POST) +0.297
+  [gemma2b F] Sigma and L versions; competent-only; onsets; uncovered first-token mass of clean B
+    AFTER     s_ID L/Sigma/E +0.487/+0.487/+0.486  r +1.000/+1.000/+1.000  mass(B) 0.983/0.986/0.998  gap(B) 0.002  competent n=98 s_ID^E +0.502  l0=0/26 s_K +0.486; l0=2/26 s_K +0.251; l0=8/26 s_K +0.281
+    BEFORE    s_ID L/Sigma/E -0.013/-0.013/-0.013  r -0.018/-0.018/-0.018  mass(B) 0.549/0.976/0.993  gap(B) 0.007  competent n=77 s_ID^E -0.015  l0=0/26 s_K +0.009; l0=2/26 s_K +0.008; l0=8/26 s_K +0.010
+    NONE      s_ID L/Sigma/E +0.005/+0.004/+0.004  r +0.011/+0.008/+0.008  mass(B) 0.004/0.948/0.988  gap(B) 0.011  competent n=86 s_ID^E +0.005  l0=0/26 s_K +0.008; l0=2/26 s_K +0.008; l0=8/26 s_K +0.009
+    POST      s_ID L/Sigma/E +0.052/+0.059/+0.060  r +0.095/+0.096/+0.097  mass(B) 0.004/0.967/0.990  gap(B) 0.010  competent n=86 s_ID^E +0.085  l0=0/26 s_K +0.035; l0=2/26 s_K +0.015; l0=8/26 s_K +0.022
+    PRE       s_ID L/Sigma/E -0.011/-0.010/-0.010  r -0.021/-0.017/-0.018  mass(B) 0.007/0.977/0.993  gap(B) 0.007  competent n=127 s_ID^E -0.011  l0=0/26 s_K +0.016; l0=2/26 s_K +0.016; l0=8/26 s_K +0.016
+    POST-NULL s_ID L/Sigma/E +0.005/+0.004/+0.004  r +0.011/+0.007/+0.007  mass(B) 0.005/0.959/0.988  gap(B) 0.012  competent n=74 s_ID^E +0.003  l0=0/26 s_K +0.025; l0=2/26 s_K +0.026; l0=8/26 s_K +0.027
+    per level lexicon 1   (n=75): r^E(POST) +0.114  s_ID^E(POST) +0.076  s_ID^E(AFTER) +0.522
+    per level lexicon 2   (n=75): r^E(POST) +0.079  s_ID^E(POST) +0.046  s_ID^E(AFTER) +0.454
+    per level sentence 0  (n=19): r^E(POST) +0.104  s_ID^E(POST) +0.067  s_ID^E(AFTER) +0.502
+    per level sentence 1  (n=19): r^E(POST) -0.000  s_ID^E(POST) -0.000  s_ID^E(AFTER) +0.478
+    per level sentence 2  (n=19): r^E(POST) +0.076  s_ID^E(POST) +0.044  s_ID^E(AFTER) +0.476
+    per level sentence 3  (n=19): r^E(POST) +0.177  s_ID^E(POST) +0.108  s_ID^E(AFTER) +0.496
+    per level sentence 4  (n=19): r^E(POST) +0.147  s_ID^E(POST) +0.081  s_ID^E(AFTER) +0.456
+    per level sentence 5  (n=19): r^E(POST) +0.152  s_ID^E(POST) +0.095  s_ID^E(AFTER) +0.508
+    per level sentence 6  (n=18): r^E(POST) +0.065  s_ID^E(POST) +0.039  s_ID^E(AFTER) +0.464
+    per level sentence 7  (n=18): r^E(POST) +0.047  s_ID^E(POST) +0.034  s_ID^E(AFTER) +0.502
+    LIST-BEFORE sign: ID_K^E(BEFORE) - ID_K^E(NONE) -0.172; b_ID(POST) +0.000
+  [qwen1.5 S0] Sigma and L versions; competent-only; onsets; uncovered first-token mass of clean B
+    P1        s_ID L/Sigma/E +0.361/+0.361/+0.361  r +0.896/+0.901/+0.901  mass(B) 0.985/0.998/0.998  gap(B) 0.001  competent n=150 s_ID^E +0.361  l0=0/28 s_K +0.372; l0=2/28 s_K +0.370; l0=8/28 s_K +0.183
+    AFTER     s_ID L/Sigma/E +0.367/+0.366/+0.366  r +1.000/+1.000/+1.000  mass(B) 0.949/1.000/1.000  gap(B) 0.000  competent n=150 s_ID^E +0.366  l0=0/28 s_K +0.373; l0=2/28 s_K +0.371; l0=8/28 s_K +0.177
+    POST      s_ID L/Sigma/E -0.079/-0.069/-0.070  r -0.150/-0.132/-0.134  mass(B) 0.742/0.990/0.996  gap(B) 0.004  competent n=102 s_ID^E -0.066  l0=0/28 s_K +0.031; l0=2/28 s_K +0.036; l0=8/28 s_K +0.074
+    NONE      s_ID L/Sigma/E +0.016/+0.022/+0.016  r +0.052/+0.073/+0.053  mass(B) 0.618/0.988/0.995  gap(B) 0.005  competent n=114 s_ID^E +0.017  l0=0/28 s_K +0.073; l0=2/28 s_K +0.073; l0=8/28 s_K +0.073
+  [qwen3b S0] Sigma and L versions; competent-only; onsets; uncovered first-token mass of clean B
+    P1        s_ID L/Sigma/E +0.675/+0.675/+0.675  r +0.837/+0.848/+0.848  mass(B) 1.000/1.000/1.000  gap(B) 0.000  competent n=93 s_ID^E +0.685  l0=0/36 s_K +0.693; l0=2/36 s_K +0.692; l0=11/36 s_K +0.564
+    AFTER     s_ID L/Sigma/E +0.710/+0.709/+0.709  r +1.000/+1.000/+1.000  mass(B) 0.973/1.000/1.000  gap(B) 0.000  competent n=103 s_ID^E +0.719  l0=0/36 s_K +0.732; l0=2/36 s_K +0.731; l0=11/36 s_K +0.596
+    POST      s_ID L/Sigma/E -0.001/+0.004/+0.004  r -0.001/+0.004/+0.004  mass(B) 0.004/0.992/0.992  gap(B) 0.008  competent n=115 s_ID^E +0.050  l0=0/36 s_K +0.103; l0=2/36 s_K +0.103; l0=11/36 s_K +0.120
+    NONE      s_ID L/Sigma/E +0.005/+0.002/+0.002  r +0.007/+0.003/+0.003  mass(B) 0.000/0.993/0.993  gap(B) 0.007  competent n=136 s_ID^E +0.001  l0=0/36 s_K +0.096; l0=2/36 s_K +0.096; l0=11/36 s_K +0.096
+  frame census frames/falcon7.json: admitted []; AFTER: ' ' 90; BEFORE: ' ' 90; NONE: ' ' 90; POST: ' ' 90; PRE: ' ' 90; POST-NULL: ' ' 90; P1: ' ' 90
+  frame census frames/gemma2b.json: admitted []; AFTER: ' ' 90; BEFORE: ' ' 90; NONE: ' ' 90; POST: ' ' 90; PRE: ' ' 90; POST-NULL: ' ' 90; P1: ' ' 90
+  frame census frames/gemma9.json: admitted []; AFTER: ' ' 90; BEFORE: ' ' 90; NONE: ' ' 90; POST: ' ' 90; PRE: ' ' 90; POST-NULL: ' ' 90; P1: ' ' 90
+  frame census frames/llama8.json: admitted []; AFTER: ' ' 90; BEFORE: ' ' 90; NONE: ' ' 90; POST: ' ' 90; PRE: ' ' 90; POST-NULL: ' ' 90; P1: ' ' 90
+  frame census frames/mistral24.json: admitted []; AFTER: ' ' 90; BEFORE: ' ' 90; NONE: ' ' 90; POST: ' ' 90; PRE: ' ' 90; POST-NULL: ' ' 90; P1: ' ' 90
+  frame census frames/mistral7.json: admitted []; AFTER: ' ' 90; BEFORE: ' ' 90; NONE: ' ' 90; POST: ' ' 90; PRE: ' ' 90; POST-NULL: ' ' 90; P1: ' ' 90
+  frame census frames/olmo7.json: admitted []; AFTER: ' ' 90; BEFORE: ' ' 90; NONE: ' ' 90; POST: ' ' 90; PRE: ' ' 90; POST-NULL: ' ' 90; P1: ' ' 90
+  frame census frames/phi4.json: admitted []; AFTER: ' ' 90; BEFORE: ' ' 90; NONE: ' ' 90; POST: ' ' 90; PRE: ' ' 90; POST-NULL: ' ' 90; P1: ' ' 90
+  frame census frames/qwen1.5.json: admitted []; AFTER: ' ' 90; BEFORE: ' ' 90; NONE: ' ' 90; POST: ' ' 90; PRE: ' ' 90; POST-NULL: ' ' 90; P1: ' ' 90
+  frame census frames/qwen14.json: admitted []; AFTER: ' ' 90; BEFORE: ' ' 90; NONE: ' ' 90; POST: ' ' 90; PRE: ' ' 90; POST-NULL: ' ' 90; P1: ' ' 90
+  frame census frames/qwen3b.json: admitted []; AFTER: ' ' 90; BEFORE: ' ' 90; NONE: ' ' 90; POST: ' ' 90; PRE: ' ' 90; POST-NULL: ' ' 90; P1: ' ' 90
+  frame census frames/qwen7.json: admitted []; AFTER: ' ' 90; BEFORE: ' ' 90; NONE: ' ' 90; POST: ' ' 90; PRE: ' ' 90; POST-NULL: ' ' 90; P1: ' ' 90
+  eval/qwen7_x1eager_S0.json (exploratory X1/X2): AFTER s_ID^E +0.799 s_ID^L +0.799; POST s_ID^E +0.300 s_ID^L +0.300; NONE s_ID^E +0.045 s_ID^L +0.063
+  eval/qwen7_x1fp32_S0.json (exploratory X1/X2): AFTER s_ID^E +0.786 s_ID^L +0.786; POST s_ID^E +0.326 s_ID^L +0.325; NONE s_ID^E +0.047 s_ID^L +0.061
+  [qwen7 S0] trie L against the published path (all items, rows, S/B/X): mean |dL| 0.1400, max 2.3404
+  [qwen14 S0] trie L against the published path (all items, rows, S/B/X): mean |dL| 0.1683, max 3.5000
+  [mistral7 S0] trie L against the published path (all items, rows, S/B/X): mean |dL| 0.0807, max 2.9355
+  [olmo7 S0] trie L against the published path (all items, rows, S/B/X): mean |dL| 0.0440, max 0.4918
+
+  paper tables written: tab_fresh.tex, tab_mass.tex, tab_invariance.tex, fig_crossover.csv in results/gpu_stage8b

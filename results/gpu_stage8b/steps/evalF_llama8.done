@@ -1,0 +1,2 @@
+2026-10-13T12:53:13Z HEAD 8b74b79b76e06b27bedc0d841c7b1e4a5f671649
+python experiments/fresh_factorial.py --out results/gpu_stage8b --stage eval --population F --model /root/stage8_models/llama8 --key llama8 --reserve-min 67 

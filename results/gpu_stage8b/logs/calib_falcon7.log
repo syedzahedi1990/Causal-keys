@@ -1,0 +1,10 @@
+==== 2026-10-13T13:12:06Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage calib --model /root/stage8_models/falcon7 --key falcon7
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+  calib AFTER done (1s)
+  calib BEFORE done (2s)
+  calib NONE done (3s)
+  calib POST done (4s)
+  calib PRE done (5s)
+  calib POST-NULL done (6s)
+  calib P1 done (7s)
+frames [] (rejected []); file results/gpu_stage8b/frames/falcon7.json sha256 fc9e0c0aea7579d43dec0eb0d0f9c50c4b4381ce2e1cf18ac1b3091d76623dcd

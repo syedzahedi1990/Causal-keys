@@ -1,0 +1,6 @@
+==== 2026-10-13T12:13:44Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage g3 --model /root/stage8_models/mistral7 --key mistral7
+frames file results/gpu_stage8b/frames/mistral7.json sha256 9434618bf9d10464c1daafa9fe8b6fd45cb11596b8cb668e75eebdfdb6ccb953: 0 discovered frames []
+  g3 NONE: {'n': 30, 's_ID_trie': 0.0141932762134857, 's_ID_plain': 0.014927606627889998, 'abs_ds': 0.0007343304144042974, 'mean_abs_dL': 0.08555522612813446, 'ID_KV_plain': 16.134586635231972, 'tol_dL': 0.8067293317615987, 'pass': True} (15s)
+  g3 POST: {'n': 30, 's_ID_trie': 0.3495734260908159, 's_ID_plain': 0.3511259724899408, 'abs_ds': 0.0015525463991249433, 'mean_abs_dL': 0.0996695188081099, 'ID_KV_plain': 16.178417933980622, 'tol_dL': 0.8089208966990311, 'pass': True} (31s)
+  g3 AFTER: {'n': 30, 's_ID_trie': 0.8078661200856241, 's_ID_plain': 0.8069875995976529, 'abs_ds': 0.0008785204879712127, 'mean_abs_dL': 0.07171620806663365, 'ID_KV_plain': 17.022395867678764, 'tol_dL': 0.8511197933839383, 'pass': True} (47s)
+JB-G3 PASS: the evaluation scores with the trie

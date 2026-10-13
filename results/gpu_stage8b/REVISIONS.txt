@@ -1,0 +1,14 @@
+# <repo> <revision> key=<key> attn=<impl> token=<used> sources=<where the verified bytes came from>; pins: scripts/stage8_models.json sha256 b840b71ea644d3f01e634c67ef2c2b9bdb26cdf53d3fe6b45d34c5e78c0cb707
+Qwen/Qwen2.5-7B-Instruct a09a35458c702b33eeacc393d103063234e8bc28 key=qwen7 attn=sdpa token=no sources=Qwen/Qwen2.5-7B-Instruct@a09a35458c
+Qwen/Qwen2.5-14B-Instruct cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8 key=qwen14 attn=sdpa token=no sources=
+mistralai/Mistral-7B-Instruct-v0.3 c170c708c41dac9275d15a8fff4eca08d52bab71 key=mistral7 attn=sdpa token=no sources=
+allenai/OLMo-2-1124-7B-Instruct 470b1fba1ae01581f270116362ee4aa1b97f4c84 key=olmo7 attn=sdpa token=no sources=
+meta-llama/Llama-3.1-8B-Instruct 0e9e39f249a16976918f6564b8830bc894c89659 key=llama8 attn=sdpa token=no sources=
+google/gemma-2-9b-it 11c9b309abf73637e4b6f9a3fa1e92e615547819 key=gemma9 attn=eager token=no sources=
+microsoft/phi-4 2db69c1c3e91a05d2c64a3185acfbaf36f744e25 key=phi4 attn=sdpa token=no sources=
+tiiuae/Falcon3-7B-Instruct 1e57a0ecd176c7c139f289c60a74e57f887c3dfb key=falcon7 attn=sdpa token=no sources=
+google/gemma-2-2b-it 299a8560bedf22ed1c72a8a11e7dce4a7f9f51f8 key=gemma2b attn=eager token=no sources=
+mistralai/Mistral-Small-24B-Instruct-2501 9527884be6e5616bdd54de542f9ae13384489724 key=mistral24 attn=sdpa token=no sources=
+Qwen/Qwen2.5-1.5B-Instruct 989aa7980e4cf806f80c7fef2b1adb7bc71aa306 key=qwen1.5 attn=sdpa token=no sources=Qwen/Qwen2.5-1.5B-Instruct@989aa7980e
+Qwen/Qwen2.5-3B-Instruct aa8e72537993ba99e69dfaafa59ed015b17504d1 key=qwen3b attn=sdpa token=no sources=Qwen/Qwen2.5-3B-Instruct@aa8e725379
+Qwen/Qwen2.5-7B-Instruct a09a35458c702b33eeacc393d103063234e8bc28 key=qwen7 attn=sdpa token=no sources=

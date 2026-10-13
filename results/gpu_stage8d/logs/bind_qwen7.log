@@ -1,0 +1,12 @@
+==== 2026-10-13T09:38:11Z python experiments/stage8_flag.py --out results/gpu_stage8d --stage bind --model /root/stage8_models/qwen7 --key qwen7
+bind story 0 (1s)
+bind story 10 (4s)
+bind story 20 (7s)
+bind story 30 (11s)
+bind story 40 (14s)
+bind story 50 (17s)
+bind story 60 (20s)
+bind story 70 (24s)
+bind story 80 (27s)
+bind story 90 (30s)
+bind: 100 stories (33s)

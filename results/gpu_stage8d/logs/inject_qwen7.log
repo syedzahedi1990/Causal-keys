@@ -1,0 +1,12 @@
+==== 2026-10-13T09:32:59Z python experiments/stage8_flag.py --out results/gpu_stage8d --stage inject --model /root/stage8_models/qwen7 --key qwen7
+inject story 0 (2s)
+inject story 10 (20s)
+inject story 20 (37s)
+inject story 30 (55s)
+inject story 40 (74s)
+inject story 50 (92s)
+inject story 60 (109s)
+inject story 70 (127s)
+inject story 80 (145s)
+inject story 90 (163s)
+inject: 100 stories (179s)

@@ -1,0 +1,9 @@
+==== 2026-10-13T12:13:23Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage calib --model /root/stage8_models/mistral7 --key mistral7
+  calib AFTER done (2s)
+  calib BEFORE done (4s)
+  calib NONE done (6s)
+  calib POST done (8s)
+  calib PRE done (10s)
+  calib POST-NULL done (12s)
+  calib P1 done (13s)
+frames [] (rejected []); file results/gpu_stage8b/frames/mistral7.json sha256 9434618bf9d10464c1daafa9fe8b6fd45cb11596b8cb668e75eebdfdb6ccb953

@@ -1,0 +1,9 @@
+==== 2026-10-13T12:14:39Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage eval --population F --model /root/stage8_models/mistral7 --key mistral7 --reserve-min 101
+frames file results/gpu_stage8b/frames/mistral7.json sha256 9434618bf9d10464c1daafa9fe8b6fd45cb11596b8cb668e75eebdfdb6ccb953: 0 discovered frames []
+  AFTER done: 150 items (60s; total 60s)
+  BEFORE done: 150 items (61s; total 121s)
+  NONE done: 150 items (57s; total 177s)
+  POST done: 150 items (62s; total 239s)
+  PRE done: 150 items (62s; total 301s)
+  POST-NULL done: 150 items (62s; total 363s)
+wrote results/gpu_stage8b/eval/mistral7_F.json (900 items, 0 skipped, arms not run []; 364s)

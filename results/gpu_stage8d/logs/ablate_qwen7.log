@@ -1,0 +1,8 @@
+==== 2026-10-13T09:36:07Z python experiments/stage8_flag.py --out results/gpu_stage8d --stage ablate --model /root/stage8_models/qwen7 --key qwen7
+ablate story 0 (2s)
+ablate story 10 (21s)
+ablate story 20 (40s)
+ablate story 30 (60s)
+ablate story 40 (79s)
+ablate story 50 (98s)
+ablate: 60 stories x 9 conditions (115s)

@@ -1,0 +1,7 @@
+==== 2026-10-13T13:12:22Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage g3 --model /root/stage8_models/falcon7 --key falcon7
+frames file results/gpu_stage8b/frames/falcon7.json sha256 fc9e0c0aea7579d43dec0eb0d0f9c50c4b4381ce2e1cf18ac1b3091d76623dcd: 0 discovered frames []
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+  g3 NONE: {'n': 30, 's_ID_trie': 0.019872025293939263, 's_ID_plain': 0.019661314355981, 'abs_ds': 0.0002107109379582625, 'mean_abs_dL': 0.08580320378144582, 'ID_KV_plain': 15.155562351147333, 'tol_dL': 0.7577781175573667, 'pass': True} (12s)
+  g3 POST: {'n': 30, 's_ID_trie': 0.36867409608126256, 's_ID_plain': 0.36786097535370177, 'abs_ds': 0.0008131207275607899, 'mean_abs_dL': 0.08857892037679752, 'ID_KV_plain': 10.699902351697286, 'tol_dL': 0.5349951175848643, 'pass': True} (25s)
+  g3 AFTER: {'n': 30, 's_ID_trie': 0.7891519296179532, 's_ID_plain': 0.7889770145869078, 'abs_ds': 0.0001749150310453862, 'mean_abs_dL': 0.06611312330011161, 'ID_KV_plain': 13.092578108272331, 'tol_dL': 0.6546289054136166, 'pass': True} (38s)
+JB-G3 PASS: the evaluation scores with the trie

@@ -1,0 +1,3 @@
+==== 2026-10-13T13:24:55Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage tokcheck --model /root/stage8_models/mistral24 --key mistral24
+[transformers] The tokenizer you are loading from '/root/stage8_models/mistral24' with an incorrect regex pattern: https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503/discussions/84#69121093e8b480e709447d5e. This will lead to incorrect tokenization. You should set the `fix_mistral_regex=True` flag when loading this tokenizer to fix this issue.
+tokcheck PASS: ROOM 21 tokens, sentences {0: [23], 1: [22], 2: [23], 3: [22], 4: [21], 5: [22], 6: [22], 7: [22]}; trie nodes {'F': [79, 88], 'C': [79, 88], 'S0': [88, 88]}; 0 failures []

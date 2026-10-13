@@ -1,0 +1,25 @@
+==== 2026-10-13T13:17:35Z fetch mistral24 -> /root/stage8_models/mistral24
+mistral24/SYSTEM_PROMPT.txt: verified (git_blob) from mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+mistral24/config.json: verified (git_blob) from mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724
+mistral24/generation_config.json: verified (git_blob) from mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724
+mistral24/model-00001-of-00010.safetensors: verified (sha256) from mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724
+mistral24/model-00002-of-00010.safetensors: verified (sha256) from mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724
+mistral24/model-00003-of-00010.safetensors: verified (sha256) from mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724
+mistral24/model-00004-of-00010.safetensors: verified (sha256) from mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724
+mistral24/model-00005-of-00010.safetensors: verified (sha256) from mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724
+mistral24/model-00006-of-00010.safetensors: verified (sha256) from mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724
+mistral24/model-00007-of-00010.safetensors: verified (sha256) from mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724
+mistral24/model-00008-of-00010.safetensors: verified (sha256) from mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724
+mistral24/model-00009-of-00010.safetensors: verified (sha256) from mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724
+mistral24/model-00010-of-00010.safetensors: verified (sha256) from mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724
+mistral24/model.safetensors.index.json: verified (git_blob) from mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724
+mistral24/params.json: verified (git_blob) from mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724
+mistral24/special_tokens_map.json: verified (git_blob) from mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724
+mistral24/tekken.json: verified (sha256) from mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724
+mistral24/tokenizer.json: verified (sha256) from mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724
+mistral24/tokenizer_config.json: verified (git_blob) from mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724
+mistral24: 19 files verified against mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724 -> /root/stage8_models/mistral24/VERIFIED.json
+==== 2026-10-13T13:24:11Z prefetch of mistral24: exit 0
+==== 2026-10-13T13:24:20Z fetch mistral24 -> /root/stage8_models/mistral24
+mistral24: 19 files verified against mistralai/Mistral-Small-24B-Instruct-2501@9527884be6e5616bdd54de542f9ae13384489724 -> /root/stage8_models/mistral24/VERIFIED.json

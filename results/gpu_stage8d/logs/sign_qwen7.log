@@ -1,0 +1,7 @@
+==== 2026-10-13T09:38:53Z python experiments/stage8_flag.py --out results/gpu_stage8d --stage sign --model /root/stage8_models/qwen7 --key qwen7
+sign Q_IN: 100 stories (99s)
+sign Q_OUT: 100 stories (203s)
+sign P1: 100 stories (214s)
+sign INLINE: 100 cores (271s)
+sign INLINE_CHAT: 100 cores (329s)
+sign AFTER: 100 cores (387s)

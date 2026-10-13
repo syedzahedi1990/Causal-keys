@@ -1,0 +1,10 @@
+==== 2026-10-13T13:25:08Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage calib --model /root/stage8_models/mistral24 --key mistral24
+[transformers] The tokenizer you are loading from '/root/stage8_models/mistral24' with an incorrect regex pattern: https://huggingface.co/mistralai/Mistral-Small-3.1-24B-Instruct-2503/discussions/84#69121093e8b480e709447d5e. This will lead to incorrect tokenization. You should set the `fix_mistral_regex=True` flag when loading this tokenizer to fix this issue.
+  calib AFTER done (3s)
+  calib BEFORE done (6s)
+  calib NONE done (8s)
+  calib POST done (12s)
+  calib PRE done (15s)
+  calib POST-NULL done (19s)
+  calib P1 done (21s)
+frames [] (rejected []); file results/gpu_stage8b/frames/mistral24.json sha256 5a74b1bf09f5183c7b52449bc2c1d48dd3a5cc08a5153094e07ce465197edf50

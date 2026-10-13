@@ -1,0 +1,9 @@
+==== 2026-10-13T11:41:56Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage eval --population S0 --model /root/stage8_models/qwen7 --key qwen7 --reserve-min 163
+frames file results/gpu_stage8b/frames/qwen7.json sha256 ae18b810014aed61658ed99b73c9cd429e144ca8a65a3135502fe213a96a3f4a: 0 discovered frames []
+  P1 done: 150 items (72s; total 72s)
+  AFTER done: 150 items (69s; total 141s)
+  BEFORE done: 150 items (69s; total 209s)
+  POST done: 150 items (70s; total 279s)
+  PRE done: 150 items (70s; total 349s)
+  NONE done: 150 items (64s; total 414s)
+wrote results/gpu_stage8b/eval/qwen7_S0.json (900 items, 0 skipped, arms not run []; 414s)

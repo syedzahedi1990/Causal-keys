@@ -1,0 +1,5 @@
+==== 2026-10-13T11:24:59Z stage 8 part b TEST_MODE=0 FORCE=0 FORCE_STEPS= DEADLINE_H=4.5 TESTS=1 KEEP_CACHE=0
+8b74b79b76e06b27bedc0d841c7b1e4a5f671649
+?? results/gpu_stage8b/
+?? results/gpu_stage8d/
+preregistration P-2026-10-10-J final at 8b74b79b76e06b27bedc0d841c7b1e4a5f671649; HEAD 8b74b79b76e06b27bedc0d841c7b1e4a5f671649

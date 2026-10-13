@@ -1,0 +1,111 @@
+{
+ "key": "llama8",
+ "repo": "meta-llama/Llama-3.1-8B-Instruct",
+ "revision": "0e9e39f249a16976918f6564b8830bc894c89659",
+ "attn": "sdpa",
+ "gated": "manual",
+ "token_used": false,
+ "manifest": "/workspace/Causal-keys/scripts/stage8_models.json",
+ "manifest_sha256": "b840b71ea644d3f01e634c67ef2c2b9bdb26cdf53d3fe6b45d34c5e78c0cb707",
+ "fetcher_sha256": "aba1e5a423fea2b079b5cc4936ab6fc95cb64818812f0178609cd118fcea8c8c",
+ "dest": "/root/stage8_models/llama8",
+ "host": "17ea459426e7",
+ "time_utc": "2026-10-13T12:46:26Z",
+ "sources_used": [
+  "existing copy (re-verified)"
+ ],
+ "files": {
+  "config.json": {
+   "kind": "git_blob",
+   "expected": "0bb6fd75b3ad2fe988565929f329945262c2814e",
+   "size": 855,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "0bb6fd75b3ad2fe988565929f329945262c2814e"
+  },
+  "generation_config.json": {
+   "kind": "git_blob",
+   "expected": "cc7276afd599de091142c6ed3005faf8a74aa257",
+   "size": 184,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "cc7276afd599de091142c6ed3005faf8a74aa257"
+  },
+  "model-00001-of-00004.safetensors": {
+   "kind": "sha256",
+   "expected": "2b1879f356aed350030bb40eb45ad362c89d9891096f79a3ab323d3ba5607668",
+   "size": 4976698672,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "2b1879f356aed350030bb40eb45ad362c89d9891096f79a3ab323d3ba5607668"
+  },
+  "model-00002-of-00004.safetensors": {
+   "kind": "sha256",
+   "expected": "09d433f650646834a83c580877bd60c6d1f88f7755305c12576b5c7058f9af15",
+   "size": 4999802720,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "09d433f650646834a83c580877bd60c6d1f88f7755305c12576b5c7058f9af15"
+  },
+  "model-00003-of-00004.safetensors": {
+   "kind": "sha256",
+   "expected": "fc1cdddd6bfa91128d6e94ee73d0ce62bfcdb7af29e978ddcab30c66ae9ea7fa",
+   "size": 4915916176,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "fc1cdddd6bfa91128d6e94ee73d0ce62bfcdb7af29e978ddcab30c66ae9ea7fa"
+  },
+  "model-00004-of-00004.safetensors": {
+   "kind": "sha256",
+   "expected": "92ecfe1a2414458b4821ac8c13cf8cb70aed66b5eea8dc5ad9eeb4ff309d6d7b",
+   "size": 1168138808,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "92ecfe1a2414458b4821ac8c13cf8cb70aed66b5eea8dc5ad9eeb4ff309d6d7b"
+  },
+  "model.safetensors.index.json": {
+   "kind": "git_blob",
+   "expected": "0fd8120f1c6acddc268ebc2583058efaf699a771",
+   "size": 23950,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "0fd8120f1c6acddc268ebc2583058efaf699a771"
+  },
+  "special_tokens_map.json": {
+   "kind": "git_blob",
+   "expected": "02ee80b6196926a5ad790a004d9efd6ab1ba6542",
+   "size": 296,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "02ee80b6196926a5ad790a004d9efd6ab1ba6542"
+  },
+  "tokenizer.json": {
+   "kind": "git_blob",
+   "expected": "5cc5f00a5b203e90a27a3bd60d1ec393b07971e8",
+   "size": 9085657,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "5cc5f00a5b203e90a27a3bd60d1ec393b07971e8"
+  },
+  "tokenizer_config.json": {
+   "kind": "git_blob",
+   "expected": "db88166e2bc4c799fd5d1ae643b75e84d03ee70e",
+   "size": 55351,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "db88166e2bc4c799fd5d1ae643b75e84d03ee70e"
+  }
+ },
+ "failed": [],
+ "unexpected_files": []
+}

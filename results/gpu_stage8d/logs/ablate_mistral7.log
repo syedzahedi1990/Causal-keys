@@ -1,0 +1,8 @@
+==== 2026-10-13T10:10:17Z python experiments/stage8_flag.py --out results/gpu_stage8d --stage ablate --model /root/stage8_models/mistral7 --key mistral7
+ablate story 0 (3s)
+ablate story 10 (23s)
+ablate story 20 (44s)
+ablate story 30 (65s)
+ablate story 40 (86s)
+ablate story 50 (107s)
+ablate: 60 stories x 9 conditions (125s)

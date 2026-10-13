@@ -1,0 +1,15 @@
+==== 2026-10-13T12:46:15Z fetch gemma9 -> /root/stage8_models/gemma9
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+gemma9/config.json: verified (git_blob) from thr3a/gemma-2-9b-it@e99c393fd7e90100fa1252165c629586682cfd1f
+gemma9/generation_config.json: verified (git_blob) from thr3a/gemma-2-9b-it@e99c393fd7e90100fa1252165c629586682cfd1f
+gemma9/model-00001-of-00004.safetensors: verified (sha256) from unsloth/gemma-2-9b-it@fc7d4737cda11c3a19af2b722319e846670b4d89
+gemma9/model-00002-of-00004.safetensors: verified (sha256) from unsloth/gemma-2-9b-it@fc7d4737cda11c3a19af2b722319e846670b4d89
+gemma9/model-00003-of-00004.safetensors: verified (sha256) from unsloth/gemma-2-9b-it@fc7d4737cda11c3a19af2b722319e846670b4d89
+gemma9/model-00004-of-00004.safetensors: verified (sha256) from unsloth/gemma-2-9b-it@fc7d4737cda11c3a19af2b722319e846670b4d89
+gemma9/model.safetensors.index.json: verified (git_blob) from unsloth/gemma-2-9b-it@fc7d4737cda11c3a19af2b722319e846670b4d89
+gemma9/tokenizer.model: verified (sha256) from unsloth/gemma-2-9b-it@fc7d4737cda11c3a19af2b722319e846670b4d89
+gemma9/tokenizer_config.json: verified (git_blob) from dnhkng/RYS-Gemma-2-9b-it@dd19021a5b4a8217d0123579dc855c3b07dca5f2
+gemma9: 11 files verified against google/gemma-2-9b-it@11c9b309abf73637e4b6f9a3fa1e92e615547819 -> /root/stage8_models/gemma9/VERIFIED.json
+==== 2026-10-13T12:48:52Z prefetch of gemma9: exit 0
+==== 2026-10-13T12:53:13Z fetch gemma9 -> /root/stage8_models/gemma9
+gemma9: 11 files verified against google/gemma-2-9b-it@11c9b309abf73637e4b6f9a3fa1e92e615547819 -> /root/stage8_models/gemma9/VERIFIED.json

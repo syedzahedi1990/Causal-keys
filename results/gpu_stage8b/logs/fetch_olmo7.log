@@ -1,0 +1,13 @@
+==== 2026-10-13T12:13:00Z fetch olmo7 -> /root/stage8_models/olmo7
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+olmo7/generation_config.json: verified (git_blob) from allenai/OLMo-2-1124-7B-Instruct@470b1fba1ae01581f270116362ee4aa1b97f4c84
+olmo7/merges.txt: verified (git_blob) from allenai/OLMo-2-1124-7B-Instruct@470b1fba1ae01581f270116362ee4aa1b97f4c84
+olmo7/model-00001-of-00003.safetensors: verified (sha256) from allenai/OLMo-2-1124-7B-Instruct@470b1fba1ae01581f270116362ee4aa1b97f4c84
+olmo7/model-00002-of-00003.safetensors: verified (sha256) from allenai/OLMo-2-1124-7B-Instruct@470b1fba1ae01581f270116362ee4aa1b97f4c84
+olmo7/model-00003-of-00003.safetensors: verified (sha256) from allenai/OLMo-2-1124-7B-Instruct@470b1fba1ae01581f270116362ee4aa1b97f4c84
+olmo7/model.safetensors.index.json: verified (git_blob) from allenai/OLMo-2-1124-7B-Instruct@470b1fba1ae01581f270116362ee4aa1b97f4c84
+olmo7/vocab.json: verified (git_blob) from allenai/OLMo-2-1124-7B-Instruct@470b1fba1ae01581f270116362ee4aa1b97f4c84
+olmo7: 11 files verified against allenai/OLMo-2-1124-7B-Instruct@470b1fba1ae01581f270116362ee4aa1b97f4c84 -> /root/stage8_models/olmo7/VERIFIED.json
+==== 2026-10-13T12:15:37Z prefetch of olmo7: exit 0
+==== 2026-10-13T12:30:32Z fetch olmo7 -> /root/stage8_models/olmo7
+olmo7: 11 files verified against allenai/OLMo-2-1124-7B-Instruct@470b1fba1ae01581f270116362ee4aa1b97f4c84 -> /root/stage8_models/olmo7/VERIFIED.json

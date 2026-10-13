@@ -1,0 +1,2 @@
+==== 2026-10-13T10:19:48Z python experiments/stage8_flag.py --out results/gpu_stage8d --stage sets --model /root/stage8_models/qwen1.5 --key qwen1.5
+sets: ranked in-run (Stage6.base_runs, phase 1); k* 17, L* [0, 4, 5, 6, 8, 9, 10, 12, 16, 17]; hop-2 top [[22, 7], [21, 11], [18, 3], [23, 8], [21, 8]]; in-run a3 overlap with H* 17/17 (12s)

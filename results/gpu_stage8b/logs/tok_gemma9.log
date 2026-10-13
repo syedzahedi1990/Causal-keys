@@ -1,0 +1,2 @@
+==== 2026-10-13T12:53:26Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage tokcheck --model /root/stage8_models/gemma9 --key gemma9
+tokcheck PASS: ROOM 21 tokens, sentences {0: [23], 1: [22], 2: [23], 3: [22], 4: [21], 5: [21], 6: [21], 7: [22]}; trie nodes {'F': [25, 25], 'C': [25, 25], 'S0': [25, 25]}; 0 failures []

@@ -1,0 +1,2 @@
+2026-10-13T10:21:29Z HEAD 8b74b79b76e06b27bedc0d841c7b1e4a5f671649
+python experiments/stage8_flag.py --out results/gpu_stage8d --stage diss --model /root/stage8_models/qwen1.5 --key qwen1.5 

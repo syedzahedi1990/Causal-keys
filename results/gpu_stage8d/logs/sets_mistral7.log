@@ -1,0 +1,2 @@
+==== 2026-10-13T09:51:07Z python experiments/stage8_flag.py --out results/gpu_stage8d --stage sets --model /root/stage8_models/mistral7 --key mistral7
+sets: stage6; k* 52, L* [1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 19, 20, 21, 28, 30]; hop-2 top [[18, 22], [19, 8], [18, 30], [28, 0], [14, 8]]; in-run a3 overlap with H* 52/52 (10s)

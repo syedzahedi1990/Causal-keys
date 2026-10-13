@@ -1,0 +1,12 @@
+==== 2026-10-13T10:06:13Z python experiments/stage8_flag.py --out results/gpu_stage8d --stage inject --model /root/stage8_models/mistral7 --key mistral7
+inject story 0 (3s)
+inject story 10 (26s)
+inject story 20 (49s)
+inject story 30 (72s)
+inject story 40 (96s)
+inject story 50 (119s)
+inject story 60 (143s)
+inject story 70 (166s)
+inject story 80 (189s)
+inject story 90 (213s)
+inject: 100 stories (235s)

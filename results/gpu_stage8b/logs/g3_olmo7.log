@@ -1,0 +1,6 @@
+==== 2026-10-13T12:31:15Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage g3 --model /root/stage8_models/olmo7 --key olmo7
+frames file results/gpu_stage8b/frames/olmo7.json sha256 fba83c5dfbd55264b6ce3f71248ce08f116e1195545833c35733836d3a031749: 0 discovered frames []
+  g3 NONE: {'n': 30, 's_ID_trie': 0.042981519804341055, 's_ID_plain': 0.04273160146847166, 'abs_ds': 0.00024991833586939655, 'mean_abs_dL': 0.04766071145875483, 'ID_KV_plain': 13.698962408055861, 'tol_dL': 0.6849481204027931, 'pass': True} (14s)
+  g3 POST: {'n': 30, 's_ID_trie': 0.12777294657240995, 's_ID_plain': 0.12769710645647847, 'abs_ds': 7.584011593148032e-05, 'mean_abs_dL': 0.05817179170682923, 'ID_KV_plain': 10.087052456025654, 'tol_dL': 0.5043526228012828, 'pass': True} (29s)
+  g3 AFTER: {'n': 30, 's_ID_trie': 0.6253003749484186, 's_ID_plain': 0.624325126396894, 'abs_ds': 0.0009752485515246434, 'mean_abs_dL': 0.05726213565469354, 'ID_KV_plain': 11.526576744016104, 'tol_dL': 0.5763288372008052, 'pass': True} (44s)
+JB-G3 PASS: the evaluation scores with the trie

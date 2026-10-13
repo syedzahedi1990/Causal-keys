@@ -1,0 +1,102 @@
+{
+ "key": "qwen3b",
+ "repo": "Qwen/Qwen2.5-3B-Instruct",
+ "revision": "aa8e72537993ba99e69dfaafa59ed015b17504d1",
+ "attn": "sdpa",
+ "gated": false,
+ "token_used": false,
+ "manifest": "/workspace/Causal-keys/scripts/stage8_models.json",
+ "manifest_sha256": "b840b71ea644d3f01e634c67ef2c2b9bdb26cdf53d3fe6b45d34c5e78c0cb707",
+ "fetcher_sha256": "aba1e5a423fea2b079b5cc4936ab6fc95cb64818812f0178609cd118fcea8c8c",
+ "dest": "/root/stage8_models/qwen3b",
+ "host": "17ea459426e7",
+ "time_utc": "2026-10-13T10:21:33Z",
+ "sources_used": [
+  "existing copy (re-verified)"
+ ],
+ "files": {
+  "config.json": {
+   "kind": "git_blob",
+   "expected": "51b83fbd4e2d363b60235b9c8d494046a83c1cbf",
+   "size": 661,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "51b83fbd4e2d363b60235b9c8d494046a83c1cbf"
+  },
+  "generation_config.json": {
+   "kind": "git_blob",
+   "expected": "bf077f03dc569cfb8a90b3ec1ad20365a620bad6",
+   "size": 242,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "bf077f03dc569cfb8a90b3ec1ad20365a620bad6"
+  },
+  "merges.txt": {
+   "kind": "git_blob",
+   "expected": "20024bfe7c83998e9aeaf98a0cd6a2ce6306c2f0",
+   "size": 1671839,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "20024bfe7c83998e9aeaf98a0cd6a2ce6306c2f0"
+  },
+  "model-00001-of-00002.safetensors": {
+   "kind": "sha256",
+   "expected": "67347b23fb4165b652eb6611f5e1f2a06dfcddba8e909df1b2b0b1857bee06c2",
+   "size": 3968658944,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "67347b23fb4165b652eb6611f5e1f2a06dfcddba8e909df1b2b0b1857bee06c2"
+  },
+  "model-00002-of-00002.safetensors": {
+   "kind": "sha256",
+   "expected": "a40d941d0e7e0b966ad8b62bb6d6b7c88cce1299197b599d9d0a4ce59aabfc1d",
+   "size": 2203268048,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "a40d941d0e7e0b966ad8b62bb6d6b7c88cce1299197b599d9d0a4ce59aabfc1d"
+  },
+  "model.safetensors.index.json": {
+   "kind": "git_blob",
+   "expected": "38047c6284a25427043f0ab040f623a2a20dd093",
+   "size": 35581,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "38047c6284a25427043f0ab040f623a2a20dd093"
+  },
+  "tokenizer.json": {
+   "kind": "git_blob",
+   "expected": "443909a61d429dff23010e5bddd28ff530edda00",
+   "size": 7031645,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "443909a61d429dff23010e5bddd28ff530edda00"
+  },
+  "tokenizer_config.json": {
+   "kind": "git_blob",
+   "expected": "07bfe0640cb5a0037f9322287fbfc682806cf672",
+   "size": 7305,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "07bfe0640cb5a0037f9322287fbfc682806cf672"
+  },
+  "vocab.json": {
+   "kind": "git_blob",
+   "expected": "4783fe10ac3adce15ac8f358ef5462739852c569",
+   "size": 2776833,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "4783fe10ac3adce15ac8f358ef5462739852c569"
+  }
+ },
+ "failed": [],
+ "unexpected_files": []
+}

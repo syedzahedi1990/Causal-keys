@@ -1,0 +1,6 @@
+==== 2026-10-13T10:13:16Z python experiments/stage8_flag.py --out results/gpu_stage8d --stage sign --model /root/stage8_models/mistral7 --key mistral7
+sign Q_IN: 100 stories (119s)
+sign Q_OUT: 100 stories (236s)
+sign P1: 100 stories (248s)
+sign INLINE: 100 cores (310s)
+sign INLINE_CHAT: 100 cores (372s)

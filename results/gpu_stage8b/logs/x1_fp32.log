@@ -1,0 +1,6 @@
+==== 2026-10-13T13:43:07Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage eval --population S0 --model /root/stage8_models/qwen7 --key qwen7 --n 60 --arms AFTER,POST,NONE --no-plain --dtype float32 --suffix _x1fp32
+frames file results/gpu_stage8b/frames/qwen7.json sha256 ae18b810014aed61658ed99b73c9cd429e144ca8a65a3135502fe213a96a3f4a: 0 discovered frames []
+  AFTER done: 60 items (147s; total 147s)
+  POST done: 60 items (152s; total 299s)
+  NONE done: 60 items (129s; total 428s)
+wrote results/gpu_stage8b/eval/qwen7_x1fp32_S0.json (180 items, 0 skipped, arms not run []; 428s)

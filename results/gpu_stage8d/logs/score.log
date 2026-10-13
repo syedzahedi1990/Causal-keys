@@ -1,0 +1,238 @@
+==== 2026-10-13T10:32:57Z python analysis/stage8d_score.py --results results/gpu_stage8d
+Stage 8 part D scoring, preregistration P-2026-10-10-J; results results/gpu_stage8d
+
+PROVENANCE (the pipeline's COMMIT.txt, ENV.txt, REVISIONS.txt, SKIPPED.txt; every results file)
+  COMMIT.txt:
+    ==== 2026-10-13T09:16:49Z stage 8 part d TEST_MODE=0 FORCE=0 FORCE_STEPS= DEADLINE_H=3.5 TESTS=1 KEEP_CACHE=0
+    8b74b79b76e06b27bedc0d841c7b1e4a5f671649
+    ?? results/gpu_stage8d/
+    preregistration P-2026-10-10-J final at 8b74b79b76e06b27bedc0d841c7b1e4a5f671649; HEAD 8b74b79b76e06b27bedc0d841c7b1e4a5f671649
+  ENV.txt:
+    ==== 2026-10-13T09:17:04Z part d TEST_MODE=0 OUT=results/gpu_stage8d DEV=cuda DTYPE=bfloat16 deadline 2026-10-13T12:46:49Z (DEADLINE_H=3.5)
+    HEAD 8b74b79b76e06b27bedc0d841c7b1e4a5f671649 finalising commit 8b74b79b76e06b27bedc0d841c7b1e4a5f671649
+    manifest scripts/stage8_models.json sha256 b840b71ea644d3f01e634c67ef2c2b9bdb26cdf53d3fe6b45d34c5e78c0cb707; model store /root/stage8_models; HF_TOKEN set: no (the token itself is never recorded)
+    disk at the model store: 200G free of 200G
+    python 3.12.14 torch 2.11.0+cu128 transformers 5.18.0 numpy 2.5.3 huggingface_hub 2.2.0 gpus 1 NVIDIA A100-SXM4-80GB
+    name, memory.total [MiB], driver_version
+    NVIDIA A100-SXM4-80GB, 81920 MiB, 580.159.03
+    2026-10-13T10:21:29Z qwen1.5 removed from /root/stage8_models/qwen1.5
+    2026-10-13T10:24:10Z qwen3b removed from /root/stage8_models/qwen3b
+    2026-10-13T10:28:25Z qwen7 removed from /root/stage8_models/qwen7
+    2026-10-13T10:32:57Z mistral7 removed from /root/stage8_models/mistral7
+  REVISIONS.txt:
+    # <repo> <revision> key=<key> attn=<impl> token=<used> sources=<where the verified bytes came from>; pins: scripts/stage8_models.json sha256 b840b71ea644d3f01e634c67ef2c2b9bdb26cdf53d3fe6b45d34c5e78c0cb707
+    Qwen/Qwen2.5-7B-Instruct a09a35458c702b33eeacc393d103063234e8bc28 key=qwen7 attn=sdpa token=no sources=Qwen/Qwen2.5-7B-Instruct@a09a35458c
+    mistralai/Mistral-7B-Instruct-v0.3 c170c708c41dac9275d15a8fff4eca08d52bab71 key=mistral7 attn=sdpa token=no sources=
+    Qwen/Qwen2.5-1.5B-Instruct 989aa7980e4cf806f80c7fef2b1adb7bc71aa306 key=qwen1.5 attn=sdpa token=no sources=
+    Qwen/Qwen2.5-3B-Instruct aa8e72537993ba99e69dfaafa59ed015b17504d1 key=qwen3b attn=sdpa token=no sources=
+  SKIPPED.txt: absent
+  ablate/mistral7: commit 8b74b79b76, /root/stage8_models/mistral7 rev c170c708c4, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, test_mode False
+  ablate/qwen7: commit 8b74b79b76, /root/stage8_models/qwen7 rev a09a35458c, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, test_mode False
+  before/qwen7: commit 8b74b79b76, /root/stage8_models/qwen7 rev a09a35458c, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, test_mode False
+  bind/mistral7: commit 8b74b79b76, /root/stage8_models/mistral7 rev c170c708c4, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, test_mode False
+  bind/qwen7: commit 8b74b79b76, /root/stage8_models/qwen7 rev a09a35458c, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, test_mode False
+  diss/qwen1.5: commit 8b74b79b76, /root/stage8_models/qwen1.5 rev 989aa7980e, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, test_mode False
+  diss/qwen3b: commit 8b74b79b76, /root/stage8_models/qwen3b rev aa8e725379, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, test_mode False
+  diss/qwen7: commit 8b74b79b76, /root/stage8_models/qwen7 rev a09a35458c, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, test_mode False
+  fit/mistral7: commit 8b74b79b76, /root/stage8_models/mistral7 rev c170c708c4, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, test_mode False
+  fit/qwen1.5: commit 8b74b79b76, /root/stage8_models/qwen1.5 rev 989aa7980e, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, test_mode False
+  fit/qwen3b: commit 8b74b79b76, /root/stage8_models/qwen3b rev aa8e725379, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, test_mode False
+  fit/qwen7: commit 8b74b79b76, /root/stage8_models/qwen7 rev a09a35458c, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, test_mode False
+  inject/mistral7: commit 8b74b79b76, /root/stage8_models/mistral7 rev c170c708c4, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, test_mode False
+  inject/qwen7: commit 8b74b79b76, /root/stage8_models/qwen7 rev a09a35458c, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, test_mode False
+  preflight/mistral7: commit 8b74b79b76, /root/stage8_models/mistral7 rev c170c708c4, dtype -, attn -, device NVIDIA A100-SXM4-80GB, test_mode False
+  preflight/qwen1.5: commit 8b74b79b76, /root/stage8_models/qwen1.5 rev 989aa7980e, dtype -, attn -, device NVIDIA A100-SXM4-80GB, test_mode False
+  preflight/qwen3b: commit 8b74b79b76, /root/stage8_models/qwen3b rev aa8e725379, dtype -, attn -, device NVIDIA A100-SXM4-80GB, test_mode False
+  preflight/qwen7: commit 8b74b79b76, /root/stage8_models/qwen7 rev a09a35458c, dtype -, attn -, device NVIDIA A100-SXM4-80GB, test_mode False
+  sets/mistral7: commit 8b74b79b76, /root/stage8_models/mistral7 rev c170c708c4, dtype torch.bfloat16, attn eager, device NVIDIA A100-SXM4-80GB, test_mode False
+  sets/qwen1.5: commit 8b74b79b76, /root/stage8_models/qwen1.5 rev 989aa7980e, dtype torch.bfloat16, attn eager, device NVIDIA A100-SXM4-80GB, test_mode False
+  sets/qwen3b: commit 8b74b79b76, /root/stage8_models/qwen3b rev aa8e725379, dtype torch.bfloat16, attn eager, device NVIDIA A100-SXM4-80GB, test_mode False
+  sets/qwen7: commit 8b74b79b76, /root/stage8_models/qwen7 rev a09a35458c, dtype torch.bfloat16, attn eager, device NVIDIA A100-SXM4-80GB, test_mode False
+  sign/mistral7: commit 8b74b79b76, /root/stage8_models/mistral7 rev c170c708c4, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, test_mode False
+  sign/qwen7: commit 8b74b79b76, /root/stage8_models/qwen7 rev a09a35458c, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, test_mode False
+  xtask/mistral7: commit 8b74b79b76, /root/stage8_models/mistral7 rev c170c708c4, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, test_mode False
+  xtask/qwen7: commit 8b74b79b76, /root/stage8_models/qwen7 rev a09a35458c, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, test_mode False
+  commits: ['8b74b79b76']
+
+POPULATION (pinned hashes of R, R', E8, BIND, the IOI candidate lists and the task lists; sizes)
+  preflight qwen7: hashes OK; overlaps none; IOI E_ioi 100 valid, F_ioi 60; prompts checked 1325
+  preflight mistral7: hashes OK; overlaps none; IOI E_ioi 100 valid, F_ioi 60; prompts checked 1125
+  preflight qwen1.5: hashes OK; overlaps none; IOI E_ioi 100 valid, F_ioi 60; prompts checked 1125
+  preflight qwen3b: hashes OK; overlaps none; IOI E_ioi 100 valid, F_ioi 60; prompts checked 1125
+  population: OK
+
+  J-D-G0  FP32 unit tests (last of 1 run(s)): tests/test_flag.py 13 passed, 0 failed, 0 skipped; tests/test_questions.py 11 passed, 0 failed, 0 skipped; tests/test_stage8d_score.py 18 passed, 0 failed, 0 skipped; tests/test_stage8_populations.py 5 passed, 0 failed, 0 skipped; tests/test_stage8_holm.py 7 passed, 0 failed, 0 skipped; failures in the run 0, skips in the run 0 -> MET
+GATES (J-D-G0 before any model; J-D-G1 natural effect; J-D-G2 batch floor; J-D-G3 competence; J-D-G4 transfer evaluable; J-D-G5 binding queries; J-D-G6 dissociation population; J-D-G7 ratio denominators, per line)
+  J-D-G1 qwen7    N_X (P1, E8) +23.576 [+22.836,+24.331] (>= 3 nats, CI excl. 0) -> MET
+  J-D-G2 qwen7    inject batch floor 0.0000 (<= 0.05) -> MET
+  J-D-G5 qwen7    accuracy other_agent 0.91, irrelevant_object 0.99 (>= 0.80; direct 1.00) -> MET
+  J-D-G3 qwen7    Q_IN        argmax mentioned 1.00 (>= 0.90), candidate mass 1.00 (>= 0.50) -> MET
+  J-D-G2 qwen7    Q_IN        batch floor 0.0000 -> MET
+  J-D-G4 qwen7    Q_IN        d_G +13.184 [+12.406,+13.941], ID_K(allT) +13.364 [+12.549,+14.139], d_G/ID_K +0.987 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 qwen7    Q_OUT       argmax unmentioned 1.00 (>= 0.90), candidate mass 1.00 (>= 0.50) -> MET
+  J-D-G2 qwen7    Q_OUT       batch floor 0.0000 -> MET
+  J-D-G4 qwen7    Q_OUT       d_G -12.131 [-12.894,-11.407], ID_K(allT) -12.148 [-12.903,-11.433], d_G/ID_K +0.999 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 qwen7    INLINE      two-way 1.00 (>= 0.75), four-way 0.58 (>= 0.50), LD +8.456 [+7.747,+9.195] (> 0, CI excl. 0) -> MET
+  J-D-G2 qwen7    INLINE      batch floor 0.0000 -> MET
+  J-D-G4 qwen7    INLINE      d_G -2.008 [-2.284,-1.733], ID_K(allT) -3.518 [-3.829,-3.205], d_G/ID_K +0.571 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 qwen7    INLINE_CHAT two-way 0.98 (>= 0.75), four-way 0.55 (>= 0.50), LD +8.904 [+7.880,+9.902] (> 0, CI excl. 0) -> MET
+  J-D-G4 qwen7    INLINE_CHAT d_G -2.210 [-3.160,-1.244], ID_K(allT) -4.910 [-5.858,-3.952], d_G/ID_K +0.450 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> NOT MET
+  J-D-G3 qwen7    AFTER       two-way 0.98 (>= 0.75), four-way 0.87 (>= 0.50), LD +13.004 [+11.887,+14.118] (> 0, CI excl. 0) -> MET
+  J-D-G4 qwen7    AFTER       d_G +8.054 [+7.004,+9.167], ID_K(allT) +5.846 [+4.779,+6.990], d_G/ID_K +1.378 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G1 mistral7 N_X (P1, E8) +15.139 [+14.348,+15.926] (>= 3 nats, CI excl. 0) -> MET
+  J-D-G2 mistral7 inject batch floor 0.0000 (<= 0.05) -> MET
+  J-D-G5 mistral7 accuracy other_agent 0.94, irrelevant_object 0.96 (>= 0.80; direct 1.00) -> MET
+  J-D-G3 mistral7 Q_IN        argmax mentioned 0.98 (>= 0.90), candidate mass 1.00 (>= 0.50) -> MET
+  J-D-G2 mistral7 Q_IN        batch floor 0.0000 -> MET
+  J-D-G4 mistral7 Q_IN        d_G +3.829 [+3.320,+4.333], ID_K(allT) +3.757 [+3.257,+4.251], d_G/ID_K +1.019 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 mistral7 Q_OUT       argmax unmentioned 1.00 (>= 0.90), candidate mass 1.00 (>= 0.50) -> MET
+  J-D-G2 mistral7 Q_OUT       batch floor 0.0000 -> MET
+  J-D-G4 mistral7 Q_OUT       d_G -7.117 [-7.756,-6.496], ID_K(allT) -7.231 [-7.876,-6.600], d_G/ID_K +0.984 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 mistral7 INLINE      two-way 1.00 (>= 0.75), four-way 0.58 (>= 0.50), LD +5.064 [+4.762,+5.367] (> 0, CI excl. 0) -> MET
+  J-D-G2 mistral7 INLINE      batch floor 0.0000 -> MET
+  J-D-G4 mistral7 INLINE      d_G -1.137 [-1.303,-0.978], ID_K(allT) -2.372 [-2.567,-2.182], d_G/ID_K +0.479 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> NOT MET
+  J-D-G3 mistral7 INLINE_CHAT two-way 0.68 (>= 0.75), four-way 0.46 (>= 0.50), LD +3.191 [+2.184,+4.208] (> 0, CI excl. 0) -> NOT MET
+  J-D-G4 mistral7 INLINE_CHAT d_G +0.146 [-0.525,+0.846], ID_K(allT) -1.673 [-2.318,-0.992], d_G/ID_K -0.087 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> NOT MET
+  J-D-G6 qwen1.5  competent cores 72 of 100 (>= 40); P1 injection dl_X +4.126 [+3.755,+4.510] (> 0, CI excl. 0); R(k*) of the in-run H* +0.905 [+0.875,+0.932] (>= 0.6); batch floor 0.0000 -> MET
+  J-D-G6 qwen3b   competent cores 35 of 60 (>= 40); P1 injection dl_X +10.285 [+8.849,+11.645] (> 0, CI excl. 0); R(k*) of the in-run H* +1.017 [+1.005,+1.031] (>= 0.6); batch floor 0.0000 -> NOT MET
+  J-D-G6 qwen7    competent cores 100 of 100 (>= 40); P1 injection dl_X +15.898 [+14.555,+17.258] (> 0, CI excl. 0); batch floor 0.0000 -> MET
+
+PREDICTIONS (code, class, kind, prior, verdict; the numbers it was decided on; 2/2 lines need two evaluable models)
+  J-D1           R A prior 0.55  MET           sufficiency: the leave-one-word-out flag moves the answer to an absent option (ID_inj^LOO / ID_K)
+    qwen7    MET           ID_inj^LOO/ID_K +0.997 [+0.980,+1.014] (>= 0.5; H0: <= 0.35), pi_X(move, LOO) 0.96 (>= 0.5); ID_K +20.650 [+20.078,+21.207]
+    mistral7 MET           ID_inj^LOO/ID_K +0.803 [+0.746,+0.856] (>= 0.5; H0: <= 0.35), pi_X(move, LOO) 0.67 (>= 0.5); ID_K +14.682 [+14.123,+15.206]
+  J-D2           R A prior 0.55  NOT MET       specificity against structured controls (own write orthogonal to the flag, mean H* output, active-set flag)
+    qwen7    NOT MET       iota(move) +0.999 [+0.992,+1.006]; orth: iota +0.135 [+0.096,+0.179], difference +0.864 [+0.818,+0.905] (>= 0.4; H0: <= 0), ratio +0.135 (<= 0.3); meanH: iota +0.614 [+0.549,+0.679], difference +0.385 [+0.320,+0.450] (>= 0.4; H0: <= 0), ratio +0.615 (<= 0.3); active: iota -0.032 [-0.037,-0.027], difference +1.031 [+1.021,+1.040] (>= 0.4; H0: <= 0), ratio -0.032 (<= 0.3)
+    mistral7 NOT MET       iota(move) +0.794 [+0.719,+0.864]; orth: iota +0.409 [+0.332,+0.488], difference +0.384 [+0.268,+0.496] (>= 0.4; H0: <= 0), ratio +0.516 (<= 0.3); meanH: iota +0.120 [+0.078,+0.166], difference +0.674 [+0.604,+0.743] (>= 0.4; H0: <= 0), ratio +0.151 (<= 0.3); active: iota -0.010 [-0.015,-0.006], difference +0.804 [+0.729,+0.875] (>= 0.4; H0: <= 0), ratio -0.013 (<= 0.3)
+  J-D3           R A prior 0.50  NOT MET       necessity: ablating one direction per layer at the option rows removes the key read (rho_K)
+    qwen7    NOT MET       rho_K flag +0.466 [+0.416,+0.516] (<= 0.5; H0: >= 0.6), pc1 +0.687 [+0.633,+0.738] (>= 0.7), mean-H* output +0.561 [+0.520,+0.600] (>= 0.7)
+    mistral7 MET           rho_K flag +0.478 [+0.403,+0.553] (<= 0.5; H0: >= 0.6), pc1 +0.846 [+0.786,+0.902] (>= 0.7), mean-H* output +0.899 [+0.846,+0.946] (>= 0.7)
+  J-D4           M A prior 0.85  MET           the injected flag is read at hop 2 by key (r_ans^inj)
+    qwen7    MET           r_ans^inj(KV) +0.869 [+0.855,+0.884] (>= 0.6; H0: <= 0.45), K +0.689 [+0.642,+0.735], V +0.047 [+0.030,+0.067], K - V +0.642 [+0.589,+0.692] (H0: <= 0); denominator +23.528 [+22.801,+24.266]
+    mistral7 MET           r_ans^inj(KV) +0.762 [+0.737,+0.786] (>= 0.6; H0: <= 0.45), K +0.601 [+0.540,+0.659], V +0.068 [+0.035,+0.104], K - V +0.533 [+0.478,+0.588] (H0: <= 0); denominator +11.997 [+10.873,+13.090]
+  J-D-ADDR       M A prior 0.80  MET           the flag is identity-free: the key-only and the natural (K and V) writes give the same flag
+    qwen7    MET           weighted cos(Delta^K, Delta^KV) +0.993 (>= 0.9); ID_inj(KV)/ID_inj(K) +1.005 [+1.003,+1.008] (in [0.8, 1.25]; 95 % CI inside [0.7, 1.4])
+    mistral7 MET           weighted cos(Delta^K, Delta^KV) +0.962 (>= 0.9); ID_inj(KV)/ID_inj(K) +0.981 [+0.949,+1.013] (in [0.8, 1.25]; 95 % CI inside [0.7, 1.4])
+  J-D-KN         R A prior 0.40  NOT MET       a non-candidate key acts as removing B's flag, with no specific beneficiary
+    qwen7    NOT MET       mean per-story Pearson +0.894 [+0.868,+0.917] (>= 0.8; 0 undefined), B-loss ratio +5.167 [+3.878,+7.704] (in [0.7, 1.3]), mean(dl_S - dl_X) -0.073 [-0.763,+0.612] (95 % CI inside +-2.065 = 0.1 x ID_K)
+    mistral7 NOT MET       mean per-story Pearson +0.147 [+0.041,+0.252] (>= 0.8; 0 undefined), B-loss ratio +9.095 [+2.862,+58.110] (in [0.7, 1.3]), mean(dl_S - dl_X) +0.290 [-0.457,+1.024] (95 % CI inside +-1.468 = 0.1 x ID_K)
+  J-D5           R A prior 0.25  NOT MET       the flag of an initial-state sentence carries its binding (Psi_bind > 0 in both sentence orders)
+    qwen7    NOT MET       Psi_bind pooled -0.578 [-0.863,-0.308] (H0: <= 0), object-first +0.376 [+0.156,+0.619] (n 43), distractor-first -1.299 [-1.678,-0.955] (n 57), stratum difference +1.675 [+1.272,+2.115] (CI must include 0)
+    mistral7 MET           Psi_bind pooled +0.269 [+0.096,+0.456] (H0: <= 0), object-first +0.459 [+0.120,+0.848] (n 43), distractor-first +0.126 [-0.034,+0.283] (n 57), stratum difference +0.333 [-0.049,+0.751] (CI must include 0)
+  J-D7           M A prior 0.85  MET           consistency: the key read is negative under Q_OUT and positive under Q_IN
+    qwen7    MET           ID_K(Q_OUT) -12.138 [-12.905,-11.413] (<= -1; H0: >= 0), ID_K(Q_IN) +13.005 [+12.206,+13.777] (>= 1; H0: <= 0), paired difference +25.143 [+24.121,+26.159] (H0: <= 0)
+    mistral7 MET           ID_K(Q_OUT) -7.083 [-7.726,-6.463] (<= -1; H0: >= 0), ID_K(Q_IN) +3.575 [+3.085,+4.059] (>= 1; H0: <= 0), paired difference +10.658 [+9.897,+11.413] (H0: <= 0)
+  J-D-SIGN-Q     M A prior 0.85  MET           Q_OUT: the key and the value reads are both negative (task semantics)
+    qwen7    MET           Q_OUT ID_K -12.138 [-12.905,-11.413] (H0: >= 0), ID_V -0.431 [-0.616,-0.254] (H0: >= 0)
+    mistral7 MET           Q_OUT ID_K -7.083 [-7.726,-6.463] (H0: >= 0), ID_V -1.806 [-2.442,-1.192] (H0: >= 0)
+  J-D-SIGN-IOI   L A prior 0.90  MET           IOI INLINE: the key read is negative while the value read is positive
+    qwen7    MET           INLINE ID_K -3.350 [-3.655,-3.042] (H0: >= 0), ID_V +2.550 [+2.244,+2.889] (H0: <= 0)
+    mistral7 MET           INLINE ID_K -2.352 [-2.542,-2.162] (H0: >= 0), ID_V +1.096 [+0.945,+1.247] (H0: <= 0)
+  J-D8-Q         M A prior 0.85  MET           consistency: the frozen H* carry the Q_IN and Q_OUT key reads
+    qwen7    MET           Q_IN: R(H*) +1.027 [+1.016,+1.038] (>= 0.6; H0: <= 0.45), KO(H*) +0.974 [+0.968,+0.980] (>= 0.6; H0: <= 0.45), random R +0.004 KO +0.009 (<= 0.15); d_Gc/ID_K +0.992 | Q_OUT: R(H*) +0.986 [+0.971,+1.002] (>= 0.6; H0: <= 0.45), KO(H*) +1.021 [+1.001,+1.041] (>= 0.6; H0: <= 0.45), random R +0.003 KO +0.014 (<= 0.15); d_Gc/ID_K +0.996
+    mistral7 MET           Q_IN: R(H*) +1.058 [+1.032,+1.087] (>= 0.6; H0: <= 0.45), KO(H*) +0.931 [+0.892,+0.964] (>= 0.6; H0: <= 0.45), random R +0.015 KO -0.005 (<= 0.15); d_Gc/ID_K +1.031 | Q_OUT: R(H*) +1.050 [+1.011,+1.093] (>= 0.6; H0: <= 0.45), KO(H*) +0.958 [+0.918,+0.995] (>= 0.6; H0: <= 0.45), random R +0.007 KO -0.006 (<= 0.15); d_Gc/ID_K +0.963
+  J-D8-IOI       R A prior 0.55  NOT EVALUABLE the frozen H* carry the negative IOI INLINE key read at the listed names
+    qwen7    MET           INLINE: R(H*) +0.922 [+0.882,+0.960] (>= 0.6; H0: <= 0.45), KO(H*) +0.998 [+0.980,+1.016] (>= 0.6; H0: <= 0.45), random R +0.002 KO +0.031 (<= 0.15); d_Gc/ID_K +0.567
+    mistral7 NOT EVALUABLE J-D-G4 INLINE not passed
+  J-D-ROUTE-IOI  R A prior 0.40  MET           IOI INLINE: the negative read is applied at the answer row's key read of the listed names
+    qwen7    MET           K_S rows: r_ans(KV) +0.897 [+0.821,+0.976] (>= 0.6), K +0.431 [+0.318,+0.536], V +0.211 [+0.163,+0.267], K - V +0.220 [+0.081,+0.343] (H0: <= 0); r_other +0.103 [+0.064,+0.146] (>= 0.5 would mean S2 or tail rows carry it); dm(K_S) -4.117 [-4.714,-3.528]
+    mistral7 MET           K_S rows: r_ans(KV) +0.839 [+0.769,+0.910] (>= 0.6), K +0.488 [+0.406,+0.567], V +0.263 [+0.231,+0.298], K - V +0.225 [+0.131,+0.314] (H0: <= 0); r_other +0.190 [+0.157,+0.223] (>= 0.5 would mean S2 or tail rows carry it); dm(K_S) -2.507 [-2.768,-2.253]
+  J-D-HOP2       R A prior 0.25  NOT MET       the same top-10 hop-2 heads carry the injected flag's Q_OUT and IOI effects (same reader, opposite sign)
+    qwen7    NOT MET       [different reader] Q_OUT: carry(top-10) +0.077 [+0.062,+0.092] (>= 0.5; H0: <= 0.2), all heads +0.696, random 10 +0.025; dl_X(inj) -15.179 [-16.292,-14.025]; INLINE: carry(top-10) -0.085 [-0.141,-0.036] (>= 0.5; H0: <= 0.2), all heads +0.855, random 10 +0.053; dl_X(inj) -2.779 [-3.176,-2.398]
+    mistral7 NOT MET       [different reader] Q_OUT: carry(top-10) +0.161 [+0.117,+0.208] (>= 0.5; H0: <= 0.2), all heads +0.851, random 10 -0.003; dl_X(inj) -6.422 [-7.260,-5.576]; INLINE: carry(top-10) -0.029 [-0.093,+0.025] (>= 0.5; H0: <= 0.2), all heads +0.555, random 10 +0.003; dl_X(inj) -0.752 [-0.914,-0.601]
+  J-D6a          L A prior 0.90  MET           consistency: the flag is written in sentences as in lists at every scale (omega, kappa)
+    qwen1.5  MET           omega +0.967 [+0.952,+0.982] (>= 0.6; H0: <= 0.4), kappa +0.966 (>= 0.7)
+    qwen3b   MET           omega +0.954 [+0.937,+0.971] (>= 0.6; H0: <= 0.4), kappa +0.895 (>= 0.7)
+    qwen7    MET           omega +0.822 [+0.810,+0.834] (>= 0.6; H0: <= 0.4), kappa +0.872 (>= 0.7)
+  J-D6           R A prior 0.35  NOT MET       mediation: the sentence-row flag carries the natural POST/P1 read ratio at 1.5B, 3B and 7B
+    qwen1.5  NOT MET       rho -0.126 [-0.179,-0.077], rho_nat +0.090 [+0.042,+0.137] (same sign: False), rho - rho_nat -0.216 [-0.273,-0.163] (95 % CI inside +-0.100); dl_X(inj) P1 +4.126 [+3.755,+4.510], POST -0.520 [-0.701,-0.331]; N_X P1 +5.615 [+5.077,+6.139], POST +0.508 [+0.228,+0.789]; 72 competent cores
+    qwen3b   NOT EVALUABLE J-D-G6 or J-D-G2 not passed
+    qwen7    NOT MET       rho +0.257 [+0.222,+0.292], rho_nat +0.468 [+0.431,+0.505] (same sign: True), rho - rho_nat -0.211 [-0.245,-0.178] (95 % CI inside +-0.234); dl_X(inj) P1 +15.898 [+14.555,+17.258], POST +4.085 [+3.395,+4.817]; N_X P1 +23.583 [+22.840,+24.350], POST +11.044 [+10.193,+11.920]; 100 competent cores
+  J-D6-ROUTE     R A prior 0.35  NOT MET       at 1.5B the answer reads the sentence-row flag by value (r_ans^inj(V) > r_ans^inj(K))
+    qwen1.5  NOT MET       POST: r_ans^inj(V) -0.140 [-0.276,-0.054], K +1.114 [+1.006,+1.285], V - K -1.254 [-1.543,-1.075] (H0: <= 0); KV +1.026 [+0.957,+1.137]; dl_X(inj) -0.507 [-0.687,-0.322]
+
+D6 DECISION TABLE (fixed in the entry): (d) MIXED: none of (a)-(c); reported as such
+
+REPORTED (no verdict counted)
+  qwen7: iota add 0.5 / 1 / 2 +0.053 / +0.673 / +0.684 (monotone: True); add-only +0.673 [+0.616,+0.729] (>= 0.25, LB > 0: True); move +0.999 [+0.992,+1.006]; pi_X(move) 0.96; ID_inj(full flag)/ID_K +0.994 [+0.978,+1.010]; N_X +23.576 [+22.836,+24.331]
+  qwen7: sanity rows: iso0 -0.005, iso1 +0.013, iso2 +0.018, hspan0 +0.048, hspan1 +0.019, hspan2 -0.004, perm +0.048, choices -0.002, question +0.002; pi_X shift choices +0.00, question +0.00; rank-1 capture +1.008 [+0.993,+1.029]
+  qwen7: D4 r_other +0.018 [+0.008,+0.031]
+  qwen7: B-identity share of the per-story flag (null 0.08): l0 0.62, l2 0.85, l3 0.88, l4 0.74, l5 0.42, l8 0.67, l9 0.30, l10 0.29, l11 0.65, l12 0.48, l14 0.33, l15 0.51, l16 0.28, l17 0.24, l19 0.28, l21 0.63, l22 0.37, l26 0.33
+  qwen7: logit lens max|cos(Delta, W_U[loc])| vs random: l0 0.020/0.028, l2 0.028/0.020, l3 0.009/0.013, l4 0.019/0.015, l5 0.017/0.013, l8 0.030/0.014, l9 0.044/0.013, l10 0.037/0.026, l11 0.053/0.053, l12 0.042/0.051, l14 0.034/0.045, l15 0.015/0.021, l16 0.021/0.027, l17 0.044/0.013, l19 0.020/0.015, l21 0.071/0.034, l22 0.031/0.014, l26 0.045/0.023
+  mistral7: iota add 0.5 / 1 / 2 +0.054 / +0.541 / +0.612 (monotone: True); add-only +0.541 [+0.459,+0.626] (>= 0.25, LB > 0: True); move +0.794 [+0.719,+0.864]; pi_X(move) 0.70; ID_inj(full flag)/ID_K +0.814 [+0.759,+0.865]; N_X +15.139 [+14.348,+15.926]
+  mistral7: sanity rows: iso0 -0.006, iso1 +0.021, iso2 +0.027, hspan0 +0.013, hspan1 -0.038, hspan2 +0.003, perm +0.036, choices -0.001, question -0.013; pi_X shift choices +0.00, question +0.00; rank-1 capture +0.851 [+0.772,+0.929]
+  mistral7: D4 r_other +0.078 [+0.053,+0.107]
+  mistral7: B-identity share of the per-story flag (null 0.08): l1 0.94, l4 0.58, l5 0.55, l6 0.68, l7 0.61, l8 0.38, l9 0.54, l10 0.29, l11 0.38, l12 0.28, l14 0.24, l15 0.28, l16 0.24, l17 0.30, l19 0.29, l20 0.59, l21 0.55, l28 0.32, l30 0.35
+  mistral7: logit lens max|cos(Delta, W_U[loc])| vs random: l1 0.030/0.013, l4 0.019/0.017, l5 0.017/0.013, l6 0.028/0.012, l7 0.021/0.014, l8 0.028/0.013, l9 0.025/0.016, l10 0.016/0.016, l11 0.034/0.014, l12 0.018/0.014, l14 0.018/0.012, l15 0.023/0.012, l16 0.036/0.011, l17 0.036/0.016, l19 0.056/0.014, l20 0.055/0.015, l21 0.121/0.013, l28 0.047/0.016, l30 0.021/0.009
+  qwen7: rho_K isotropic iso0 +0.999 [+0.997,+1.000], iso1 +1.002 [+1.000,+1.004], iso2 +1.000 [+0.999,+1.002] (sanity >= 0.85)
+  mistral7: rho_K isotropic iso0 +1.001 [+0.999,+1.002], iso1 +1.001 [+1.000,+1.002], iso2 +1.001 [+0.999,+1.002] (sanity >= 0.85)
+  qwen7: event vs initial (role confounded with order) Psi_ev +18.559 [+16.640,+20.482]
+  mistral7: event vs initial (role confounded with order) Psi_ev +10.734 [+9.260,+12.228]
+  qwen7 Q_IN: ID_K +13.005 [+12.206,+13.777], ID_V +3.798 [+3.504,+4.115]; R(H*) +1.027 [+1.016,+1.038], KO(H*) +0.974 [+0.968,+0.980], d_G/ID_K +0.987 [+0.977,+0.997], d_Gc/ID_K +0.992 [+0.980,+1.006] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S -12.522 [-13.450,-11.577] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) +14.155 [+13.086,+15.234], N_X(cfg) +14.166 [+13.045,+15.270], ratio +0.999; isotropic +0.146, +0.302, +0.020
+  qwen7 Q_OUT: ID_K -12.138 [-12.905,-11.413], ID_V -0.431 [-0.616,-0.254]; R(H*) +0.986 [+0.971,+1.002], KO(H*) +1.021 [+1.001,+1.041], d_G/ID_K +0.999 [+0.990,+1.009], d_Gc/ID_K +0.996 [+0.985,+1.007] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +12.869 [+11.571,+14.106] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -15.188 [-16.324,-14.030], N_X(cfg) -12.369 [-13.651,-11.057], ratio +1.228; isotropic +0.649, +0.164, +0.209
+  qwen7: hop-2 carry under P1 (the ranking format): top10 +0.339 [+0.317,+0.360], rand10 +0.023 [+0.016,+0.031], all +0.846 [+0.820,+0.869]
+  qwen7 INLINE: ID_K -3.350 [-3.655,-3.042], ID_V +2.550 [+2.244,+2.889]; R(H*) +0.922 [+0.882,+0.960], KO(H*) +0.998 [+0.980,+1.016], d_G/ID_K +0.571 [+0.519,+0.618], d_Gc/ID_K +0.567 [+0.515,+0.615] (a re-mention read only if >= 0.5)
+     route of the injected IOI flag: r_ans(KV) +0.889 [+0.851,+0.926], K +0.628 [+0.557,+0.694], V +0.158 [+0.115,+0.205], other +0.066 [+0.023,+0.110]; dm(inj) -3.852 [-4.389,-3.348]
+  qwen7 INLINE_CHAT: ID_K -4.767 [-5.727,-3.807], ID_V +5.787 [+5.252,+6.350]; R(H*) +0.929 [+0.842,+1.029], KO(H*) +1.074 [+1.031,+1.157], d_G/ID_K +0.450 [+0.310,+0.549], d_Gc/ID_K +0.443 [+0.303,+0.543] (a re-mention read only if >= 0.5)
+  qwen7 AFTER: ID_K +5.871 [+4.819,+6.995], ID_V +5.852 [+5.297,+6.427]; R(H*) +0.972 [+0.940,+1.003], KO(H*) +0.997 [+0.987,+1.007], d_G/ID_K +1.378 [+1.294,+1.486], d_Gc/ID_K +1.378 [+1.294,+1.488] (a re-mention read only if >= 0.5)
+  mistral7 Q_IN: ID_K +3.575 [+3.085,+4.059], ID_V +1.028 [+0.779,+1.295]; R(H*) +1.058 [+1.032,+1.087], KO(H*) +0.931 [+0.892,+0.964], d_G/ID_K +1.019 [+0.997,+1.042], d_Gc/ID_K +1.031 [+0.988,+1.077] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S -3.475 [-4.276,-2.678] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) +2.847 [+2.123,+3.619], N_X(cfg) +4.284 [+3.381,+5.204], ratio +0.665; isotropic -0.499, +0.362, -0.088
+  mistral7 Q_OUT: ID_K -7.083 [-7.726,-6.463], ID_V -1.806 [-2.442,-1.192]; R(H*) +1.050 [+1.011,+1.093], KO(H*) +0.958 [+0.918,+0.995], d_G/ID_K +0.984 [+0.966,+1.001], d_Gc/ID_K +0.963 [+0.937,+0.989] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +7.613 [+6.561,+8.681] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -6.429 [-7.264,-5.591], N_X(cfg) -7.151 [-8.181,-6.117], ratio +0.899; isotropic +1.371, -0.754, +0.160
+  mistral7: hop-2 carry under P1 (the ranking format): top10 +0.292 [+0.252,+0.332], rand10 +0.002 [+0.000,+0.004], all +0.810 [+0.769,+0.849]
+  mistral7 INLINE: ID_K -2.352 [-2.542,-2.162], ID_V +1.096 [+0.945,+1.247]; R(H*) +0.938 [+0.913,+0.964], KO(H*) +1.030 [+1.013,+1.050], d_G/ID_K +0.479 [+0.434,+0.522], d_Gc/ID_K +0.479 [+0.434,+0.521] (a re-mention read only if >= 0.5)
+     route of the injected IOI flag: r_ans(KV) +0.792 [+0.746,+0.837], K +0.550 [+0.472,+0.619], V +0.233 [+0.193,+0.276], other +0.207 [+0.151,+0.258]; dm(inj) -1.274 [-1.460,-1.099]
+  mistral7 INLINE_CHAT: ID_K -1.555 [-2.200,-0.883], ID_V +5.545 [+4.769,+6.303]; R(H*) +0.415 [-3.888,+5.858], KO(H*) +0.427 [-2.524,+4.816], d_G/ID_K -0.087 [-0.822,+0.231], d_Gc/ID_K -0.080 [-0.820,+0.241] (a re-mention read only if >= 0.5)
+  qwen1.5: D6b Delta^POST at the P1 list row / Delta^P1 there +0.926 [+0.908,+0.942] (>= 0.6 expected)
+  qwen3b: D6b Delta^POST at the P1 list row / Delta^P1 there +0.926 [+0.892,+0.961] (>= 0.6 expected)
+  qwen7: D6b Delta^POST at the P1 list row / Delta^P1 there +0.943 [+0.924,+0.961] (>= 0.6 expected)
+
+SUMMARY
+  account lines, class L: 2 lines: 2 MET, 0 NOT MET, 0 MET IN PART, 0 NOT EVALUABLE; observed 2 against expected 1.80; Brier 0.010
+  account lines, class M: 5 lines: 5 MET, 0 NOT MET, 0 MET IN PART, 0 NOT EVALUABLE; observed 5 against expected 4.20; Brier 0.026
+  account lines, class R: 10 lines: 2 MET, 7 NOT MET, 0 MET IN PART, 1 NOT EVALUABLE; observed 2 against expected 3.60; Brier 0.183; not evaluable: J-D8-IOI
+  measurement-validity lines: none in part D (the batch floors and competence checks are gates)
+  met rate among R account lines with a verdict: 2 of 9 (expected 3.60)
+  Holm sensitivity (analysis/stage8_holm.py; reported, no verdict uses it): step-down at familywise one-sided 0.025 over the 27 interval components of the R-class account lines with a verdict (normal p from the bootstrap SE)
+    J-D1: 2 components; no decision changes under Holm; verdict unchanged (MET)
+    J-D2: 6 components; no decision changes under Holm; verdict unchanged (NOT MET)
+    J-D3: 2 components; no decision changes under Holm; verdict unchanged (NOT MET)
+    J-D-KN: 4 components; no decision changes under Holm; verdict unchanged (NOT MET)
+    J-D5: 2 components; no decision changes under Holm; verdict unchanged (NOT MET)
+    J-D8-IOI: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-D-ROUTE-IOI: 2 components; no decision changes under Holm; verdict unchanged (MET)
+    J-D-HOP2: 4 components; no decision changes under Holm; verdict unchanged (NOT MET)
+    J-D6: 4 components; no decision changes under Holm; verdict unchanged (NOT MET)
+    J-D6-ROUTE: 1 components; no decision changes under Holm; verdict unchanged (NOT MET)
+  provenance OK; population OK; J-D-G0 MET
+
+######## EXPLORATORY (not scored)
+-- qwen7: sets (stage6): k* 40, L* [0, 2, 3, 4, 5, 8, 9, 10, 11, 12, 14, 15, 16, 17, 19, 21, 22, 26]; hop-2 top-10 [[23, 11], [22, 24], [24, 27], [22, 27], [19, 17], [22, 26], [22, 25], [25, 25], [20, 17], [22, 7]]; in-run a3 overlap with H* 40
+-- qwen7: flag geometry: consistency l0 0.89, l2 0.96, l3 0.92, l4 0.97, l5 0.59, l8 0.89, l9 0.45, l10 0.95, l11 0.85, l12 0.92, l14 0.86, l15 0.89, l16 0.92, l17 0.90, l19 0.72, l21 0.67, l22 0.51, l26 0.64; mean cross-layer cos +0.061; flag cosines P1|KV +0.99; P1|POST +0.85; P1|init +0.70; P1|dloc +0.69; P1|IOI +0.31; KV|POST +0.83; KV|init +0.69; KV|dloc +0.69; KV|IOI +0.31; POST|init +0.64; POST|dloc +0.62; POST|IOI +0.35; init|dloc +0.96; init|IOI +0.38; dloc|IOI +0.38
+-- mistral7: sets (stage6): k* 52, L* [1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 19, 20, 21, 28, 30]; hop-2 top-10 [[18, 22], [19, 8], [18, 30], [28, 0], [14, 8], [19, 17], [19, 16], [16, 29], [18, 12], [25, 29]]; in-run a3 overlap with H* 52
+-- mistral7: flag geometry: consistency l1 0.90, l4 0.73, l5 0.40, l6 0.83, l7 0.90, l8 0.81, l9 0.86, l10 0.69, l11 0.84, l12 0.85, l14 0.76, l15 0.82, l16 0.68, l17 0.87, l19 0.66, l20 0.59, l21 0.75, l28 0.64, l30 0.60; mean cross-layer cos +0.046; flag cosines P1|KV +0.83; P1|POST +0.83; P1|init +0.66; P1|dloc +0.62; P1|IOI +0.20; KV|POST +0.67; KV|init +0.51; KV|dloc +0.50; KV|IOI +0.11; POST|init +0.50; POST|dloc +0.47; POST|IOI +0.19; init|dloc +0.97; init|IOI +0.26; dloc|IOI +0.26
+-- qwen1.5: sets (ranked in-run (Stage6.base_runs, phase 1)): k* 17, L* [0, 4, 5, 6, 8, 9, 10, 12, 16, 17]; hop-2 top-10 [[22, 7], [21, 11], [18, 3], [23, 8], [21, 8], [23, 1], [20, 2], [21, 9], [20, 9], [21, 10]]; in-run a3 overlap with H* 17
+-- qwen1.5: flag geometry: consistency l0 0.68, l4 0.89, l5 0.89, l6 0.92, l8 0.91, l9 0.69, l10 0.92, l12 0.90, l16 0.84, l17 0.88; mean cross-layer cos +0.146; flag cosines P1|KV +0.99; P1|POST +0.97; KV|POST +0.96
+-- qwen3b: sets (ranked in-run (Stage6.base_runs, phase 1)): k* 29, L* [3, 4, 5, 6, 10, 13, 15, 17, 19, 21, 22, 23, 24, 25, 27, 28, 31]; hop-2 top-10 [[30, 3], [29, 2], [31, 15], [23, 0], [27, 1], [23, 5], [29, 5], [25, 14], [31, 7], [32, 3]]; in-run a3 overlap with H* 29
+-- qwen3b: flag geometry: consistency l3 0.93, l4 0.93, l5 0.98, l6 0.77, l10 0.92, l13 0.70, l15 0.79, l17 0.91, l19 0.87, l21 0.76, l22 0.88, l23 0.90, l24 0.94, l25 0.90, l27 0.91, l28 0.89, l31 0.89; mean cross-layer cos +0.090; flag cosines P1|KV +1.00; P1|POST +0.87; KV|POST +0.86
+-- qwen7: E6, iota on the raw margin m_X = lp(X) - lp(B): add1 +0.418 [+0.381,+0.455], move +0.878 [+0.858,+0.898], looX +0.878 [+0.855,+0.899]
+-- mistral7: E6, iota on the raw margin m_X = lp(X) - lp(B): add1 +0.376 [+0.316,+0.438], move +0.689 [+0.619,+0.757], looX +0.668 [+0.597,+0.738]
+-- qwen7: H3/G7b reconciliation (base answer rate, initial-location rate): flag@init_dloc 1.00/0.00, flag@B 0.85/0.15, none 1.00/0.00, flag 0.88/0.10
+-- mistral7: H3/G7b reconciliation (base answer rate, initial-location rate): flag@init_dloc 1.00/0.00, flag@B 1.00/0.00, none 1.00/0.00, flag 1.00/0.00
+-- qwen7: Q_OUT behaviour, answer = the story's own word B: none 0.00, K_S 0.31, V_S 0.00
+-- qwen7: IOI injections at the listed IO_X row (dl, four-way): injIOI -2.775 [-3.175,-2.397], moveIOI -3.635 [-4.064,-3.212], injP1 -0.692 [-0.945,-0.445], iso +0.058 [-0.001,+0.122], K_X -3.592 [-4.093,-3.088]
+-- mistral7: Q_OUT behaviour, answer = the story's own word B: none 0.00, K_S 0.33, V_S 0.01
+-- mistral7: IOI injections at the listed IO_X row (dl, four-way): injIOI -0.748 [-0.910,-0.596], moveIOI -1.018 [-1.202,-0.844], injP1 -0.014 [-0.079,+0.048], iso +0.001 [-0.015,+0.016], K_X -2.316 [-2.570,-2.063]
+-- qwen7: IOI BEFORE knockout of p -> names rows: ID_K -1.782 -> fraction removed -0.767 (second-order read elsewhere; two-sided rule)
+-- qwen7: IOI BEFORE knockout of p -> list rows: ID_K -1.782 -> fraction removed -0.862 (second-order read elsewhere; two-sided rule)
+-- qwen7: IOI BEFORE RowSplice fractions of the full key effect: self +0.16, choices +0.00, options +0.00, options_sx +0.00, sentence_tail +1.98, tail -1.68, rest_after_p +0.00
+-- qwen7: cross-task paint: own flag dl_X +14.699, belief flag +6.385, ratio +0.434 (intermediate); weighted cos +0.637
+-- qwen7: cross-task schedule: own flag dl_X +8.549, belief flag +3.709, ratio +0.434 (intermediate); weighted cos +0.645
+-- mistral7: cross-task paint: own flag dl_X +3.737, belief flag +0.664, ratio +0.178 (task-specific); weighted cos +0.624
+-- mistral7: cross-task schedule: own flag dl_X +7.984, belief flag +4.543, ratio +0.569 (intermediate); weighted cos +0.590

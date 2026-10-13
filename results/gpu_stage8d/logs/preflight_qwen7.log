@@ -1,0 +1,2 @@
+==== 2026-10-13T09:22:28Z python experiments/stage8_flag.py --out results/gpu_stage8d --stage preflight --model /root/stage8_models/qwen7 --key qwen7
+preflight OK: 1325 prompts, IOI F 60 E 100 (skipped 0), trie nodes 5, tasks {'paint': True, 'schedule': True}

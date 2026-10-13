@@ -1,0 +1,102 @@
+{
+ "key": "gemma2b",
+ "repo": "google/gemma-2-2b-it",
+ "revision": "299a8560bedf22ed1c72a8a11e7dce4a7f9f51f8",
+ "attn": "eager",
+ "gated": "manual",
+ "token_used": false,
+ "manifest": "/workspace/Causal-keys/scripts/stage8_models.json",
+ "manifest_sha256": "b840b71ea644d3f01e634c67ef2c2b9bdb26cdf53d3fe6b45d34c5e78c0cb707",
+ "fetcher_sha256": "aba1e5a423fea2b079b5cc4936ab6fc95cb64818812f0178609cd118fcea8c8c",
+ "dest": "/root/stage8_models/gemma2b",
+ "host": "17ea459426e7",
+ "time_utc": "2026-10-13T13:17:39Z",
+ "sources_used": [
+  "existing copy (re-verified)"
+ ],
+ "files": {
+  "config.json": {
+   "kind": "git_blob",
+   "expected": "05131f6b339647ddff99327b199ac3d34a50bf2e",
+   "size": 838,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "05131f6b339647ddff99327b199ac3d34a50bf2e"
+  },
+  "generation_config.json": {
+   "kind": "git_blob",
+   "expected": "2da7d771ff9ea5f81a30bced0e7390b52061c08e",
+   "size": 187,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "2da7d771ff9ea5f81a30bced0e7390b52061c08e"
+  },
+  "model-00001-of-00002.safetensors": {
+   "kind": "sha256",
+   "expected": "532d792c9178805064170a3ec485b7dedbfccc6fd297b92c31a6091b6c7e41bf",
+   "size": 4988025760,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "532d792c9178805064170a3ec485b7dedbfccc6fd297b92c31a6091b6c7e41bf"
+  },
+  "model-00002-of-00002.safetensors": {
+   "kind": "sha256",
+   "expected": "6d6d9ce84db398fb6e0191f91542e5da0a73da2cb695e172a24edc2146dc8d20",
+   "size": 240691728,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "6d6d9ce84db398fb6e0191f91542e5da0a73da2cb695e172a24edc2146dc8d20"
+  },
+  "model.safetensors.index.json": {
+   "kind": "git_blob",
+   "expected": "022daff51a2616bf88f5f0d0eac5dbd525e7cd24",
+   "size": 24223,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "022daff51a2616bf88f5f0d0eac5dbd525e7cd24"
+  },
+  "special_tokens_map.json": {
+   "kind": "git_blob",
+   "expected": "8d6368f7e735fbe4781bf6e956b7c6ad0586df80",
+   "size": 636,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "8d6368f7e735fbe4781bf6e956b7c6ad0586df80"
+  },
+  "tokenizer.json": {
+   "kind": "sha256",
+   "expected": "3f289bc05132635a8bc7aca7aa21255efd5e18f3710f43e3cdb96bcd41be4922",
+   "size": 17525357,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "3f289bc05132635a8bc7aca7aa21255efd5e18f3710f43e3cdb96bcd41be4922"
+  },
+  "tokenizer.model": {
+   "kind": "sha256",
+   "expected": "61a7b147390c64585d6c3543dd6fc636906c9af3865a5548f27f31aee1d4c8e2",
+   "size": 4241003,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "61a7b147390c64585d6c3543dd6fc636906c9af3865a5548f27f31aee1d4c8e2"
+  },
+  "tokenizer_config.json": {
+   "kind": "git_blob",
+   "expected": "36ba12877e7efaba5252f7b17ab337a59d953563",
+   "size": 46996,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "36ba12877e7efaba5252f7b17ab337a59d953563"
+  }
+ },
+ "failed": [],
+ "unexpected_files": []
+}

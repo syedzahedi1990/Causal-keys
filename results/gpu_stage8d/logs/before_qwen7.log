@@ -1,0 +1,3 @@
+==== 2026-10-13T10:24:11Z python experiments/stage8_flag.py --out results/gpu_stage8d --stage before --model /root/stage8_models/qwen7 --key qwen7
+  BEFORE done (21s)
+before: 60 cores (48s)

@@ -1,0 +1,192 @@
+{
+ "key": "mistral24",
+ "repo": "mistralai/Mistral-Small-24B-Instruct-2501",
+ "revision": "9527884be6e5616bdd54de542f9ae13384489724",
+ "attn": "sdpa",
+ "gated": false,
+ "token_used": false,
+ "manifest": "/workspace/Causal-keys/scripts/stage8_models.json",
+ "manifest_sha256": "b840b71ea644d3f01e634c67ef2c2b9bdb26cdf53d3fe6b45d34c5e78c0cb707",
+ "fetcher_sha256": "aba1e5a423fea2b079b5cc4936ab6fc95cb64818812f0178609cd118fcea8c8c",
+ "dest": "/root/stage8_models/mistral24",
+ "host": "17ea459426e7",
+ "time_utc": "2026-10-13T13:24:54Z",
+ "sources_used": [
+  "existing copy (re-verified)"
+ ],
+ "files": {
+  "SYSTEM_PROMPT.txt": {
+   "kind": "git_blob",
+   "expected": "71547ac274705598b36bee46a4070e9a4e10031e",
+   "size": 997,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "71547ac274705598b36bee46a4070e9a4e10031e"
+  },
+  "config.json": {
+   "kind": "git_blob",
+   "expected": "c4f8f50ccc8cf615ddee9ffc4aa32b496fe39e9e",
+   "size": 623,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "c4f8f50ccc8cf615ddee9ffc4aa32b496fe39e9e"
+  },
+  "generation_config.json": {
+   "kind": "git_blob",
+   "expected": "1f1821243a48f73a94037f10d9dd562978886c21",
+   "size": 160,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "1f1821243a48f73a94037f10d9dd562978886c21"
+  },
+  "model-00001-of-00010.safetensors": {
+   "kind": "sha256",
+   "expected": "75a14c708eea501700a723dc74bc886cf36a1393686a3fb098ee106b160da32f",
+   "size": 4781571736,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "75a14c708eea501700a723dc74bc886cf36a1393686a3fb098ee106b160da32f"
+  },
+  "model-00002-of-00010.safetensors": {
+   "kind": "sha256",
+   "expected": "1ff40fbfd9e042b7dab3f3c9442f870a4701f53e394dda769807a160ba40f32a",
+   "size": 4781592784,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "1ff40fbfd9e042b7dab3f3c9442f870a4701f53e394dda769807a160ba40f32a"
+  },
+  "model-00003-of-00010.safetensors": {
+   "kind": "sha256",
+   "expected": "4cc2d059fded71efd2947a414f32053b4ed3fa84383edf97b6d91fd9f04e4235",
+   "size": 4781592800,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "4cc2d059fded71efd2947a414f32053b4ed3fa84383edf97b6d91fd9f04e4235"
+  },
+  "model-00004-of-00010.safetensors": {
+   "kind": "sha256",
+   "expected": "aa0e9acacf161c45ae0d71ca3f7e4ec9ee55dae2153398da52f81ee4f9e1b8d2",
+   "size": 4886471600,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "aa0e9acacf161c45ae0d71ca3f7e4ec9ee55dae2153398da52f81ee4f9e1b8d2"
+  },
+  "model-00005-of-00010.safetensors": {
+   "kind": "sha256",
+   "expected": "dafb696763d31a1fda58010b73ecc05c19d395da8ec2c24aa9c41da33f2230d3",
+   "size": 4781592824,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "dafb696763d31a1fda58010b73ecc05c19d395da8ec2c24aa9c41da33f2230d3"
+  },
+  "model-00006-of-00010.safetensors": {
+   "kind": "sha256",
+   "expected": "d9a433b19fd4d6986660a616a0d6fc7d02d9e8c0ab3c9b98940217ee6bd4e053",
+   "size": 4781592816,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "d9a433b19fd4d6986660a616a0d6fc7d02d9e8c0ab3c9b98940217ee6bd4e053"
+  },
+  "model-00007-of-00010.safetensors": {
+   "kind": "sha256",
+   "expected": "5ac5c7b042491f917016c3e9635583177058f736be5fa315019b959fc3c43b63",
+   "size": 4886471600,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "5ac5c7b042491f917016c3e9635583177058f736be5fa315019b959fc3c43b63"
+  },
+  "model-00008-of-00010.safetensors": {
+   "kind": "sha256",
+   "expected": "3c460c5b957ab3ac81f03bb20c0348820225dd9b819fa4487ae733b1e696e573",
+   "size": 4781592824,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "3c460c5b957ab3ac81f03bb20c0348820225dd9b819fa4487ae733b1e696e573"
+  },
+  "model-00009-of-00010.safetensors": {
+   "kind": "sha256",
+   "expected": "304f66de1aeb55f0b4e1181885e3d15b65b485d5ce5c93b4adcdf7dd2c2d8cc5",
+   "size": 4781592816,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "304f66de1aeb55f0b4e1181885e3d15b65b485d5ce5c93b4adcdf7dd2c2d8cc5"
+  },
+  "model-00010-of-00010.safetensors": {
+   "kind": "sha256",
+   "expected": "c4c3bcedc02f4dd7e04c8b0fe1199f4f27de7a37790d1510a8772ffe05093543",
+   "size": 3900777072,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "c4c3bcedc02f4dd7e04c8b0fe1199f4f27de7a37790d1510a8772ffe05093543"
+  },
+  "model.safetensors.index.json": {
+   "kind": "git_blob",
+   "expected": "fea625e56294eba8231f10d76c291f8fc78a3dbd",
+   "size": 29894,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "fea625e56294eba8231f10d76c291f8fc78a3dbd"
+  },
+  "params.json": {
+   "kind": "git_blob",
+   "expected": "08ac609f2021b9ccc31bc3f04612d04cc42adcc5",
+   "size": 270,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "08ac609f2021b9ccc31bc3f04612d04cc42adcc5"
+  },
+  "special_tokens_map.json": {
+   "kind": "git_blob",
+   "expected": "642b1b50c2ed17cd03114ad8af688a4854da558a",
+   "size": 21311,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "642b1b50c2ed17cd03114ad8af688a4854da558a"
+  },
+  "tekken.json": {
+   "kind": "sha256",
+   "expected": "c4b90a968dbc67ef3975129d0b78a2e3cbb6bea340ab9205f22e8a0308b1ffc5",
+   "size": 14801223,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "c4b90a968dbc67ef3975129d0b78a2e3cbb6bea340ab9205f22e8a0308b1ffc5"
+  },
+  "tokenizer.json": {
+   "kind": "sha256",
+   "expected": "b76085f9923309d873994d444989f7eb6ec074b06f25b58f1e8d7b7741070949",
+   "size": 17078037,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "b76085f9923309d873994d444989f7eb6ec074b06f25b58f1e8d7b7741070949"
+  },
+  "tokenizer_config.json": {
+   "kind": "git_blob",
+   "expected": "a20398005bd56cc879ebcea8c364afe0b6a428bc",
+   "size": 199695,
+   "attempts": [],
+   "ok": true,
+   "source": "existing copy (re-verified)",
+   "observed": "a20398005bd56cc879ebcea8c364afe0b6a428bc"
+  }
+ },
+ "failed": [],
+ "unexpected_files": []
+}

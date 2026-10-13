@@ -1,0 +1,6 @@
+==== 2026-10-13T13:40:19Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage g3 --model /root/stage8_models/qwen3b --key qwen3b
+frames file results/gpu_stage8b/frames/qwen3b.json sha256 f32c2351789ee7960e8e74b69eeeabd929b6411413702f1e8109b1838e2e4a31: 0 discovered frames []
+  g3 NONE: {'n': 30, 's_ID_trie': 0.012350660373059364, 's_ID_plain': 0.012704748645127157, 'abs_ds': 0.00035408827206779257, 'mean_abs_dL': 0.23659989370240106, 'ID_KV_plain': 23.576015289624532, 'tol_dL': 1.1788007644812266, 'pass': True} (9s)
+  g3 POST: {'n': 30, 's_ID_trie': 0.030870919205376546, 's_ID_plain': 0.025604781055515887, 'abs_ds': 0.005266138149860659, 'mean_abs_dL': 0.287589907211562, 'ID_KV_plain': 14.966145754853885, 'tol_dL': 0.7483072877426943, 'pass': True} (18s)
+  g3 AFTER: {'n': 30, 's_ID_trie': 0.7280473633604101, 's_ID_plain': 0.7288607066360094, 'abs_ds': 0.000813343275599343, 'mean_abs_dL': 0.2484259849981975, 'ID_KV_plain': 16.59791667516016, 'tol_dL': 0.829895833758008, 'pass': True} (27s)
+JB-G3 PASS: the evaluation scores with the trie

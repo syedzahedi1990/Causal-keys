@@ -1,0 +1,6 @@
+==== 2026-10-13T12:54:04Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage g3 --model /root/stage8_models/gemma9 --key gemma9
+frames file results/gpu_stage8b/frames/gemma9.json sha256 18a4778a52c4edd6bdbaf32da16078c7dc793ab36907000623736e9f472887bc: 0 discovered frames []
+  g3 NONE: {'n': 30, 's_ID_trie': 0.006155379251304241, 's_ID_plain': 0.00650403876373117, 'abs_ds': 0.00034865951242692844, 'mean_abs_dL': 0.10352157966958152, 'ID_KV_plain': 17.24078789552053, 'tol_dL': 0.8620393947760265, 'pass': True} (18s)
+  g3 POST: {'n': 30, 's_ID_trie': 0.3454298155019347, 's_ID_plain': 0.34533607231048236, 'abs_ds': 9.374319145233345e-05, 'mean_abs_dL': 0.10023322105407714, 'ID_KV_plain': 15.877132312456768, 'tol_dL': 0.7938566156228384, 'pass': True} (38s)
+  g3 AFTER: {'n': 30, 's_ID_trie': 0.6982827869199186, 's_ID_plain': 0.6983404143010257, 'abs_ds': 5.7627381107039355e-05, 'mean_abs_dL': 0.06144895724509196, 'ID_KV_plain': 15.120572880713734, 'tol_dL': 0.7560286440356867, 'pass': True} (57s)
+JB-G3 PASS: the evaluation scores with the trie

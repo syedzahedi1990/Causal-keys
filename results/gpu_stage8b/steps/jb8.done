@@ -1,0 +1,2 @@
+2026-10-13T13:36:09Z HEAD 8b74b79b76e06b27bedc0d841c7b1e4a5f671649
+python experiments/paper1_frames.py --model mistral --p1-root /root/paper1/v5.5-reviewer-repository --out results/gpu_stage8b/jb8 --score E --frames results/gpu_stage8b/frames/mistral24.json --model-dir /root/stage8_models/mistral24 

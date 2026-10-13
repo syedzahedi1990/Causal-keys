@@ -1,0 +1,9 @@
+==== 2026-10-13T12:53:41Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage calib --model /root/stage8_models/gemma9 --key gemma9
+  calib AFTER done (2s)
+  calib BEFORE done (4s)
+  calib NONE done (6s)
+  calib POST done (8s)
+  calib PRE done (9s)
+  calib POST-NULL done (11s)
+  calib P1 done (13s)
+frames [] (rejected []); file results/gpu_stage8b/frames/gemma9.json sha256 18a4778a52c4edd6bdbaf32da16078c7dc793ab36907000623736e9f472887bc

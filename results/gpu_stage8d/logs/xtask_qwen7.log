@@ -1,0 +1,2 @@
+==== 2026-10-13T10:25:08Z python experiments/stage8_flag.py --out results/gpu_stage8d --stage xtask --model /root/stage8_models/qwen7 --key qwen7
+xtask done (189s)

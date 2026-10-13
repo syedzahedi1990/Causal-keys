@@ -1,0 +1,9 @@
+==== 2026-10-13T13:40:05Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage calib --model /root/stage8_models/qwen3b --key qwen3b
+  calib AFTER done (1s)
+  calib BEFORE done (2s)
+  calib NONE done (3s)
+  calib POST done (4s)
+  calib PRE done (5s)
+  calib POST-NULL done (5s)
+  calib P1 done (6s)
+frames [] (rejected []); file results/gpu_stage8b/frames/qwen3b.json sha256 f32c2351789ee7960e8e74b69eeeabd929b6411413702f1e8109b1838e2e4a31

@@ -1,0 +1,2 @@
+==== 2026-10-13T09:22:54Z python experiments/stage8_flag.py --out results/gpu_stage8d --stage fit --model /root/stage8_models/qwen7 --key qwen7
+fit: L* [0, 2, 3, 4, 5, 8, 9, 10, 11, 12, 14, 15, 16, 17, 19, 21, 22, 26]; |Delta| [0.68, 2.807, 3.194, 3.267, 0.621, 7.874, 0.683, 3.878, 6.622, 5.923, 6.72, 13.203, 5.242, 4.374, 4.545, 3.048, 1.047, 3.454]; cos(K, KV) 0.993; kappa(POST, P1) 0.872 (596s)

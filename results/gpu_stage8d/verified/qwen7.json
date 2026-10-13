@@ -1,0 +1,219 @@
+{
+ "key": "qwen7",
+ "repo": "Qwen/Qwen2.5-7B-Instruct",
+ "revision": "a09a35458c702b33eeacc393d103063234e8bc28",
+ "attn": "sdpa",
+ "gated": false,
+ "token_used": false,
+ "manifest": "/workspace/Causal-keys/scripts/stage8_models.json",
+ "manifest_sha256": "b840b71ea644d3f01e634c67ef2c2b9bdb26cdf53d3fe6b45d34c5e78c0cb707",
+ "fetcher_sha256": "aba1e5a423fea2b079b5cc4936ab6fc95cb64818812f0178609cd118fcea8c8c",
+ "dest": "/root/stage8_models/qwen7",
+ "host": "17ea459426e7",
+ "time_utc": "2026-10-13T09:22:27Z",
+ "sources_used": [
+  "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28"
+ ],
+ "files": {
+  "config.json": {
+   "kind": "git_blob",
+   "expected": "0178295f88afc3c7f279ed284f961f8c1be00654",
+   "size": 663,
+   "attempts": [
+    {
+     "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+     "ok": true,
+     "observed": {
+      "size": 663,
+      "git_blob": "0178295f88afc3c7f279ed284f961f8c1be00654"
+     }
+    }
+   ],
+   "ok": true,
+   "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+   "observed": "0178295f88afc3c7f279ed284f961f8c1be00654"
+  },
+  "generation_config.json": {
+   "kind": "git_blob",
+   "expected": "0eb3c536657dcd12626e09eca4b6198c0cbcde1e",
+   "size": 243,
+   "attempts": [
+    {
+     "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+     "ok": true,
+     "observed": {
+      "size": 243,
+      "git_blob": "0eb3c536657dcd12626e09eca4b6198c0cbcde1e"
+     }
+    }
+   ],
+   "ok": true,
+   "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+   "observed": "0eb3c536657dcd12626e09eca4b6198c0cbcde1e"
+  },
+  "merges.txt": {
+   "kind": "git_blob",
+   "expected": "20024bfe7c83998e9aeaf98a0cd6a2ce6306c2f0",
+   "size": 1671839,
+   "attempts": [
+    {
+     "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+     "ok": true,
+     "observed": {
+      "size": 1671839,
+      "git_blob": "20024bfe7c83998e9aeaf98a0cd6a2ce6306c2f0"
+     }
+    }
+   ],
+   "ok": true,
+   "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+   "observed": "20024bfe7c83998e9aeaf98a0cd6a2ce6306c2f0"
+  },
+  "model-00001-of-00004.safetensors": {
+   "kind": "sha256",
+   "expected": "a1333e6293854747c481288ea83b348226af178dd565c49b6f9495ba1966aba7",
+   "size": 3945441440,
+   "attempts": [
+    {
+     "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+     "ok": true,
+     "observed": {
+      "size": 3945441440,
+      "sha256": "a1333e6293854747c481288ea83b348226af178dd565c49b6f9495ba1966aba7"
+     }
+    }
+   ],
+   "ok": true,
+   "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+   "observed": "a1333e6293854747c481288ea83b348226af178dd565c49b6f9495ba1966aba7"
+  },
+  "model-00002-of-00004.safetensors": {
+   "kind": "sha256",
+   "expected": "f5d25a2772cb825164a2a2c0fb6d51a87e282abf21e4dd75bc5cfb3cd0ea6185",
+   "size": 3864726352,
+   "attempts": [
+    {
+     "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+     "ok": true,
+     "observed": {
+      "size": 3864726352,
+      "sha256": "f5d25a2772cb825164a2a2c0fb6d51a87e282abf21e4dd75bc5cfb3cd0ea6185"
+     }
+    }
+   ],
+   "ok": true,
+   "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+   "observed": "f5d25a2772cb825164a2a2c0fb6d51a87e282abf21e4dd75bc5cfb3cd0ea6185"
+  },
+  "model-00003-of-00004.safetensors": {
+   "kind": "sha256",
+   "expected": "8efdec4c1bc12317ae1a38dc42b595ce777738a64deea3fcb8a0a91381bcdfd5",
+   "size": 3864726424,
+   "attempts": [
+    {
+     "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+     "ok": true,
+     "observed": {
+      "size": 3864726424,
+      "sha256": "8efdec4c1bc12317ae1a38dc42b595ce777738a64deea3fcb8a0a91381bcdfd5"
+     }
+    }
+   ],
+   "ok": true,
+   "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+   "observed": "8efdec4c1bc12317ae1a38dc42b595ce777738a64deea3fcb8a0a91381bcdfd5"
+  },
+  "model-00004-of-00004.safetensors": {
+   "kind": "sha256",
+   "expected": "1a72d403cdf0c1ec3cb7f289f17b394a01e64394c2e9b3c0f94dbce3faf879bd",
+   "size": 3556377672,
+   "attempts": [
+    {
+     "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+     "ok": true,
+     "observed": {
+      "size": 3556377672,
+      "sha256": "1a72d403cdf0c1ec3cb7f289f17b394a01e64394c2e9b3c0f94dbce3faf879bd"
+     }
+    }
+   ],
+   "ok": true,
+   "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+   "observed": "1a72d403cdf0c1ec3cb7f289f17b394a01e64394c2e9b3c0f94dbce3faf879bd"
+  },
+  "model.safetensors.index.json": {
+   "kind": "git_blob",
+   "expected": "14d037fdda5a1311dcc0275003a7a370d84114e6",
+   "size": 27752,
+   "attempts": [
+    {
+     "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+     "ok": true,
+     "observed": {
+      "size": 27752,
+      "git_blob": "14d037fdda5a1311dcc0275003a7a370d84114e6"
+     }
+    }
+   ],
+   "ok": true,
+   "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+   "observed": "14d037fdda5a1311dcc0275003a7a370d84114e6"
+  },
+  "tokenizer.json": {
+   "kind": "git_blob",
+   "expected": "443909a61d429dff23010e5bddd28ff530edda00",
+   "size": 7031645,
+   "attempts": [
+    {
+     "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+     "ok": true,
+     "observed": {
+      "size": 7031645,
+      "git_blob": "443909a61d429dff23010e5bddd28ff530edda00"
+     }
+    }
+   ],
+   "ok": true,
+   "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+   "observed": "443909a61d429dff23010e5bddd28ff530edda00"
+  },
+  "tokenizer_config.json": {
+   "kind": "git_blob",
+   "expected": "07bfe0640cb5a0037f9322287fbfc682806cf672",
+   "size": 7305,
+   "attempts": [
+    {
+     "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+     "ok": true,
+     "observed": {
+      "size": 7305,
+      "git_blob": "07bfe0640cb5a0037f9322287fbfc682806cf672"
+     }
+    }
+   ],
+   "ok": true,
+   "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+   "observed": "07bfe0640cb5a0037f9322287fbfc682806cf672"
+  },
+  "vocab.json": {
+   "kind": "git_blob",
+   "expected": "4783fe10ac3adce15ac8f358ef5462739852c569",
+   "size": 2776833,
+   "attempts": [
+    {
+     "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+     "ok": true,
+     "observed": {
+      "size": 2776833,
+      "git_blob": "4783fe10ac3adce15ac8f358ef5462739852c569"
+     }
+    }
+   ],
+   "ok": true,
+   "source": "Qwen/Qwen2.5-7B-Instruct@a09a35458c702b33eeacc393d103063234e8bc28",
+   "observed": "4783fe10ac3adce15ac8f358ef5462739852c569"
+  }
+ },
+ "failed": [],
+ "unexpected_files": []
+}

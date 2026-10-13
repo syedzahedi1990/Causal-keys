@@ -1,0 +1,2 @@
+2026-10-13T13:50:26Z HEAD 8b74b79b76e06b27bedc0d841c7b1e4a5f671649
+python experiments/fresh_factorial.py --out results/gpu_stage8b --stage eval --population S0 --model /root/stage8_models/qwen7 --key qwen7 --n 60 --arms AFTER\,POST\,NONE --no-plain --dtype float32 --suffix _x1fp32 

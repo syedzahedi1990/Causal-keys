@@ -1,0 +1,1218 @@
+==== 2026-10-13T09:17:08Z python -m pytest tests/test_flag.py tests/test_questions.py tests/test_stage8d_score.py tests/test_head_splice.py tests/test_stage8_populations.py tests/test_stage8_holm.py -v -rA -p no:cacheprovider
+========================================================================= test session starts =========================================================================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /venv/main/bin/python
+rootdir: /workspace/Causal-keys
+plugins: anyio-4.15.1
+collecting ... collected 61 items
+
+tests/test_flag.py::test_zero_injection_equals_clean PASSED                                                                                                     [  1%]
+tests/test_flag.py::test_injection_is_exactly_the_added_vector PASSED                                                                                           [  3%]
+tests/test_flag.py::test_batched_equals_single PASSED                                                                                                           [  4%]
+tests/test_flag.py::test_ablation_mu_own_is_clean_and_sets_projection PASSED                                                                                    [  6%]
+tests/test_flag.py::test_head_outputs_sum_to_o_proj PASSED                                                                                                      [  8%]
+tests/test_flag.py::test_composition_nonzero_add PASSED                                                                                                         [  9%]
+tests/test_flag.py::test_transfer_allT_equals_full_key_clamp PASSED                                                                                             [ 11%]
+tests/test_flag.py::test_kv_clamp_rows_equal_run_item PASSED                                                                                                    [ 13%]
+tests/test_flag.py::test_inline_chat_item_code_equals_ioi_factorial PASSED                                                                                      [ 14%]
+tests/test_flag.py::test_trie_scoring_with_noop_hop PASSED                                                                                                      [ 16%]
+tests/test_flag.py::test_flag_from_write_pass_matches_independent_capture PASSED                                                                                [ 18%]
+tests/test_flag.py::test_hop2_key_splice_equals_hopsplice_answer_key PASSED                                                                                     [ 19%]
+tests/test_flag.py::test_trie_scoring_hop_mask_extends_over_the_trie PASSED                                                                                     [ 21%]
+tests/test_questions.py::test_question_arms_text PASSED                                                                                                         [ 22%]
+tests/test_questions.py::test_inline_chat_text PASSED                                                                                                           [ 24%]
+tests/test_questions.py::test_populations PASSED                                                                                                                [ 26%]
+tests/test_questions.py::test_disjoint_from_other_parts PASSED                                                                                                  [ 27%]
+tests/test_questions.py::test_belief_layouts[qwen] PASSED                                                                                                       [ 29%]
+tests/test_questions.py::test_belief_layouts[mistral] PASSED                                                                                                    [ 31%]
+tests/test_questions.py::test_ioi_layouts[qwen] PASSED                                                                                                          [ 32%]
+tests/test_questions.py::test_ioi_layouts[mistral] PASSED                                                                                                       [ 34%]
+tests/test_questions.py::test_words_and_forms[qwen] PASSED                                                                                                      [ 36%]
+tests/test_questions.py::test_words_and_forms[mistral] PASSED                                                                                                   [ 37%]
+tests/test_questions.py::test_ioi_candidate_lists_fixed PASSED                                                                                                  [ 39%]
+tests/test_stage8d_score.py::test_bootstrap_seeded_and_ratio_recomputed PASSED                                                                                  [ 40%]
+tests/test_stage8d_score.py::test_one_sided_tests_and_holm_components PASSED                                                                                    [ 42%]
+tests/test_stage8d_score.py::test_risk_class_follows_the_prior PASSED                                                                                           [ 44%]
+tests/test_stage8d_score.py::test_holm_family_contract PASSED                                                                                                   [ 45%]
+tests/test_stage8d_score.py::test_holm_with_the_shared_helper PASSED                                                                                            [ 47%]
+tests/test_stage8d_score.py::test_combine_rule PASSED                                                                                                           [ 49%]
+tests/test_stage8d_score.py::test_inject_lines_known_values PASSED                                                                                              [ 50%]
+tests/test_stage8d_score.py::test_ablate_rho PASSED                                                                                                             [ 52%]
+tests/test_stage8d_score.py::test_bind_psi_and_strata PASSED                                                                                                    [ 54%]
+tests/test_stage8d_score.py::test_cells_transfer_competence_route_hop2 PASSED                                                                                   [ 55%]
+tests/test_stage8d_score.py::test_diss_statistics PASSED                                                                                                        [ 57%]
+tests/test_stage8d_score.py::test_end_to_end PASSED                                                                                                             [ 59%]
+tests/test_stage8d_score.py::test_gate_failures_make_lines_not_evaluable PASSED                                                                                 [ 60%]
+tests/test_stage8d_score.py::test_line_exception_is_a_scorer_error PASSED                                                                                       [ 62%]
+tests/test_stage8d_score.py::test_g0_counts_skips_in_every_file_of_the_run PASSED                                                                               [ 63%]
+tests/test_stage8d_score.py::test_g0_requires_the_shared_population_and_holm_tests PASSED                                                                       [ 65%]
+tests/test_stage8d_score.py::test_d6_table_branches PASSED                                                                                                      [ 67%]
+tests/test_stage8d_score.py::test_pins_equal_the_experiment PASSED                                                                                              [ 68%]
+tests/test_head_splice.py::test_headsplice_all_heads_is_full_clamp_and_empty_is_clean PASSED                                                                    [ 70%]
+tests/test_head_splice.py::test_headsplice_rows_G_and_group_slices_equal_rowsplice PASSED                                                                       [ 72%]
+tests/test_head_splice.py::test_headsplice_batched_grid_equals_single_runs PASSED                                                                               [ 73%]
+tests/test_head_splice.py::test_self_ablation_is_clean PASSED                                                                                                   [ 75%]
+tests/test_head_splice.py::test_hopsplice_all_rows_is_plain_clamp PASSED                                                                                        [ 77%]
+tests/test_head_splice.py::test_hopsplice_no_overwrite_and_answer_only_cache PASSED                                                                             [ 78%]
+tests/test_head_splice.py::test_hop_batch_equals_single_rows PASSED                                                                                             [ 80%]
+tests/test_stage8_populations.py::test_every_part_computes_U_identically PASSED                                                                                 [ 81%]
+tests/test_stage8_populations.py::test_populations_have_the_expected_sizes PASSED                                                                               [ 83%]
+tests/test_stage8_populations.py::test_fresh_populations_disjoint_from_U_and_from_each_other PASSED                                                             [ 85%]
+tests/test_stage8_populations.py::test_labelled_reuses PASSED                                                                                                   [ 86%]
+tests/test_stage8_populations.py::test_no_confirmatory_population_uses_a_pilot_seed PASSED                                                                      [ 88%]
+tests/test_stage8_holm.py::test_phi_and_p_values PASSED                                                                                                         [ 90%]
+tests/test_stage8_holm.py::test_degenerate_and_undefined PASSED                                                                                                 [ 91%]
+tests/test_stage8_holm.py::test_holm_hand_worked PASSED                                                                                                         [ 93%]
+tests/test_stage8_holm.py::test_directions_mixed_and_passthrough PASSED                                                                                         [ 95%]
+tests/test_stage8_holm.py::test_ties_keep_input_order PASSED                                                                                                    [ 96%]
+tests/test_stage8_holm.py::test_adjusted_p_against_brute_force PASSED                                                                                           [ 98%]
+tests/test_stage8_holm.py::test_single_component_equals_the_unadjusted_test PASSED                                                                              [100%]
+
+=============================================================================== PASSES ================================================================================
+__________________________________________________________________ test_zero_injection_equals_clean ___________________________________________________________________
+------------------------------------------------------------------------ Captured stderr setup ------------------------------------------------------------------------
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+------------------------------------------------------------------------- Captured log setup --------------------------------------------------------------------------
+WARNING  huggingface_hub.utils._http:_http.py:1023 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+______________________________________________________________________ test_holm_family_contract ______________________________________________________________________
+------------------------------------------------------------------------ Captured stdout call -------------------------------------------------------------------------
+Stage 8 part D scoring, preregistration P-2026-10-10-J; results /tmp/pytest-of-root/pytest-0/test_holm_family_contract0; TEST MODE (verdicts are plumbing checks)
+
+PROVENANCE (the pipeline's COMMIT.txt, ENV.txt, REVISIONS.txt, SKIPPED.txt; every results file)
+  COMMIT.txt: absent
+  ENV.txt: absent
+  REVISIONS.txt: absent
+  SKIPPED.txt: absent
+  ablate/mistral7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  ablate/qwen7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  bind/qwen7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  diss/qwen1.5: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  diss/qwen3b: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  diss/qwen7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  fit/mistral7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  fit/qwen1.5: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  fit/qwen3b: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  fit/qwen7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  inject/mistral7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  inject/qwen7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  preflight/mistral7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  preflight/qwen1.5: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  preflight/qwen3b: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  preflight/qwen7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sets/mistral7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sets/qwen1.5: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sets/qwen3b: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sets/qwen7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sign/mistral7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sign/qwen7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  commits: ['None', 'abc']  MISMATCH: not one commit
+
+POPULATION (pinned hashes of R, R', E8, BIND, the IOI candidate lists and the task lists; sizes not checked in TEST MODE)
+  preflight qwen7: hashes OK; overlaps none; IOI E_ioi 0 valid, F_ioi 0; prompts checked None
+  inject/qwen7: population hashes differ from the preflight: MISMATCH
+  ablate/qwen7: population hashes differ from the preflight: MISMATCH
+  bind/qwen7: population hashes differ from the preflight: MISMATCH
+  diss/qwen7: population hashes differ from the preflight: MISMATCH
+  preflight mistral7: hashes OK; overlaps none; IOI E_ioi 0 valid, F_ioi 0; prompts checked None
+  inject/mistral7: population hashes differ from the preflight: MISMATCH
+  ablate/mistral7: population hashes differ from the preflight: MISMATCH
+  preflight qwen1.5: hashes OK; overlaps none; IOI E_ioi 0 valid, F_ioi 0; prompts checked None
+  diss/qwen1.5: population hashes differ from the preflight: MISMATCH
+  preflight qwen3b: hashes OK; overlaps none; IOI E_ioi 0 valid, F_ioi 0; prompts checked None
+  diss/qwen3b: population hashes differ from the preflight: MISMATCH
+  population: MISMATCH
+
+  J-D-G0  FP32 unit tests (last of 1 run(s)): tests/test_flag.py 13 passed, 0 failed, 0 skipped; tests/test_questions.py 11 passed, 0 failed, 0 skipped; tests/test_stage8d_score.py 18 passed, 0 failed, 0 skipped; tests/test_stage8_populations.py 5 passed, 0 failed, 0 skipped; tests/test_stage8_holm.py 7 passed, 0 failed, 0 skipped; failures in the run 0, skips in the run 0 -> MET
+GATES (J-D-G0 before any model; J-D-G1 natural effect; J-D-G2 batch floor; J-D-G3 competence; J-D-G4 transfer evaluable; J-D-G5 binding queries; J-D-G6 dissociation population; J-D-G7 ratio denominators, per line)
+  J-D-G1 qwen7    N_X (P1, E8) +4.000 [+4.000,+4.000] (>= 3 nats, CI excl. 0) -> MET
+  J-D-G2 qwen7    inject batch floor 0.0000 (<= 0.05) -> MET
+  J-D-G5 qwen7    accuracy other_agent 1.00, irrelevant_object 1.00 (>= 0.80; direct 1.00) -> MET
+  J-D-G3 qwen7    Q_IN        argmax mentioned 1.00 (>= 0.90), candidate mass 0.90 (>= 0.50) -> MET
+  J-D-G2 qwen7    Q_IN        batch floor 0.0000 -> MET
+  J-D-G4 qwen7    Q_IN        d_G +4.000 [+4.000,+4.000], ID_K(allT) +4.400 [+4.400,+4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 qwen7    Q_OUT       argmax unmentioned 1.00 (>= 0.90), candidate mass 0.90 (>= 0.50) -> MET
+  J-D-G2 qwen7    Q_OUT       batch floor 0.0000 -> MET
+  J-D-G4 qwen7    Q_OUT       d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 qwen7    INLINE      two-way 1.00 (>= 0.75), four-way 1.00 (>= 0.50), LD +3.028 [+2.993,+3.066] (> 0, CI excl. 0) -> MET
+  J-D-G2 qwen7    INLINE      batch floor 0.0000 -> MET
+  J-D-G4 qwen7    INLINE      d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 qwen7    INLINE_CHAT two-way 1.00 (>= 0.75), four-way 1.00 (>= 0.50), LD +3.028 [+2.993,+3.066] (> 0, CI excl. 0) -> MET
+  J-D-G2 qwen7    INLINE_CHAT batch floor 0.0000 -> MET
+  J-D-G4 qwen7    INLINE_CHAT d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G1 mistral7 N_X (P1, E8) +4.000 [+4.000,+4.000] (>= 3 nats, CI excl. 0) -> MET
+  J-D-G2 mistral7 inject batch floor 0.0000 (<= 0.05) -> MET
+  J-D-G3 mistral7 Q_IN        argmax mentioned 1.00 (>= 0.90), candidate mass 0.90 (>= 0.50) -> MET
+  J-D-G2 mistral7 Q_IN        batch floor 0.0000 -> MET
+  J-D-G4 mistral7 Q_IN        d_G +4.000 [+4.000,+4.000], ID_K(allT) +4.400 [+4.400,+4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 mistral7 Q_OUT       argmax unmentioned 1.00 (>= 0.90), candidate mass 0.90 (>= 0.50) -> MET
+  J-D-G2 mistral7 Q_OUT       batch floor 0.0000 -> MET
+  J-D-G4 mistral7 Q_OUT       d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 mistral7 INLINE      two-way 1.00 (>= 0.75), four-way 1.00 (>= 0.50), LD +3.028 [+2.993,+3.066] (> 0, CI excl. 0) -> MET
+  J-D-G2 mistral7 INLINE      batch floor 0.0000 -> MET
+  J-D-G4 mistral7 INLINE      d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 mistral7 INLINE_CHAT two-way 1.00 (>= 0.75), four-way 1.00 (>= 0.50), LD +3.028 [+2.993,+3.066] (> 0, CI excl. 0) -> MET
+  J-D-G2 mistral7 INLINE_CHAT batch floor 0.0000 -> MET
+  J-D-G4 mistral7 INLINE_CHAT d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G6 qwen1.5  competent cores 60 of 60 (>= 40); P1 injection dl_X +2.000 [+2.000,+2.000] (> 0, CI excl. 0); R(k*) of the in-run H* +0.900 [+0.900,+0.900] (>= 0.6); batch floor 0.0000 -> MET
+  J-D-G6 qwen3b   competent cores 60 of 60 (>= 40); P1 injection dl_X +2.000 [+2.000,+2.000] (> 0, CI excl. 0); R(k*) of the in-run H* +0.900 [+0.900,+0.900] (>= 0.6); batch floor 0.0000 -> MET
+  J-D-G6 qwen7    competent cores 60 of 60 (>= 40); P1 injection dl_X +2.000 [+2.000,+2.000] (> 0, CI excl. 0); batch floor 0.0000 -> MET
+
+PREDICTIONS (code, class, kind, prior, verdict; the numbers it was decided on; 2/2 lines need two evaluable models)
+  J-D1           R A prior 0.55  MET           sufficiency: the leave-one-word-out flag moves the answer to an absent option (ID_inj^LOO / ID_K)
+    qwen7    MET           ID_inj^LOO/ID_K +1.250 [+1.250,+1.250] (>= 0.5; H0: <= 0.35), pi_X(move, LOO) 1.00 (>= 0.5); ID_K +4.000 [+4.000,+4.000]
+    mistral7 MET           ID_inj^LOO/ID_K +1.250 [+1.250,+1.250] (>= 0.5; H0: <= 0.35), pi_X(move, LOO) 1.00 (>= 0.5); ID_K +4.000 [+4.000,+4.000]
+  J-D2           R A prior 0.55  MET           specificity against structured controls (own write orthogonal to the flag, mean H* output, active-set flag)
+    qwen7    MET           iota(move) +1.125 [+1.125,+1.125]; orth: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3); meanH: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3); active: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3)
+    mistral7 MET           iota(move) +1.125 [+1.125,+1.125]; orth: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3); meanH: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3); active: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3)
+  J-D3           R A prior 0.50  MET           necessity: ablating one direction per layer at the option rows removes the key read (rho_K)
+    qwen7    MET           rho_K flag +0.200 [+0.200,+0.200] (<= 0.5; H0: >= 0.6), pc1 +0.900 [+0.900,+0.900] (>= 0.7), mean-H* output +0.900 [+0.900,+0.900] (>= 0.7)
+    mistral7 MET           rho_K flag +0.200 [+0.200,+0.200] (<= 0.5; H0: >= 0.6), pc1 +0.900 [+0.900,+0.900] (>= 0.7), mean-H* output +0.900 [+0.900,+0.900] (>= 0.7)
+  J-D4           M A prior 0.85  MET           the injected flag is read at hop 2 by key (r_ans^inj)
+    qwen7    MET           r_ans^inj(KV) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), K +0.900 [+0.900,+0.900], V +0.100 [+0.100,+0.100], K - V +0.800 [+0.800,+0.800] (H0: <= 0); denominator +4.500 [+4.500,+4.500]
+    mistral7 MET           r_ans^inj(KV) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), K +0.900 [+0.900,+0.900], V +0.100 [+0.100,+0.100], K - V +0.800 [+0.800,+0.800] (H0: <= 0); denominator +4.500 [+4.500,+4.500]
+  J-D-ADDR       M A prior 0.80  MET           the flag is identity-free: the key-only and the natural (K and V) writes give the same flag
+    qwen7    MET           weighted cos(Delta^K, Delta^KV) +0.970 (>= 0.9); ID_inj(KV)/ID_inj(K) +1.000 [+1.000,+1.000] (in [0.8, 1.25]; 95 % CI inside [0.7, 1.4])
+    mistral7 MET           weighted cos(Delta^K, Delta^KV) +0.970 (>= 0.9); ID_inj(KV)/ID_inj(K) +1.000 [+1.000,+1.000] (in [0.8, 1.25]; 95 % CI inside [0.7, 1.4])
+  J-D-KN         R A prior 0.40  MET           a non-candidate key acts as removing B's flag, with no specific beneficiary
+    qwen7    MET           mean per-story Pearson +1.000 [+1.000,+1.000] (>= 0.8; 0 undefined), B-loss ratio +1.000 [+1.000,+1.000] (in [0.7, 1.3]), mean(dl_S - dl_X) +0.000 [+0.000,+0.000] (95 % CI inside +-0.400 = 0.1 x ID_K)
+    mistral7 MET           mean per-story Pearson +1.000 [+1.000,+1.000] (>= 0.8; 0 undefined), B-loss ratio +1.000 [+1.000,+1.000] (in [0.7, 1.3]), mean(dl_S - dl_X) +0.000 [+0.000,+0.000] (95 % CI inside +-0.400 = 0.1 x ID_K)
+  J-D5           R A prior 0.25  NOT EVALUABLE the flag of an initial-state sentence carries its binding (Psi_bind > 0 in both sentence orders)
+    qwen7    MET           Psi_bind pooled +1.000 [+1.000,+1.000] (H0: <= 0), object-first +1.000 [+1.000,+1.000] (n 20), distractor-first +1.000 [+1.000,+1.000] (n 20), stratum difference +0.000 [+0.000,+0.000] (CI must include 0)
+    mistral7 NOT EVALUABLE J-D-G0 not passed or no binding results
+  J-D7           M A prior 0.85  MET           consistency: the key read is negative under Q_OUT and positive under Q_IN
+    qwen7    MET           ID_K(Q_OUT) -2.984 [-3.018,-2.950] (<= -1; H0: >= 0), ID_K(Q_IN) +3.016 [+2.982,+3.050] (>= 1; H0: <= 0), paired difference +6.000 [+6.000,+6.000] (H0: <= 0)
+    mistral7 MET           ID_K(Q_OUT) -2.984 [-3.018,-2.950] (<= -1; H0: >= 0), ID_K(Q_IN) +3.016 [+2.982,+3.050] (>= 1; H0: <= 0), paired difference +6.000 [+6.000,+6.000] (H0: <= 0)
+  J-D-SIGN-Q     M A prior 0.85  MET           Q_OUT: the key and the value reads are both negative (task semantics)
+    qwen7    MET           Q_OUT ID_K -2.984 [-3.018,-2.950] (H0: >= 0), ID_V -5.000 [-5.037,-4.964] (H0: >= 0)
+    mistral7 MET           Q_OUT ID_K -2.984 [-3.018,-2.950] (H0: >= 0), ID_V -5.000 [-5.037,-4.964] (H0: >= 0)
+  J-D-SIGN-IOI   L A prior 0.90  NOT MET       IOI INLINE: the key read is negative while the value read is positive
+    qwen7    NOT MET       INLINE ID_K -3.038 [-3.069,-3.009] (H0: >= 0), ID_V -0.984 [-1.018,-0.951] (H0: <= 0)
+    mistral7 MET           INLINE ID_K -3.038 [-3.069,-3.009] (H0: >= 0), ID_V +2.016 [+1.982,+2.049] (H0: <= 0)
+  J-D8-Q         M A prior 0.85  MET           consistency: the frozen H* carry the Q_IN and Q_OUT key reads
+    qwen7    MET           Q_IN: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545 | Q_OUT: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545
+    mistral7 MET           Q_IN: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545 | Q_OUT: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545
+  J-D8-IOI       R A prior 0.55  MET           the frozen H* carry the negative IOI INLINE key read at the listed names
+    qwen7    MET           INLINE: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545
+    mistral7 MET           INLINE: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545
+  J-D-ROUTE-IOI  R A prior 0.40  NOT MET       IOI INLINE: the negative read is applied at the answer row's key read of the listed names
+    qwen7    NOT MET       K_S rows: r_ans(KV) +0.300 [+0.300,+0.300] (>= 0.6), K +0.200 [+0.200,+0.200], V +0.500 [+0.500,+0.500], K - V -0.300 [-0.300,-0.300] (H0: <= 0); r_other +0.000 [+0.000,+0.000] (>= 0.5 would mean S2 or tail rows carry it); dm(K_S) -3.000 [-3.000,-3.000]
+    mistral7 MET           K_S rows: r_ans(KV) +0.950 [+0.950,+0.950] (>= 0.6), K +0.900 [+0.900,+0.900], V +0.200 [+0.200,+0.200], K - V +0.700 [+0.700,+0.700] (H0: <= 0); r_other +0.000 [+0.000,+0.000] (>= 0.5 would mean S2 or tail rows carry it); dm(K_S) -3.000 [-3.000,-3.000]
+  J-D-HOP2       R A prior 0.25  NOT MET       the same top-10 hop-2 heads carry the injected flag's Q_OUT and IOI effects (same reader, opposite sign)
+    qwen7    NOT MET       [intermediate] Q_OUT: carry(top-10) +0.700 [+0.700,+0.700] (>= 0.5; H0: <= 0.2), all heads +0.900, random 10 +0.000; dl_X(inj) -2.000 [-2.000,-2.000]; INLINE: carry(top-10) +0.100 [+0.100,+0.100] (>= 0.5; H0: <= 0.2), all heads +0.900, random 10 +0.000; dl_X(inj) -2.000 [-2.000,-2.000]
+    mistral7 NOT MET       [intermediate] Q_OUT: carry(top-10) +0.700 [+0.700,+0.700] (>= 0.5; H0: <= 0.2), all heads +0.900, random 10 +0.000; dl_X(inj) -2.000 [-2.000,-2.000]; INLINE: carry(top-10) +0.100 [+0.100,+0.100] (>= 0.5; H0: <= 0.2), all heads +0.900, random 10 +0.000; dl_X(inj) -2.000 [-2.000,-2.000]
+  J-D6a          L A prior 0.90  MET           consistency: the flag is written in sentences as in lists at every scale (omega, kappa)
+    qwen1.5  MET           omega +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.4), kappa +0.950 (>= 0.7)
+    qwen3b   MET           omega +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.4), kappa +0.950 (>= 0.7)
+    qwen7    MET           omega +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.4), kappa +0.950 (>= 0.7)
+  J-D6           R A prior 0.35  MET           mediation: the sentence-row flag carries the natural POST/P1 read ratio at 1.5B, 3B and 7B
+    qwen1.5  MET           rho -0.200 [-0.200,-0.200], rho_nat -0.200 [-0.200,-0.200] (same sign: True), rho - rho_nat -0.000 [-0.000,-0.000] (95 % CI inside +-0.100); dl_X(inj) P1 +2.000 [+2.000,+2.000], POST -0.400 [-0.400,-0.400]; N_X P1 +4.000 [+4.000,+4.000], POST -0.800 [-0.800,-0.800]; 60 competent cores
+    qwen3b   MET           rho +0.050 [+0.050,+0.050], rho_nat +0.050 [+0.050,+0.050] (same sign: True), rho - rho_nat -0.000 [-0.000,-0.000] (95 % CI inside +-0.100); dl_X(inj) P1 +2.000 [+2.000,+2.000], POST +0.100 [+0.100,+0.100]; N_X P1 +4.000 [+4.000,+4.000], POST +0.200 [+0.200,+0.200]; 60 competent cores
+    qwen7    MET           rho +0.250 [+0.250,+0.250], rho_nat +0.250 [+0.250,+0.250] (same sign: True), rho - rho_nat -0.000 [-0.000,-0.000] (95 % CI inside +-0.125); dl_X(inj) P1 +2.000 [+2.000,+2.000], POST +0.500 [+0.500,+0.500]; N_X P1 +4.000 [+4.000,+4.000], POST +1.000 [+1.000,+1.000]; 60 competent cores
+  J-D6-ROUTE     R A prior 0.35  MET           at 1.5B the answer reads the sentence-row flag by value (r_ans^inj(V) > r_ans^inj(K))
+    qwen1.5  MET           POST: r_ans^inj(V) +0.700 [+0.700,+0.700], K +0.100 [+0.100,+0.100], V - K +0.600 [+0.600,+0.600] (H0: <= 0); KV +1.000 [+1.000,+1.000]; dl_X(inj) -0.400 [-0.400,-0.400]
+
+D6 DECISION TABLE (fixed in the entry): (a) MEDIATED, READ BY VALUE AT 1.5B: the sentence-row flag carries the natural read ratio at every scale, and at 1.5B the answer reads it by value
+
+REPORTED (no verdict counted)
+  qwen7: iota add 0.5 / 1 / 2 +0.250 / +0.500 / +1.000 (monotone: True); add-only +0.500 [+0.500,+0.500] (>= 0.25, LB > 0: True); move +1.125 [+1.125,+1.125]; pi_X(move) 1.00; ID_inj(full flag)/ID_K +1.125 [+1.125,+1.125]; N_X +4.000 [+4.000,+4.000]
+  qwen7: sanity rows: iso0 +0.012, iso1 +0.012, iso2 +0.012, hspan0 +0.012, hspan1 +0.012, hspan2 +0.012, perm +0.012, choices +0.012, question +0.012; pi_X shift choices +0.00, question +0.00; rank-1 capture +0.978 [+0.978,+0.978]
+  qwen7: D4 r_other +0.022 [+0.022,+0.022]
+  qwen7: B-identity share of the per-story flag (null 0.10): l3 0.40
+  qwen7: logit lens max|cos(Delta, W_U[loc])| vs random: l3 0.050/0.020
+  mistral7: iota add 0.5 / 1 / 2 +0.250 / +0.500 / +1.000 (monotone: True); add-only +0.500 [+0.500,+0.500] (>= 0.25, LB > 0: True); move +1.125 [+1.125,+1.125]; pi_X(move) 1.00; ID_inj(full flag)/ID_K +1.125 [+1.125,+1.125]; N_X +4.000 [+4.000,+4.000]
+  mistral7: sanity rows: iso0 +0.012, iso1 +0.012, iso2 +0.012, hspan0 +0.012, hspan1 +0.012, hspan2 +0.012, perm +0.012, choices +0.012, question +0.012; pi_X shift choices +0.00, question +0.00; rank-1 capture +0.978 [+0.978,+0.978]
+  mistral7: D4 r_other +0.022 [+0.022,+0.022]
+  mistral7: B-identity share of the per-story flag (null 0.10): l3 0.40
+  mistral7: logit lens max|cos(Delta, W_U[loc])| vs random: l3 0.050/0.020
+  qwen7: rho_K isotropic iso0 +1.000 [+1.000,+1.000], iso1 +1.000 [+1.000,+1.000], iso2 +1.000 [+1.000,+1.000] (sanity >= 0.85)
+  mistral7: rho_K isotropic iso0 +1.000 [+1.000,+1.000], iso1 +1.000 [+1.000,+1.000], iso2 +1.000 [+1.000,+1.000] (sanity >= 0.85)
+  qwen7: event vs initial (role confounded with order) Psi_ev +2.000 [+2.000,+2.000]
+  qwen7 Q_IN: ID_K +3.016 [+2.982,+3.050], ID_V +5.000 [+4.963,+5.036]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +0.006 [+0.006,+0.006] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -1.000 [-1.000,-1.000], N_X(cfg) -3.000 [-3.000,-3.000], ratio +0.333; isotropic +0.000, +0.000, +0.000
+  qwen7 Q_OUT: ID_K -2.984 [-3.018,-2.950], ID_V -5.000 [-5.037,-4.964]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +0.006 [+0.006,+0.006] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -1.000 [-1.000,-1.000], N_X(cfg) -3.000 [-3.000,-3.000], ratio +0.333; isotropic +0.000, +0.000, +0.000
+  qwen7: hop-2 carry under P1 (the ranking format): top10 +0.700 [+0.700,+0.700], rand10 +0.000 [+0.000,+0.000], all +0.900 [+0.900,+0.900]
+  qwen7 INLINE: ID_K -3.038 [-3.069,-3.009], ID_V -0.984 [-1.018,-0.951]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     route of the injected IOI flag: r_ans(KV) +1.000 [+1.000,+1.000], K +0.900 [+0.900,+0.900], V +0.000 [+0.000,+0.000], other +0.000 [+0.000,+0.000]; dm(inj) -2.000 [-2.000,-2.000]
+  qwen7 INLINE_CHAT: ID_K -3.038 [-3.069,-3.009], ID_V +2.016 [+1.982,+2.049]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+  mistral7 Q_IN: ID_K +3.016 [+2.982,+3.050], ID_V +5.000 [+4.963,+5.036]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +0.006 [+0.006,+0.006] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -1.000 [-1.000,-1.000], N_X(cfg) -3.000 [-3.000,-3.000], ratio +0.333; isotropic +0.000, +0.000, +0.000
+  mistral7 Q_OUT: ID_K -2.984 [-3.018,-2.950], ID_V -5.000 [-5.037,-4.964]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +0.006 [+0.006,+0.006] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -1.000 [-1.000,-1.000], N_X(cfg) -3.000 [-3.000,-3.000], ratio +0.333; isotropic +0.000, +0.000, +0.000
+  mistral7: hop-2 carry under P1 (the ranking format): top10 +0.700 [+0.700,+0.700], rand10 +0.000 [+0.000,+0.000], all +0.900 [+0.900,+0.900]
+  mistral7 INLINE: ID_K -3.038 [-3.069,-3.009], ID_V +2.016 [+1.982,+2.049]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     route of the injected IOI flag: r_ans(KV) +1.000 [+1.000,+1.000], K +0.900 [+0.900,+0.900], V +0.000 [+0.000,+0.000], other +0.000 [+0.000,+0.000]; dm(inj) -2.000 [-2.000,-2.000]
+  mistral7 INLINE_CHAT: ID_K -3.038 [-3.069,-3.009], ID_V +2.016 [+1.982,+2.049]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+  qwen1.5: D6b Delta^POST at the P1 list row / Delta^P1 there +0.900 [+0.900,+0.900] (>= 0.6 expected)
+  qwen3b: D6b Delta^POST at the P1 list row / Delta^P1 there +0.900 [+0.900,+0.900] (>= 0.6 expected)
+  qwen7: D6b Delta^POST at the P1 list row / Delta^P1 there +0.900 [+0.900,+0.900] (>= 0.6 expected)
+
+SUMMARY
+  account lines, class L: 2 lines: 1 MET, 1 NOT MET, 0 MET IN PART, 0 NOT EVALUABLE; observed 1 against expected 1.80; Brier 0.410
+  account lines, class M: 5 lines: 5 MET, 0 NOT MET, 0 MET IN PART, 0 NOT EVALUABLE; observed 5 against expected 4.20; Brier 0.026
+  account lines, class R: 10 lines: 7 MET, 2 NOT MET, 0 MET IN PART, 1 NOT EVALUABLE; observed 7 against expected 3.90; Brier 0.254; not evaluable: J-D5
+  measurement-validity lines: none in part D (the batch floors and competence checks are gates)
+  met rate among R account lines with a verdict: 7 of 9 (expected 3.90)
+  Holm sensitivity (analysis/stage8_holm.py; reported, no verdict uses it): step-down at familywise one-sided 0.025 over the 31 interval components of the R-class account lines with a verdict (normal p from the bootstrap SE)
+    J-D1: 2 components; 2 decision(s) change under Holm: qwen7 ID_inj^LOO/ID_K H0: <= 0.35 (p 0.5; interval rule rejects, Holm does not reject); mistral7 ID_inj^LOO/ID_K H0: <= 0.35 (p 0.5; interval rule rejects, Holm does not reject); verdict MET -> NOT MET under Holm
+    J-D2: 6 components; 6 decision(s) change under Holm: qwen7 iota(flag)-iota(orth) H0: <= 0 (p 0.5; interval rule rejects, Holm does not reject); qwen7 iota(flag)-iota(meanH) H0: <= 0 (p 0.5; interval rule rejects, Holm does not reject); qwen7 iota(flag)-iota(active) H0: <= 0 (p 0.5; interval rule rejects, Holm does not reject); mistral7 iota(flag)-iota(orth) H0: <= 0 (p 0.5; interval rule rejects, Holm does not reject); mistral7 iota(flag)-iota(meanH) H0: <= 0 (p 0.5; interval rule rejects, Holm does not reject); mistral7 iota(flag)-iota(active) H0: <= 0 (p 0.5; interval rule rejects, Holm does not reject); verdict MET -> NOT MET under Holm
+    J-D3: 2 components; 2 decision(s) change under Holm: qwen7 rho_K(flag) H0: >= 0.6 (p 0.5; interval rule rejects, Holm does not reject); mistral7 rho_K(flag) H0: >= 0.6 (p 0.5; interval rule rejects, Holm does not reject); verdict MET -> NOT MET under Holm
+    J-D-KN: 4 components; 4 decision(s) change under Holm: qwen7 mean(dl_S - dl_X | K_N) H0: <= -0.4 (p 0.5; interval rule rejects, Holm does not reject); qwen7 mean(dl_S - dl_X | K_N) H0: >= 0.4 (p 0.5; interval rule rejects, Holm does not reject); mistral7 mean(dl_S - dl_X | K_N) H0: <= -0.4 (p 0.5; interval rule rejects, Holm does not reject); mistral7 mean(dl_S - dl_X | K_N) H0: >= 0.4 (p 0.5; interval rule rejects, Holm does not reject); verdict MET -> NOT MET under Holm
+    J-D5: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-D8-IOI: 4 components; 4 decision(s) change under Holm: qwen7 INLINE R(H*) H0: <= 0.45 (p 0.5; interval rule rejects, Holm does not reject); qwen7 INLINE KO(H*) H0: <= 0.45 (p 0.5; interval rule rejects, Holm does not reject); mistral7 INLINE R(H*) H0: <= 0.45 (p 0.5; interval rule rejects, Holm does not reject); mistral7 INLINE KO(H*) H0: <= 0.45 (p 0.5; interval rule rejects, Holm does not reject); verdict MET -> NOT MET under Holm
+    J-D-ROUTE-IOI: 2 components; 1 decision(s) change under Holm: mistral7 r_ans(K)-r_ans(V) IOI H0: <= 0 (p 0.5; interval rule rejects, Holm does not reject); verdict unchanged (NOT MET)
+    J-D-HOP2: 4 components; 2 decision(s) change under Holm: qwen7 Q_OUT carry(top10) H0: <= 0.2 (p 0.5; interval rule rejects, Holm does not reject); mistral7 Q_OUT carry(top10) H0: <= 0.2 (p 0.5; interval rule rejects, Holm does not reject); verdict unchanged (NOT MET)
+    J-D6: 6 components; 6 decision(s) change under Holm: qwen1.5 rho - rho_nat H0: <= -0.1 (p 0.5; interval rule rejects, Holm does not reject); qwen1.5 rho - rho_nat H0: >= 0.1 (p 0.5; interval rule rejects, Holm does not reject); qwen3b rho - rho_nat H0: <= -0.1 (p 0.5; interval rule rejects, Holm does not reject); qwen3b rho - rho_nat H0: >= 0.1 (p 0.5; interval rule rejects, Holm does not reject); qwen7 rho - rho_nat H0: <= -0.125 (p 0.5; interval rule rejects, Holm does not reject); qwen7 rho - rho_nat H0: >= 0.125 (p 0.5; interval rule rejects, Holm does not reject); verdict MET -> NOT MET under Holm
+    J-D6-ROUTE: 1 components; 1 decision(s) change under Holm: qwen1.5 r_ans(V)-r_ans(K) POST H0: <= 0 (p 0.5; interval rule rejects, Holm does not reject); verdict MET -> NOT MET under Holm
+  provenance MISMATCH; population MISMATCH; J-D-G0 MET
+
+######## EXPLORATORY (not scored)
+-- qwen7: sets (None): k* 5, L* [3]; hop-2 top-10 []; in-run a3 overlap with H* 5
+-- qwen7: flag geometry: consistency l3 0.90; mean cross-layer cos +0.000; flag cosines 
+-- mistral7: sets (None): k* 5, L* [3]; hop-2 top-10 []; in-run a3 overlap with H* 5
+-- mistral7: flag geometry: consistency l3 0.90; mean cross-layer cos +0.000; flag cosines 
+-- qwen1.5: sets (None): k* 5, L* [3]; hop-2 top-10 []; in-run a3 overlap with H* 5
+-- qwen1.5: flag geometry: consistency l3 0.90; mean cross-layer cos +0.000; flag cosines 
+-- qwen3b: sets (None): k* 5, L* [3]; hop-2 top-10 []; in-run a3 overlap with H* 5
+-- qwen3b: flag geometry: consistency l3 0.90; mean cross-layer cos +0.000; flag cosines 
+-- qwen7: E6, iota on the raw margin m_X = lp(X) - lp(B): add1 +0.460 [+0.460,+0.460], move +1.214 [+1.214,+1.214], looX +1.946 [+1.946,+1.946]
+-- mistral7: E6, iota on the raw margin m_X = lp(X) - lp(B): add1 +0.460 [+0.460,+0.460], move +1.214 [+1.214,+1.214], looX +1.946 [+1.946,+1.946]
+-- qwen7: H3/G7b reconciliation (base answer rate, initial-location rate): flag@init_dloc 1.00/0.00, flag@B 1.00/0.00, none 1.00/0.00, flag 1.00/0.00
+-- mistral7: H3/G7b reconciliation (base answer rate, initial-location rate): flag@init_dloc 1.00/0.00, flag@B 1.00/0.00, none 1.00/0.00, flag 1.00/0.00
+-- qwen7: Q_OUT behaviour, answer = the story's own word B: none 1.00, K_S 1.00, V_S 1.00
+-- qwen7: IOI injections at the listed IO_X row (dl, four-way): injIOI -1.000 [-1.000,-1.000], moveIOI -1.000 [-1.000,-1.000], injP1 -0.300 [-0.300,-0.300], iso +0.000 [+0.000,+0.000], K_X -3.000 [-3.000,-3.000]
+-- mistral7: Q_OUT behaviour, answer = the story's own word B: none 1.00, K_S 1.00, V_S 1.00
+-- mistral7: IOI injections at the listed IO_X row (dl, four-way): injIOI -1.000 [-1.000,-1.000], moveIOI -1.000 [-1.000,-1.000], injP1 -0.300 [-0.300,-0.300], iso +0.000 [+0.000,+0.000], K_X -3.000 [-3.000,-3.000]
+__________________________________________________________________ test_holm_with_the_shared_helper ___________________________________________________________________
+------------------------------------------------------------------------ Captured stdout call -------------------------------------------------------------------------
+Stage 8 part D scoring, preregistration P-2026-10-10-J; results /tmp/pytest-of-root/pytest-0/test_holm_with_the_shared_help0; TEST MODE (verdicts are plumbing checks)
+
+PROVENANCE (the pipeline's COMMIT.txt, ENV.txt, REVISIONS.txt, SKIPPED.txt; every results file)
+  COMMIT.txt: absent
+  ENV.txt: absent
+  REVISIONS.txt: absent
+  SKIPPED.txt: absent
+  ablate/mistral7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  ablate/qwen7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  bind/qwen7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  diss/qwen1.5: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  diss/qwen3b: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  diss/qwen7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  fit/mistral7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  fit/qwen1.5: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  fit/qwen3b: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  fit/qwen7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  inject/mistral7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  inject/qwen7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  preflight/mistral7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  preflight/qwen1.5: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  preflight/qwen3b: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  preflight/qwen7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sets/mistral7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sets/qwen1.5: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sets/qwen3b: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sets/qwen7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sign/mistral7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sign/qwen7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  commits: ['None', 'abc']  MISMATCH: not one commit
+
+POPULATION (pinned hashes of R, R', E8, BIND, the IOI candidate lists and the task lists; sizes not checked in TEST MODE)
+  preflight qwen7: hashes OK; overlaps none; IOI E_ioi 0 valid, F_ioi 0; prompts checked None
+  inject/qwen7: population hashes differ from the preflight: MISMATCH
+  ablate/qwen7: population hashes differ from the preflight: MISMATCH
+  bind/qwen7: population hashes differ from the preflight: MISMATCH
+  diss/qwen7: population hashes differ from the preflight: MISMATCH
+  preflight mistral7: hashes OK; overlaps none; IOI E_ioi 0 valid, F_ioi 0; prompts checked None
+  inject/mistral7: population hashes differ from the preflight: MISMATCH
+  ablate/mistral7: population hashes differ from the preflight: MISMATCH
+  preflight qwen1.5: hashes OK; overlaps none; IOI E_ioi 0 valid, F_ioi 0; prompts checked None
+  diss/qwen1.5: population hashes differ from the preflight: MISMATCH
+  preflight qwen3b: hashes OK; overlaps none; IOI E_ioi 0 valid, F_ioi 0; prompts checked None
+  diss/qwen3b: population hashes differ from the preflight: MISMATCH
+  population: MISMATCH
+
+  J-D-G0  FP32 unit tests (last of 1 run(s)): tests/test_flag.py 13 passed, 0 failed, 0 skipped; tests/test_questions.py 11 passed, 0 failed, 0 skipped; tests/test_stage8d_score.py 18 passed, 0 failed, 0 skipped; tests/test_stage8_populations.py 5 passed, 0 failed, 0 skipped; tests/test_stage8_holm.py 7 passed, 0 failed, 0 skipped; failures in the run 0, skips in the run 0 -> MET
+GATES (J-D-G0 before any model; J-D-G1 natural effect; J-D-G2 batch floor; J-D-G3 competence; J-D-G4 transfer evaluable; J-D-G5 binding queries; J-D-G6 dissociation population; J-D-G7 ratio denominators, per line)
+  J-D-G1 qwen7    N_X (P1, E8) +4.000 [+4.000,+4.000] (>= 3 nats, CI excl. 0) -> MET
+  J-D-G2 qwen7    inject batch floor 0.0000 (<= 0.05) -> MET
+  J-D-G5 qwen7    accuracy other_agent 1.00, irrelevant_object 1.00 (>= 0.80; direct 1.00) -> MET
+  J-D-G3 qwen7    Q_IN        argmax mentioned 1.00 (>= 0.90), candidate mass 0.90 (>= 0.50) -> MET
+  J-D-G2 qwen7    Q_IN        batch floor 0.0000 -> MET
+  J-D-G4 qwen7    Q_IN        d_G +4.000 [+4.000,+4.000], ID_K(allT) +4.400 [+4.400,+4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 qwen7    Q_OUT       argmax unmentioned 1.00 (>= 0.90), candidate mass 0.90 (>= 0.50) -> MET
+  J-D-G2 qwen7    Q_OUT       batch floor 0.0000 -> MET
+  J-D-G4 qwen7    Q_OUT       d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 qwen7    INLINE      two-way 1.00 (>= 0.75), four-way 1.00 (>= 0.50), LD +3.028 [+2.993,+3.066] (> 0, CI excl. 0) -> MET
+  J-D-G2 qwen7    INLINE      batch floor 0.0000 -> MET
+  J-D-G4 qwen7    INLINE      d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 qwen7    INLINE_CHAT two-way 1.00 (>= 0.75), four-way 1.00 (>= 0.50), LD +3.028 [+2.993,+3.066] (> 0, CI excl. 0) -> MET
+  J-D-G2 qwen7    INLINE_CHAT batch floor 0.0000 -> MET
+  J-D-G4 qwen7    INLINE_CHAT d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G1 mistral7 N_X (P1, E8) +4.000 [+4.000,+4.000] (>= 3 nats, CI excl. 0) -> MET
+  J-D-G2 mistral7 inject batch floor 0.0000 (<= 0.05) -> MET
+  J-D-G3 mistral7 Q_IN        argmax mentioned 1.00 (>= 0.90), candidate mass 0.90 (>= 0.50) -> MET
+  J-D-G2 mistral7 Q_IN        batch floor 0.0000 -> MET
+  J-D-G4 mistral7 Q_IN        d_G +4.000 [+4.000,+4.000], ID_K(allT) +4.400 [+4.400,+4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 mistral7 Q_OUT       argmax unmentioned 1.00 (>= 0.90), candidate mass 0.90 (>= 0.50) -> MET
+  J-D-G2 mistral7 Q_OUT       batch floor 0.0000 -> MET
+  J-D-G4 mistral7 Q_OUT       d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 mistral7 INLINE      two-way 1.00 (>= 0.75), four-way 1.00 (>= 0.50), LD +3.028 [+2.993,+3.066] (> 0, CI excl. 0) -> MET
+  J-D-G2 mistral7 INLINE      batch floor 0.0000 -> MET
+  J-D-G4 mistral7 INLINE      d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 mistral7 INLINE_CHAT two-way 1.00 (>= 0.75), four-way 1.00 (>= 0.50), LD +3.028 [+2.993,+3.066] (> 0, CI excl. 0) -> MET
+  J-D-G2 mistral7 INLINE_CHAT batch floor 0.0000 -> MET
+  J-D-G4 mistral7 INLINE_CHAT d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G6 qwen1.5  competent cores 60 of 60 (>= 40); P1 injection dl_X +2.000 [+2.000,+2.000] (> 0, CI excl. 0); R(k*) of the in-run H* +0.900 [+0.900,+0.900] (>= 0.6); batch floor 0.0000 -> MET
+  J-D-G6 qwen3b   competent cores 60 of 60 (>= 40); P1 injection dl_X +2.000 [+2.000,+2.000] (> 0, CI excl. 0); R(k*) of the in-run H* +0.900 [+0.900,+0.900] (>= 0.6); batch floor 0.0000 -> MET
+  J-D-G6 qwen7    competent cores 60 of 60 (>= 40); P1 injection dl_X +2.000 [+2.000,+2.000] (> 0, CI excl. 0); batch floor 0.0000 -> MET
+
+PREDICTIONS (code, class, kind, prior, verdict; the numbers it was decided on; 2/2 lines need two evaluable models)
+  J-D1           R A prior 0.55  MET           sufficiency: the leave-one-word-out flag moves the answer to an absent option (ID_inj^LOO / ID_K)
+    qwen7    MET           ID_inj^LOO/ID_K +1.250 [+1.250,+1.250] (>= 0.5; H0: <= 0.35), pi_X(move, LOO) 1.00 (>= 0.5); ID_K +4.000 [+4.000,+4.000]
+    mistral7 MET           ID_inj^LOO/ID_K +1.250 [+1.250,+1.250] (>= 0.5; H0: <= 0.35), pi_X(move, LOO) 1.00 (>= 0.5); ID_K +4.000 [+4.000,+4.000]
+  J-D2           R A prior 0.55  MET           specificity against structured controls (own write orthogonal to the flag, mean H* output, active-set flag)
+    qwen7    MET           iota(move) +1.125 [+1.125,+1.125]; orth: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3); meanH: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3); active: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3)
+    mistral7 MET           iota(move) +1.125 [+1.125,+1.125]; orth: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3); meanH: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3); active: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3)
+  J-D3           R A prior 0.50  MET           necessity: ablating one direction per layer at the option rows removes the key read (rho_K)
+    qwen7    MET           rho_K flag +0.200 [+0.200,+0.200] (<= 0.5; H0: >= 0.6), pc1 +0.900 [+0.900,+0.900] (>= 0.7), mean-H* output +0.900 [+0.900,+0.900] (>= 0.7)
+    mistral7 MET           rho_K flag +0.200 [+0.200,+0.200] (<= 0.5; H0: >= 0.6), pc1 +0.900 [+0.900,+0.900] (>= 0.7), mean-H* output +0.900 [+0.900,+0.900] (>= 0.7)
+  J-D4           M A prior 0.85  MET           the injected flag is read at hop 2 by key (r_ans^inj)
+    qwen7    MET           r_ans^inj(KV) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), K +0.900 [+0.900,+0.900], V +0.100 [+0.100,+0.100], K - V +0.800 [+0.800,+0.800] (H0: <= 0); denominator +4.500 [+4.500,+4.500]
+    mistral7 MET           r_ans^inj(KV) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), K +0.900 [+0.900,+0.900], V +0.100 [+0.100,+0.100], K - V +0.800 [+0.800,+0.800] (H0: <= 0); denominator +4.500 [+4.500,+4.500]
+  J-D-ADDR       M A prior 0.80  MET           the flag is identity-free: the key-only and the natural (K and V) writes give the same flag
+    qwen7    MET           weighted cos(Delta^K, Delta^KV) +0.970 (>= 0.9); ID_inj(KV)/ID_inj(K) +1.000 [+1.000,+1.000] (in [0.8, 1.25]; 95 % CI inside [0.7, 1.4])
+    mistral7 MET           weighted cos(Delta^K, Delta^KV) +0.970 (>= 0.9); ID_inj(KV)/ID_inj(K) +1.000 [+1.000,+1.000] (in [0.8, 1.25]; 95 % CI inside [0.7, 1.4])
+  J-D-KN         R A prior 0.40  MET           a non-candidate key acts as removing B's flag, with no specific beneficiary
+    qwen7    MET           mean per-story Pearson +1.000 [+1.000,+1.000] (>= 0.8; 0 undefined), B-loss ratio +1.000 [+1.000,+1.000] (in [0.7, 1.3]), mean(dl_S - dl_X) +0.000 [+0.000,+0.000] (95 % CI inside +-0.400 = 0.1 x ID_K)
+    mistral7 MET           mean per-story Pearson +1.000 [+1.000,+1.000] (>= 0.8; 0 undefined), B-loss ratio +1.000 [+1.000,+1.000] (in [0.7, 1.3]), mean(dl_S - dl_X) +0.000 [+0.000,+0.000] (95 % CI inside +-0.400 = 0.1 x ID_K)
+  J-D5           R A prior 0.25  NOT EVALUABLE the flag of an initial-state sentence carries its binding (Psi_bind > 0 in both sentence orders)
+    qwen7    MET           Psi_bind pooled +1.000 [+1.000,+1.000] (H0: <= 0), object-first +1.000 [+1.000,+1.000] (n 20), distractor-first +1.000 [+1.000,+1.000] (n 20), stratum difference +0.000 [+0.000,+0.000] (CI must include 0)
+    mistral7 NOT EVALUABLE J-D-G0 not passed or no binding results
+  J-D7           M A prior 0.85  MET           consistency: the key read is negative under Q_OUT and positive under Q_IN
+    qwen7    MET           ID_K(Q_OUT) -2.984 [-3.018,-2.950] (<= -1; H0: >= 0), ID_K(Q_IN) +3.016 [+2.982,+3.050] (>= 1; H0: <= 0), paired difference +6.000 [+6.000,+6.000] (H0: <= 0)
+    mistral7 MET           ID_K(Q_OUT) -2.984 [-3.018,-2.950] (<= -1; H0: >= 0), ID_K(Q_IN) +3.016 [+2.982,+3.050] (>= 1; H0: <= 0), paired difference +6.000 [+6.000,+6.000] (H0: <= 0)
+  J-D-SIGN-Q     M A prior 0.85  MET           Q_OUT: the key and the value reads are both negative (task semantics)
+    qwen7    MET           Q_OUT ID_K -2.984 [-3.018,-2.950] (H0: >= 0), ID_V -5.000 [-5.037,-4.964] (H0: >= 0)
+    mistral7 MET           Q_OUT ID_K -2.984 [-3.018,-2.950] (H0: >= 0), ID_V -5.000 [-5.037,-4.964] (H0: >= 0)
+  J-D-SIGN-IOI   L A prior 0.90  NOT MET       IOI INLINE: the key read is negative while the value read is positive
+    qwen7    NOT MET       INLINE ID_K -3.038 [-3.069,-3.009] (H0: >= 0), ID_V -0.984 [-1.018,-0.951] (H0: <= 0)
+    mistral7 MET           INLINE ID_K -3.038 [-3.069,-3.009] (H0: >= 0), ID_V +2.016 [+1.982,+2.049] (H0: <= 0)
+  J-D8-Q         M A prior 0.85  MET           consistency: the frozen H* carry the Q_IN and Q_OUT key reads
+    qwen7    MET           Q_IN: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545 | Q_OUT: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545
+    mistral7 MET           Q_IN: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545 | Q_OUT: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545
+  J-D8-IOI       R A prior 0.55  MET           the frozen H* carry the negative IOI INLINE key read at the listed names
+    qwen7    MET           INLINE: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545
+    mistral7 MET           INLINE: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545
+  J-D-ROUTE-IOI  R A prior 0.40  NOT MET       IOI INLINE: the negative read is applied at the answer row's key read of the listed names
+    qwen7    NOT MET       K_S rows: r_ans(KV) +0.300 [+0.300,+0.300] (>= 0.6), K +0.200 [+0.200,+0.200], V +0.500 [+0.500,+0.500], K - V -0.300 [-0.300,-0.300] (H0: <= 0); r_other +0.000 [+0.000,+0.000] (>= 0.5 would mean S2 or tail rows carry it); dm(K_S) -3.000 [-3.000,-3.000]
+    mistral7 MET           K_S rows: r_ans(KV) +0.950 [+0.950,+0.950] (>= 0.6), K +0.900 [+0.900,+0.900], V +0.200 [+0.200,+0.200], K - V +0.700 [+0.700,+0.700] (H0: <= 0); r_other +0.000 [+0.000,+0.000] (>= 0.5 would mean S2 or tail rows carry it); dm(K_S) -3.000 [-3.000,-3.000]
+  J-D-HOP2       R A prior 0.25  NOT MET       the same top-10 hop-2 heads carry the injected flag's Q_OUT and IOI effects (same reader, opposite sign)
+    qwen7    NOT MET       [intermediate] Q_OUT: carry(top-10) +0.700 [+0.700,+0.700] (>= 0.5; H0: <= 0.2), all heads +0.900, random 10 +0.000; dl_X(inj) -2.000 [-2.000,-2.000]; INLINE: carry(top-10) +0.100 [+0.100,+0.100] (>= 0.5; H0: <= 0.2), all heads +0.900, random 10 +0.000; dl_X(inj) -2.000 [-2.000,-2.000]
+    mistral7 NOT MET       [intermediate] Q_OUT: carry(top-10) +0.700 [+0.700,+0.700] (>= 0.5; H0: <= 0.2), all heads +0.900, random 10 +0.000; dl_X(inj) -2.000 [-2.000,-2.000]; INLINE: carry(top-10) +0.100 [+0.100,+0.100] (>= 0.5; H0: <= 0.2), all heads +0.900, random 10 +0.000; dl_X(inj) -2.000 [-2.000,-2.000]
+  J-D6a          L A prior 0.90  MET           consistency: the flag is written in sentences as in lists at every scale (omega, kappa)
+    qwen1.5  MET           omega +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.4), kappa +0.950 (>= 0.7)
+    qwen3b   MET           omega +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.4), kappa +0.950 (>= 0.7)
+    qwen7    MET           omega +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.4), kappa +0.950 (>= 0.7)
+  J-D6           R A prior 0.35  MET           mediation: the sentence-row flag carries the natural POST/P1 read ratio at 1.5B, 3B and 7B
+    qwen1.5  MET           rho -0.200 [-0.200,-0.200], rho_nat -0.200 [-0.200,-0.200] (same sign: True), rho - rho_nat -0.000 [-0.000,-0.000] (95 % CI inside +-0.100); dl_X(inj) P1 +2.000 [+2.000,+2.000], POST -0.400 [-0.400,-0.400]; N_X P1 +4.000 [+4.000,+4.000], POST -0.800 [-0.800,-0.800]; 60 competent cores
+    qwen3b   MET           rho +0.050 [+0.050,+0.050], rho_nat +0.050 [+0.050,+0.050] (same sign: True), rho - rho_nat -0.000 [-0.000,-0.000] (95 % CI inside +-0.100); dl_X(inj) P1 +2.000 [+2.000,+2.000], POST +0.100 [+0.100,+0.100]; N_X P1 +4.000 [+4.000,+4.000], POST +0.200 [+0.200,+0.200]; 60 competent cores
+    qwen7    MET           rho +0.250 [+0.250,+0.250], rho_nat +0.250 [+0.250,+0.250] (same sign: True), rho - rho_nat -0.000 [-0.000,-0.000] (95 % CI inside +-0.125); dl_X(inj) P1 +2.000 [+2.000,+2.000], POST +0.500 [+0.500,+0.500]; N_X P1 +4.000 [+4.000,+4.000], POST +1.000 [+1.000,+1.000]; 60 competent cores
+  J-D6-ROUTE     R A prior 0.35  MET           at 1.5B the answer reads the sentence-row flag by value (r_ans^inj(V) > r_ans^inj(K))
+    qwen1.5  MET           POST: r_ans^inj(V) +0.700 [+0.700,+0.700], K +0.100 [+0.100,+0.100], V - K +0.600 [+0.600,+0.600] (H0: <= 0); KV +1.000 [+1.000,+1.000]; dl_X(inj) -0.400 [-0.400,-0.400]
+
+D6 DECISION TABLE (fixed in the entry): (a) MEDIATED, READ BY VALUE AT 1.5B: the sentence-row flag carries the natural read ratio at every scale, and at 1.5B the answer reads it by value
+
+REPORTED (no verdict counted)
+  qwen7: iota add 0.5 / 1 / 2 +0.250 / +0.500 / +1.000 (monotone: True); add-only +0.500 [+0.500,+0.500] (>= 0.25, LB > 0: True); move +1.125 [+1.125,+1.125]; pi_X(move) 1.00; ID_inj(full flag)/ID_K +1.125 [+1.125,+1.125]; N_X +4.000 [+4.000,+4.000]
+  qwen7: sanity rows: iso0 +0.012, iso1 +0.012, iso2 +0.012, hspan0 +0.012, hspan1 +0.012, hspan2 +0.012, perm +0.012, choices +0.012, question +0.012; pi_X shift choices +0.00, question +0.00; rank-1 capture +0.978 [+0.978,+0.978]
+  qwen7: D4 r_other +0.022 [+0.022,+0.022]
+  qwen7: B-identity share of the per-story flag (null 0.10): l3 0.40
+  qwen7: logit lens max|cos(Delta, W_U[loc])| vs random: l3 0.050/0.020
+  mistral7: iota add 0.5 / 1 / 2 +0.250 / +0.500 / +1.000 (monotone: True); add-only +0.500 [+0.500,+0.500] (>= 0.25, LB > 0: True); move +1.125 [+1.125,+1.125]; pi_X(move) 1.00; ID_inj(full flag)/ID_K +1.125 [+1.125,+1.125]; N_X +4.000 [+4.000,+4.000]
+  mistral7: sanity rows: iso0 +0.012, iso1 +0.012, iso2 +0.012, hspan0 +0.012, hspan1 +0.012, hspan2 +0.012, perm +0.012, choices +0.012, question +0.012; pi_X shift choices +0.00, question +0.00; rank-1 capture +0.978 [+0.978,+0.978]
+  mistral7: D4 r_other +0.022 [+0.022,+0.022]
+  mistral7: B-identity share of the per-story flag (null 0.10): l3 0.40
+  mistral7: logit lens max|cos(Delta, W_U[loc])| vs random: l3 0.050/0.020
+  qwen7: rho_K isotropic iso0 +1.000 [+1.000,+1.000], iso1 +1.000 [+1.000,+1.000], iso2 +1.000 [+1.000,+1.000] (sanity >= 0.85)
+  mistral7: rho_K isotropic iso0 +1.000 [+1.000,+1.000], iso1 +1.000 [+1.000,+1.000], iso2 +1.000 [+1.000,+1.000] (sanity >= 0.85)
+  qwen7: event vs initial (role confounded with order) Psi_ev +2.000 [+2.000,+2.000]
+  qwen7 Q_IN: ID_K +3.016 [+2.982,+3.050], ID_V +5.000 [+4.963,+5.036]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +0.006 [+0.006,+0.006] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -1.000 [-1.000,-1.000], N_X(cfg) -3.000 [-3.000,-3.000], ratio +0.333; isotropic +0.000, +0.000, +0.000
+  qwen7 Q_OUT: ID_K -2.984 [-3.018,-2.950], ID_V -5.000 [-5.037,-4.964]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +0.006 [+0.006,+0.006] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -1.000 [-1.000,-1.000], N_X(cfg) -3.000 [-3.000,-3.000], ratio +0.333; isotropic +0.000, +0.000, +0.000
+  qwen7: hop-2 carry under P1 (the ranking format): top10 +0.700 [+0.700,+0.700], rand10 +0.000 [+0.000,+0.000], all +0.900 [+0.900,+0.900]
+  qwen7 INLINE: ID_K -3.038 [-3.069,-3.009], ID_V -0.984 [-1.018,-0.951]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     route of the injected IOI flag: r_ans(KV) +1.000 [+1.000,+1.000], K +0.900 [+0.900,+0.900], V +0.000 [+0.000,+0.000], other +0.000 [+0.000,+0.000]; dm(inj) -2.000 [-2.000,-2.000]
+  qwen7 INLINE_CHAT: ID_K -3.038 [-3.069,-3.009], ID_V +2.016 [+1.982,+2.049]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+  mistral7 Q_IN: ID_K +3.016 [+2.982,+3.050], ID_V +5.000 [+4.963,+5.036]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +0.006 [+0.006,+0.006] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -1.000 [-1.000,-1.000], N_X(cfg) -3.000 [-3.000,-3.000], ratio +0.333; isotropic +0.000, +0.000, +0.000
+  mistral7 Q_OUT: ID_K -2.984 [-3.018,-2.950], ID_V -5.000 [-5.037,-4.964]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +0.006 [+0.006,+0.006] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -1.000 [-1.000,-1.000], N_X(cfg) -3.000 [-3.000,-3.000], ratio +0.333; isotropic +0.000, +0.000, +0.000
+  mistral7: hop-2 carry under P1 (the ranking format): top10 +0.700 [+0.700,+0.700], rand10 +0.000 [+0.000,+0.000], all +0.900 [+0.900,+0.900]
+  mistral7 INLINE: ID_K -3.038 [-3.069,-3.009], ID_V +2.016 [+1.982,+2.049]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     route of the injected IOI flag: r_ans(KV) +1.000 [+1.000,+1.000], K +0.900 [+0.900,+0.900], V +0.000 [+0.000,+0.000], other +0.000 [+0.000,+0.000]; dm(inj) -2.000 [-2.000,-2.000]
+  mistral7 INLINE_CHAT: ID_K -3.038 [-3.069,-3.009], ID_V +2.016 [+1.982,+2.049]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+  qwen1.5: D6b Delta^POST at the P1 list row / Delta^P1 there +0.900 [+0.900,+0.900] (>= 0.6 expected)
+  qwen3b: D6b Delta^POST at the P1 list row / Delta^P1 there +0.900 [+0.900,+0.900] (>= 0.6 expected)
+  qwen7: D6b Delta^POST at the P1 list row / Delta^P1 there +0.900 [+0.900,+0.900] (>= 0.6 expected)
+
+SUMMARY
+  account lines, class L: 2 lines: 1 MET, 1 NOT MET, 0 MET IN PART, 0 NOT EVALUABLE; observed 1 against expected 1.80; Brier 0.410
+  account lines, class M: 5 lines: 5 MET, 0 NOT MET, 0 MET IN PART, 0 NOT EVALUABLE; observed 5 against expected 4.20; Brier 0.026
+  account lines, class R: 10 lines: 7 MET, 2 NOT MET, 0 MET IN PART, 1 NOT EVALUABLE; observed 7 against expected 3.90; Brier 0.254; not evaluable: J-D5
+  measurement-validity lines: none in part D (the batch floors and competence checks are gates)
+  met rate among R account lines with a verdict: 7 of 9 (expected 3.90)
+  Holm sensitivity (analysis/stage8_holm.py; reported, no verdict uses it): step-down at familywise one-sided 0.025 over the 31 interval components of the R-class account lines with a verdict (normal p from the bootstrap SE)
+    J-D1: 2 components; no decision changes under Holm; verdict unchanged (MET)
+    J-D2: 6 components; no decision changes under Holm; verdict unchanged (MET)
+    J-D3: 2 components; no decision changes under Holm; verdict unchanged (MET)
+    J-D-KN: 4 components; no decision changes under Holm; verdict unchanged (MET)
+    J-D5: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-D8-IOI: 4 components; no decision changes under Holm; verdict unchanged (MET)
+    J-D-ROUTE-IOI: 2 components; no decision changes under Holm; verdict unchanged (NOT MET)
+    J-D-HOP2: 4 components; no decision changes under Holm; verdict unchanged (NOT MET)
+    J-D6: 6 components; no decision changes under Holm; verdict unchanged (MET)
+    J-D6-ROUTE: 1 components; no decision changes under Holm; verdict unchanged (MET)
+  provenance MISMATCH; population MISMATCH; J-D-G0 MET
+
+######## EXPLORATORY (not scored)
+-- qwen7: sets (None): k* 5, L* [3]; hop-2 top-10 []; in-run a3 overlap with H* 5
+-- qwen7: flag geometry: consistency l3 0.90; mean cross-layer cos +0.000; flag cosines 
+-- mistral7: sets (None): k* 5, L* [3]; hop-2 top-10 []; in-run a3 overlap with H* 5
+-- mistral7: flag geometry: consistency l3 0.90; mean cross-layer cos +0.000; flag cosines 
+-- qwen1.5: sets (None): k* 5, L* [3]; hop-2 top-10 []; in-run a3 overlap with H* 5
+-- qwen1.5: flag geometry: consistency l3 0.90; mean cross-layer cos +0.000; flag cosines 
+-- qwen3b: sets (None): k* 5, L* [3]; hop-2 top-10 []; in-run a3 overlap with H* 5
+-- qwen3b: flag geometry: consistency l3 0.90; mean cross-layer cos +0.000; flag cosines 
+-- qwen7: E6, iota on the raw margin m_X = lp(X) - lp(B): add1 +0.460 [+0.460,+0.460], move +1.214 [+1.214,+1.214], looX +1.946 [+1.946,+1.946]
+-- mistral7: E6, iota on the raw margin m_X = lp(X) - lp(B): add1 +0.460 [+0.460,+0.460], move +1.214 [+1.214,+1.214], looX +1.946 [+1.946,+1.946]
+-- qwen7: H3/G7b reconciliation (base answer rate, initial-location rate): flag@init_dloc 1.00/0.00, flag@B 1.00/0.00, none 1.00/0.00, flag 1.00/0.00
+-- mistral7: H3/G7b reconciliation (base answer rate, initial-location rate): flag@init_dloc 1.00/0.00, flag@B 1.00/0.00, none 1.00/0.00, flag 1.00/0.00
+-- qwen7: Q_OUT behaviour, answer = the story's own word B: none 1.00, K_S 1.00, V_S 1.00
+-- qwen7: IOI injections at the listed IO_X row (dl, four-way): injIOI -1.000 [-1.000,-1.000], moveIOI -1.000 [-1.000,-1.000], injP1 -0.300 [-0.300,-0.300], iso +0.000 [+0.000,+0.000], K_X -3.000 [-3.000,-3.000]
+-- mistral7: Q_OUT behaviour, answer = the story's own word B: none 1.00, K_S 1.00, V_S 1.00
+-- mistral7: IOI injections at the listed IO_X row (dl, four-way): injIOI -1.000 [-1.000,-1.000], moveIOI -1.000 [-1.000,-1.000], injP1 -0.300 [-0.300,-0.300], iso +0.000 [+0.000,+0.000], K_X -3.000 [-3.000,-3.000]
+___________________________________________________________________________ test_end_to_end ___________________________________________________________________________
+------------------------------------------------------------------------ Captured stdout call -------------------------------------------------------------------------
+Stage 8 part D scoring, preregistration P-2026-10-10-J; results /tmp/pytest-of-root/pytest-0/test_end_to_end0; TEST MODE (verdicts are plumbing checks)
+
+PROVENANCE (the pipeline's COMMIT.txt, ENV.txt, REVISIONS.txt, SKIPPED.txt; every results file)
+  COMMIT.txt: absent
+  ENV.txt: absent
+  REVISIONS.txt: absent
+  SKIPPED.txt: absent
+  ablate/mistral7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  ablate/qwen7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  bind/qwen7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  diss/qwen1.5: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  diss/qwen3b: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  diss/qwen7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  fit/mistral7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  fit/qwen1.5: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  fit/qwen3b: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  fit/qwen7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  inject/mistral7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  inject/qwen7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  preflight/mistral7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  preflight/qwen1.5: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  preflight/qwen3b: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  preflight/qwen7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sets/mistral7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sets/qwen1.5: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sets/qwen3b: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sets/qwen7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sign/mistral7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sign/qwen7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  commits: ['None', 'abc']  MISMATCH: not one commit
+
+POPULATION (pinned hashes of R, R', E8, BIND, the IOI candidate lists and the task lists; sizes not checked in TEST MODE)
+  preflight qwen7: hashes OK; overlaps none; IOI E_ioi 0 valid, F_ioi 0; prompts checked None
+  inject/qwen7: population hashes differ from the preflight: MISMATCH
+  ablate/qwen7: population hashes differ from the preflight: MISMATCH
+  bind/qwen7: population hashes differ from the preflight: MISMATCH
+  diss/qwen7: population hashes differ from the preflight: MISMATCH
+  preflight mistral7: hashes OK; overlaps none; IOI E_ioi 0 valid, F_ioi 0; prompts checked None
+  inject/mistral7: population hashes differ from the preflight: MISMATCH
+  ablate/mistral7: population hashes differ from the preflight: MISMATCH
+  preflight qwen1.5: hashes OK; overlaps none; IOI E_ioi 0 valid, F_ioi 0; prompts checked None
+  diss/qwen1.5: population hashes differ from the preflight: MISMATCH
+  preflight qwen3b: hashes OK; overlaps none; IOI E_ioi 0 valid, F_ioi 0; prompts checked None
+  diss/qwen3b: population hashes differ from the preflight: MISMATCH
+  population: MISMATCH
+
+  J-D-G0  FP32 unit tests (last of 1 run(s)): tests/test_flag.py 13 passed, 0 failed, 0 skipped; tests/test_questions.py 11 passed, 0 failed, 0 skipped; tests/test_stage8d_score.py 18 passed, 0 failed, 0 skipped; tests/test_stage8_populations.py 5 passed, 0 failed, 0 skipped; tests/test_stage8_holm.py 7 passed, 0 failed, 0 skipped; failures in the run 0, skips in the run 0 -> MET
+GATES (J-D-G0 before any model; J-D-G1 natural effect; J-D-G2 batch floor; J-D-G3 competence; J-D-G4 transfer evaluable; J-D-G5 binding queries; J-D-G6 dissociation population; J-D-G7 ratio denominators, per line)
+  J-D-G1 qwen7    N_X (P1, E8) +4.000 [+4.000,+4.000] (>= 3 nats, CI excl. 0) -> MET
+  J-D-G2 qwen7    inject batch floor 0.0000 (<= 0.05) -> MET
+  J-D-G5 qwen7    accuracy other_agent 1.00, irrelevant_object 1.00 (>= 0.80; direct 1.00) -> MET
+  J-D-G3 qwen7    Q_IN        argmax mentioned 1.00 (>= 0.90), candidate mass 0.90 (>= 0.50) -> MET
+  J-D-G2 qwen7    Q_IN        batch floor 0.0000 -> MET
+  J-D-G4 qwen7    Q_IN        d_G +4.000 [+4.000,+4.000], ID_K(allT) +4.400 [+4.400,+4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 qwen7    Q_OUT       argmax unmentioned 1.00 (>= 0.90), candidate mass 0.90 (>= 0.50) -> MET
+  J-D-G2 qwen7    Q_OUT       batch floor 0.0000 -> MET
+  J-D-G4 qwen7    Q_OUT       d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 qwen7    INLINE      two-way 1.00 (>= 0.75), four-way 1.00 (>= 0.50), LD +3.028 [+2.993,+3.066] (> 0, CI excl. 0) -> MET
+  J-D-G2 qwen7    INLINE      batch floor 0.0000 -> MET
+  J-D-G4 qwen7    INLINE      d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 qwen7    INLINE_CHAT two-way 1.00 (>= 0.75), four-way 1.00 (>= 0.50), LD +3.028 [+2.993,+3.066] (> 0, CI excl. 0) -> MET
+  J-D-G2 qwen7    INLINE_CHAT batch floor 0.0000 -> MET
+  J-D-G4 qwen7    INLINE_CHAT d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G1 mistral7 N_X (P1, E8) +4.000 [+4.000,+4.000] (>= 3 nats, CI excl. 0) -> MET
+  J-D-G2 mistral7 inject batch floor 0.0000 (<= 0.05) -> MET
+  J-D-G3 mistral7 Q_IN        argmax mentioned 1.00 (>= 0.90), candidate mass 0.90 (>= 0.50) -> MET
+  J-D-G2 mistral7 Q_IN        batch floor 0.0000 -> MET
+  J-D-G4 mistral7 Q_IN        d_G +4.000 [+4.000,+4.000], ID_K(allT) +4.400 [+4.400,+4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 mistral7 Q_OUT       argmax unmentioned 1.00 (>= 0.90), candidate mass 0.90 (>= 0.50) -> MET
+  J-D-G2 mistral7 Q_OUT       batch floor 0.0000 -> MET
+  J-D-G4 mistral7 Q_OUT       d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 mistral7 INLINE      two-way 1.00 (>= 0.75), four-way 1.00 (>= 0.50), LD +3.028 [+2.993,+3.066] (> 0, CI excl. 0) -> MET
+  J-D-G2 mistral7 INLINE      batch floor 0.0000 -> MET
+  J-D-G4 mistral7 INLINE      d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 mistral7 INLINE_CHAT two-way 1.00 (>= 0.75), four-way 1.00 (>= 0.50), LD +3.028 [+2.993,+3.066] (> 0, CI excl. 0) -> MET
+  J-D-G2 mistral7 INLINE_CHAT batch floor 0.0000 -> MET
+  J-D-G4 mistral7 INLINE_CHAT d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G6 qwen1.5  competent cores 60 of 60 (>= 40); P1 injection dl_X +2.000 [+2.000,+2.000] (> 0, CI excl. 0); R(k*) of the in-run H* +0.900 [+0.900,+0.900] (>= 0.6); batch floor 0.0000 -> MET
+  J-D-G6 qwen3b   competent cores 60 of 60 (>= 40); P1 injection dl_X +2.000 [+2.000,+2.000] (> 0, CI excl. 0); R(k*) of the in-run H* +0.900 [+0.900,+0.900] (>= 0.6); batch floor 0.0000 -> MET
+  J-D-G6 qwen7    competent cores 60 of 60 (>= 40); P1 injection dl_X +2.000 [+2.000,+2.000] (> 0, CI excl. 0); batch floor 0.0000 -> MET
+
+PREDICTIONS (code, class, kind, prior, verdict; the numbers it was decided on; 2/2 lines need two evaluable models)
+  J-D1           R A prior 0.55  MET           sufficiency: the leave-one-word-out flag moves the answer to an absent option (ID_inj^LOO / ID_K)
+    qwen7    MET           ID_inj^LOO/ID_K +1.250 [+1.250,+1.250] (>= 0.5; H0: <= 0.35), pi_X(move, LOO) 1.00 (>= 0.5); ID_K +4.000 [+4.000,+4.000]
+    mistral7 MET           ID_inj^LOO/ID_K +1.250 [+1.250,+1.250] (>= 0.5; H0: <= 0.35), pi_X(move, LOO) 1.00 (>= 0.5); ID_K +4.000 [+4.000,+4.000]
+  J-D2           R A prior 0.55  MET           specificity against structured controls (own write orthogonal to the flag, mean H* output, active-set flag)
+    qwen7    MET           iota(move) +1.125 [+1.125,+1.125]; orth: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3); meanH: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3); active: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3)
+    mistral7 MET           iota(move) +1.125 [+1.125,+1.125]; orth: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3); meanH: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3); active: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3)
+  J-D3           R A prior 0.50  MET           necessity: ablating one direction per layer at the option rows removes the key read (rho_K)
+    qwen7    MET           rho_K flag +0.200 [+0.200,+0.200] (<= 0.5; H0: >= 0.6), pc1 +0.900 [+0.900,+0.900] (>= 0.7), mean-H* output +0.900 [+0.900,+0.900] (>= 0.7)
+    mistral7 MET           rho_K flag +0.200 [+0.200,+0.200] (<= 0.5; H0: >= 0.6), pc1 +0.900 [+0.900,+0.900] (>= 0.7), mean-H* output +0.900 [+0.900,+0.900] (>= 0.7)
+  J-D4           M A prior 0.85  MET           the injected flag is read at hop 2 by key (r_ans^inj)
+    qwen7    MET           r_ans^inj(KV) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), K +0.900 [+0.900,+0.900], V +0.100 [+0.100,+0.100], K - V +0.800 [+0.800,+0.800] (H0: <= 0); denominator +4.500 [+4.500,+4.500]
+    mistral7 MET           r_ans^inj(KV) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), K +0.900 [+0.900,+0.900], V +0.100 [+0.100,+0.100], K - V +0.800 [+0.800,+0.800] (H0: <= 0); denominator +4.500 [+4.500,+4.500]
+  J-D-ADDR       M A prior 0.80  MET           the flag is identity-free: the key-only and the natural (K and V) writes give the same flag
+    qwen7    MET           weighted cos(Delta^K, Delta^KV) +0.970 (>= 0.9); ID_inj(KV)/ID_inj(K) +1.000 [+1.000,+1.000] (in [0.8, 1.25]; 95 % CI inside [0.7, 1.4])
+    mistral7 MET           weighted cos(Delta^K, Delta^KV) +0.970 (>= 0.9); ID_inj(KV)/ID_inj(K) +1.000 [+1.000,+1.000] (in [0.8, 1.25]; 95 % CI inside [0.7, 1.4])
+  J-D-KN         R A prior 0.40  MET           a non-candidate key acts as removing B's flag, with no specific beneficiary
+    qwen7    MET           mean per-story Pearson +1.000 [+1.000,+1.000] (>= 0.8; 0 undefined), B-loss ratio +1.000 [+1.000,+1.000] (in [0.7, 1.3]), mean(dl_S - dl_X) +0.000 [+0.000,+0.000] (95 % CI inside +-0.400 = 0.1 x ID_K)
+    mistral7 MET           mean per-story Pearson +1.000 [+1.000,+1.000] (>= 0.8; 0 undefined), B-loss ratio +1.000 [+1.000,+1.000] (in [0.7, 1.3]), mean(dl_S - dl_X) +0.000 [+0.000,+0.000] (95 % CI inside +-0.400 = 0.1 x ID_K)
+  J-D5           R A prior 0.25  NOT EVALUABLE the flag of an initial-state sentence carries its binding (Psi_bind > 0 in both sentence orders)
+    qwen7    MET           Psi_bind pooled +1.000 [+1.000,+1.000] (H0: <= 0), object-first +1.000 [+1.000,+1.000] (n 20), distractor-first +1.000 [+1.000,+1.000] (n 20), stratum difference +0.000 [+0.000,+0.000] (CI must include 0)
+    mistral7 NOT EVALUABLE J-D-G0 not passed or no binding results
+  J-D7           M A prior 0.85  MET           consistency: the key read is negative under Q_OUT and positive under Q_IN
+    qwen7    MET           ID_K(Q_OUT) -2.984 [-3.018,-2.950] (<= -1; H0: >= 0), ID_K(Q_IN) +3.016 [+2.982,+3.050] (>= 1; H0: <= 0), paired difference +6.000 [+6.000,+6.000] (H0: <= 0)
+    mistral7 MET           ID_K(Q_OUT) -2.984 [-3.018,-2.950] (<= -1; H0: >= 0), ID_K(Q_IN) +3.016 [+2.982,+3.050] (>= 1; H0: <= 0), paired difference +6.000 [+6.000,+6.000] (H0: <= 0)
+  J-D-SIGN-Q     M A prior 0.85  MET           Q_OUT: the key and the value reads are both negative (task semantics)
+    qwen7    MET           Q_OUT ID_K -2.984 [-3.018,-2.950] (H0: >= 0), ID_V -5.000 [-5.037,-4.964] (H0: >= 0)
+    mistral7 MET           Q_OUT ID_K -2.984 [-3.018,-2.950] (H0: >= 0), ID_V -5.000 [-5.037,-4.964] (H0: >= 0)
+  J-D-SIGN-IOI   L A prior 0.90  NOT MET       IOI INLINE: the key read is negative while the value read is positive
+    qwen7    NOT MET       INLINE ID_K -3.038 [-3.069,-3.009] (H0: >= 0), ID_V -0.984 [-1.018,-0.951] (H0: <= 0)
+    mistral7 MET           INLINE ID_K -3.038 [-3.069,-3.009] (H0: >= 0), ID_V +2.016 [+1.982,+2.049] (H0: <= 0)
+  J-D8-Q         M A prior 0.85  MET           consistency: the frozen H* carry the Q_IN and Q_OUT key reads
+    qwen7    MET           Q_IN: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545 | Q_OUT: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545
+    mistral7 MET           Q_IN: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545 | Q_OUT: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545
+  J-D8-IOI       R A prior 0.55  MET           the frozen H* carry the negative IOI INLINE key read at the listed names
+    qwen7    MET           INLINE: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545
+    mistral7 MET           INLINE: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545
+  J-D-ROUTE-IOI  R A prior 0.40  NOT MET       IOI INLINE: the negative read is applied at the answer row's key read of the listed names
+    qwen7    NOT MET       K_S rows: r_ans(KV) +0.300 [+0.300,+0.300] (>= 0.6), K +0.200 [+0.200,+0.200], V +0.500 [+0.500,+0.500], K - V -0.300 [-0.300,-0.300] (H0: <= 0); r_other +0.000 [+0.000,+0.000] (>= 0.5 would mean S2 or tail rows carry it); dm(K_S) -3.000 [-3.000,-3.000]
+    mistral7 MET           K_S rows: r_ans(KV) +0.950 [+0.950,+0.950] (>= 0.6), K +0.900 [+0.900,+0.900], V +0.200 [+0.200,+0.200], K - V +0.700 [+0.700,+0.700] (H0: <= 0); r_other +0.000 [+0.000,+0.000] (>= 0.5 would mean S2 or tail rows carry it); dm(K_S) -3.000 [-3.000,-3.000]
+  J-D-HOP2       R A prior 0.25  NOT MET       the same top-10 hop-2 heads carry the injected flag's Q_OUT and IOI effects (same reader, opposite sign)
+    qwen7    NOT MET       [intermediate] Q_OUT: carry(top-10) +0.700 [+0.700,+0.700] (>= 0.5; H0: <= 0.2), all heads +0.900, random 10 +0.000; dl_X(inj) -2.000 [-2.000,-2.000]; INLINE: carry(top-10) +0.100 [+0.100,+0.100] (>= 0.5; H0: <= 0.2), all heads +0.900, random 10 +0.000; dl_X(inj) -2.000 [-2.000,-2.000]
+    mistral7 NOT MET       [intermediate] Q_OUT: carry(top-10) +0.700 [+0.700,+0.700] (>= 0.5; H0: <= 0.2), all heads +0.900, random 10 +0.000; dl_X(inj) -2.000 [-2.000,-2.000]; INLINE: carry(top-10) +0.100 [+0.100,+0.100] (>= 0.5; H0: <= 0.2), all heads +0.900, random 10 +0.000; dl_X(inj) -2.000 [-2.000,-2.000]
+  J-D6a          L A prior 0.90  MET           consistency: the flag is written in sentences as in lists at every scale (omega, kappa)
+    qwen1.5  MET           omega +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.4), kappa +0.950 (>= 0.7)
+    qwen3b   MET           omega +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.4), kappa +0.950 (>= 0.7)
+    qwen7    MET           omega +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.4), kappa +0.950 (>= 0.7)
+  J-D6           R A prior 0.35  MET           mediation: the sentence-row flag carries the natural POST/P1 read ratio at 1.5B, 3B and 7B
+    qwen1.5  MET           rho -0.200 [-0.200,-0.200], rho_nat -0.200 [-0.200,-0.200] (same sign: True), rho - rho_nat -0.000 [-0.000,-0.000] (95 % CI inside +-0.100); dl_X(inj) P1 +2.000 [+2.000,+2.000], POST -0.400 [-0.400,-0.400]; N_X P1 +4.000 [+4.000,+4.000], POST -0.800 [-0.800,-0.800]; 60 competent cores
+    qwen3b   MET           rho +0.050 [+0.050,+0.050], rho_nat +0.050 [+0.050,+0.050] (same sign: True), rho - rho_nat -0.000 [-0.000,-0.000] (95 % CI inside +-0.100); dl_X(inj) P1 +2.000 [+2.000,+2.000], POST +0.100 [+0.100,+0.100]; N_X P1 +4.000 [+4.000,+4.000], POST +0.200 [+0.200,+0.200]; 60 competent cores
+    qwen7    MET           rho +0.250 [+0.250,+0.250], rho_nat +0.250 [+0.250,+0.250] (same sign: True), rho - rho_nat -0.000 [-0.000,-0.000] (95 % CI inside +-0.125); dl_X(inj) P1 +2.000 [+2.000,+2.000], POST +0.500 [+0.500,+0.500]; N_X P1 +4.000 [+4.000,+4.000], POST +1.000 [+1.000,+1.000]; 60 competent cores
+  J-D6-ROUTE     R A prior 0.35  MET           at 1.5B the answer reads the sentence-row flag by value (r_ans^inj(V) > r_ans^inj(K))
+    qwen1.5  MET           POST: r_ans^inj(V) +0.700 [+0.700,+0.700], K +0.100 [+0.100,+0.100], V - K +0.600 [+0.600,+0.600] (H0: <= 0); KV +1.000 [+1.000,+1.000]; dl_X(inj) -0.400 [-0.400,-0.400]
+
+D6 DECISION TABLE (fixed in the entry): (a) MEDIATED, READ BY VALUE AT 1.5B: the sentence-row flag carries the natural read ratio at every scale, and at 1.5B the answer reads it by value
+
+REPORTED (no verdict counted)
+  qwen7: iota add 0.5 / 1 / 2 +0.250 / +0.500 / +1.000 (monotone: True); add-only +0.500 [+0.500,+0.500] (>= 0.25, LB > 0: True); move +1.125 [+1.125,+1.125]; pi_X(move) 1.00; ID_inj(full flag)/ID_K +1.125 [+1.125,+1.125]; N_X +4.000 [+4.000,+4.000]
+  qwen7: sanity rows: iso0 +0.012, iso1 +0.012, iso2 +0.012, hspan0 +0.012, hspan1 +0.012, hspan2 +0.012, perm +0.012, choices +0.012, question +0.012; pi_X shift choices +0.00, question +0.00; rank-1 capture +0.978 [+0.978,+0.978]
+  qwen7: D4 r_other +0.022 [+0.022,+0.022]
+  qwen7: B-identity share of the per-story flag (null 0.10): l3 0.40
+  qwen7: logit lens max|cos(Delta, W_U[loc])| vs random: l3 0.050/0.020
+  mistral7: iota add 0.5 / 1 / 2 +0.250 / +0.500 / +1.000 (monotone: True); add-only +0.500 [+0.500,+0.500] (>= 0.25, LB > 0: True); move +1.125 [+1.125,+1.125]; pi_X(move) 1.00; ID_inj(full flag)/ID_K +1.125 [+1.125,+1.125]; N_X +4.000 [+4.000,+4.000]
+  mistral7: sanity rows: iso0 +0.012, iso1 +0.012, iso2 +0.012, hspan0 +0.012, hspan1 +0.012, hspan2 +0.012, perm +0.012, choices +0.012, question +0.012; pi_X shift choices +0.00, question +0.00; rank-1 capture +0.978 [+0.978,+0.978]
+  mistral7: D4 r_other +0.022 [+0.022,+0.022]
+  mistral7: B-identity share of the per-story flag (null 0.10): l3 0.40
+  mistral7: logit lens max|cos(Delta, W_U[loc])| vs random: l3 0.050/0.020
+  qwen7: rho_K isotropic iso0 +1.000 [+1.000,+1.000], iso1 +1.000 [+1.000,+1.000], iso2 +1.000 [+1.000,+1.000] (sanity >= 0.85)
+  mistral7: rho_K isotropic iso0 +1.000 [+1.000,+1.000], iso1 +1.000 [+1.000,+1.000], iso2 +1.000 [+1.000,+1.000] (sanity >= 0.85)
+  qwen7: event vs initial (role confounded with order) Psi_ev +2.000 [+2.000,+2.000]
+  qwen7 Q_IN: ID_K +3.016 [+2.982,+3.050], ID_V +5.000 [+4.963,+5.036]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +0.006 [+0.006,+0.006] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -1.000 [-1.000,-1.000], N_X(cfg) -3.000 [-3.000,-3.000], ratio +0.333; isotropic +0.000, +0.000, +0.000
+  qwen7 Q_OUT: ID_K -2.984 [-3.018,-2.950], ID_V -5.000 [-5.037,-4.964]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +0.006 [+0.006,+0.006] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -1.000 [-1.000,-1.000], N_X(cfg) -3.000 [-3.000,-3.000], ratio +0.333; isotropic +0.000, +0.000, +0.000
+  qwen7: hop-2 carry under P1 (the ranking format): top10 +0.700 [+0.700,+0.700], rand10 +0.000 [+0.000,+0.000], all +0.900 [+0.900,+0.900]
+  qwen7 INLINE: ID_K -3.038 [-3.069,-3.009], ID_V -0.984 [-1.018,-0.951]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     route of the injected IOI flag: r_ans(KV) +1.000 [+1.000,+1.000], K +0.900 [+0.900,+0.900], V +0.000 [+0.000,+0.000], other +0.000 [+0.000,+0.000]; dm(inj) -2.000 [-2.000,-2.000]
+  qwen7 INLINE_CHAT: ID_K -3.038 [-3.069,-3.009], ID_V +2.016 [+1.982,+2.049]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+  mistral7 Q_IN: ID_K +3.016 [+2.982,+3.050], ID_V +5.000 [+4.963,+5.036]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +0.006 [+0.006,+0.006] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -1.000 [-1.000,-1.000], N_X(cfg) -3.000 [-3.000,-3.000], ratio +0.333; isotropic +0.000, +0.000, +0.000
+  mistral7 Q_OUT: ID_K -2.984 [-3.018,-2.950], ID_V -5.000 [-5.037,-4.964]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +0.006 [+0.006,+0.006] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -1.000 [-1.000,-1.000], N_X(cfg) -3.000 [-3.000,-3.000], ratio +0.333; isotropic +0.000, +0.000, +0.000
+  mistral7: hop-2 carry under P1 (the ranking format): top10 +0.700 [+0.700,+0.700], rand10 +0.000 [+0.000,+0.000], all +0.900 [+0.900,+0.900]
+  mistral7 INLINE: ID_K -3.038 [-3.069,-3.009], ID_V +2.016 [+1.982,+2.049]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     route of the injected IOI flag: r_ans(KV) +1.000 [+1.000,+1.000], K +0.900 [+0.900,+0.900], V +0.000 [+0.000,+0.000], other +0.000 [+0.000,+0.000]; dm(inj) -2.000 [-2.000,-2.000]
+  mistral7 INLINE_CHAT: ID_K -3.038 [-3.069,-3.009], ID_V +2.016 [+1.982,+2.049]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+  qwen1.5: D6b Delta^POST at the P1 list row / Delta^P1 there +0.900 [+0.900,+0.900] (>= 0.6 expected)
+  qwen3b: D6b Delta^POST at the P1 list row / Delta^P1 there +0.900 [+0.900,+0.900] (>= 0.6 expected)
+  qwen7: D6b Delta^POST at the P1 list row / Delta^P1 there +0.900 [+0.900,+0.900] (>= 0.6 expected)
+
+SUMMARY
+  account lines, class L: 2 lines: 1 MET, 1 NOT MET, 0 MET IN PART, 0 NOT EVALUABLE; observed 1 against expected 1.80; Brier 0.410
+  account lines, class M: 5 lines: 5 MET, 0 NOT MET, 0 MET IN PART, 0 NOT EVALUABLE; observed 5 against expected 4.20; Brier 0.026
+  account lines, class R: 10 lines: 7 MET, 2 NOT MET, 0 MET IN PART, 1 NOT EVALUABLE; observed 7 against expected 3.90; Brier 0.254; not evaluable: J-D5
+  measurement-validity lines: none in part D (the batch floors and competence checks are gates)
+  met rate among R account lines with a verdict: 7 of 9 (expected 3.90)
+  Holm sensitivity (analysis/stage8_holm.py; reported, no verdict uses it): step-down at familywise one-sided 0.025 over the 31 interval components of the R-class account lines with a verdict (normal p from the bootstrap SE)
+    J-D1: 2 components; no decision changes under Holm; verdict unchanged (MET)
+    J-D2: 6 components; no decision changes under Holm; verdict unchanged (MET)
+    J-D3: 2 components; no decision changes under Holm; verdict unchanged (MET)
+    J-D-KN: 4 components; no decision changes under Holm; verdict unchanged (MET)
+    J-D5: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-D8-IOI: 4 components; no decision changes under Holm; verdict unchanged (MET)
+    J-D-ROUTE-IOI: 2 components; no decision changes under Holm; verdict unchanged (NOT MET)
+    J-D-HOP2: 4 components; no decision changes under Holm; verdict unchanged (NOT MET)
+    J-D6: 6 components; no decision changes under Holm; verdict unchanged (MET)
+    J-D6-ROUTE: 1 components; no decision changes under Holm; verdict unchanged (MET)
+  provenance MISMATCH; population MISMATCH; J-D-G0 MET
+
+######## EXPLORATORY (not scored)
+-- qwen7: sets (None): k* 5, L* [3]; hop-2 top-10 []; in-run a3 overlap with H* 5
+-- qwen7: flag geometry: consistency l3 0.90; mean cross-layer cos +0.000; flag cosines 
+-- mistral7: sets (None): k* 5, L* [3]; hop-2 top-10 []; in-run a3 overlap with H* 5
+-- mistral7: flag geometry: consistency l3 0.90; mean cross-layer cos +0.000; flag cosines 
+-- qwen1.5: sets (None): k* 5, L* [3]; hop-2 top-10 []; in-run a3 overlap with H* 5
+-- qwen1.5: flag geometry: consistency l3 0.90; mean cross-layer cos +0.000; flag cosines 
+-- qwen3b: sets (None): k* 5, L* [3]; hop-2 top-10 []; in-run a3 overlap with H* 5
+-- qwen3b: flag geometry: consistency l3 0.90; mean cross-layer cos +0.000; flag cosines 
+-- qwen7: E6, iota on the raw margin m_X = lp(X) - lp(B): add1 +0.460 [+0.460,+0.460], move +1.214 [+1.214,+1.214], looX +1.946 [+1.946,+1.946]
+-- mistral7: E6, iota on the raw margin m_X = lp(X) - lp(B): add1 +0.460 [+0.460,+0.460], move +1.214 [+1.214,+1.214], looX +1.946 [+1.946,+1.946]
+-- qwen7: H3/G7b reconciliation (base answer rate, initial-location rate): flag@init_dloc 1.00/0.00, flag@B 1.00/0.00, none 1.00/0.00, flag 1.00/0.00
+-- mistral7: H3/G7b reconciliation (base answer rate, initial-location rate): flag@init_dloc 1.00/0.00, flag@B 1.00/0.00, none 1.00/0.00, flag 1.00/0.00
+-- qwen7: Q_OUT behaviour, answer = the story's own word B: none 1.00, K_S 1.00, V_S 1.00
+-- qwen7: IOI injections at the listed IO_X row (dl, four-way): injIOI -1.000 [-1.000,-1.000], moveIOI -1.000 [-1.000,-1.000], injP1 -0.300 [-0.300,-0.300], iso +0.000 [+0.000,+0.000], K_X -3.000 [-3.000,-3.000]
+-- mistral7: Q_OUT behaviour, answer = the story's own word B: none 1.00, K_S 1.00, V_S 1.00
+-- mistral7: IOI injections at the listed IO_X row (dl, four-way): injIOI -1.000 [-1.000,-1.000], moveIOI -1.000 [-1.000,-1.000], injP1 -0.300 [-0.300,-0.300], iso +0.000 [+0.000,+0.000], K_X -3.000 [-3.000,-3.000]
+_____________________________________________________________ test_gate_failures_make_lines_not_evaluable _____________________________________________________________
+------------------------------------------------------------------------ Captured stdout call -------------------------------------------------------------------------
+Stage 8 part D scoring, preregistration P-2026-10-10-J; results /tmp/pytest-of-root/pytest-0/test_gate_failures_make_lines_0; TEST MODE (verdicts are plumbing checks)
+
+PROVENANCE (the pipeline's COMMIT.txt, ENV.txt, REVISIONS.txt, SKIPPED.txt; every results file)
+  COMMIT.txt: absent
+  ENV.txt: absent
+  REVISIONS.txt: absent
+  SKIPPED.txt: absent
+  ablate/mistral7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  ablate/qwen7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  bind/mistral7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  bind/qwen7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  diss/qwen1.5: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  diss/qwen3b: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  diss/qwen7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  fit/mistral7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  fit/qwen1.5: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  fit/qwen3b: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  fit/qwen7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  inject/mistral7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  inject/qwen7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  preflight/mistral7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  preflight/qwen1.5: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  preflight/qwen3b: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  preflight/qwen7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sets/mistral7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sets/qwen1.5: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sets/qwen3b: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sets/qwen7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sign/mistral7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sign/qwen7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  commits: ['None', 'abc']  MISMATCH: not one commit
+
+POPULATION (pinned hashes of R, R', E8, BIND, the IOI candidate lists and the task lists; sizes not checked in TEST MODE)
+  preflight qwen7: hashes OK; overlaps none; IOI E_ioi 0 valid, F_ioi 0; prompts checked None
+  inject/qwen7: population hashes differ from the preflight: MISMATCH
+  ablate/qwen7: population hashes differ from the preflight: MISMATCH
+  bind/qwen7: population hashes differ from the preflight: MISMATCH
+  diss/qwen7: population hashes differ from the preflight: MISMATCH
+  preflight mistral7: hashes OK; overlaps none; IOI E_ioi 0 valid, F_ioi 0; prompts checked None
+  inject/mistral7: population hashes differ from the preflight: MISMATCH
+  ablate/mistral7: population hashes differ from the preflight: MISMATCH
+  bind/mistral7: population hashes differ from the preflight: MISMATCH
+  preflight qwen1.5: hashes OK; overlaps none; IOI E_ioi 0 valid, F_ioi 0; prompts checked None
+  diss/qwen1.5: population hashes differ from the preflight: MISMATCH
+  preflight qwen3b: hashes OK; overlaps none; IOI E_ioi 0 valid, F_ioi 0; prompts checked None
+  diss/qwen3b: population hashes differ from the preflight: MISMATCH
+  population: MISMATCH
+
+  J-D-G0  FP32 unit tests (last of 1 run(s)): tests/test_flag.py 12 passed, 0 failed, 1 skipped; tests/test_questions.py 10 passed, 0 failed, 1 skipped; tests/test_stage8d_score.py 17 passed, 0 failed, 1 skipped; tests/test_stage8_populations.py 4 passed, 0 failed, 1 skipped; tests/test_stage8_holm.py 6 passed, 0 failed, 1 skipped; failures in the run 0, skips in the run 5 -> NOT MET
+GATES (J-D-G0 before any model; J-D-G1 natural effect; J-D-G2 batch floor; J-D-G3 competence; J-D-G4 transfer evaluable; J-D-G5 binding queries; J-D-G6 dissociation population; J-D-G7 ratio denominators, per line)
+  J-D-G1 qwen7    N_X (P1, E8) +4.000 [+4.000,+4.000] (>= 3 nats, CI excl. 0) -> MET
+  J-D-G2 qwen7    inject batch floor 0.0000 (<= 0.05) -> MET
+  J-D-G5 qwen7    accuracy other_agent 1.00, irrelevant_object 1.00 (>= 0.80; direct 1.00) -> MET
+  J-D-G3 qwen7    Q_IN        argmax mentioned 1.00 (>= 0.90), candidate mass 0.90 (>= 0.50) -> MET
+  J-D-G2 qwen7    Q_IN        batch floor 0.0000 -> MET
+  J-D-G4 qwen7    Q_IN        d_G +4.000 [+4.000,+4.000], ID_K(allT) +4.400 [+4.400,+4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 qwen7    Q_OUT       argmax unmentioned 1.00 (>= 0.90), candidate mass 0.90 (>= 0.50) -> MET
+  J-D-G2 qwen7    Q_OUT       batch floor 0.0000 -> MET
+  J-D-G4 qwen7    Q_OUT       d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 qwen7    INLINE      two-way 1.00 (>= 0.75), four-way 1.00 (>= 0.50), LD +3.028 [+2.993,+3.066] (> 0, CI excl. 0) -> MET
+  J-D-G2 qwen7    INLINE      batch floor 0.0000 -> MET
+  J-D-G4 qwen7    INLINE      d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 qwen7    INLINE_CHAT two-way 1.00 (>= 0.75), four-way 1.00 (>= 0.50), LD +3.028 [+2.993,+3.066] (> 0, CI excl. 0) -> MET
+  J-D-G2 qwen7    INLINE_CHAT batch floor 0.0000 -> MET
+  J-D-G4 qwen7    INLINE_CHAT d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G1 mistral7 N_X (P1, E8) +4.000 [+4.000,+4.000] (>= 3 nats, CI excl. 0) -> MET
+  J-D-G2 mistral7 inject batch floor 0.0000 (<= 0.05) -> MET
+  J-D-G5 mistral7 accuracy other_agent 1.00, irrelevant_object 1.00 (>= 0.80; direct 1.00) -> MET
+  J-D-G3 mistral7 Q_IN        argmax mentioned 1.00 (>= 0.90), candidate mass 0.90 (>= 0.50) -> MET
+  J-D-G2 mistral7 Q_IN        batch floor 0.0000 -> MET
+  J-D-G4 mistral7 Q_IN        d_G +4.000 [+4.000,+4.000], ID_K(allT) +4.400 [+4.400,+4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 mistral7 Q_OUT       argmax unmentioned 1.00 (>= 0.90), candidate mass 0.90 (>= 0.50) -> MET
+  J-D-G2 mistral7 Q_OUT       batch floor 0.0000 -> MET
+  J-D-G4 mistral7 Q_OUT       d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 mistral7 INLINE      two-way 1.00 (>= 0.75), four-way 1.00 (>= 0.50), LD +3.028 [+2.993,+3.066] (> 0, CI excl. 0) -> MET
+  J-D-G2 mistral7 INLINE      batch floor 0.0000 -> MET
+  J-D-G4 mistral7 INLINE      d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 mistral7 INLINE_CHAT two-way 1.00 (>= 0.75), four-way 1.00 (>= 0.50), LD +3.028 [+2.993,+3.066] (> 0, CI excl. 0) -> MET
+  J-D-G2 mistral7 INLINE_CHAT batch floor 0.0000 -> MET
+  J-D-G4 mistral7 INLINE_CHAT d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G6 qwen1.5  competent cores 60 of 60 (>= 40); P1 injection dl_X +2.000 [+2.000,+2.000] (> 0, CI excl. 0); R(k*) of the in-run H* +0.900 [+0.900,+0.900] (>= 0.6); batch floor 0.0000 -> MET
+  J-D-G6 qwen3b   competent cores 60 of 60 (>= 40); P1 injection dl_X +2.000 [+2.000,+2.000] (> 0, CI excl. 0); R(k*) of the in-run H* +0.900 [+0.900,+0.900] (>= 0.6); batch floor 0.0000 -> MET
+  J-D-G6 qwen7    competent cores 60 of 60 (>= 40); P1 injection dl_X +2.000 [+2.000,+2.000] (> 0, CI excl. 0); batch floor 0.0000 -> MET
+
+PREDICTIONS (code, class, kind, prior, verdict; the numbers it was decided on; 2/2 lines need two evaluable models)
+  J-D1           R A prior 0.55  NOT EVALUABLE sufficiency: the leave-one-word-out flag moves the answer to an absent option (ID_inj^LOO / ID_K)
+    qwen7    NOT EVALUABLE gates (J-D-G0, J-D-G1, J-D-G2) not passed or no results
+    mistral7 NOT EVALUABLE gates (J-D-G0, J-D-G1, J-D-G2) not passed or no results
+  J-D2           R A prior 0.55  NOT EVALUABLE specificity against structured controls (own write orthogonal to the flag, mean H* output, active-set flag)
+    qwen7    NOT EVALUABLE gates not passed or no results
+    mistral7 NOT EVALUABLE gates not passed or no results
+  J-D3           R A prior 0.50  NOT EVALUABLE necessity: ablating one direction per layer at the option rows removes the key read (rho_K)
+    qwen7    NOT EVALUABLE gates not passed or no ablation results
+    mistral7 NOT EVALUABLE gates not passed or no ablation results
+  J-D4           M A prior 0.85  NOT EVALUABLE the injected flag is read at hop 2 by key (r_ans^inj)
+    qwen7    NOT EVALUABLE gates not passed or no results
+    mistral7 NOT EVALUABLE gates not passed or no results
+  J-D-ADDR       M A prior 0.80  NOT EVALUABLE the flag is identity-free: the key-only and the natural (K and V) writes give the same flag
+    qwen7    NOT EVALUABLE gates not passed or no results
+    mistral7 NOT EVALUABLE gates not passed or no results
+  J-D-KN         R A prior 0.40  NOT EVALUABLE a non-candidate key acts as removing B's flag, with no specific beneficiary
+    qwen7    NOT EVALUABLE gates not passed or no results
+    mistral7 NOT EVALUABLE gates not passed or no results
+  J-D5           R A prior 0.25  NOT EVALUABLE the flag of an initial-state sentence carries its binding (Psi_bind > 0 in both sentence orders)
+    qwen7    NOT EVALUABLE J-D-G0 not passed or no binding results
+    mistral7 NOT EVALUABLE J-D-G0 not passed or no binding results
+  J-D7           M A prior 0.85  NOT EVALUABLE consistency: the key read is negative under Q_OUT and positive under Q_IN
+    qwen7    NOT EVALUABLE J-D-G0 not passed
+    mistral7 NOT EVALUABLE J-D-G0 not passed
+  J-D-SIGN-Q     M A prior 0.85  NOT EVALUABLE Q_OUT: the key and the value reads are both negative (task semantics)
+    qwen7    NOT EVALUABLE J-D-G0 not passed
+    mistral7 NOT EVALUABLE J-D-G0 not passed
+  J-D-SIGN-IOI   L A prior 0.90  NOT EVALUABLE IOI INLINE: the key read is negative while the value read is positive
+    qwen7    NOT EVALUABLE J-D-G0 not passed
+    mistral7 NOT EVALUABLE J-D-G0 not passed
+  J-D8-Q         M A prior 0.85  NOT EVALUABLE consistency: the frozen H* carry the Q_IN and Q_OUT key reads
+    qwen7    NOT EVALUABLE J-D-G0 not passed | J-D-G0 not passed
+    mistral7 NOT EVALUABLE J-D-G0 not passed | J-D-G0 not passed
+  J-D8-IOI       R A prior 0.55  NOT EVALUABLE the frozen H* carry the negative IOI INLINE key read at the listed names
+    qwen7    NOT EVALUABLE J-D-G0 not passed
+    mistral7 NOT EVALUABLE J-D-G0 not passed
+  J-D-ROUTE-IOI  R A prior 0.40  NOT EVALUABLE IOI INLINE: the negative read is applied at the answer row's key read of the listed names
+    qwen7    NOT EVALUABLE J-D-G0 not passed
+    mistral7 NOT EVALUABLE J-D-G0 not passed
+  J-D-HOP2       R A prior 0.25  NOT EVALUABLE the same top-10 hop-2 heads carry the injected flag's Q_OUT and IOI effects (same reader, opposite sign)
+    qwen7    NOT EVALUABLE J-D-G0 not passed
+    mistral7 NOT EVALUABLE J-D-G0 not passed
+  J-D6a          L A prior 0.90  NOT EVALUABLE consistency: the flag is written in sentences as in lists at every scale (omega, kappa)
+    qwen1.5  NOT EVALUABLE J-D-G0 not passed or no results
+    qwen3b   NOT EVALUABLE J-D-G0 not passed or no results
+    qwen7    NOT EVALUABLE J-D-G0 not passed or no results
+  J-D6           R A prior 0.35  NOT EVALUABLE mediation: the sentence-row flag carries the natural POST/P1 read ratio at 1.5B, 3B and 7B
+    qwen1.5  NOT EVALUABLE J-D-G0 not passed or no results
+    qwen3b   NOT EVALUABLE J-D-G0 not passed or no results
+    qwen7    NOT EVALUABLE J-D-G0 not passed or no results
+  J-D6-ROUTE     R A prior 0.35  NOT EVALUABLE at 1.5B the answer reads the sentence-row flag by value (r_ans^inj(V) > r_ans^inj(K))
+    qwen1.5  NOT EVALUABLE J-D-G0 not passed or no results
+
+D6 DECISION TABLE (fixed in the entry): (d) MIXED: none of (a)-(c); reported as such
+
+REPORTED (no verdict counted)
+  qwen7: iota add 0.5 / 1 / 2 +0.250 / +0.500 / +1.000 (monotone: True); add-only +0.500 [+0.500,+0.500] (>= 0.25, LB > 0: True); move +1.125 [+1.125,+1.125]; pi_X(move) 1.00; ID_inj(full flag)/ID_K +1.125 [+1.125,+1.125]; N_X +4.000 [+4.000,+4.000]
+  qwen7: sanity rows: iso0 +0.012, iso1 +0.012, iso2 +0.012, hspan0 +0.012, hspan1 +0.012, hspan2 +0.012, perm +0.012, choices +0.012, question +0.012; pi_X shift choices +0.00, question +0.00; rank-1 capture +0.978 [+0.978,+0.978]
+  qwen7: D4 r_other +0.022 [+0.022,+0.022]
+  qwen7: B-identity share of the per-story flag (null 0.10): l3 0.40
+  qwen7: logit lens max|cos(Delta, W_U[loc])| vs random: l3 0.050/0.020
+  mistral7: iota add 0.5 / 1 / 2 +0.250 / +0.500 / +1.000 (monotone: True); add-only +0.500 [+0.500,+0.500] (>= 0.25, LB > 0: True); move +1.125 [+1.125,+1.125]; pi_X(move) 1.00; ID_inj(full flag)/ID_K +1.125 [+1.125,+1.125]; N_X +4.000 [+4.000,+4.000]
+  mistral7: sanity rows: iso0 +0.012, iso1 +0.012, iso2 +0.012, hspan0 +0.012, hspan1 +0.012, hspan2 +0.012, perm +0.012, choices +0.012, question +0.012; pi_X shift choices +0.00, question +0.00; rank-1 capture +0.978 [+0.978,+0.978]
+  mistral7: D4 r_other +0.022 [+0.022,+0.022]
+  mistral7: B-identity share of the per-story flag (null 0.10): l3 0.40
+  mistral7: logit lens max|cos(Delta, W_U[loc])| vs random: l3 0.050/0.020
+  qwen7: rho_K isotropic iso0 +1.000 [+1.000,+1.000], iso1 +1.000 [+1.000,+1.000], iso2 +1.000 [+1.000,+1.000] (sanity >= 0.85)
+  mistral7: rho_K isotropic iso0 +1.000 [+1.000,+1.000], iso1 +1.000 [+1.000,+1.000], iso2 +1.000 [+1.000,+1.000] (sanity >= 0.85)
+  qwen7: event vs initial (role confounded with order) Psi_ev +2.000 [+2.000,+2.000]
+  mistral7: event vs initial (role confounded with order) Psi_ev +2.000 [+2.000,+2.000]
+  qwen7 Q_IN: ID_K +3.016 [+2.982,+3.050], ID_V +5.000 [+4.963,+5.036]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +0.006 [+0.006,+0.006] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -1.000 [-1.000,-1.000], N_X(cfg) -3.000 [-3.000,-3.000], ratio +0.333; isotropic +0.000, +0.000, +0.000
+  qwen7 Q_OUT: ID_K -2.984 [-3.018,-2.950], ID_V -5.000 [-5.037,-4.964]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +0.006 [+0.006,+0.006] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -1.000 [-1.000,-1.000], N_X(cfg) -3.000 [-3.000,-3.000], ratio +0.333; isotropic +0.000, +0.000, +0.000
+  qwen7: hop-2 carry under P1 (the ranking format): top10 +0.700 [+0.700,+0.700], rand10 +0.000 [+0.000,+0.000], all +0.900 [+0.900,+0.900]
+  qwen7 INLINE: ID_K -3.038 [-3.069,-3.009], ID_V +2.016 [+1.982,+2.049]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     route of the injected IOI flag: r_ans(KV) +1.000 [+1.000,+1.000], K +0.900 [+0.900,+0.900], V +0.000 [+0.000,+0.000], other +0.000 [+0.000,+0.000]; dm(inj) -2.000 [-2.000,-2.000]
+  qwen7 INLINE_CHAT: ID_K -3.038 [-3.069,-3.009], ID_V +2.016 [+1.982,+2.049]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+  mistral7 Q_IN: ID_K +3.016 [+2.982,+3.050], ID_V +5.000 [+4.963,+5.036]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +0.006 [+0.006,+0.006] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -1.000 [-1.000,-1.000], N_X(cfg) -3.000 [-3.000,-3.000], ratio +0.333; isotropic +0.000, +0.000, +0.000
+  mistral7 Q_OUT: ID_K -2.984 [-3.018,-2.950], ID_V -5.000 [-5.037,-4.964]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +0.006 [+0.006,+0.006] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -1.000 [-1.000,-1.000], N_X(cfg) -3.000 [-3.000,-3.000], ratio +0.333; isotropic +0.000, +0.000, +0.000
+  mistral7: hop-2 carry under P1 (the ranking format): top10 +0.700 [+0.700,+0.700], rand10 +0.000 [+0.000,+0.000], all +0.900 [+0.900,+0.900]
+  mistral7 INLINE: ID_K -3.038 [-3.069,-3.009], ID_V +2.016 [+1.982,+2.049]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     route of the injected IOI flag: r_ans(KV) +1.000 [+1.000,+1.000], K +0.900 [+0.900,+0.900], V +0.000 [+0.000,+0.000], other +0.000 [+0.000,+0.000]; dm(inj) -2.000 [-2.000,-2.000]
+  mistral7 INLINE_CHAT: ID_K -3.038 [-3.069,-3.009], ID_V +2.016 [+1.982,+2.049]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+  qwen1.5: D6b Delta^POST at the P1 list row / Delta^P1 there +0.900 [+0.900,+0.900] (>= 0.6 expected)
+  qwen3b: D6b Delta^POST at the P1 list row / Delta^P1 there +0.900 [+0.900,+0.900] (>= 0.6 expected)
+  qwen7: D6b Delta^POST at the P1 list row / Delta^P1 there +0.900 [+0.900,+0.900] (>= 0.6 expected)
+
+SUMMARY
+  account lines, class L: 2 lines: 0 MET, 0 NOT MET, 0 MET IN PART, 2 NOT EVALUABLE; observed 0 against expected 0.00; Brier nan; not evaluable: J-D-SIGN-IOI, J-D6a
+  account lines, class M: 5 lines: 0 MET, 0 NOT MET, 0 MET IN PART, 5 NOT EVALUABLE; observed 0 against expected 0.00; Brier nan; not evaluable: J-D4, J-D-ADDR, J-D7, J-D-SIGN-Q, J-D8-Q
+  account lines, class R: 10 lines: 0 MET, 0 NOT MET, 0 MET IN PART, 10 NOT EVALUABLE; observed 0 against expected 0.00; Brier nan; not evaluable: J-D1, J-D2, J-D3, J-D-KN, J-D5, J-D8-IOI, J-D-ROUTE-IOI, J-D-HOP2, J-D6, J-D6-ROUTE
+  measurement-validity lines: none in part D (the batch floors and competence checks are gates)
+  met rate among R account lines with a verdict: 0 of 0 (expected 0.00)
+  Holm sensitivity (analysis/stage8_holm.py; reported, no verdict uses it): step-down at familywise one-sided 0.025 over the 0 interval components of the R-class account lines with a verdict (normal p from the bootstrap SE)
+    J-D1: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-D2: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-D3: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-D-KN: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-D5: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-D8-IOI: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-D-ROUTE-IOI: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-D-HOP2: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-D6: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-D6-ROUTE: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+  provenance MISMATCH; population MISMATCH; J-D-G0 NOT MET
+
+######## EXPLORATORY (not scored)
+-- qwen7: sets (None): k* 5, L* [3]; hop-2 top-10 []; in-run a3 overlap with H* 5
+-- qwen7: flag geometry: consistency l3 0.90; mean cross-layer cos +0.000; flag cosines 
+-- mistral7: sets (None): k* 5, L* [3]; hop-2 top-10 []; in-run a3 overlap with H* 5
+-- mistral7: flag geometry: consistency l3 0.90; mean cross-layer cos +0.000; flag cosines 
+-- qwen1.5: sets (None): k* 5, L* [3]; hop-2 top-10 []; in-run a3 overlap with H* 5
+-- qwen1.5: flag geometry: consistency l3 0.90; mean cross-layer cos +0.000; flag cosines 
+-- qwen3b: sets (None): k* 5, L* [3]; hop-2 top-10 []; in-run a3 overlap with H* 5
+-- qwen3b: flag geometry: consistency l3 0.90; mean cross-layer cos +0.000; flag cosines 
+-- qwen7: E6, iota on the raw margin m_X = lp(X) - lp(B): add1 +0.460 [+0.460,+0.460], move +1.214 [+1.214,+1.214], looX +1.946 [+1.946,+1.946]
+-- mistral7: E6, iota on the raw margin m_X = lp(X) - lp(B): add1 +0.460 [+0.460,+0.460], move +1.214 [+1.214,+1.214], looX +1.946 [+1.946,+1.946]
+-- qwen7: H3/G7b reconciliation (base answer rate, initial-location rate): flag@init_dloc 1.00/0.00, flag@B 1.00/0.00, none 1.00/0.00, flag 1.00/0.00
+-- mistral7: H3/G7b reconciliation (base answer rate, initial-location rate): flag@init_dloc 1.00/0.00, flag@B 1.00/0.00, none 1.00/0.00, flag 1.00/0.00
+-- qwen7: Q_OUT behaviour, answer = the story's own word B: none 1.00, K_S 1.00, V_S 1.00
+-- qwen7: IOI injections at the listed IO_X row (dl, four-way): injIOI -1.000 [-1.000,-1.000], moveIOI -1.000 [-1.000,-1.000], injP1 -0.300 [-0.300,-0.300], iso +0.000 [+0.000,+0.000], K_X -3.000 [-3.000,-3.000]
+-- mistral7: Q_OUT behaviour, answer = the story's own word B: none 1.00, K_S 1.00, V_S 1.00
+-- mistral7: IOI injections at the listed IO_X row (dl, four-way): injIOI -1.000 [-1.000,-1.000], moveIOI -1.000 [-1.000,-1.000], injP1 -0.300 [-0.300,-0.300], iso +0.000 [+0.000,+0.000], K_X -3.000 [-3.000,-3.000]
+________________________________________________________________ test_line_exception_is_a_scorer_error ________________________________________________________________
+------------------------------------------------------------------------ Captured stdout call -------------------------------------------------------------------------
+Stage 8 part D scoring, preregistration P-2026-10-10-J; results /tmp/pytest-of-root/pytest-0/test_line_exception_is_a_score0; TEST MODE (verdicts are plumbing checks)
+
+PROVENANCE (the pipeline's COMMIT.txt, ENV.txt, REVISIONS.txt, SKIPPED.txt; every results file)
+  COMMIT.txt: absent
+  ENV.txt: absent
+  REVISIONS.txt: absent
+  SKIPPED.txt: absent
+  ablate/mistral7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  ablate/qwen7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  bind/qwen7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  diss/qwen1.5: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  diss/qwen3b: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  diss/qwen7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  fit/mistral7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  fit/qwen1.5: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  fit/qwen3b: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  fit/qwen7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  inject/mistral7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  inject/qwen7: commit None, None rev None, dtype -, attn -, device -, test_mode None  MISMATCH: flags hash differs from the fit file
+  preflight/mistral7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  preflight/qwen1.5: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  preflight/qwen3b: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  preflight/qwen7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sets/mistral7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sets/qwen1.5: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sets/qwen3b: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sets/qwen7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sign/mistral7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  sign/qwen7: commit abc, None rev None, dtype -, attn -, device -, test_mode None
+  commits: ['None', 'abc']  MISMATCH: not one commit
+
+POPULATION (pinned hashes of R, R', E8, BIND, the IOI candidate lists and the task lists; sizes not checked in TEST MODE)
+  preflight qwen7: hashes OK; overlaps none; IOI E_ioi 0 valid, F_ioi 0; prompts checked None
+  inject/qwen7: population hashes differ from the preflight: MISMATCH
+  ablate/qwen7: population hashes differ from the preflight: MISMATCH
+  bind/qwen7: population hashes differ from the preflight: MISMATCH
+  diss/qwen7: population hashes differ from the preflight: MISMATCH
+  preflight mistral7: hashes OK; overlaps none; IOI E_ioi 0 valid, F_ioi 0; prompts checked None
+  inject/mistral7: population hashes differ from the preflight: MISMATCH
+  ablate/mistral7: population hashes differ from the preflight: MISMATCH
+  preflight qwen1.5: hashes OK; overlaps none; IOI E_ioi 0 valid, F_ioi 0; prompts checked None
+  diss/qwen1.5: population hashes differ from the preflight: MISMATCH
+  preflight qwen3b: hashes OK; overlaps none; IOI E_ioi 0 valid, F_ioi 0; prompts checked None
+  diss/qwen3b: population hashes differ from the preflight: MISMATCH
+  population: MISMATCH
+
+  J-D-G0  FP32 unit tests (last of 1 run(s)): tests/test_flag.py 13 passed, 0 failed, 0 skipped; tests/test_questions.py 11 passed, 0 failed, 0 skipped; tests/test_stage8d_score.py 18 passed, 0 failed, 0 skipped; tests/test_stage8_populations.py 5 passed, 0 failed, 0 skipped; tests/test_stage8_holm.py 7 passed, 0 failed, 0 skipped; failures in the run 0, skips in the run 0 -> MET
+GATES (J-D-G0 before any model; J-D-G1 natural effect; J-D-G2 batch floor; J-D-G3 competence; J-D-G4 transfer evaluable; J-D-G5 binding queries; J-D-G6 dissociation population; J-D-G7 ratio denominators, per line)
+  J-D-G1 qwen7    N_X (P1, E8) +4.000 [+4.000,+4.000] (>= 3 nats, CI excl. 0) -> MET
+  J-D-G2 qwen7    inject batch floor 0.0000 (<= 0.05) -> MET
+  J-D-G5 qwen7    accuracy other_agent 1.00, irrelevant_object 1.00 (>= 0.80; direct 1.00) -> MET
+  J-D-G3 qwen7    Q_IN        argmax mentioned 1.00 (>= 0.90), candidate mass 0.90 (>= 0.50) -> MET
+  J-D-G2 qwen7    Q_IN        batch floor 0.0000 -> MET
+  J-D-G4 qwen7    Q_IN        d_G +4.000 [+4.000,+4.000], ID_K(allT) +4.400 [+4.400,+4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 qwen7    Q_OUT       argmax unmentioned 1.00 (>= 0.90), candidate mass 0.90 (>= 0.50) -> MET
+  J-D-G2 qwen7    Q_OUT       batch floor 0.0000 -> MET
+  J-D-G4 qwen7    Q_OUT       d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 qwen7    INLINE      two-way 1.00 (>= 0.75), four-way 1.00 (>= 0.50), LD +3.028 [+2.993,+3.066] (> 0, CI excl. 0) -> MET
+  J-D-G2 qwen7    INLINE      batch floor 0.0000 -> MET
+  J-D-G4 qwen7    INLINE      d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 qwen7    INLINE_CHAT two-way 1.00 (>= 0.75), four-way 1.00 (>= 0.50), LD +3.028 [+2.993,+3.066] (> 0, CI excl. 0) -> MET
+  J-D-G2 qwen7    INLINE_CHAT batch floor 0.0000 -> MET
+  J-D-G4 qwen7    INLINE_CHAT d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G1 mistral7 N_X (P1, E8) +4.000 [+4.000,+4.000] (>= 3 nats, CI excl. 0) -> MET
+  J-D-G2 mistral7 inject batch floor 0.0000 (<= 0.05) -> MET
+  J-D-G3 mistral7 Q_IN        argmax mentioned 1.00 (>= 0.90), candidate mass 0.90 (>= 0.50) -> MET
+  J-D-G2 mistral7 Q_IN        batch floor 0.0000 -> MET
+  J-D-G4 mistral7 Q_IN        d_G +4.000 [+4.000,+4.000], ID_K(allT) +4.400 [+4.400,+4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 mistral7 Q_OUT       argmax unmentioned 1.00 (>= 0.90), candidate mass 0.90 (>= 0.50) -> MET
+  J-D-G2 mistral7 Q_OUT       batch floor 0.0000 -> MET
+  J-D-G4 mistral7 Q_OUT       d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 mistral7 INLINE      two-way 1.00 (>= 0.75), four-way 1.00 (>= 0.50), LD +3.028 [+2.993,+3.066] (> 0, CI excl. 0) -> MET
+  J-D-G2 mistral7 INLINE      batch floor 0.0000 -> MET
+  J-D-G4 mistral7 INLINE      d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G3 mistral7 INLINE_CHAT two-way 1.00 (>= 0.75), four-way 1.00 (>= 0.50), LD +3.028 [+2.993,+3.066] (> 0, CI excl. 0) -> MET
+  J-D-G2 mistral7 INLINE_CHAT batch floor 0.0000 -> MET
+  J-D-G4 mistral7 INLINE_CHAT d_G -4.000 [-4.000,-4.000], ID_K(allT) -4.400 [-4.400,-4.400], d_G/ID_K +0.909 (|d_G| >= 1, CI excl. 0, same sign, >= 0.5) -> MET
+  J-D-G6 qwen1.5  competent cores 60 of 60 (>= 40); P1 injection dl_X +2.000 [+2.000,+2.000] (> 0, CI excl. 0); R(k*) of the in-run H* +0.900 [+0.900,+0.900] (>= 0.6); batch floor 0.0000 -> MET
+  J-D-G6 qwen3b   competent cores 60 of 60 (>= 40); P1 injection dl_X +2.000 [+2.000,+2.000] (> 0, CI excl. 0); R(k*) of the in-run H* +0.900 [+0.900,+0.900] (>= 0.6); batch floor 0.0000 -> MET
+  J-D-G6 qwen7    competent cores 60 of 60 (>= 40); P1 injection dl_X +2.000 [+2.000,+2.000] (> 0, CI excl. 0); batch floor 0.0000 -> MET
+
+PREDICTIONS (code, class, kind, prior, verdict; the numbers it was decided on; 2/2 lines need two evaluable models)
+  J-D1           R A prior 0.55  MET           sufficiency: the leave-one-word-out flag moves the answer to an absent option (ID_inj^LOO / ID_K)
+    qwen7    MET           ID_inj^LOO/ID_K +1.250 [+1.250,+1.250] (>= 0.5; H0: <= 0.35), pi_X(move, LOO) 1.00 (>= 0.5); ID_K +4.000 [+4.000,+4.000]
+    mistral7 MET           ID_inj^LOO/ID_K +1.250 [+1.250,+1.250] (>= 0.5; H0: <= 0.35), pi_X(move, LOO) 1.00 (>= 0.5); ID_K +4.000 [+4.000,+4.000]
+  J-D2           R A prior 0.55  MET           specificity against structured controls (own write orthogonal to the flag, mean H* output, active-set flag)
+    qwen7    MET           iota(move) +1.125 [+1.125,+1.125]; orth: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3); meanH: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3); active: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3)
+    mistral7 MET           iota(move) +1.125 [+1.125,+1.125]; orth: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3); meanH: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3); active: iota +0.113 [+0.113,+0.113], difference +1.012 [+1.012,+1.012] (>= 0.4; H0: <= 0), ratio +0.100 (<= 0.3)
+  J-D3           R A prior 0.50  MET           necessity: ablating one direction per layer at the option rows removes the key read (rho_K)
+    qwen7    MET           rho_K flag +0.200 [+0.200,+0.200] (<= 0.5; H0: >= 0.6), pc1 +0.900 [+0.900,+0.900] (>= 0.7), mean-H* output +0.900 [+0.900,+0.900] (>= 0.7)
+    mistral7 MET           rho_K flag +0.200 [+0.200,+0.200] (<= 0.5; H0: >= 0.6), pc1 +0.900 [+0.900,+0.900] (>= 0.7), mean-H* output +0.900 [+0.900,+0.900] (>= 0.7)
+  J-D4           M A prior 0.85  MET           the injected flag is read at hop 2 by key (r_ans^inj)
+    qwen7    MET           r_ans^inj(KV) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), K +0.900 [+0.900,+0.900], V +0.100 [+0.100,+0.100], K - V +0.800 [+0.800,+0.800] (H0: <= 0); denominator +4.500 [+4.500,+4.500]
+    mistral7 MET           r_ans^inj(KV) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), K +0.900 [+0.900,+0.900], V +0.100 [+0.100,+0.100], K - V +0.800 [+0.800,+0.800] (H0: <= 0); denominator +4.500 [+4.500,+4.500]
+  J-D-ADDR       M A prior 0.80  NOT EVALUABLE the flag is identity-free: the key-only and the natural (K and V) writes give the same flag
+    qwen7    NOT EVALUABLE scorer error:
+Traceback (most recent call last):
+  File "/workspace/Causal-keys/analysis/stage8d_score.py", line 331, in run
+    v, txt = fn(k)
+             ^^^^^
+  File "/workspace/Causal-keys/analysis/stage8d_score.py", line 395, in addr
+    r = G.inj[k].addr()
+        ^^^^^^^^^^^^^^^
+  File "/workspace/Causal-keys/tests/test_stage8d_score.py", line 421, in addr
+    raise RuntimeError("synthetic scorer bug")
+RuntimeError: synthetic scorer bug
+
+    mistral7 MET           weighted cos(Delta^K, Delta^KV) +0.970 (>= 0.9); ID_inj(KV)/ID_inj(K) +1.000 [+1.000,+1.000] (in [0.8, 1.25]; 95 % CI inside [0.7, 1.4])
+  J-D-KN         R A prior 0.40  MET           a non-candidate key acts as removing B's flag, with no specific beneficiary
+    qwen7    MET           mean per-story Pearson +1.000 [+1.000,+1.000] (>= 0.8; 0 undefined), B-loss ratio +1.000 [+1.000,+1.000] (in [0.7, 1.3]), mean(dl_S - dl_X) +0.000 [+0.000,+0.000] (95 % CI inside +-0.400 = 0.1 x ID_K)
+    mistral7 MET           mean per-story Pearson +1.000 [+1.000,+1.000] (>= 0.8; 0 undefined), B-loss ratio +1.000 [+1.000,+1.000] (in [0.7, 1.3]), mean(dl_S - dl_X) +0.000 [+0.000,+0.000] (95 % CI inside +-0.400 = 0.1 x ID_K)
+  J-D5           R A prior 0.25  NOT EVALUABLE the flag of an initial-state sentence carries its binding (Psi_bind > 0 in both sentence orders)
+    qwen7    MET           Psi_bind pooled +1.000 [+1.000,+1.000] (H0: <= 0), object-first +1.000 [+1.000,+1.000] (n 20), distractor-first +1.000 [+1.000,+1.000] (n 20), stratum difference +0.000 [+0.000,+0.000] (CI must include 0)
+    mistral7 NOT EVALUABLE J-D-G0 not passed or no binding results
+  J-D7           M A prior 0.85  MET           consistency: the key read is negative under Q_OUT and positive under Q_IN
+    qwen7    MET           ID_K(Q_OUT) -2.984 [-3.018,-2.950] (<= -1; H0: >= 0), ID_K(Q_IN) +3.016 [+2.982,+3.050] (>= 1; H0: <= 0), paired difference +6.000 [+6.000,+6.000] (H0: <= 0)
+    mistral7 MET           ID_K(Q_OUT) -2.984 [-3.018,-2.950] (<= -1; H0: >= 0), ID_K(Q_IN) +3.016 [+2.982,+3.050] (>= 1; H0: <= 0), paired difference +6.000 [+6.000,+6.000] (H0: <= 0)
+  J-D-SIGN-Q     M A prior 0.85  MET           Q_OUT: the key and the value reads are both negative (task semantics)
+    qwen7    MET           Q_OUT ID_K -2.984 [-3.018,-2.950] (H0: >= 0), ID_V -5.000 [-5.037,-4.964] (H0: >= 0)
+    mistral7 MET           Q_OUT ID_K -2.984 [-3.018,-2.950] (H0: >= 0), ID_V -5.000 [-5.037,-4.964] (H0: >= 0)
+  J-D-SIGN-IOI   L A prior 0.90  NOT MET       IOI INLINE: the key read is negative while the value read is positive
+    qwen7    NOT MET       INLINE ID_K -3.038 [-3.069,-3.009] (H0: >= 0), ID_V -0.984 [-1.018,-0.951] (H0: <= 0)
+    mistral7 MET           INLINE ID_K -3.038 [-3.069,-3.009] (H0: >= 0), ID_V +2.016 [+1.982,+2.049] (H0: <= 0)
+  J-D8-Q         M A prior 0.85  MET           consistency: the frozen H* carry the Q_IN and Q_OUT key reads
+    qwen7    MET           Q_IN: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545 | Q_OUT: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545
+    mistral7 MET           Q_IN: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545 | Q_OUT: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545
+  J-D8-IOI       R A prior 0.55  MET           the frozen H* carry the negative IOI INLINE key read at the listed names
+    qwen7    MET           INLINE: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545
+    mistral7 MET           INLINE: R(H*) +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.45), KO(H*) +0.950 [+0.950,+0.950] (>= 0.6; H0: <= 0.45), random R +0.000 KO +0.000 (<= 0.15); d_Gc/ID_K +0.545
+  J-D-ROUTE-IOI  R A prior 0.40  NOT MET       IOI INLINE: the negative read is applied at the answer row's key read of the listed names
+    qwen7    NOT MET       K_S rows: r_ans(KV) +0.300 [+0.300,+0.300] (>= 0.6), K +0.200 [+0.200,+0.200], V +0.500 [+0.500,+0.500], K - V -0.300 [-0.300,-0.300] (H0: <= 0); r_other +0.000 [+0.000,+0.000] (>= 0.5 would mean S2 or tail rows carry it); dm(K_S) -3.000 [-3.000,-3.000]
+    mistral7 MET           K_S rows: r_ans(KV) +0.950 [+0.950,+0.950] (>= 0.6), K +0.900 [+0.900,+0.900], V +0.200 [+0.200,+0.200], K - V +0.700 [+0.700,+0.700] (H0: <= 0); r_other +0.000 [+0.000,+0.000] (>= 0.5 would mean S2 or tail rows carry it); dm(K_S) -3.000 [-3.000,-3.000]
+  J-D-HOP2       R A prior 0.25  NOT MET       the same top-10 hop-2 heads carry the injected flag's Q_OUT and IOI effects (same reader, opposite sign)
+    qwen7    NOT MET       [intermediate] Q_OUT: carry(top-10) +0.700 [+0.700,+0.700] (>= 0.5; H0: <= 0.2), all heads +0.900, random 10 +0.000; dl_X(inj) -2.000 [-2.000,-2.000]; INLINE: carry(top-10) +0.100 [+0.100,+0.100] (>= 0.5; H0: <= 0.2), all heads +0.900, random 10 +0.000; dl_X(inj) -2.000 [-2.000,-2.000]
+    mistral7 NOT MET       [intermediate] Q_OUT: carry(top-10) +0.700 [+0.700,+0.700] (>= 0.5; H0: <= 0.2), all heads +0.900, random 10 +0.000; dl_X(inj) -2.000 [-2.000,-2.000]; INLINE: carry(top-10) +0.100 [+0.100,+0.100] (>= 0.5; H0: <= 0.2), all heads +0.900, random 10 +0.000; dl_X(inj) -2.000 [-2.000,-2.000]
+  J-D6a          L A prior 0.90  MET           consistency: the flag is written in sentences as in lists at every scale (omega, kappa)
+    qwen1.5  MET           omega +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.4), kappa +0.950 (>= 0.7)
+    qwen3b   MET           omega +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.4), kappa +0.950 (>= 0.7)
+    qwen7    MET           omega +0.900 [+0.900,+0.900] (>= 0.6; H0: <= 0.4), kappa +0.950 (>= 0.7)
+  J-D6           R A prior 0.35  MET           mediation: the sentence-row flag carries the natural POST/P1 read ratio at 1.5B, 3B and 7B
+    qwen1.5  MET           rho -0.200 [-0.200,-0.200], rho_nat -0.200 [-0.200,-0.200] (same sign: True), rho - rho_nat -0.000 [-0.000,-0.000] (95 % CI inside +-0.100); dl_X(inj) P1 +2.000 [+2.000,+2.000], POST -0.400 [-0.400,-0.400]; N_X P1 +4.000 [+4.000,+4.000], POST -0.800 [-0.800,-0.800]; 60 competent cores
+    qwen3b   MET           rho +0.050 [+0.050,+0.050], rho_nat +0.050 [+0.050,+0.050] (same sign: True), rho - rho_nat -0.000 [-0.000,-0.000] (95 % CI inside +-0.100); dl_X(inj) P1 +2.000 [+2.000,+2.000], POST +0.100 [+0.100,+0.100]; N_X P1 +4.000 [+4.000,+4.000], POST +0.200 [+0.200,+0.200]; 60 competent cores
+    qwen7    MET           rho +0.250 [+0.250,+0.250], rho_nat +0.250 [+0.250,+0.250] (same sign: True), rho - rho_nat -0.000 [-0.000,-0.000] (95 % CI inside +-0.125); dl_X(inj) P1 +2.000 [+2.000,+2.000], POST +0.500 [+0.500,+0.500]; N_X P1 +4.000 [+4.000,+4.000], POST +1.000 [+1.000,+1.000]; 60 competent cores
+  J-D6-ROUTE     R A prior 0.35  MET           at 1.5B the answer reads the sentence-row flag by value (r_ans^inj(V) > r_ans^inj(K))
+    qwen1.5  MET           POST: r_ans^inj(V) +0.700 [+0.700,+0.700], K +0.100 [+0.100,+0.100], V - K +0.600 [+0.600,+0.600] (H0: <= 0); KV +1.000 [+1.000,+1.000]; dl_X(inj) -0.400 [-0.400,-0.400]
+
+D6 DECISION TABLE (fixed in the entry): (a) MEDIATED, READ BY VALUE AT 1.5B: the sentence-row flag carries the natural read ratio at every scale, and at 1.5B the answer reads it by value
+
+REPORTED (no verdict counted)
+  qwen7: iota add 0.5 / 1 / 2 +0.250 / +0.500 / +1.000 (monotone: True); add-only +0.500 [+0.500,+0.500] (>= 0.25, LB > 0: True); move +1.125 [+1.125,+1.125]; pi_X(move) 1.00; ID_inj(full flag)/ID_K +1.125 [+1.125,+1.125]; N_X +4.000 [+4.000,+4.000]
+  qwen7: sanity rows: iso0 +0.012, iso1 +0.012, iso2 +0.012, hspan0 +0.012, hspan1 +0.012, hspan2 +0.012, perm +0.012, choices +0.012, question +0.012; pi_X shift choices +0.00, question +0.00; rank-1 capture +0.978 [+0.978,+0.978]
+  qwen7: D4 r_other +0.022 [+0.022,+0.022]
+  qwen7: B-identity share of the per-story flag (null 0.10): l3 0.40
+  qwen7: logit lens max|cos(Delta, W_U[loc])| vs random: l3 0.050/0.020
+  mistral7: iota add 0.5 / 1 / 2 +0.250 / +0.500 / +1.000 (monotone: True); add-only +0.500 [+0.500,+0.500] (>= 0.25, LB > 0: True); move +1.125 [+1.125,+1.125]; pi_X(move) 1.00; ID_inj(full flag)/ID_K +1.125 [+1.125,+1.125]; N_X +4.000 [+4.000,+4.000]
+  mistral7: sanity rows: iso0 +0.012, iso1 +0.012, iso2 +0.012, hspan0 +0.012, hspan1 +0.012, hspan2 +0.012, perm +0.012, choices +0.012, question +0.012; pi_X shift choices +0.00, question +0.00; rank-1 capture +0.978 [+0.978,+0.978]
+  mistral7: D4 r_other +0.022 [+0.022,+0.022]
+  mistral7: B-identity share of the per-story flag (null 0.10): l3 0.40
+  mistral7: logit lens max|cos(Delta, W_U[loc])| vs random: l3 0.050/0.020
+  qwen7: rho_K isotropic iso0 +1.000 [+1.000,+1.000], iso1 +1.000 [+1.000,+1.000], iso2 +1.000 [+1.000,+1.000] (sanity >= 0.85)
+  mistral7: rho_K isotropic iso0 +1.000 [+1.000,+1.000], iso1 +1.000 [+1.000,+1.000], iso2 +1.000 [+1.000,+1.000] (sanity >= 0.85)
+  qwen7: event vs initial (role confounded with order) Psi_ev +2.000 [+2.000,+2.000]
+  qwen7 Q_IN: ID_K +3.016 [+2.982,+3.050], ID_V +5.000 [+4.963,+5.036]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +0.006 [+0.006,+0.006] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -1.000 [-1.000,-1.000], N_X(cfg) -3.000 [-3.000,-3.000], ratio +0.333; isotropic +0.000, +0.000, +0.000
+  qwen7 Q_OUT: ID_K -2.984 [-3.018,-2.950], ID_V -5.000 [-5.037,-4.964]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +0.006 [+0.006,+0.006] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -1.000 [-1.000,-1.000], N_X(cfg) -3.000 [-3.000,-3.000], ratio +0.333; isotropic +0.000, +0.000, +0.000
+  qwen7: hop-2 carry under P1 (the ranking format): top10 +0.700 [+0.700,+0.700], rand10 +0.000 [+0.000,+0.000], all +0.900 [+0.900,+0.900]
+  qwen7 INLINE: ID_K -3.038 [-3.069,-3.009], ID_V -0.984 [-1.018,-0.951]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     route of the injected IOI flag: r_ans(KV) +1.000 [+1.000,+1.000], K +0.900 [+0.900,+0.900], V +0.000 [+0.000,+0.000], other +0.000 [+0.000,+0.000]; dm(inj) -2.000 [-2.000,-2.000]
+  qwen7 INLINE_CHAT: ID_K -3.038 [-3.069,-3.009], ID_V +2.016 [+1.982,+2.049]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+  mistral7 Q_IN: ID_K +3.016 [+2.982,+3.050], ID_V +5.000 [+4.963,+5.036]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +0.006 [+0.006,+0.006] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -1.000 [-1.000,-1.000], N_X(cfg) -3.000 [-3.000,-3.000], ratio +0.333; isotropic +0.000, +0.000, +0.000
+  mistral7 Q_OUT: ID_K -2.984 [-3.018,-2.950], ID_V -5.000 [-5.037,-4.964]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     behavioural correlate: dl_B under K_S +0.006 [+0.006,+0.006] (Q_OUT: > 0 expected, the written word becomes a 'not mentioned' answer)
+     D9 rows: dl_X(+Delta^P1 at r_X) -1.000 [-1.000,-1.000], N_X(cfg) -3.000 [-3.000,-3.000], ratio +0.333; isotropic +0.000, +0.000, +0.000
+  mistral7: hop-2 carry under P1 (the ranking format): top10 +0.700 [+0.700,+0.700], rand10 +0.000 [+0.000,+0.000], all +0.900 [+0.900,+0.900]
+  mistral7 INLINE: ID_K -3.038 [-3.069,-3.009], ID_V +2.016 [+1.982,+2.049]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+     route of the injected IOI flag: r_ans(KV) +1.000 [+1.000,+1.000], K +0.900 [+0.900,+0.900], V +0.000 [+0.000,+0.000], other +0.000 [+0.000,+0.000]; dm(inj) -2.000 [-2.000,-2.000]
+  mistral7 INLINE_CHAT: ID_K -3.038 [-3.069,-3.009], ID_V +2.016 [+1.982,+2.049]; R(H*) +0.900 [+0.900,+0.900], KO(H*) +0.950 [+0.950,+0.950], d_G/ID_K +0.909 [+0.909,+0.909], d_Gc/ID_K +0.545 [+0.545,+0.545] (a re-mention read only if >= 0.5)
+  qwen1.5: D6b Delta^POST at the P1 list row / Delta^P1 there +0.900 [+0.900,+0.900] (>= 0.6 expected)
+  qwen3b: D6b Delta^POST at the P1 list row / Delta^P1 there +0.900 [+0.900,+0.900] (>= 0.6 expected)
+  qwen7: D6b Delta^POST at the P1 list row / Delta^P1 there +0.900 [+0.900,+0.900] (>= 0.6 expected)
+
+SUMMARY
+  account lines, class L: 2 lines: 1 MET, 1 NOT MET, 0 MET IN PART, 0 NOT EVALUABLE; observed 1 against expected 1.80; Brier 0.410
+  account lines, class M: 5 lines: 4 MET, 0 NOT MET, 0 MET IN PART, 1 NOT EVALUABLE; observed 4 against expected 3.40; Brier 0.023; not evaluable: J-D-ADDR
+  account lines, class R: 10 lines: 7 MET, 2 NOT MET, 0 MET IN PART, 1 NOT EVALUABLE; observed 7 against expected 3.90; Brier 0.254; not evaluable: J-D5
+  measurement-validity lines: none in part D (the batch floors and competence checks are gates)
+  met rate among R account lines with a verdict: 7 of 9 (expected 3.90)
+  Holm sensitivity (analysis/stage8_holm.py; reported, no verdict uses it): step-down at familywise one-sided 0.025 over the 31 interval components of the R-class account lines with a verdict (normal p from the bootstrap SE)
+    J-D1: 2 components; no decision changes under Holm; verdict unchanged (MET)
+    J-D2: 6 components; no decision changes under Holm; verdict unchanged (MET)
+    J-D3: 2 components; no decision changes under Holm; verdict unchanged (MET)
+    J-D-KN: 4 components; no decision changes under Holm; verdict unchanged (MET)
+    J-D5: 0 components; no decision changes under Holm; verdict unchanged (NOT EVALUABLE)
+    J-D8-IOI: 4 components; no decision changes under Holm; verdict unchanged (MET)
+    J-D-ROUTE-IOI: 2 components; no decision changes under Holm; verdict unchanged (NOT MET)
+    J-D-HOP2: 4 components; no decision changes under Holm; verdict unchanged (NOT MET)
+    J-D6: 6 components; no decision changes under Holm; verdict unchanged (MET)
+    J-D6-ROUTE: 1 components; no decision changes under Holm; verdict unchanged (MET)
+  provenance MISMATCH; population MISMATCH; J-D-G0 MET; SCORER ERROR in ['J-D-ADDR/qwen7']
+
+######## EXPLORATORY (not scored)
+-- qwen7: sets (None): k* 5, L* [3]; hop-2 top-10 []; in-run a3 overlap with H* 5
+-- qwen7: flag geometry: consistency l3 0.90; mean cross-layer cos +0.000; flag cosines 
+-- mistral7: sets (None): k* 5, L* [3]; hop-2 top-10 []; in-run a3 overlap with H* 5
+-- mistral7: flag geometry: consistency l3 0.90; mean cross-layer cos +0.000; flag cosines 
+-- qwen1.5: sets (None): k* 5, L* [3]; hop-2 top-10 []; in-run a3 overlap with H* 5
+-- qwen1.5: flag geometry: consistency l3 0.90; mean cross-layer cos +0.000; flag cosines 
+-- qwen3b: sets (None): k* 5, L* [3]; hop-2 top-10 []; in-run a3 overlap with H* 5
+-- qwen3b: flag geometry: consistency l3 0.90; mean cross-layer cos +0.000; flag cosines 
+-- qwen7: E6, iota on the raw margin m_X = lp(X) - lp(B): add1 +0.460 [+0.460,+0.460], move +1.214 [+1.214,+1.214], looX +1.946 [+1.946,+1.946]
+-- mistral7: E6, iota on the raw margin m_X = lp(X) - lp(B): add1 +0.460 [+0.460,+0.460], move +1.214 [+1.214,+1.214], looX +1.946 [+1.946,+1.946]
+-- qwen7: H3/G7b reconciliation (base answer rate, initial-location rate): flag@init_dloc 1.00/0.00, flag@B 1.00/0.00, none 1.00/0.00, flag 1.00/0.00
+-- mistral7: H3/G7b reconciliation (base answer rate, initial-location rate): flag@init_dloc 1.00/0.00, flag@B 1.00/0.00, none 1.00/0.00, flag 1.00/0.00
+-- qwen7: Q_OUT behaviour, answer = the story's own word B: none 1.00, K_S 1.00, V_S 1.00
+-- qwen7: IOI injections at the listed IO_X row (dl, four-way): injIOI -1.000 [-1.000,-1.000], moveIOI -1.000 [-1.000,-1.000], injP1 -0.300 [-0.300,-0.300], iso +0.000 [+0.000,+0.000], K_X -3.000 [-3.000,-3.000]
+-- mistral7: Q_OUT behaviour, answer = the story's own word B: none 1.00, K_S 1.00, V_S 1.00
+-- mistral7: IOI injections at the listed IO_X row (dl, four-way): injIOI -1.000 [-1.000,-1.000], moveIOI -1.000 [-1.000,-1.000], injP1 -0.300 [-0.300,-0.300], iso +0.000 [+0.000,+0.000], K_X -3.000 [-3.000,-3.000]
+======================================================================= short test summary info =======================================================================
+PASSED tests/test_flag.py::test_zero_injection_equals_clean
+PASSED tests/test_flag.py::test_injection_is_exactly_the_added_vector
+PASSED tests/test_flag.py::test_batched_equals_single
+PASSED tests/test_flag.py::test_ablation_mu_own_is_clean_and_sets_projection
+PASSED tests/test_flag.py::test_head_outputs_sum_to_o_proj
+PASSED tests/test_flag.py::test_composition_nonzero_add
+PASSED tests/test_flag.py::test_transfer_allT_equals_full_key_clamp
+PASSED tests/test_flag.py::test_kv_clamp_rows_equal_run_item
+PASSED tests/test_flag.py::test_inline_chat_item_code_equals_ioi_factorial
+PASSED tests/test_flag.py::test_trie_scoring_with_noop_hop
+PASSED tests/test_flag.py::test_flag_from_write_pass_matches_independent_capture
+PASSED tests/test_flag.py::test_hop2_key_splice_equals_hopsplice_answer_key
+PASSED tests/test_flag.py::test_trie_scoring_hop_mask_extends_over_the_trie
+PASSED tests/test_questions.py::test_question_arms_text
+PASSED tests/test_questions.py::test_inline_chat_text
+PASSED tests/test_questions.py::test_populations
+PASSED tests/test_questions.py::test_disjoint_from_other_parts
+PASSED tests/test_questions.py::test_belief_layouts[qwen]
+PASSED tests/test_questions.py::test_belief_layouts[mistral]
+PASSED tests/test_questions.py::test_ioi_layouts[qwen]
+PASSED tests/test_questions.py::test_ioi_layouts[mistral]
+PASSED tests/test_questions.py::test_words_and_forms[qwen]
+PASSED tests/test_questions.py::test_words_and_forms[mistral]
+PASSED tests/test_questions.py::test_ioi_candidate_lists_fixed
+PASSED tests/test_stage8d_score.py::test_bootstrap_seeded_and_ratio_recomputed
+PASSED tests/test_stage8d_score.py::test_one_sided_tests_and_holm_components
+PASSED tests/test_stage8d_score.py::test_risk_class_follows_the_prior
+PASSED tests/test_stage8d_score.py::test_holm_family_contract
+PASSED tests/test_stage8d_score.py::test_holm_with_the_shared_helper
+PASSED tests/test_stage8d_score.py::test_combine_rule
+PASSED tests/test_stage8d_score.py::test_inject_lines_known_values
+PASSED tests/test_stage8d_score.py::test_ablate_rho
+PASSED tests/test_stage8d_score.py::test_bind_psi_and_strata
+PASSED tests/test_stage8d_score.py::test_cells_transfer_competence_route_hop2
+PASSED tests/test_stage8d_score.py::test_diss_statistics
+PASSED tests/test_stage8d_score.py::test_end_to_end
+PASSED tests/test_stage8d_score.py::test_gate_failures_make_lines_not_evaluable
+PASSED tests/test_stage8d_score.py::test_line_exception_is_a_scorer_error
+PASSED tests/test_stage8d_score.py::test_g0_counts_skips_in_every_file_of_the_run
+PASSED tests/test_stage8d_score.py::test_g0_requires_the_shared_population_and_holm_tests
+PASSED tests/test_stage8d_score.py::test_d6_table_branches
+PASSED tests/test_stage8d_score.py::test_pins_equal_the_experiment
+PASSED tests/test_head_splice.py::test_headsplice_all_heads_is_full_clamp_and_empty_is_clean
+PASSED tests/test_head_splice.py::test_headsplice_rows_G_and_group_slices_equal_rowsplice
+PASSED tests/test_head_splice.py::test_headsplice_batched_grid_equals_single_runs
+PASSED tests/test_head_splice.py::test_self_ablation_is_clean
+PASSED tests/test_head_splice.py::test_hopsplice_all_rows_is_plain_clamp
+PASSED tests/test_head_splice.py::test_hopsplice_no_overwrite_and_answer_only_cache
+PASSED tests/test_head_splice.py::test_hop_batch_equals_single_rows
+PASSED tests/test_stage8_populations.py::test_every_part_computes_U_identically
+PASSED tests/test_stage8_populations.py::test_populations_have_the_expected_sizes
+PASSED tests/test_stage8_populations.py::test_fresh_populations_disjoint_from_U_and_from_each_other
+PASSED tests/test_stage8_populations.py::test_labelled_reuses
+PASSED tests/test_stage8_populations.py::test_no_confirmatory_population_uses_a_pilot_seed
+PASSED tests/test_stage8_holm.py::test_phi_and_p_values
+PASSED tests/test_stage8_holm.py::test_degenerate_and_undefined
+PASSED tests/test_stage8_holm.py::test_holm_hand_worked
+PASSED tests/test_stage8_holm.py::test_directions_mixed_and_passthrough
+PASSED tests/test_stage8_holm.py::test_ties_keep_input_order
+PASSED tests/test_stage8_holm.py::test_adjusted_p_against_brute_force
+PASSED tests/test_stage8_holm.py::test_single_component_equals_the_unadjusted_test
+==================================================================== 61 passed in 88.84s (0:01:28) ====================================================================

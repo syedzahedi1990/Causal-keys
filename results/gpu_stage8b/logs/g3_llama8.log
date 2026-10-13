@@ -1,0 +1,7 @@
+==== 2026-10-13T12:46:58Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage g3 --model /root/stage8_models/llama8 --key llama8
+frames file results/gpu_stage8b/frames/llama8.json sha256 da3daabc1b59219f4484fee43a2c81e19dbbc4419ad4bc622d3206fe94570486: 0 discovered frames []
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+  g3 NONE: {'n': 30, 's_ID_trie': 0.08066922039990794, 's_ID_plain': 0.08061543675972316, 'abs_ds': 5.378364018478188e-05, 'mean_abs_dL': 0.0736691386749347, 'ID_KV_plain': 10.057291686534882, 'tol_dL': 0.5028645843267441, 'pass': True} (14s)
+  g3 POST: {'n': 30, 's_ID_trie': 0.25940860297648477, 's_ID_plain': 0.25948477565490374, 'abs_ds': 7.617267841897313e-05, 'mean_abs_dL': 0.07805370075835122, 'ID_KV_plain': 7.369791648785273, 'tol_dL': 0.36848958243926366, 'pass': True} (30s)
+  g3 AFTER: {'n': 30, 's_ID_trie': 0.609999997995974, 's_ID_plain': 0.6077505728486357, 'abs_ds': 0.002249425147338391, 'mean_abs_dL': 0.08476178970174968, 'ID_KV_plain': 9.427083375491202, 'tol_dL': 0.47135416877456016, 'pass': True} (45s)
+JB-G3 PASS: the evaluation scores with the trie

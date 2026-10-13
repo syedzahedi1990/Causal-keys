@@ -1,0 +1,13 @@
+==== 2026-10-13T13:11:40Z fetch gemma2b -> /root/stage8_models/gemma2b
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+gemma2b/config.json: verified (git_blob) from SceneWorks/gemma-2-2b-it@684c553b5b41a1c835989d89f62f585e6269a7de
+gemma2b/generation_config.json: verified (git_blob) from SceneWorks/gemma-2-2b-it@684c553b5b41a1c835989d89f62f585e6269a7de
+gemma2b/model-00001-of-00002.safetensors: verified (sha256) from SceneWorks/gemma-2-2b-it@684c553b5b41a1c835989d89f62f585e6269a7de
+gemma2b/model-00002-of-00002.safetensors: verified (sha256) from SceneWorks/gemma-2-2b-it@684c553b5b41a1c835989d89f62f585e6269a7de
+gemma2b/model.safetensors.index.json: verified (git_blob) from SceneWorks/gemma-2-2b-it@684c553b5b41a1c835989d89f62f585e6269a7de
+gemma2b/tokenizer.model: verified (sha256) from SceneWorks/gemma-2-2b-it@684c553b5b41a1c835989d89f62f585e6269a7de
+gemma2b/tokenizer_config.json: verified (git_blob) from SceneWorks/gemma-2-2b-it@684c553b5b41a1c835989d89f62f585e6269a7de
+gemma2b: 9 files verified against google/gemma-2-2b-it@299a8560bedf22ed1c72a8a11e7dce4a7f9f51f8 -> /root/stage8_models/gemma2b/VERIFIED.json
+==== 2026-10-13T13:12:30Z prefetch of gemma2b: exit 0
+==== 2026-10-13T13:17:35Z fetch gemma2b -> /root/stage8_models/gemma2b
+gemma2b: 9 files verified against google/gemma-2-2b-it@299a8560bedf22ed1c72a8a11e7dce4a7f9f51f8 -> /root/stage8_models/gemma2b/VERIFIED.json

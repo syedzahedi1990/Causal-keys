@@ -1,0 +1,2 @@
+==== 2026-10-13T12:13:11Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage tokcheck --model /root/stage8_models/mistral7 --key mistral7
+tokcheck PASS: ROOM 21 tokens, sentences {0: [23], 1: [22], 2: [23], 3: [22], 4: [21], 5: [22], 6: [22], 7: [22]}; trie nodes {'F': [83, 116], 'C': [83, 116], 'S0': [116, 116]}; 0 failures []

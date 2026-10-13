@@ -1,0 +1,16 @@
+==== 2026-10-13T12:30:32Z fetch llama8 -> /root/stage8_models/llama8
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+llama8/config.json: verified (git_blob) from NousResearch/Meta-Llama-3.1-8B-Instruct@d10aef7999a2b5ba950ab3974312feeedbfe0b77
+llama8/generation_config.json: verified (git_blob) from NousResearch/Meta-Llama-3.1-8B-Instruct@d10aef7999a2b5ba950ab3974312feeedbfe0b77
+llama8/model-00001-of-00004.safetensors: verified (sha256) from NousResearch/Meta-Llama-3.1-8B-Instruct@d10aef7999a2b5ba950ab3974312feeedbfe0b77
+llama8/model-00002-of-00004.safetensors: verified (sha256) from NousResearch/Meta-Llama-3.1-8B-Instruct@d10aef7999a2b5ba950ab3974312feeedbfe0b77
+llama8/model-00003-of-00004.safetensors: verified (sha256) from NousResearch/Meta-Llama-3.1-8B-Instruct@d10aef7999a2b5ba950ab3974312feeedbfe0b77
+llama8/model-00004-of-00004.safetensors: verified (sha256) from NousResearch/Meta-Llama-3.1-8B-Instruct@d10aef7999a2b5ba950ab3974312feeedbfe0b77
+llama8/model.safetensors.index.json: verified (git_blob) from NousResearch/Meta-Llama-3.1-8B-Instruct@d10aef7999a2b5ba950ab3974312feeedbfe0b77
+llama8/special_tokens_map.json: verified (git_blob) from NousResearch/Meta-Llama-3.1-8B-Instruct@d10aef7999a2b5ba950ab3974312feeedbfe0b77
+llama8/tokenizer.json: verified (git_blob) from NousResearch/Meta-Llama-3.1-8B-Instruct@d10aef7999a2b5ba950ab3974312feeedbfe0b77
+llama8/tokenizer_config.json: verified (git_blob) from modularai/Llama-3.1-8B-Instruct-GGUF@966694508430d1177f6d585de779250e7a34bc3a
+llama8: 10 files verified against meta-llama/Llama-3.1-8B-Instruct@0e9e39f249a16976918f6564b8830bc894c89659 -> /root/stage8_models/llama8/VERIFIED.json
+==== 2026-10-13T12:32:48Z prefetch of llama8: exit 0
+==== 2026-10-13T12:46:15Z fetch llama8 -> /root/stage8_models/llama8
+llama8: 10 files verified against meta-llama/Llama-3.1-8B-Instruct@0e9e39f249a16976918f6564b8830bc894c89659 -> /root/stage8_models/llama8/VERIFIED.json

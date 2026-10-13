@@ -1,0 +1,2 @@
+==== 2026-10-13T11:36:26Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage tokcheck --model /root/stage8_models/qwen7 --key qwen7
+tokcheck PASS: ROOM 21 tokens, sentences {0: [23], 1: [22], 2: [23], 3: [22], 4: [21], 5: [21], 6: [21], 7: [22]}; trie nodes {'F': [31, 37], 'C': [31, 37], 'S0': [37, 37]}; 0 failures []

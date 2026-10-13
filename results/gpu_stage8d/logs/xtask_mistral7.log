@@ -1,0 +1,2 @@
+==== 2026-10-13T10:28:26Z python experiments/stage8_flag.py --out results/gpu_stage8d --stage xtask --model /root/stage8_models/mistral7 --key mistral7
+xtask done (262s)

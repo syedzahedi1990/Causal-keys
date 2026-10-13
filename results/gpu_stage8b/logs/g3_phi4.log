@@ -1,0 +1,6 @@
+==== 2026-10-13T13:02:24Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage g3 --model /root/stage8_models/phi4 --key phi4
+frames file results/gpu_stage8b/frames/phi4.json sha256 9390d9db19b78accf62863e39eb1806ce76a9dcb43771107f838504171188492: 0 discovered frames []
+  g3 NONE: {'n': 30, 's_ID_trie': 0.0027780477085392924, 's_ID_plain': 0.00246273500318978, 'abs_ds': 0.0003153127053495126, 'mean_abs_dL': 0.08842755953470866, 'ID_KV_plain': 15.869140497843425, 'tol_dL': 0.7934570248921713, 'pass': True} (20s)
+  g3 POST: {'n': 30, 's_ID_trie': 0.24795518781738612, 's_ID_plain': 0.2476326331632847, 'abs_ds': 0.0003225546541014146, 'mean_abs_dL': 0.09619475404421489, 'ID_KV_plain': 13.304426960150401, 'tol_dL': 0.6652213480075201, 'pass': True} (44s)
+  g3 AFTER: {'n': 30, 's_ID_trie': 0.7299471004891195, 's_ID_plain': 0.7282620407925514, 'abs_ds': 0.0016850596965680698, 'mean_abs_dL': 0.0659128661516964, 'ID_KV_plain': 16.11249993989865, 'tol_dL': 0.8056249969949326, 'pass': True} (66s)
+JB-G3 PASS: the evaluation scores with the trie

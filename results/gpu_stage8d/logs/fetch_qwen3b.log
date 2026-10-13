@@ -1,0 +1,15 @@
+==== 2026-10-13T10:19:36Z fetch qwen3b -> /root/stage8_models/qwen3b
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+qwen3b/config.json: verified (git_blob) from Qwen/Qwen2.5-3B-Instruct@aa8e72537993ba99e69dfaafa59ed015b17504d1
+qwen3b/generation_config.json: verified (git_blob) from Qwen/Qwen2.5-3B-Instruct@aa8e72537993ba99e69dfaafa59ed015b17504d1
+qwen3b/merges.txt: verified (git_blob) from Qwen/Qwen2.5-3B-Instruct@aa8e72537993ba99e69dfaafa59ed015b17504d1
+qwen3b/model-00001-of-00002.safetensors: verified (sha256) from Qwen/Qwen2.5-3B-Instruct@aa8e72537993ba99e69dfaafa59ed015b17504d1
+qwen3b/model-00002-of-00002.safetensors: verified (sha256) from Qwen/Qwen2.5-3B-Instruct@aa8e72537993ba99e69dfaafa59ed015b17504d1
+qwen3b/model.safetensors.index.json: verified (git_blob) from Qwen/Qwen2.5-3B-Instruct@aa8e72537993ba99e69dfaafa59ed015b17504d1
+qwen3b/tokenizer.json: verified (git_blob) from Qwen/Qwen2.5-3B-Instruct@aa8e72537993ba99e69dfaafa59ed015b17504d1
+qwen3b/tokenizer_config.json: verified (git_blob) from Qwen/Qwen2.5-3B-Instruct@aa8e72537993ba99e69dfaafa59ed015b17504d1
+qwen3b/vocab.json: verified (git_blob) from Qwen/Qwen2.5-3B-Instruct@aa8e72537993ba99e69dfaafa59ed015b17504d1
+qwen3b: 9 files verified against Qwen/Qwen2.5-3B-Instruct@aa8e72537993ba99e69dfaafa59ed015b17504d1 -> /root/stage8_models/qwen3b/VERIFIED.json
+==== 2026-10-13T10:20:35Z prefetch of qwen3b: exit 0
+==== 2026-10-13T10:21:29Z fetch qwen3b -> /root/stage8_models/qwen3b
+qwen3b: 9 files verified against Qwen/Qwen2.5-3B-Instruct@aa8e72537993ba99e69dfaafa59ed015b17504d1 -> /root/stage8_models/qwen3b/VERIFIED.json

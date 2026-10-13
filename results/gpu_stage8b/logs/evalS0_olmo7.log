@@ -1,0 +1,9 @@
+==== 2026-10-13T12:37:26Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage eval --population S0 --model /root/stage8_models/olmo7 --key olmo7 --reserve-min 79
+frames file results/gpu_stage8b/frames/olmo7.json sha256 fba83c5dfbd55264b6ce3f71248ce08f116e1195545833c35733836d3a031749: 0 discovered frames []
+  P1 done: 150 items (91s; total 91s)
+  AFTER done: 150 items (87s; total 178s)
+  BEFORE done: 150 items (87s; total 265s)
+  POST done: 150 items (89s; total 354s)
+  PRE done: 150 items (89s; total 443s)
+  NONE done: 150 items (77s; total 520s)
+wrote results/gpu_stage8b/eval/olmo7_S0.json (900 items, 0 skipped, arms not run []; 521s)

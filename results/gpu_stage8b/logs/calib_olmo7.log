@@ -1,0 +1,9 @@
+==== 2026-10-13T12:30:57Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage calib --model /root/stage8_models/olmo7 --key olmo7
+  calib AFTER done (2s)
+  calib BEFORE done (3s)
+  calib NONE done (4s)
+  calib POST done (5s)
+  calib PRE done (7s)
+  calib POST-NULL done (8s)
+  calib P1 done (9s)
+frames [] (rejected []); file results/gpu_stage8b/frames/olmo7.json sha256 fba83c5dfbd55264b6ce3f71248ce08f116e1195545833c35733836d3a031749

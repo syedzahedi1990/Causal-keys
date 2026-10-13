@@ -1,0 +1,12 @@
+==== 2026-10-13T13:01:27Z fetch falcon7 -> /root/stage8_models/falcon7
+falcon7/generation_config.json: verified (git_blob) from tiiuae/Falcon3-7B-Instruct@1e57a0ecd176c7c139f289c60a74e57f887c3dfb
+falcon7/model-00001-of-00004.safetensors: verified (sha256) from tiiuae/Falcon3-7B-Instruct@1e57a0ecd176c7c139f289c60a74e57f887c3dfb
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+falcon7/model-00002-of-00004.safetensors: verified (sha256) from tiiuae/Falcon3-7B-Instruct@1e57a0ecd176c7c139f289c60a74e57f887c3dfb
+falcon7/model-00003-of-00004.safetensors: verified (sha256) from tiiuae/Falcon3-7B-Instruct@1e57a0ecd176c7c139f289c60a74e57f887c3dfb
+falcon7/model-00004-of-00004.safetensors: verified (sha256) from tiiuae/Falcon3-7B-Instruct@1e57a0ecd176c7c139f289c60a74e57f887c3dfb
+falcon7/model.safetensors.index.json: verified (git_blob) from tiiuae/Falcon3-7B-Instruct@1e57a0ecd176c7c139f289c60a74e57f887c3dfb
+falcon7: 10 files verified against tiiuae/Falcon3-7B-Instruct@1e57a0ecd176c7c139f289c60a74e57f887c3dfb -> /root/stage8_models/falcon7/VERIFIED.json
+==== 2026-10-13T13:03:36Z prefetch of falcon7: exit 0
+==== 2026-10-13T13:11:40Z fetch falcon7 -> /root/stage8_models/falcon7
+falcon7: 10 files verified against tiiuae/Falcon3-7B-Instruct@1e57a0ecd176c7c139f289c60a74e57f887c3dfb -> /root/stage8_models/falcon7/VERIFIED.json

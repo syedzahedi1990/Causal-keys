@@ -1,0 +1,10 @@
+==== 2026-10-13T12:46:40Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage calib --model /root/stage8_models/llama8 --key llama8
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+  calib AFTER done (1s)
+  calib BEFORE done (3s)
+  calib NONE done (4s)
+  calib POST done (5s)
+  calib PRE done (6s)
+  calib POST-NULL done (8s)
+  calib P1 done (9s)
+frames [] (rejected []); file results/gpu_stage8b/frames/llama8.json sha256 da3daabc1b59219f4484fee43a2c81e19dbbc4419ad4bc622d3206fe94570486

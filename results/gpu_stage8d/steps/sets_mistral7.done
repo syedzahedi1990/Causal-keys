@@ -1,0 +1,2 @@
+2026-10-13T09:51:26Z HEAD 8b74b79b76e06b27bedc0d841c7b1e4a5f671649
+python experiments/stage8_flag.py --out results/gpu_stage8d --stage sets --model /root/stage8_models/mistral7 --key mistral7 

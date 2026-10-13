@@ -1,0 +1,12 @@
+==== 2026-10-13T09:45:28Z python experiments/stage8_flag.py --out results/gpu_stage8d --stage diss --model /root/stage8_models/qwen7 --key qwen7
+diss story 0 (4s)
+diss story 10 (35s)
+diss story 20 (66s)
+diss story 30 (97s)
+diss story 40 (127s)
+diss story 50 (158s)
+diss story 60 (189s)
+diss story 70 (220s)
+diss story 80 (250s)
+diss story 90 (282s)
+diss: 100 stories (310s)

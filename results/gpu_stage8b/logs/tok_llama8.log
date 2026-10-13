@@ -1,0 +1,3 @@
+==== 2026-10-13T12:46:27Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage tokcheck --model /root/stage8_models/llama8 --key llama8
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+tokcheck PASS: ROOM 21 tokens, sentences {0: [23], 1: [22], 2: [23], 3: [22], 4: [21], 5: [21], 6: [21], 7: [22]}; trie nodes {'F': [31, 37], 'C': [31, 37], 'S0': [37, 37]}; 0 failures []

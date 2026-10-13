@@ -1,0 +1,10 @@
+==== 2026-10-13T12:47:52Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage eval --population F --model /root/stage8_models/llama8 --key llama8 --reserve-min 67
+frames file results/gpu_stage8b/frames/llama8.json sha256 da3daabc1b59219f4484fee43a2c81e19dbbc4419ad4bc622d3206fe94570486: 0 discovered frames []
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+  AFTER done: 150 items (54s; total 54s)
+  BEFORE done: 150 items (51s; total 105s)
+  NONE done: 150 items (49s; total 154s)
+  POST done: 150 items (52s; total 206s)
+  PRE done: 150 items (52s; total 258s)
+  POST-NULL done: 150 items (54s; total 312s)
+wrote results/gpu_stage8b/eval/llama8_F.json (900 items, 0 skipped, arms not run []; 313s)

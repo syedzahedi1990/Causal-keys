@@ -1,0 +1,9 @@
+==== 2026-10-13T13:18:43Z python experiments/fresh_factorial.py --out results/gpu_stage8b --stage eval --population F --model /root/stage8_models/gemma2b --key gemma2b --reserve-min 10
+frames file results/gpu_stage8b/frames/gemma2b.json sha256 506bc27166312183fe04ab69e171266701499c1f77389f7a41cab6dbb7f42f3e: 0 discovered frames []
+  AFTER done: 150 items (28s; total 28s)
+  BEFORE done: 150 items (25s; total 53s)
+  NONE done: 150 items (23s; total 75s)
+  POST done: 150 items (26s; total 102s)
+  PRE done: 150 items (26s; total 127s)
+  POST-NULL done: 150 items (26s; total 153s)
+wrote results/gpu_stage8b/eval/gemma2b_F.json (900 items, 0 skipped, arms not run []; 154s)

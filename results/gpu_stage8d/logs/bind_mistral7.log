@@ -1,0 +1,12 @@
+==== 2026-10-13T10:12:32Z python experiments/stage8_flag.py --out results/gpu_stage8d --stage bind --model /root/stage8_models/mistral7 --key mistral7
+bind story 0 (1s)
+bind story 10 (4s)
+bind story 20 (8s)
+bind story 30 (11s)
+bind story 40 (15s)
+bind story 50 (18s)
+bind story 60 (22s)
+bind story 70 (25s)
+bind story 80 (28s)
+bind story 90 (32s)
+bind: 100 stories (35s)

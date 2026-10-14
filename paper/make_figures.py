@@ -2357,8 +2357,8 @@ lines.append(r"\end{tabular}")
 wtab("tab_link.tex", lines)
 
 
-# ================================================================ stage 8 (preregistration J, paper v5): parts A, B and D
-# Parsed from STAGE8A_SCORE.txt, STAGE8B_SCORE.txt and STAGE8D_SCORE.txt as stages 5-7 are: smac/smac3 take a printed
+# ================================================================ stage 8 (preregistration J, paper v5): parts A, B, C and D
+# Parsed from STAGE8A_SCORE.txt, STAGE8B_SCORE.txt, STAGE8C_SCORE.txt and STAGE8D_SCORE.txt as stages 5-7 are: smac/smac3 take a printed
 # string at its printed precision and assert that it is on the cited line; a range over models or cells (...Min, ...Max)
 # selects printed strings (nm); counts and sums of printed values are registered with amac; values the scorers do not
 # print are recomputed from the raw results through the committed scorers' own classes (rmac: label them exploratory or
@@ -2366,9 +2366,10 @@ wtab("tab_link.tex", lines)
 # Part B's cell table results/gpu_stage8b/tab_invariance.tex is the part-B scorer's own output, written in the same run
 # as its score file, and is cited the same way (tag S8BINV). Part D's pytest session of record (results/gpu_stage8d/logs/
 # pytest.log) prints the J-D-G0 total of the outcome record, which the score line does not (tag S8DPY).
-# Groups: S8A (part A, natural passages), S8B (part B, fresh samples and the emitted-form score), S8D (part D, the flag),
-# S8X (counts across parts). Part C is still running on the GPU: its section below is a placeholder that registers nothing.
-# Names: J + part (Ja, Jb, Jd, Jx) + statistic + format or arm + model tag; an estimate with an interval also has ...Lo and
+# Groups: S8A (part A, natural passages), S8B (part B, fresh samples and the emitted-form score), S8C (part C, independently
+# obtained identity edits and the channel-ratio law; its own conventions are at the head of its section), S8D (part D, the
+# flag), S8X (counts across parts).
+# Names: J + part (Ja, Jb, Jc, Jd, Jx) + statistic + format or arm + model tag; an estimate with an interval also has ...Lo and
 # ...Hi. Model tags: LlamaEight, GemmaNine, GemmaTwo, QwenOnefive, QwenThree, QwenSeven, QwenFourteen, MistralSeven,
 # MistralTwentyfour, OlmoSeven, PhiFour, FalconSeven. Part A formats: Opta, Leta, Mena, Nom, Optb, Menb. Part B arms:
 # After, Post, PostNull, None, Pre, Before (Opt = P1 on S0). Part D cells: Qin, Qout, Inline, InlineChat, After.
@@ -2390,7 +2391,7 @@ FAM8 = {"llama8": "Llama", "gemma9": "Gemma", "gemma2b": "Gemma", "qwen1.5": "Qw
         "qwen14": "Qwen", "mistral7": "Mistral", "mistral24": "Mistral", "olmo7": "OLMo", "phi4": "Phi", "falcon7": "Falcon"}
 VRD = r"(MET|NOT MET|NOT EVALUABLE)"
 CLS8 = (r"(\d+) lines: (\d+) MET, (\d+) NOT MET, (\d+) MET IN PART, (\d+) NOT EVALUABLE; observed (\d+) against expected "
-        r"(\d+\.\d+); Brier (\d\.\d+)")
+        r"(\d+\.\d+); Brier (\d\.\d+|nan)")   # nan: a class with no line (part C, class L)
 
 
 def sm8(name, tag, i, pat, desc, group, g=0):
@@ -2425,10 +2426,10 @@ def classes8(L, a, b, pre, group, kinds=("L", "M", "R")):
     for c in kinds:
         lab = f"  account lines, class {c}: " if c != "Val" else "  measurement-validity lines, class R: "
         i = find(L, lab, start=a, end=b)
-        tag = {id(S8A): "S8A", id(S8B): "S8B", id(S8D): "S8D"}[id(L)]
+        tag = next(t_ for t_ in ("S8A", "S8B", "S8C", "S8D") if SCORE.get(t_) is L)
         what = "measurement-validity lines (class R)" if c == "Val" else f"account lines of class {c}"
         for j, w in enumerate(("Lines", "Met", "NotMet", "MetInPart", "NotEval", "Observed", "Exp", "Brier")):
-            if w in ("MetInPart", "Observed"):
+            if w in ("MetInPart", "Observed") or (w == "Brier" and grab(L, i, CLS8)[j] == "nan"):
                 continue
             sm8(f"{pre}Class{c}{w}", tag, i, CLS8, f"{what}: {dict(Lines='lines', Met='MET', NotMet='NOT MET', NotEval='NOT EVALUABLE', Exp='expected MET (sum of the recorded priors of the lines with a verdict)', Brier='Brier score')[w]}", group, j)
 
@@ -3003,13 +3004,818 @@ for tag8, w in (("x1eager", "Eager"), ("x1fp32", "Fp")):
         sm8(f"JbXone{w}{AB8[arm]}", "S8B", i, re.escape(arm) + r" s_ID\^E " + NUM,
             f"X1 (exploratory): s_ID^E on the first 60 S0 cores, {arm}, Qwen2.5-7B, {'BF16 eager attention' if w == 'Eager' else 'FP32 sdpa'}", G8B)
 
-# ---------------------------------------------------------------- stage 8, part C: placeholder (still running on the GPU)
-# Part C is scored by analysis/stage8c_score.py into results/gpu_stage8c/STAGE8C_SCORE.txt when its run completes. Its
-# section goes here, in the style of parts A, B and D (group S8C, prefix Jc), followed by the part-C rows of
-# tab_prereg_j.tex and the A-B-C-D totals in S8X. Nothing of part C is registered yet; the cross-part counts below cover
-# parts A, B and D only (the macros ending in ABD).
-if (ROOT / "results/gpu_stage8c/STAGE8C_SCORE.txt").exists():
-    print("note: results/gpu_stage8c/STAGE8C_SCORE.txt exists, but part C is not yet parsed by make_figures.py")
+# ---------------------------------------------------------------- stage 8, part C: independently obtained identity edits and the channel-ratio law
+# Parsed from STAGE8C_SCORE.txt in the style of parts A, B and D (group S8C, prefix Jc). Part C's intervals: a lambda
+# statistic and a pooled lambda-bar carry the 90 % interval of the TOST (smac390 / rmac390: their ...Lo and ...Hi
+# descriptions say 90 %); every other interval is the 95 % hierarchical cluster-bootstrap interval (smac3). The pytest
+# session of record (results/gpu_stage8c/logs/pytest.log, one session) prints the 95 tests of the outcome record (tag
+# S8CPY). Values the scorer does not print are recomputed through the committed part-C scorer's own classes
+# (analysis/stage8c_parts: law.Model, readers.Readers, the hierarchical bootstrap stats.Boot, seed 20261012) and registered
+# with rmac; the same code first reproduces every printed lambda statistic, pooled lambda-bar, J-C-READa row, lexical-code
+# reading and identity-carrying phi to the printed digit (asserted), and where the outcome record (docs/PREREGISTRATION.md,
+# "Outcome of P-2026-10-10-J, part C") prints a value marked "(recomputed)", the recomputation reproduces it (asserted).
+# Names: Jc + statistic + instance + format or statistic code + depth + model tag (...Lo / ...Hi: the interval bounds).
+# Instances: Nat (the natural write), T (the equivalence control), Eone, Etwo, Ethree, Efour (E4 at the seed level),
+# Efoura, Efourb (seeds 101, 102), EfiveFr, EfiveDe, EfiveSyn, EfiveNl; components Par / Perp / Lex / Nonlex + instance.
+# Statistic codes: Wopt = W(P1, l), Wpost = W(POST, l), Aletter = A_L(l), Aopt = A_P(l); depths Three, Seven, Eleven,
+# Fifteen; formats Letter (LETTER), Opt (P1), Post (POST), None (NONE). Line words: One ... Five, Bound, Reada, Readb, Six,
+# Screen, Win.
+G8C = "S8C"
+for _tag, _f in (("S8C", "results/gpu_stage8c/STAGE8C_SCORE.txt"), ("S8CPY", "results/gpu_stage8c/logs/pytest.log")):
+    SCORE[_tag] = (ROOT / _f).read_text().splitlines()
+    SNAME[_tag] = _f
+S8C = SCORE["S8C"]
+SRCC = SNAME["S8C"]
+MC8 = ["qwen7", "mistral7", "llama8"]
+DW8 = {3: "Three", 7: "Seven", 11: "Eleven", 15: "Fifteen"}
+FWC8 = {"LETTER": "Letter", "P1": "Opt", "POST": "Post", "NONE": "None"}
+ZW8 = {"nat": "Nat", "T": "T", "E1": "Eone", "E2": "Etwo", "E3": "Ethree", "E4": "Efour", "E4a": "Efoura", "E4b": "Efourb",
+       "E5FR": "EfiveFr", "E5DE": "EfiveDe", "E5SYN": "EfiveSyn", "E5NL": "EfiveNl"}
+FAMC8 = {"qwen7": ("E1", "E2", "E3", "E4", "E5FR", "E5DE", "E5SYN", "E5NL"), "mistral7": ("E1", "E2", "E4", "E5FR", "E5DE", "E5SYN", "E5NL"),
+         "llama8": ("E1", "E2", "E5FR", "E5DE", "E5SYN", "E5NL")}
+LWC8 = {"J-C1": "One", "J-C2": "Two", "J-C3": "Three", "J-C4": "Four", "J-C5": "Five", "J-C-BOUND": "Bound", "J-C-READa": "Reada",
+        "J-C-READb": "Readb", "J-C6": "Six", "J-C-SCREEN": "Screen", "J-C-WIN": "Win"}
+ZLAB8 = {"E1": "E1 (in-task steering vector)", "E2": "E2 (steering vector from neutral sentences)", "E3": "E3 (sparse-autoencoder features)",
+         "E4": "E4 (DAS remap at the writing token, seed level)", "E4a": "E4 seed 101", "E4b": "E4 seed 102", "E5FR": "E5 French form",
+         "E5DE": "E5 German form", "E5SYN": "E5 synonym", "E5NL": "E5 NONLEX of the in-task vector"}
+
+
+def zw8(Z):
+    """instance -> name piece: E1 -> Eone, PERP:E4 -> PerpEfour, NONLEX:nat -> NonlexNat."""
+    head, _, base = Z.rpartition(":")
+    return (head.capitalize() if head else "") + ZW8[base]
+
+
+def zlab8(Z):
+    head, _, base = Z.rpartition(":")
+    return f"{head} component of {ZLAB8.get(base, base)}" if head else ZLAB8.get(Z, Z)
+
+
+def sw8(code):
+    """statistic code -> name piece: W(P1,3) -> WoptThree, W(POST,7) -> WpostSeven, A_L(7) -> AletterSeven, A_P(11) -> AoptEleven."""
+    mm = re.match(r"(W|A_L|A_P)\((?:(P1|POST),)?(\d+)\)$", code)
+    assert mm, code
+    return {"W": "Wopt" if mm[2] == "P1" else "Wpost", "A_L": "Aletter", "A_P": "Aopt"}[mm[1]] + DW8[int(mm[3])]
+
+
+def smac390(name, tag, idx, t, desc, group):
+    """estimate and its 90 % interval (the TOST level of part C's lambda statistics) -> name, nameLo, nameHi."""
+    smac(name, tag, idx, t[0], desc + " (point; ...Lo and ...Hi are its 90 % bounds)", group)
+    smac(name + "Lo", tag, idx, t[1], desc + " (lower 90 % bound)", group)
+    smac(name + "Hi", tag, idx, t[2], desc + " (upper 90 % bound)", group)
+
+
+def sm8390(name, tag, i, pat, desc, group, off=0):
+    t_ = grab(SCORE[tag], i, pat)[off:off + 3]
+    smac390(name, tag, i, t_, desc, group)
+    return t_
+
+
+def rmac390(name, e3, desc, src, group, fmt="{:.3f}"):
+    """recomputed estimate and 90 % interval -> name, nameLo, nameHi."""
+    for suf, v, d in (("", e3[0], " (point; ...Lo and ...Hi are its 90 % bounds)"), ("Lo", e3[1], " (lower 90 % bound)"), ("Hi", e3[2], " (upper 90 % bound)")):
+        rmac(name + suf, v, desc + d, src, group, fmt)
+
+
+GC8, PC8, HC8, RC8 = (sec(S8C, s) for s in ("GATES (J-C-G0", "PREDICTIONS (code, class", "HEADLINE (C-6", "REPORTED (no verdict counted)"))
+SC8, XC8 = S8C.index("SUMMARY"), sec(S8C, "######## EXPLORATORY")
+# gates: J-C-G0 (the six files the score line names; the session of record ran four shared files too)
+i = find(S8C, "  J-C-G0  FP32 unit tests", start=GC8, end=PC8)
+assert S8C[i].endswith("failures in the run 0 -> MET"), S8C[i]
+amac("JcGzeroPassed", sum(int(x) for x in re.findall(r" (\d+) passed", S8C[i])),
+     "J-C-G0: unit tests passed, summed over the six files the score line names (15, 7, 19, 5, 5 and 7; the session of record also ran four shared files: JcGzeroPassedRun)",
+     f"{SRCC}:{i + 1}", G8C, "{:d}")
+PYC8 = SCORE["S8CPY"]
+assert sum("test session starts" in x for x in PYC8) == 1
+i = find(PYC8, " passed, ", " warning in ")
+sm8("JcGzeroPassedRun", "S8CPY", i, r"=+ (\d+) passed, \d+ warnings? in [\d.]+s",
+    "J-C-G0: unit tests passed in the pytest session of record (ten files: the six of the gate and the shared test_surface, test_clamp, test_head_splice and test_prakash; 0 failed, 0 skipped)", G8C)
+assert not re.search(r"\b(failed|skipped|error)", PYC8[i]), PYC8[i]
+_pyc8 = [x.split("::")[0] for x in PYC8 if re.match(r"^tests/\w+\.py::\S+ PASSED", x)]
+assert len(_pyc8) == int(macros["JcGzeroPassedRun"]), len(_pyc8)
+amac("JcGzeroFiles", len(set(_pyc8)), "J-C-G0: test files run in that session", SNAME["S8CPY"], G8C, "{:d}")
+for k in MC8:
+    t, S = K8[k], SH8[k]
+    i = find(S8C, f"  J-C-G1 {k:8s} ", start=GC8, end=PC8)
+    assert S8C[i].endswith("all within tolerance -> MET"), S8C[i]
+    sm8(f"JcGoneCells{t}", "S8C", i, r"(\d+) evaluable cells", f"J-C-G1: evaluable cells (format x depth) in which T's tables and rows equal the natural ones (all within tolerance), {S}", G8C)
+    i = find(S8C, f"  J-C-G2 {k:8s} ", start=GC8, end=PC8)
+    assert S8C[i].endswith("-> MET"), S8C[i]
+    sm83(f"JcGtwo{t}", "S8C", i, r"sigma\(LETTER, 3\) - sigma\(NONE, 3\) " + CIR, f"J-C-G2: sigma(LETTER, 3) - sigma(NONE, 3), the natural format effect on the key share (>= 0.5 needed), {S}", G8C)
+    i = find(S8C, f"  J-C-G8 {k:8s} sensitivity -> MET", start=GC8, end=PC8)
+    for row, rw, d in (("T", "T", "the equivalence control T (the natural tables)"),
+                       ("SK50", "SkFifty", "synthetic rows: the natural key table interpolated halfway toward B (half-key)"),
+                       ("SV50", "SvFifty", "synthetic rows: the natural value table interpolated halfway toward B (half-value)"),
+                       ("SK80", "SkEighty", "synthetic rows: the key table at 0.8 of the natural displacement"),
+                       ("SV80", "SvEighty", "synthetic rows: the value table at 0.8 of the natural displacement")):
+        j = find(S8C, f"           {row}: ", start=i + 1, end=i + 6)
+        assert ("old rule fails" in S8C[j]) == (row == "SK50"), S8C[j]   # the old kappa rule fails only the half-key rows
+        sm8(f"JcGeight{rw}N{t}", "S8C", j, r": (\d+) statistics", f"J-C-G8 row {row}, {d}: lambda statistics, {S}", G8C)
+        sm8390(f"JcGeight{rw}{t}", "S8C", j, r"pooled lambda " + CIR, f"J-C-G8 row {row}, {d}: pooled lambda-bar, {S}", G8C)
+        sm83(f"JcGeight{rw}Mad{t}", "S8C", j, r"MAD " + CIR, f"J-C-G8 row {row}: the design's old kappa rule, mean |kappa - sigma| over the evaluable cells (<= 0.12 needed), {S}", G8C)
+        sm8(f"JcGeight{rw}MadMax{t}", "S8C", j, r"max (\d\.\d+) over", f"J-C-G8 row {row}: largest |kappa - sigma| over the cells (old rule: <= 0.25), {S}", G8C)
+# J-C-G4: every failing cell (the LETTER cells at l = 11 and 15 in every model) with its reason
+_g4f = []
+for k in MC8:
+    t, S = K8[k], SH8[k]
+    for l, lw in DW8.items():
+        i = find(S8C, f"  J-C-G4 {k:8s} l={l:2d} ", start=GC8, end=PC8)
+        cells = re.findall(r"(LETTER|P1|POST|NONE):(ok|x\(([^)]*)\))", S8C[i])
+        assert len(cells) == 4, S8C[i]
+        for f, ok, why in cells:
+            if ok == "ok":
+                continue
+            _g4f.append((k, f, l))
+            mm = re.search(r"ID_KV (\d+\.\d\d) < 2\.0", why)
+            if mm:
+                smac(f"JcGfourIDKV{FWC8[f]}{lw}{t}", "S8C", i, mm[1], f"J-C-G4: natural ID_KV (nats) of the failing {f} cell at l = {l} (>= 2 needed), {S}", G8C)
+            mm = re.search(r"iota (\d+\.\d\d) > 0\.5", why)
+            if mm:
+                smac(f"JcGfourIota{FWC8[f]}{lw}{t}", "S8C", i, mm[1], f"J-C-G4: natural iota of the failing {f} cell at l = {l} (<= 0.5 needed){' (a ratio over a near-zero ID_KV)' if k == 'llama8' else ''}, {S}", G8C)
+assert sorted(_g4f) == sorted((k, "LETTER", l) for k in MC8 for l in (11, 15)), _g4f
+amac("JcGfourFail", len(_g4f), "J-C-G4: cells that fail, of the 48 (3 models x 4 depths x 4 formats): LETTER at l = 11 and 15 in every model", SRCC + " GATES", G8C, "{:d}")
+# J-C-G6 (specificity of the flag direction: control R)
+_g6 = []
+for k in MC8:
+    t, S = K8[k], SH8[k]
+    for l, lw in DW8.items():
+        i = find(S8C, f"  J-C-G6 {k:8s} l={l:2d} ", start=GC8, end=PC8)
+        assert S8C[i].endswith("-> passed"), S8C[i]
+        _g6.append(sm8(f"JcGsixR{lw}{t}", "S8C", i, r"\|ID_KV\^R\| (\d\.\d+) vs", f"J-C-G6: |ID_KV| of the random-direction control R under NONE (nats), l = {l}, {S}", G8C))
+        sm8(f"JcGsixBound{lw}{t}", "S8C", i, r"vs 0\.1 ID_KV\^nat (\d\.\d+) ->", f"J-C-G6: its bound, 0.1 x the natural ID_KV under NONE (nats), l = {l}, {S}", G8C)
+rng8("JcGsixR", _g6, "J-C-G6: |ID_KV^R| over the 12 model x depth cells (nats)", SRCC + " GATES", G8C)
+# J-C-G5 (efficacy under NONE): phi(NONE) per model, instance and depth; the flip rates of E1-E4
+EFF8C = {}
+_g5 = {"near": [], "E3": [], "E4": [], "E4f": []}
+for k in MC8:
+    t, S = K8[k], SH8[k]
+    for Z in FAMC8[k]:
+        for l, lw in DW8.items():
+            i = find(S8C, f"  J-C-G5 {k:8s} {Z:6s} l={l:2d} ", start=GC8, end=PC8)
+            eff = S8C[i].endswith("-> effective")
+            assert eff or S8C[i].endswith("-> ineffective"), S8C[i]
+            EFF8C[k, Z, l] = eff
+            rule = "effective: phi >= 0.3 with lower bound > 0" if Z.startswith("E5") else "effective: flip rate >= 0.8 x natural, phi >= 0.5 with lower bound > 0.3"
+            q = sm83(f"JcGfivePhi{zw8(Z)}{lw}{t}", "S8C", i, r"phi\(NONE\) " + CIR,
+                     f"J-C-G5: phi(NONE) = psi_KV, the edit's identity effect under NONE as a share of the natural one, {zlab8(Z)}, l = {l} "
+                     f"({'effective' if eff else 'ineffective'}; {rule}), {S}", G8C)
+            if Z.startswith("E5"):
+                continue
+            fz, fn = grab(S8C, i, r"flip (\d\.\d\d) vs natural (\d\.\d\d)")
+            assert fn == "1.00", S8C[i]
+            smac(f"JcGfiveFlip{zw8(Z)}{lw}{t}", "S8C", i, fz, f"J-C-G5: flip rate under NONE (share of (story, target) whose E-argmax in the KV row is the target), {zlab8(Z)}, l = {l}, {S}", G8C)
+            if Z == "E1" and l == 3:
+                smac(f"JcGfiveFlipNat{t}", "S8C", i, fn, f"J-C-G5: the natural flip rate under NONE (the same at every depth), {S}", G8C)
+            if Z in ("E1", "E2"):
+                assert eff, (k, Z, l)
+                _g5["near"].append(q[0])
+            elif Z == "E3":
+                assert eff, (k, Z, l)
+                _g5["E3"].append(q[0])
+            elif eff:
+                _g5["E4"].append(q[0]), _g5["E4f"].append(fz)
+rng8("JcGfivePhiNear", _g5["near"], "J-C-G5: phi(NONE) of E1 and E2 over every depth of the three models (all effective, flip rate 1.00)", SRCC + " GATES", G8C)
+rng8("JcGfivePhiEthree", _g5["E3"], "J-C-G5: phi(NONE) of E3 over the four layers, Qwen2.5-7B (all effective, flip rate 1.00)", SRCC + " GATES", G8C)
+rng8("JcGfivePhiEfourEff", _g5["E4"], "J-C-G5: phi(NONE) of E4 at the depths where it is effective (l = 3, 7 at Qwen2.5-7B; 3, 7, 11 at Mistral-7B)", SRCC + " GATES", G8C)
+rng8("JcGfiveFlipEfourEff", _g5["E4f"], "J-C-G5: flip rate of E4 at the depths where it is effective", SRCC + " GATES", G8C)
+for k in ("qwen7", "mistral7"):
+    amac(f"JcGfiveEffEfour{K8[k]}", sum(EFF8C[k, "E4", l] for l in DW8), f"J-C-G5: depths (of 4) at which E4 is effective, {SH8[k]}", SRCC + " GATES", G8C, "{:d}")
+for k in MC8:
+    amac(f"JcGfiveEffEfive{K8[k]}", sum(EFF8C[k, Z, l] for Z in FAMC8[k] if Z.startswith("E5") for l in DW8),
+         f"J-C-G5: E5 sub-family x depth cells (of 16) gated in (phi >= 0.3 with lower bound > 0), {SH8[k]}", SRCC + " GATES", G8C, "{:d}")
+amac("JcGfiveEffEfiveDe", sum(EFF8C[k, "E5DE", l] for k in MC8 for l in DW8), "J-C-G5: E5-DE (German form) cells gated in, over the three models and four depths", SRCC + " GATES", G8C, "{:d}")
+assert EFF8C["mistral7", "E4", 11] and not EFF8C["qwen7", "E4", 11]
+# J-C-G3 (the dictionary's FVE at its site; not met at any layer)
+for l, lw in DW8.items():
+    i = find(S8C, f"  J-C-G3 qwen7    l={l:2d} ", start=GC8, end=PC8)
+    assert S8C[i].endswith("-> NOT MET"), S8C[i]
+    a_, b_, c_, pub = grab(S8C, i, r"FVE " + NUM + " / " + NUM + " / " + NUM + r" at l-1 / l / l\+1 \(published (\d\.\d+);")
+    for w, s_, d in (("Prev", a_, "at block l - 1"), ("", b_, "at block l, the dictionary's site (the gate's statistic)"), ("Next", c_, "at block l + 1")):
+        smac(f"JcGthreeFve{w}{lw}", "S8C", i, s_, f"J-C-G3: FVE of the layer-{l} dictionary on the block outputs over every prompt position >= 1, {d}, Qwen2.5-7B", G8C)
+    amac(f"JcGthreeFveRound{lw}", f"{round(float(b_)):,}".replace(",", "{,}"), f"J-C-G3: that FVE at block l rounded to an integer, with a thousands separator (math mode), layer {l}",
+         f"{SRCC}:{i + 1}", G8C)
+    smac(f"JcGthreePub{lw}", "S8C", i, pub, f"J-C-G3: the dictionary's published FVE (eval_results.json), layer {l}", G8C)
+    amac(f"JcGthreePubRound{lw}", float(pub), f"J-C-G3: the published FVE rounded to 3 decimals, layer {l}", f"{SRCC}:{i + 1}", G8C, "{:.3f}")
+    sm8(f"JcGthreeFveP{lw}", "S8C", i, r"FVE at p (\d\.\d+);", f"J-C-G3 (reported): FVE at the writing position p only, layer {l}", G8C)
+    sm8(f"JcGthreeKf{lw}", "S8C", i, r"k_F (\d+) beta", f"E3 calibration: k_F, the number of selective latents written, layer {l}", G8C)
+# the lines: header (code, class, kind, prior, verdict, title) and the detail lines below it
+LC8 = {}
+for i in range(PC8 + 1, HC8):
+    mm = re.match(r"  (J-C[\w-]+)\s+(\w) (\w) prior (\d\.\d\d)\s+" + VRD + r"\s+(.*)$", S8C[i])
+    if mm:
+        cur = mm[1]
+        LC8[cur] = dict(i=i, cls=mm[2], kind=mm[3], prior=mm[4], v=mm[5], title=mm[6], det=[])
+    elif S8C[i].strip():
+        LC8[cur]["det"].append(i)
+assert list(LC8) == list(LWC8), list(LC8)
+STC8 = r"(W\((?:P1|POST),\d+\)|A_L\(\d+\)|A_P\(\d+\)) ([+-]\d\.\d\d) \[([+-]\d\.\d\d),([+-]\d\.\d\d)\](\*)?(\(iota\))?"
+PAT8 = r"(equivalent|R1 copy-only|R3 key-flat|graded departure(?: \(pooled lambda within the margin; some statistic not equivalent\))?)"
+COMB8 = {}   # (line, model, instance, depths) -> the combo as printed
+LAMP8 = {}   # (model, instance, statistic code) -> dict(t=(point, lo, hi) printed or recomputed strings, eq, inter, line, rec)
+
+
+def lam8(code_line, k, Z, sts, i, rec=False, src=None):
+    """register the lambda statistics of instance Z (printed strings on line i, or recomputed Q objects with rec=True)."""
+    for s in sts:
+        if rec:
+            code, q, eq, inter = s["code"], s["q"], s["equivalent"], bool(s["interaction"])
+            t3 = tuple(f"{x:.2f}" for x in (q.pt, q.lower(0.9), q.upper(0.9)))
+        else:
+            code, pt, lo, hi, star, iota = s
+            t3, eq, inter = (sv(pt), sv(lo), sv(hi)), not star, bool(iota)
+        nm_ = f"JcLam{zw8(Z)}{sw8(code)}{K8[k]}"
+        d = (f"{code_line}: lambda = log psi_K - log psi_V of {zlab8(Z)}, statistic {code}; {'equivalent' if eq else 'not equivalent'}"
+             f"{' (iota > 0.5 in a cell: a departure by the interaction rule)' if inter else ''}, {SH8[k]}")
+        if rec:
+            rmac390(nm_, (s["q"].pt, s["q"].lower(0.9), s["q"].upper(0.9)), d, src, G8C, "{:.2f}")
+        else:
+            smac390(nm_, "S8C", i, t3, d, G8C)
+        assert (k, Z, code) not in LAMP8, (k, Z, code)
+        LAMP8[k, Z, code] = dict(t=tuple(macros[nm_ + s_] for s_ in ("", "Lo", "Hi")), eq=eq, inter=inter, line=code_line, rec=rec)
+
+
+for code in ("J-C1", "J-C2", "J-C3", "J-C4"):
+    for i in LC8[code]["det"]:
+        mm = re.match(r"    (\(seed-level, reported\) )?(qwen7|mistral7|llama8) (E\w+)(?: l in \[([\d, ]*)\])?: (.*) -> " + VRD + "$", S8C[i])
+        if not mm:
+            assert S8C[i] == "    E3 depths passing J-C-G3: []", S8C[i]
+            continue
+        seed, k, Z, dep, body, v = mm.groups()
+        dep = tuple(int(x) for x in dep.split(",")) if dep else ((3, 7, 11, 15) if seed else ())
+        t, S = K8[k], SH8[k]
+        lw = LWC8[code]
+        lab = f"{code}{' (seed level, reported)' if seed else ''}: {zlab8(Z)}, l in {list(dep)}"
+        c = dict(i=i, v=v, seed=bool(seed), k=k, Z=Z, dep=dep)
+        COMB8[code, k, Z, dep] = c
+        if v == "NOT EVALUABLE":
+            c["n"] = int(sm8(f"Jc{lw}Nstat{zw8(Z)}{t}", "S8C", i, r": (\d+) statistics \(< 3\)", f"{lab}: lambda statistics (< 3: the combo is not evaluable), {S}", G8C))
+            continue
+        m2 = re.match(r"(\d+)/(\d+) equivalent; pooled lambda " + CIR + r" \(90 %\) -> " + PAT8 + "; (.*)$", body)
+        assert m2, body
+        c.update(neq=int(m2[1]), n=int(m2[2]), pat=m2[6], pool=m2.groups()[2:5])
+        smac(f"Jc{lw}Neq{zw8(Z)}{t}", "S8C", i, m2[1], f"{lab}: lambda statistics that are equivalent (90 % interval inside +-log 1.25), {S}", G8C)
+        smac(f"Jc{lw}Nstat{zw8(Z)}{t}", "S8C", i, m2[2], f"{lab}: lambda statistics, {S}", G8C)
+        smac390(f"Jc{lw}Pool{zw8(Z)}{t}", "S8C", i, c["pool"], f"{lab}: pooled lambda-bar (mean of the statistics; pattern {m2[6].split(' (')[0]}), {S}", G8C)
+        sts = re.findall(STC8, m2[7])
+        assert len(sts) == c["n"] and sum(not s[4] for s in sts) == c["neq"], (code, k, Z)
+        lam8(code + (" (seed level)" if seed else ""), k, Z, sts, i)
+        c["codes"] = [s[0] for s in sts]
+amac("JcThreeDepths", 0, "J-C3: E3 layers passing J-C-G3 (none: J-C3 not evaluable)", f"{SRCC}:{LC8['J-C3']['i'] + 1}", G8C, "{:d}")
+# J-C5: the identity-carrying PERP / NONLEX components and their statistics
+CAR8 = []
+for i in LC8["J-C5"]["det"]:
+    mm = re.match(r"    (\w+) (PERP|NONLEX):(E\d) l=(\d+) carries identity \(phi\(NONE\) " + CIR + r" \(>= 0\.3, lower > 0\)\): (.*)$", S8C[i])
+    assert mm, S8C[i]
+    k, inst, l = mm[1], f"{mm[2]}:{mm[3]}", int(mm[4])
+    q = mm.groups()[4:7]
+    smac3(f"JcFivePhi{zw8(inst)}{DW8[l]}{K8[k]}", "S8C", i, q, f"J-C5: phi(NONE) of the identity-carrying {zlab8(inst)} at l = {l}, {SH8[k]}", G8C)
+    sts = [] if mm[8].startswith("no statistic") else re.findall(STC8, mm[8])
+    assert mm[8].startswith("no statistic") or sts, S8C[i]
+    lam8("J-C5", k, inst, sts, i)
+    CAR8.append(dict(k=k, Z=inst, l=l, phi=q, n=len(sts)))
+amac("JcFiveCarriers", len(CAR8), "J-C5: identity-carrying (phi(NONE) >= 0.3, lower bound > 0) PERP or NONLEX components of an effective E1-E4 edit", SRCC + " J-C5", G8C, "{:d}")
+amac("JcFiveCarriersStat", sum(c["n"] > 0 for c in CAR8), "J-C5: those with a lambda statistic", SRCC + " J-C5", G8C, "{:d}")
+amac("JcFiveNstat", sum(c["n"] for c in CAR8), "J-C5: lambda statistics of the carrying components (one pooled test)", SRCC + " J-C5", G8C, "{:d}")
+amac("JcFiveNeq", sum(LAMP8[x]["eq"] for x in LAMP8 if LAMP8[x]["line"] == "J-C5"), "J-C5: of those, equivalent", SRCC + " J-C5", G8C, "{:d}")
+rng8("JcFivePhi", [c["phi"][0] for c in CAR8], "J-C5: phi(NONE) of the 12 identity-carrying components", SRCC + " J-C5", G8C)
+rng8("JcFiveLam", [LAMP8[x]["t"][0] for x in LAMP8 if LAMP8[x]["line"] == "J-C5"], "J-C5: lambda of the 12 statistics of the carrying components", SRCC + " J-C5", G8C)
+# J-C-BOUND: the pooled lambda-bar of each gated-in E5 sub-family and of E2 at the same cells
+BND8 = {}
+for i in LC8["J-C-BOUND"]["det"]:
+    mm = re.match(r"    (\w+) (E5\w+): pooled lambda_E5 " + CIR + r" \(<= log 0\.5 = -0\.693; H0: >= log 0\.8 rejected, upper < -0\.223\) over (\d+) statistics; "
+                  r"E2 at the same cells " + CIR + r" \(>= log 0\.8\) -> (met|not met)$", S8C[i])
+    if not mm:
+        mm = re.match(r"    (\w+) (E5\w+): no lambda statistic at a gated-in depth", S8C[i])
+        assert mm, S8C[i]
+        BND8[mm[1], mm[2]] = None
+        continue
+    k, Z = mm[1], mm[2]
+    sw_ = ZW8[Z][5:]
+    BND8[k, Z] = dict(i=i, pool=mm.groups()[2:5], n=int(mm[6]), e2=mm.groups()[6:9], v=mm[10])
+    smac3(f"JcBound{sw_}{K8[k]}", "S8C", i, BND8[k, Z]["pool"], f"J-C-BOUND: pooled lambda-bar_E5 of {zlab8(Z)} over its statistics at the gated-in depths (<= log 0.5 point, upper 95 % bound < log 0.8 needed), {SH8[k]}", G8C)
+    smac(f"JcBoundN{sw_}{K8[k]}", "S8C", i, mm[6], f"J-C-BOUND: lambda statistics of {zlab8(Z)}, {SH8[k]}", G8C)
+    smac3(f"JcBoundEtwo{sw_}{K8[k]}", "S8C", i, BND8[k, Z]["e2"], f"J-C-BOUND: E2's pooled lambda-bar over the same statistics (>= log 0.8 point needed), the control of {zlab8(Z)}, {SH8[k]}", G8C)
+_bv = [b["v"] for b in BND8.values() if b]
+amac("JcBoundMet", _bv.count("met"), "J-C-BOUND: sub-families (model x E5 sub-family) met (Mistral-7B E5-NL, Llama-3.1-8B E5-SYN)", SRCC + " J-C-BOUND", G8C, "{:d}")
+amac("JcBoundVerd", len(_bv), "J-C-BOUND: sub-families with a verdict", SRCC + " J-C-BOUND", G8C, "{:d}")
+amac("JcBoundNoStat", sum(b is None for b in BND8.values()), "J-C-BOUND: sub-families with no lambda statistic at a gated-in depth (no verdict)", SRCC + " J-C-BOUND", G8C, "{:d}")
+# J-C-READa: the gate, KO(H*), the random-set mean and ID_K per counted (model, family); J-C-READb's E3 and E4a rows
+RDP8 = {}
+for i in LC8["J-C-READa"]["det"]:
+    s_ = S8C[i]
+    mm = re.match(r"    (\w+): gate natural KO\(H\*\) " + CIR + r" \(>= 0\.7\); ID_K\^nat " + CIR + r" \(>= 2\.0\) -> MET$", s_)
+    if mm:
+        k = mm[1]
+        smac3(f"JcReadaKONat{K8[k]}", "S8C", i, mm.groups()[1:4], f"J-C-READa gate: KO(H*) of the natural donor at P1, l = 7 (>= 0.7 needed), {SH8[k]}", G8C)
+        RDP8[k, "nat", "H"] = mm.groups()[1:4]
+        smac3(f"JcReadaIDKNat{K8[k]}", "S8C", i, mm.groups()[4:7], f"J-C-READa gate: the natural key read ID_K^nat[all] (nats; >= 2 needed), {SH8[k]}", G8C)
+        continue
+    mm = re.match(r"    (\w+) (E[12]): KO\(H\*\) " + CIR + r" \(>= 0\.7, H0: <= 0\.5 rejected\); random mean " + CIR + r" \(<= 0\.25\); ID_K ([+-]\d+\.\d\d) -> NOT MET$", s_)
+    if mm:
+        k, Z = mm[1], mm[2]
+        smac3(f"JcReadaKO{zw8(Z)}{K8[k]}", "S8C", i, mm.groups()[2:5], f"J-C-READa: KO(H*) of {zlab8(Z)}: share of its key read removed when the reader heads H* see B's key at the options (>= 0.7 and lower bound > 0.5 needed), {SH8[k]}", G8C)
+        smac3(f"JcReadaRand{zw8(Z)}{K8[k]}", "S8C", i, mm.groups()[5:8], f"J-C-READa: mean KO over the three size-matched random head sets of blocks > 7 (<= 0.25 needed: the line fails here), {zlab8(Z)}, {SH8[k]}", G8C)
+        smac(f"JcReadaIDK{zw8(Z)}{K8[k]}", "S8C", i, mm[9], f"J-C-READa: the edit's key read ID_K[all] at P1, l = 7 (nats), {zlab8(Z)}, {SH8[k]}", G8C)
+        RDP8[k, Z, "H"], RDP8[k, Z, "rand"] = mm.groups()[2:5], mm.groups()[5:8]
+        continue
+    mm = re.match(r"    (\w+) E4a: ID_K\^E4a " + CIR + r" < 2\.0 nats \(denominator gate\) -> NOT EVALUABLE$", s_)
+    if mm:
+        smac3(f"JcReadbIDKEfoura{K8[mm[1]]}", "S8C", i, mm.groups()[1:4], f"J-C-READb: the key read of E4 seed 101, ID_K[all] at P1, l = 7 (nats; < 2: not counted by the line's text), {SH8[mm[1]]}", G8C)
+        continue
+    assert s_ == "    qwen7 E3: layer 7 fails J-C-G3: not evaluable", s_
+rng8("JcReadaKO", [RDP8[k, Z, "H"][0] for k in ("qwen7", "mistral7") for Z in ("E1", "E2")], "J-C-READa: KO(H*) of E1 and E2 over both models", SRCC + " J-C-READa", G8C)
+rng8("JcReadaRand", [RDP8[k, Z, "rand"][0] for k in ("qwen7", "mistral7") for Z in ("E1", "E2")], "J-C-READa: random-set mean KO of E1 and E2 over both models", SRCC + " J-C-READa", G8C)
+# J-C6 (Qwen2.5-14B, block 28): the anchor J-C-G7, the CAA flip rate and nu, every arm's exchange statistics, the differences
+FW6 = {"NO-MENTION": "NoMention", "QNAMES": "Qnames", "OPTIONS-AFTER": "OptAfter"}
+J6 = LC8["J-C6"]["det"]
+i = J6[0]
+mm = re.match(r"    J-C-G7 anchor: BIND IIA\(NO-MENTION\) (\d\.\d+) \(>= 0\.95\); kappa_BIND NO-MENTION ([+-]\d\.\d+) vs (\d\.\d+), QNAMES ([+-]\d\.\d+) vs (\d\.\d+), "
+              r"OPTIONS-AFTER ([+-]\d\.\d+) vs (\d\.\d+) \(within 0\.05\) -> MET$", S8C[i])
+assert mm, S8C[i]
+smac("JcGsevenIIA", "S8C", i, mm[1], "J-C-G7 (the J-C6 anchor): BIND IIA under NO-MENTION at block 28 (>= 0.95 needed), Qwen2.5-14B", G8C)
+for j, f in enumerate(FW6):
+    smac(f"JcGsevenKappa{FW6[f]}", "S8C", i, mm[2 + 2 * j], f"J-C-G7: kappa_BIND in this run, {f}, Qwen2.5-14B", G8C)
+    smac(f"JcGsevenKappaRef{FW6[f]}", "S8C", i, mm[3 + 2 * j], f"J-C-G7: kappa_BIND of stage 6 (within 0.05 needed), {f}, Qwen2.5-14B", G8C)
+i = J6[1]
+mm = re.match(r"    CAA flip rate under NO-MENTION (\d\.\d+) \(gate >= 0\.5\); nu\(CAA vs ID@28\) NO-MENTION (\d\.\d+), QNAMES (\d\.\d+), OPTIONS-AFTER (\d\.\d+)$", S8C[i])
+assert mm, S8C[i]
+smac("JcSixFlip", "S8C", i, mm[1], "J-C6: the CAA edit's flip rate under NO-MENTION (its IIA; >= 0.5 needed), Qwen2.5-14B", G8C)
+for j, f in enumerate(FW6):
+    smac(f"JcSixNu{FW6[f]}", "S8C", i, mm[2 + j], f"J-C6: nu, the distance of the CAA edit's K/V tables from the identity patch ID@28's, {f}, Qwen2.5-14B", G8C)
+J6F = {}
+for i in J6[2:]:
+    mm = re.match(r"      (NO-MENTION|QNAMES|OPTIONS-AFTER): ", S8C[i])
+    if mm:
+        f = mm[1]
+        arms = re.findall(r"(CAA|BIND|ID) kappa " + CIR + r" psi_K " + NUM + r" psi_V " + NUM + r" Phi " + NUM + r" IIA (\d\.\d\d) b0 (\d\.\d+)/(\d\.\d+)", S8C[i])
+        assert [a[0] for a in arms] == ["CAA", "BIND", "ID"], S8C[i]
+        for a in arms:
+            aw, d = {"CAA": ("Caa", "the CAA identity edit"), "BIND": ("Bind", "the binding swap BIND"), "ID": ("Id", "the identity patch ID@28")}[a[0]]
+            smac3(f"JcSixKappa{aw}{FW6[f]}", "S8C", i, a[1:4], f"J-C6: kappa = psi_K / (psi_K + psi_V) of {d} at block 28, {f}, Qwen2.5-14B", G8C)
+            for w, s_, dd in (("PsiK", a[4], "psi_K"), ("PsiV", a[5], "psi_V"), ("Phi", a[6], "Phi = mean margin shift of the patched run (nats)"), ("IIA", a[7], "IIA (share of pairs whose top token is the target)"),
+                              ("BzeroFour", a[8], "Gate b0: mean |m(r4) - m(r1)| (nats)"), ("BzeroZero", a[9], "Gate b0: mean |m(r0) - m(B)| (nats)")):
+                smac(f"JcSix{w}{aw}{FW6[f]}", "S8C", i, s_, f"J-C6: {dd} of {d}, {f}, Qwen2.5-14B", G8C)
+            J6F[f, a[0]] = a[1:4]
+        continue
+    mm = re.match(r"        kappa_CAA ([+-]\d\.\d+) \(<= 0\.3\); kappa_BIND - kappa_CAA " + CIR + r" \(>= 0\.3; H0: <= 0 rejected\) -> met$", S8C[i])
+    assert mm, S8C[i]
+    J6F[f, "diff"] = mm.groups()[1:4]
+    smac3(f"JcSixDiff{FW6[f]}", "S8C", i, J6F[f, "diff"], f"J-C6: kappa_BIND - kappa_CAA (paired; >= 0.3 with H0 <= 0 rejected needed), {f}, Qwen2.5-14B", G8C)
+assert len(J6F) == 12, len(J6F)
+# J-C-SCREEN (Qwen2.5-7B, Llama-3.1-8B): the binding sweep, the key-route onsets, the working blocks W_B, no window
+SCR8 = {}
+for i in LC8["J-C-SCREEN"]["det"]:
+    s_ = S8C[i]
+    mm = re.match(r"    (\w+): population (\d+) pairs; BIND max IIA (\d\.\d+) at block (\d+) \(screen evaluable: max IIA >= 0\.7 and n >= 50\) -> yes$", s_)
+    if mm:
+        k = mm[1]
+        t, S = K8[k], SH8[k]
+        SCR8[k] = dict(i=i)
+        smac(f"JcScreenPairs{t}", "S8C", i, mm[2], f"J-C-SCREEN: pairs of Prakash et al.'s material passing the LM filter under NO-MENTION (the population, at most 150), {S}", G8C)
+        smac(f"JcScreenMaxIIA{t}", "S8C", i, mm[3], f"J-C-SCREEN: the largest IIA of the binding swap BIND over blocks (NO-MENTION), {S}", G8C)
+        smac(f"JcScreenMaxBlock{t}", "S8C", i, mm[4], f"J-C-SCREEN: the block of that largest IIA, {S}", G8C)
+        continue
+    if s_.startswith("        BIND IIA/Phi per block: "):
+        blk = re.findall(r"(\d+):(\d\.\d\d)/([+-]\d+\.\d)", s_)
+        assert [int(b[0]) for b in blk] == list(range(len(blk))), s_
+        SCR8[k]["blk"] = blk
+        amac(f"JcScreenBlocks{t}", len(blk), f"J-C-SCREEN: blocks of the model (the BIND sweep covers every block), {S}", f"{SRCC}:{i + 1}", G8C, "{:d}")
+        for b, iia, phi in blk:
+            smac(f"JcScreenIIA{word(b)}{t}", "S8C", i, iia, f"J-C-SCREEN: BIND IIA when patched at block {b} (NO-MENTION), {S}", G8C)
+            smac(f"JcScreenPhi{word(b)}{t}", "S8C", i, phi, f"J-C-SCREEN: BIND Phi (nats) when patched at block {b} (NO-MENTION; a working swap needs Phi >= 3 and IIA >= 0.5), {S}", G8C)
+        continue
+    if s_.startswith("        s_ID(OPTIONS-AFTER, l0): "):
+        sid = re.findall(r"(\d+):([+-](?:\d\.\d+|nan))", s_)
+        SCR8[k]["sid"] = {int(o): v for o, v in sid}
+        for o, v in sid:
+            if v.endswith("nan"):
+                continue
+            smac(f"JcScreenSid{word(o)}{t}", "S8C", i, v, f"J-C-SCREEN: s_ID(OPTIONS-AFTER) of the natural clamp from block {o} (the identity key route's share), {S}", G8C)
+        continue
+    mm = re.match(r"        W_B \(Phi >= 3\.0, IIA >= 0\.5\) \[([\d, ]*)\]; window \(s_ID\(l\+1\) >= 0\.4\) \[\]; l_w None$", s_)
+    assert mm, s_
+    wb = [int(x) for x in mm[1].split(",")]
+    assert wb == [int(b) for b, iia, phi in SCR8[k]["blk"] if float(iia) >= 0.5 and float(phi) >= 3.0], (k, wb)
+    for w, v, d in (("First", wb[0], "first"), ("Last", wb[-1], "last"), ("N", len(wb), "number of")):
+        amac(f"JcScreenWb{w}{t}", v, f"J-C-SCREEN: {d} block(s) where the binding swap works (W_B: Phi >= 3 nats, IIA >= 0.5), {S}", f"{SRCC}:{i + 1}", G8C, "{:d}")
+    _sw = [SCR8[k]["sid"][b + 1] for b in wb]
+    nm(f"JcScreenSidWbMax{t}", sv(max(_sw, key=fl)), f"J-C-SCREEN: the largest s_ID(OPTIONS-AFTER, l + 1) over the working blocks l in W_B (a window needs >= 0.4), {S}", f"{SRCC}:{SCR8[k]['i'] + 3}", G8C)
+    SCR8[k]["wb"] = wb
+assert set(SCR8) == {"qwen7", "llama8"} and all("wb" in v for v in SCR8.values())
+assert [S8C[i] for i in LC8["J-C-WIN"]["det"]] == ["    no window in any evaluable screened model"]
+# the lines' unit counts (for the table): sub-combos met / with a verdict, by the line's combination rule
+_u8 = {}
+for code in ("J-C1", "J-C2", "J-C3", "J-C4"):
+    vs = [c["v"] for (cd, k, Z, dep), c in COMB8.items() if cd == code and not c["seed"]]
+    _u8[code] = (vs.count("MET"), sum(v != "NOT EVALUABLE" for v in vs), "combos (model x edit x depths)")
+_u8["J-C5"] = (0, 1, "one pooled test over every statistic of every carrying component")
+_u8["J-C-BOUND"] = (_bv.count("met"), len(_bv), "sub-families (model x E5 sub-family)")
+_u8["J-C-READa"] = (0, sum(1 for x in RDP8 if x[1] in ("E1", "E2") and x[2] == "H"), "counted (model, family) pairs")
+_u8["J-C-READb"] = (0, 0, "counted (model, family) pairs (E3: J-C-G3; E4a: below the 2-nat denominator)")
+_u8["J-C6"] = (sum(1 for f in FW6 if (f, "diff") in J6F), len(FW6), "formats")
+_u8["J-C-SCREEN"] = (len(SCR8), len(SCR8), "evaluable screened models without an overlap window")   # every window list is [] (asserted above)
+_u8["J-C-WIN"] = (0, 0, "screened models with a window")
+for code, L in LC8.items():
+    met_, ev_, unit = _u8[code]
+    if f"Jc{LWC8[code]}Met" in macros:   # J-C-BOUND: registered above (JcBoundMet)
+        assert macros[f"Jc{LWC8[code]}Met"] == str(met_), code
+    else:
+        amac(f"Jc{LWC8[code]}Met", met_, f"{code}: {unit} met", f"{SRCC}:{L['i'] + 1}", G8C, "{:d}")
+    amac(f"Jc{LWC8[code]}Eval", ev_, f"{code}: {unit} with a verdict", f"{SRCC}:{L['i'] + 1}", G8C, "{:d}")
+assert {c: _u8[c][:2] for c in _u8} == {"J-C1": (0, 4), "J-C2": (1, 2), "J-C3": (0, 0), "J-C4": (0, 2), "J-C5": (0, 1), "J-C-BOUND": (2, 6), "J-C-READa": (0, 4),
+                                        "J-C-READb": (0, 0), "J-C6": (3, 3), "J-C-SCREEN": (2, 2), "J-C-WIN": (0, 0)}, _u8
+# the HEADLINE (C-6): the Section-5 outcome letter
+sm8("JcHeadline", "S8C", HC8, r"outcome \((\w)\): ", "HEADLINE (C-6): the Section-5 outcome letter of part C, (e) 'Failed': even near-natural steering vectors depart from the natural channel ratio", G8C)
+sm8("JcHeadlineWord", "S8C", HC8, r"outcome \(\w\): (\w+) \(", "HEADLINE: the outcome's word as printed", G8C)
+assert macros["JcHeadline"] == "e"
+# reported: the pi(t) diagnostic, the lexical-code reading, JC4 depth tracking
+for k in ("qwen7", "mistral7"):
+    for l, lw in DW8.items():
+        i = find(S8C, f"  pi(t) diagnostic {k} l={l} ", start=RC8, end=SC8)
+        sm83(f"JcPit{lw}{K8[k]}", "S8C", i, r"mean d_pi\(t\) - d_t " + CIR,
+             f"pi(t) diagnostic (reported): mean d_pi(t) - d_t in E4's key-only rows under LETTER, l = {l}{' (the LETTER cell fails J-C-G4: do not cite)' if l >= 11 else ''}, {SH8[k]}", G8C)
+LEXP8 = {}
+for k in MC8:
+    for Z in ("E1", "E2", "E3", "E4"):
+        for l, lw in DW8.items():
+            hits = find(S8C, f"  lexical-code reading {k} {Z} l={l}:", start=RC8, end=SC8, many=True)
+            assert len(hits) == (1 if Z in FAMC8[k] and EFF8C[k, Z, l] else 0), (k, Z, l)
+            if not hits:
+                continue
+            i = hits[0]
+            g_ = grab(S8C, i, r"phi ([+-]\d\.\d+), PAR ([+-]\d\.\d+), LEX ([+-]\d\.\d+) -> ")
+            for w, s_, d in zip(("Phi", "Par", "Lex"), g_, ("phi of the edit", "phi of its PAR component (the projection on the story's natural displacement)",
+                                                         "phi of its LEX component (the projection on the 5-dimensional English lexical span)")):
+                smac(f"JcLex{w}{zw8(Z)}{lw}{K8[k]}", "S8C", i, s_, f"lexical-code reading (reported): {d}, under NONE, {zlab8(Z)}, l = {l}, {SH8[k]}", G8C)
+            LEXP8[k, Z, l] = dict(i=i, phi=g_[0], par=g_[1], lex=g_[2], code="acts through the natural lexical code" in S8C[i], counted="not counted" not in S8C[i])
+assert all(v["code"] == (Z != "E4") for (k, Z, l), v in LEXP8.items())
+_e4lex = [v for (k, Z, l), v in LEXP8.items() if Z == "E4"]
+rng8("JcLexParEfour", [v["par"] for v in _e4lex], "lexical-code reading: phi of E4's PAR component at the depths where E4 is effective", SRCC + " REPORTED", G8C)
+rng8("JcLexLexEfour", [v["lex"] for v in _e4lex], "lexical-code reading: phi of E4's LEX component at the depths where E4 is effective", SRCC + " REPORTED", G8C)
+amac("JcLexParShareEfourMax", max(fl(v["par"]) / fl(v["phi"]) for v in _e4lex), "lexical-code reading: the largest phi(PAR)/phi of E4 (the rule needs >= 0.8)", SRCC + " REPORTED", G8C, "{:.2f}")
+amac("JcLexLexShareEfourMax", max(fl(v["lex"]) / fl(v["phi"]) for v in _e4lex), "lexical-code reading: the largest phi(LEX)/phi of E4", SRCC + " REPORTED", G8C, "{:.2f}")
+amac("JcLexCodeShareNearMin", min(max(fl(v["par"]), fl(v["lex"])) / fl(v["phi"]) for (k, Z, l), v in LEXP8.items() if Z in ("E1", "E2")),
+     "lexical-code reading: the smallest max(phi(PAR), phi(LEX))/phi of E1 and E2 over models and depths (>= 0.8: they act through the lexical code)", SRCC + " REPORTED", G8C, "{:.2f}")
+JC4P8 = []
+for i in range(find(S8C, "  JC4 depth tracking", start=RC8, end=SC8) + 1, SC8):
+    mm = re.match(r"    (\w+) (E\d) (\w+): delta_sigma ([+-]\d\.\d+) delta_kappa ([+-]\d\.\d+) -> (holds|does not hold)$", S8C[i])
+    if not mm:
+        break
+    k, Z, f = mm[1], mm[2], mm[3]
+    smac(f"JcJcfourDs{zw8(Z)}{FWC8[f]}{K8[k]}", "S8C", i, mm[4], f"JC4 depth tracking (reported): delta_sigma = sigma({f}, 3) - sigma({f}, 15), {zlab8(Z)} pair, {SH8[k]}", G8C)
+    smac(f"JcJcfourDk{zw8(Z)}{FWC8[f]}{K8[k]}", "S8C", i, mm[5], f"JC4 depth tracking (reported): delta_kappa = kappa({f}, 3) - kappa({f}, 15) of {zlab8(Z)}, {SH8[k]}", G8C)
+    JC4P8.append((mm[4], mm[5], mm[6]))
+sm8("JcJcfourHold", "S8C", i, r"JC4: (\d+) of (\d+) qualifying", "JC4: qualifying (model, edit, format) pairs whose delta_kappa tracks delta_sigma", G8C, 0)
+sm8("JcJcfourN", "S8C", i, r"JC4: (\d+) of (\d+) qualifying", "JC4: qualifying pairs (delta_sigma >= 0.25, both cells evaluable, the edit effective at l = 3 and 15)", G8C, 1)
+assert len(JC4P8) == int(macros["JcJcfourN"]) and all(h == "holds" for _, _, h in JC4P8)
+amac("JcJcfourAbsMax", max(abs(fl(a) - fl(b)) for a, b, _ in JC4P8), "JC4: the largest |delta_kappa - delta_sigma| over the qualifying pairs", SRCC + " REPORTED", G8C, "{:.3f}")
+# summary: classes (part C has no class-L line: its Brier is nan and not registered), the R tally (S8X), the counts, Holm
+classes8(S8C, SC8, XC8, "Jc", G8C)
+i = find(S8C, "  met rate among R account lines with a verdict:", start=SC8, end=XC8)
+for j, (w, d) in enumerate((("Met", "met"), ("Verd", "with a verdict"), ("Exp", "expected met"))):
+    sm8(f"JxRisky{w}C", "S8C", i, r"(\d+) of (\d+) \(expected (\d+\.\d+)\)", f"part C: risky (class R) account lines {d}", G8X, j)
+_vc = [L["v"] for L in LC8.values()]
+for w, v in (("Met", "MET"), ("NotMet", "NOT MET"), ("NotEval", "NOT EVALUABLE")):
+    amac(f"JcCount{w}", _vc.count(v), f"part C: lines {v} (counted from the verdict lines)", SRCC + " PREDICTIONS", G8C, "{:d}")
+amac("JcCountLines", len(_vc), "part C: lines in all (every one an account line)", SRCC + " PREDICTIONS", G8C, "{:d}")
+assert (macros["JcCountMet"], macros["JcCountNotMet"], macros["JcCountNotEval"], macros["JcCountLines"]) == ("2", "6", "3", "11")
+assert sum(int(macros[f"JcClass{c}Met"]) for c in "LMR") == int(macros["JcCountMet"])
+i = find(S8C, "  Holm sensitivity (analysis/stage8_holm.py", start=SC8, end=XC8)
+sm8("JcHolmN", "S8C", i, r"over the (\d+) interval components", "Holm sensitivity: interval components of part C's R-class lines with a verdict", G8C)
+_hch = 0
+for code in ("J-C3", "J-C4", "J-C5", "J-C-BOUND", "J-C-READb", "J-C-SCREEN", "J-C-WIN"):
+    i = find(S8C, f"    {code}: ", start=SC8, end=XC8)
+    sm8(f"JcHolmN{LWC8[code]}", "S8C", i, r": (\d+) components;", f"Holm sensitivity: components of {code}", G8C)
+    mm = re.search(r"(\d+) decision\(s\) change under Holm", S8C[i])
+    _hch += int(mm[1]) if mm else 0
+    for j, p_ in enumerate(re.findall(r"\(p (\S+?);", S8C[i])):
+        smac(f"JcHolmP{LWC8[code]}{word(j + 1)}", "S8C", i, p_, f"Holm sensitivity: one-sided p of the {('first', 'second', 'third')[j]} {code} component whose decision changes (the interval rule rejects, Holm does not)", G8C)
+    assert "verdict unchanged" in S8C[i], S8C[i]
+amac("JcHolmChanged", _hch, "Holm sensitivity: decisions that change (no verdict changes)", SRCC + " SUMMARY", G8C, "{:d}")
+# exploratory: kappa against sigma at l = 3 and 7, nu and the cosines, O4 flip rates, L-scored lambda, the E4 fits
+KS8 = {}
+for k in MC8:
+    t, S = K8[k], SH8[k]
+    h = find(S8C, f"-- {k}: kappa against sigma per cell", start=XC8)
+    e = next(j for j in range(h + 1, len(S8C)) if S8C[j].startswith("--"))
+    for l, lw in DW8.items():
+        for f in FWC8:
+            hits = find(S8C, f"   {f}@{l}: sigma ", start=h, end=e, many=True)
+            if not hits:
+                assert f == "LETTER" and l >= 11, (k, f, l)
+                continue
+            i = hits[0]
+            sg = grab(S8C, i, r"sigma ([+-]\d\.\d+); kappa")[0]
+            kp = dict(re.findall(r"(E\w+) ([+-]\d+\.\d\d)", S8C[i].split("; kappa ")[1]))
+            KS8[k, f, l] = (sg, kp)
+            if l not in (3, 7):
+                continue
+            smac(f"JcSigma{FWC8[f]}{lw}{t}", "S8C", i, sg, f"sigma = kappa^nat, the natural key share of the identity effect (descriptive), {f}, l = {l}, {S}", G8C)
+            for Z, s_ in kp.items():
+                smac(f"JcKappa{zw8(Z)}{FWC8[f]}{lw}{t}", "S8C", i, s_, f"kappa = mean ID_K / (mean ID_K + mean ID_V) of {zlab8(Z)} (descriptive; compare sigma), {f}, l = {l}, {S}", G8C)
+        i = find(S8C, f"   l={l}: ", start=h, end=e)
+        for Z, nu, ck, cv, a_ in re.findall(r"([\w:]+) nu (\d\.\d\d) cosK (-?\d\.\d\d) cosV (-?\d\.\d\d) a (-?\d\.\d\d)", S8C[i]):
+            for w, s_, d in (("Nu", nu, "nu, the distance of its K/V tables from the target's natural ones (relative to the natural displacement)"),
+                             ("CosK", ck, "cosine of its key displacement with the natural one"), ("CosV", cv, "cosine of its value displacement with the natural one"),
+                             ("CosResid", a_, "cosine of its residual displacement at (p, l) with the natural one")):
+                smac(f"Jc{w}{zw8(Z)}{lw}{t}", "S8C", i, s_, f"table statistics (exploratory; means over stories and targets): {d}, {zlab8(Z)}, l = {l}, {S}", G8C)
+    h = find(S8C, f"-- {k}: greedy-generation flip rates", start=XC8)
+    for f in ("NONE", "P1"):
+        i = find(S8C, f"   {f}: nat ", start=h, end=h + 3)
+        for Z, s_ in re.findall(r"(\w+) (\d\.\d\d)", S8C[i].split(": ", 1)[1]):
+            smac(f"JcOfour{FWC8[f]}{zw8(Z)}{t}", "S8C", i, s_, f"O4 (exploratory): greedy-generation flip rate of the KV row at l = 7, first 40 stories, {f}, {'the natural write' if Z == 'nat' else zlab8(Z)}, {S}", G8C)
+    h = find(S8C, f"-- {k}: L-scored lambda", start=XC8)
+    for Z in ("E1", "E2", "E3", "E4"):
+        if Z not in FAMC8[k]:
+            continue
+        i = find(S8C, f"   {Z}: mean lambda under L", start=h, end=h + 5)
+        sm8(f"JcLscore{zw8(Z)}{t}", "S8C", i, r"under L ([+-]\d\.\d+)", f"L-scored lambda (exploratory): mean over the law statistics of {zlab8(Z)}, {S}", G8C)
+        sm8(f"JcEscore{zw8(Z)}{t}", "S8C", i, r"vs E ([+-]\d\.\d+)", f"the same mean under the preregistered E score, {zlab8(Z)}, {S}", G8C)
+_fit = {"first": [], "last": [], "flip": []}
+for k in ("qwen7", "mistral7"):
+    i = find(S8C, f"-- {k}: E4 fits ", start=XC8)
+    fits = re.findall(r"(\d+)_(\d+) (\w+) loss (\d+\.\d\d)->(\d+\.\d\d) THOLD flip (\d\.\d\d)", S8C[i])
+    assert len(fits) == 8, S8C[i]
+    for x in fits:
+        _fit["first"].append(x[3]), _fit["last"].append(x[4]), _fit["flip"].append(x[5])
+rng8("JcDasLossFirst", _fit["first"], "E4 fits (16: 2 models x 4 depths x 2 seeds): mean loss over the first 50 steps", SRCC + " EXPLORATORY", G8C)
+rng8("JcDasLossLast", _fit["last"], "E4 fits: mean loss over the last 50 steps", SRCC + " EXPLORATORY", G8C)
+rng8("JcDasFlip", _fit["flip"], "E4 fits: held-out (THOLD) flip rate under NONE", SRCC + " EXPLORATORY", G8C)
+# recomputed (not printed): through the committed part-C scorer's own classes. The same code first reproduces what the
+# scorer prints (asserted: every combo's text, every carrying component's phi and statistics, every J-C-BOUND pooled value,
+# the J-C-READa rows, the lexical-code reading), then computes the values the outcome record marks "(recomputed)" and the
+# per-statistic lambdas the score file does not print (E3, E5, Qwen2.5-7B E2 at l = 11), each registered with rmac.
+from stage8c_parts import law as C8LW  # noqa: E402
+from stage8c_parts import readers as C8RD  # noqa: E402
+from stage8c_parts.stats import log_ratio as c8lr, mean_q as c8mq, tost as c8tost  # noqa: E402
+_c8mean = C8LW.Model.mean
+
+
+def _c8mean_memo(self, f, l, Z, C, field="E"):
+    """Model.mean is a pure function of its arguments (the per-story contrasts and the model's fixed bootstrap weights); a
+    memo of its results changes no number and saves the repeated 10,000-resample means (about 2 minutes)."""
+    memo = self.__dict__.setdefault("_mean_memo", {})
+    if (f, l, Z, C, field) not in memo:
+        memo[f, l, Z, C, field] = _c8mean(self, f, l, Z, C, field)
+    return memo[f, l, Z, C, field]
+
+
+C8LW.Model.mean = _c8mean_memo
+C8M = {k: C8LW.Model(json.load(open(ROOT / f"results/gpu_stage8c/eval/{k}.json"))) for k in MC8}
+SRCE8 = {k: f"results/gpu_stage8c/eval/{k}.json" for k in MC8}
+
+
+def c8cells(code):
+    """(K cell format, V cell format) of a lambda statistic."""
+    kind = code.split("(")[0]
+    if kind == "W":
+        f = code[2:-1].split(",")[0]
+        return f, f
+    return {"A_L": ("LETTER", "NONE"), "A_P": ("P1", "NONE")}[kind]
+
+
+def c8tab(m, l, Z, key):
+    """a stored table statistic of instance Z at depth l: the mean over stories and both targets (E4: and both seeds)."""
+    head, _, base = Z.rpartition(":")
+    zs = [f"{head + ':' if head else ''}{b}" for b in (("E4a", "E4b") if base == "E4" else (base,))]
+    v = [np.mean([m.S[s]["stats"][str(l)][f"{z}|{t_}"][key] for t_ in "SX"]) for z in zs for s in range(m.n)]
+    return float(np.mean(v))
+
+
+# (1) the law lines: every printed combo is reproduced by law.law (its printed text); the statistics of the combos without a
+# verdict (Qwen2.5-7B E2 at l = 11) and of E3 (post hoc: J-C-G3 failed) are registered as recomputed
+for (code, k, Z, dep), c in COMB8.items():
+    met, txt, st, pat = C8LW.law(C8M[k], Z, list(dep), "edit")
+    if c["v"] == "NOT EVALUABLE":
+        assert met is None and len(st) == c["n"], (code, k, Z)
+        if st:
+            lam8(f"{code} (combo not evaluable: fewer than 3 statistics; recomputed)", k, Z, st, None, rec=True, src=SRCE8[k])
+        continue
+    assert f": {txt} -> {c['v']}" in S8C[c["i"]], (code, k, Z, txt[:80])
+for dep, w in (([3], "LayerThree"), ([3, 7, 11, 15], "All")):
+    met, txt, st, pat = C8LW.law(C8M["qwen7"], "E3", dep, "edit")
+    assert met is False, (dep, txt)
+    pool = c8mq([s["q"] for s in st])
+    d = f"post hoc (J-C3 is not evaluable: J-C-G3): the law for E3 at Qwen2.5-7B admitting {'layer 3 only (the one layer whose FVE at p is >= published - 0.05)' if dep == [3] else 'all four layers'}"
+    rmac(f"JcThreePosthoc{w}Neq", sum(s["equivalent"] for s in st), d + ": equivalent statistics", SRCE8["qwen7"], G8C, "{:d}")
+    rmac(f"JcThreePosthoc{w}Nstat", len(st), d + ": lambda statistics", SRCE8["qwen7"], G8C, "{:d}")
+    rmac390(f"JcThreePosthoc{w}Pool", (pool.pt, pool.lower(0.9), pool.upper(0.9)), d + ": pooled lambda-bar", SRCE8["qwen7"], G8C)
+    if dep != [3]:
+        lam8("post hoc E3 (J-C-G3 not met; recomputed)", "qwen7", "E3", st, None, rec=True, src=SRCE8["qwen7"])
+_e3c = [(l, c_) for l in DW8 for c_ in ("PERP", "NONLEX") if C8M["qwen7"].effective(l, f"{c_}:E3", "carry")[0]]
+rmac("JcThreePosthocCarriers", len(_e3c), "post hoc: PERP or NONLEX components of E3 that carry identity (phi(NONE) >= 0.3, lower bound > 0) at any layer", SRCE8["qwen7"], G8C, "{:d}")
+# the outcome record's numbers (Sensitivities, J-C-G3) are reproduced
+assert (macros["JcThreePosthocLayerThreeNeq"], macros["JcThreePosthocLayerThreeNstat"], macros["JcThreePosthocLayerThreePool"], macros["JcThreePosthocLayerThreePoolLo"],
+        macros["JcThreePosthocLayerThreePoolHi"]) == ("1", "4", "-0.170", "-0.218", "-0.129")
+assert (macros["JcThreePosthocAllNeq"], macros["JcThreePosthocAllNstat"], macros["JcThreePosthocAllPool"], macros["JcThreePosthocAllPoolLo"],
+        macros["JcThreePosthocAllPoolHi"], macros["JcThreePosthocCarriers"]) == ("1", "10", "-0.640", "-0.772", "-0.542", "0")
+# (2) J-C5: every carrying component's phi and statistics are reproduced
+for c in CAR8:
+    m = C8M[c["k"]]
+    ok, ctxt = m.effective(c["l"], c["Z"], "carry")
+    st, skip = m.stats_of(c["Z"], [c["l"]], gate=None, formats=C8LW.COMP_FORMATS)
+    i = find(S8C, f"    {c['k']} {c['Z']} l={c['l']} carries identity", start=LC8["J-C5"]["i"], end=LC8["J-C-BOUND"]["i"])
+    assert ok and f"({ctxt})" in S8C[i] and len(st) == c["n"], (c, ctxt)
+    assert all(f"{s['code']} {s['q'].pt:+.2f} [{s['q'].lower(0.9):+.2f},{s['q'].upper(0.9):+.2f}]" + ("" if s["equivalent"] else "*") in S8C[i] for s in st), S8C[i]
+# (3) J-C-BOUND: each sub-family's statistics (recomputed; their pooled value and E2's reproduce the printed ones)
+for (k, Z), b in BND8.items():
+    m = C8M[k]
+    st, skip = m.stats_of(Z, m.depths, gate="carry")
+    assert bool(st) == (b is not None), (k, Z)
+    if not st:
+        continue
+    codes = {(s["code"], s["l"]) for s in st}
+    st2 = [s for s in m.stats_of("E2", sorted({s["l"] for s in st}), gate="edit")[0] if (s["code"], s["l"]) in codes]
+    assert c8mq([s["q"] for s in st]).txt() == "{} [{},{}]".format(*b["pool"]), (k, Z)   # printed strings (signs kept)
+    assert c8mq([s["q"] for s in st2]).txt() == "{} [{},{}]".format(*b["e2"]), (k, Z)
+    lam8("J-C-BOUND (statistics of the pooled lambda-bar_E5; recomputed)", k, Z, st, None, rec=True, src=SRCE8[k])
+# (4) the lexical-code reading: phi, PAR and LEX reproduce the printed values; PERP and NONLEX (not printed) are recomputed
+LEXC8 = {}
+for (k, Z, l), v in LEXP8.items():
+    m, lw = C8M[k], DW8[l]
+    for c_, w in (("", "phi"), ("PAR:", "par"), ("LEX:", "lex")):
+        assert f"{m.psi('NONE', l, c_ + Z, 'KV').pt:+.3f}" == v[w], (k, Z, l, c_)   # printed strings (signs kept)
+    for c_ in ("PERP", "NONLEX"):
+        LEXC8[k, Z, l, c_] = m.psi("NONE", l, f"{c_}:{Z}", "KV").pt
+        rmac(f"JcLex{c_.capitalize()}{zw8(Z)}{lw}{K8[k]}", LEXC8[k, Z, l, c_], f"lexical-code reading: phi of the {c_} component of {zlab8(Z)} under NONE (not printed), l = {l}, {SH8[k]}",
+             SRCE8[k], G8C)
+for c in CAR8:
+    assert f"{LEXC8[c['k'], c['Z'].split(':')[1], c['l'], c['Z'].split(':')[0]]:+.3f}" == c["phi"][0], c
+# (5) J-C-READa and J-C-READb: the readers rows (the scorer's Readers); the natural donor's random-set KO, E4a and E3
+RDR8 = {}
+for k in ("qwen7", "mistral7"):
+    t, S = K8[k], SH8[k]
+    srcf = f"results/gpu_stage8c/readers/{k}.json"
+    J_ = json.load(open(ROOT / srcf))
+    R_ = C8RD.Readers(J_)
+    a_, b_ = LC8["J-C-READa"]["i"], LC8["J-C-READb"]["i"]
+    assert R_.gate()[1] in S8C[find(S8C, f"    {k}: gate ", start=a_, end=b_)]
+    for D in ("E1", "E2"):
+        assert R_.family(D)[1] in S8C[find(S8C, f"    {k} {D}: KO(H*) ", start=a_, end=b_)], (k, D)
+    kn = R_.ko("nat", "H")
+    rn = c8mq([R_.ko("nat", f"r{j}") for j in range(3)])
+    rmac3(f"JcReadaRandNat{t}", (rn.pt, *rn.ci()), f"J-C-READa: the natural donor's mean KO over the three random head sets (the line's random-set control applied to the natural value; not printed), {S}", srcf, G8C)
+    for j in range(3):
+        rmac(f"JcReadaSet{word(j)}Nat{t}", R_.ko("nat", f"r{j}").pt, f"J-C-READa: KO of random head set r{j} for the natural donor, {S}", srcf, G8C)
+    for D in [x for x in J_["donors"] if x in ("E3", "E4a")]:
+        kq = R_.ko(D, "H")
+        rq = c8mq([R_.ko(D, f"r{j}") for j in range(3)])
+        dd = "E4 seed 101 (not counted: its key read is below 2 nats)" if D == "E4a" else "E3 (not evaluable: J-C-G3; post hoc)"
+        rmac3(f"JcReadbKO{zw8(D)}{t}", (kq.pt, *kq.ci()), f"J-C-READb: KO(H*) of {dd}; under the common part's evaluability rule this counts against the line (< 0.7: NOT MET), {S}", srcf, G8C)
+        rmac3(f"JcReadbRand{zw8(D)}{t}", (rq.pt, *rq.ci()), f"J-C-READb: random-set mean KO of {dd}, {S}", srcf, G8C)
+        if D == "E3":
+            iq = R_.m("E3", "all")
+            rmac3(f"JcReadbIDK{zw8(D)}{t}", (iq.pt, *iq.ci()), f"J-C-READb: the key read ID_K[all] of {dd} (nats), {S}", srcf, G8C)
+        RDR8[k, D] = (kq, rq)
+    RDR8[k, "nat"] = (kn, rn)
+    pair = {}
+    for D in ("E1", "E2"):
+        rz = c8mq([R_.ko(D, f"r{j}") for j in range(3)])
+        pair[D, "H"], pair[D, "rand"] = R_.ko(D, "H").pt - kn.pt, rz.pt - rn.pt
+    RDR8[k, "pair"] = pair
+    p_ = J_["provenance"]
+    n_h = len(p_["H_star"])
+    assert all(len(r) == n_h for r in p_["rand"]) and all(b >= 8 for r in p_["rand"] for b, h in r), k
+    rmac(f"JcReadaSetSize{t}", n_h, f"J-C-READ: heads in H*_{{>7}} (the stage-6 top-k* readers in blocks > 7) and in each size-matched random set, {S}", srcf, G8C, "{:d}")
+    rmac(f"JcReadaPool{t}", (p_["n_layers"] - 8) * p_["n_heads"], f"J-C-READ: heads of blocks > 7, the pool the random sets are drawn from (not disjoint from H*), {S}", srcf, G8C, "{:d}")
+    if k == "qwen7":
+        assert p_["H_star"][0] in p_["rand"][0]   # the top-ranked reader is in random set r0
+_pm = [abs(v) for k in ("qwen7", "mistral7") for (D, w), v in RDR8[k, "pair"].items() if (k, D, w) != ("mistral7", "E2", "H")]
+rmac("JcReadaPairMax", max(_pm), "J-C-READa: the largest |edit - natural| difference of KO(H*) or of the random-set mean KO over E1 and E2 at both models, except Mistral-7B E2 on H* (JcReadaPairEtwoHMistralSeven)",
+     "results/gpu_stage8c/readers/", G8C)
+rmac("JcReadaPairEtwoHMistralSeven", RDR8["mistral7", "pair"]["E2", "H"], "J-C-READa: KO(H*) of E2 minus the natural donor's, Mistral-7B", "results/gpu_stage8c/readers/mistral7.json", G8C)
+# the outcome record's numbers (Sensitivities, J-C-READa and J-C-READb) are reproduced
+assert tuple(macros[f"JcReadaRandNatQwenSeven{s_}"] for s_ in ("", "Lo", "Hi")) == ("0.307", "0.281", "0.334")
+assert tuple(macros[f"JcReadaRandNatMistralSeven{s_}"] for s_ in ("", "Lo", "Hi")) == ("0.283", "0.209", "0.391")
+assert (macros["JcReadbKOEfouraQwenSeven"], macros["JcReadbKOEfouraMistralSeven"]) == ("0.590", "0.678")
+assert f"{fl(macros['JcReadaSetZeroNatQwenSeven']):.2f}" == "0.66" and f"{fl(macros['JcReadaPairMax']):.2f}" == "0.01" and f"{fl(macros['JcReadaPairEtwoHMistralSeven']):.2f}" == "-0.03"
+assert [macros[f"JcReada{w}{t}"] for w in ("SetSize", "Pool") for t in ("QwenSeven", "MistralSeven")] == ["32", "43", "560", "768"]
+# (6) where J-C1 fails: the natural key channel behind every non-equivalent E1 / E2 statistic of J-C1 and J-C2 (both lines'
+# combos, the not-evaluable Qwen2.5-7B E2 {11, 15} included), the depth-3 statistics, a channel floor, the L score
+NE8, L38 = [], []
+for (code, k, Z, dep), c in COMB8.items():
+    if code not in ("J-C1", "J-C2") or c["seed"]:
+        continue
+    m = C8M[k]
+    for s in m.stats_of(Z, list(dep), "edit")[0]:
+        if s["l"] == 3:
+            L38.append(abs(s["q"].pt))
+        if s["equivalent"]:
+            continue
+        fk, fv = c8cells(s["code"])
+        l = s["l"]
+        Kn, KVn = m.mean(fk, l, "nat", "K").pt, m.mean(fk, l, "nat", "KV").pt
+        NE8.append(dict(k=k, Z=Z, code=s["code"], l=l, fk=fk, psiK=m.psi(fk, l, Z, "K").pt, psiV=m.psi(fv, l, Z, "V").pt, idK=Kn, share=Kn / KVn,
+                        idV=m.mean(fv, l, "nat", "V").pt))
+_src1 = "results/gpu_stage8c/eval/ (J-C1 and J-C2 combos)"
+rmac("JcOneNeN", len(NE8), "J-C1 / J-C2: non-equivalent lambda statistics of E1 and E2 (in the combos of both lines; 2 of them in the not-evaluable Qwen2.5-7B E2 {11, 15} combo)", _src1, G8C, "{:d}")
+for w, key, d, f_ in (("PsiK", "psiK", "psi_K of the edit in the statistic's K cell", "{:.3f}"), ("PsiV", "psiV", "psi_V of the edit in its V cell", "{:.3f}"),
+                      ("IDK", "idK", "natural ID_K in the K cell (nats)", "{:.2f}"), ("IDV", "idV", "natural ID_V in the V cell (nats; the smallest, 3.3, is Llama-3.1-8B E2 W(P1, 7): the outcome record's '5.8-17 nats' leaves it out)", "{:.2f}"),
+                      ("Share", "share", "natural key share ID_K / ID_KV of the K cell (the record's '0.15-0.20' holds for the W(POST, 7) and l = 11 statistics only: JcOneNeShareSmall...)", "{:.3f}")):
+    vals = [r[key] for r in NE8]
+    rmac(f"JcOneNe{w}Min", min(vals), f"J-C1 / J-C2, the non-equivalent E1 / E2 statistics: {d} (smallest)", _src1, G8C, f_)
+    rmac(f"JcOneNe{w}Max", max(vals), f"J-C1 / J-C2, the non-equivalent E1 / E2 statistics: {d} (largest)", _src1, G8C, f_)
+_sm = [r["share"] for r in NE8 if r["fk"] == "POST" or r["l"] == 11]
+rmac("JcOneNeShareSmallMin", min(_sm), "J-C1 / J-C2: natural key share ID_K / ID_KV of the K cell over the non-equivalent W(POST, 7) and l = 11 statistics (smallest; the A statistics at l = 7 sit on cells with shares 0.47-0.81)", _src1, G8C)
+rmac("JcOneNeShareSmallMax", max(_sm), "the same (largest)", _src1, G8C)
+rmac("JcOneLamThreeAbsMax", max(L38), "J-C1 / J-C2: the largest |lambda| of E1 and E2 at l = 3 over the three models (every statistic there is equivalent)", _src1, G8C)
+m = C8M["qwen7"]
+_s = next(s for s in m.stats_of("E2", [7], "edit")[0] if s["code"] == "A_L(7)")
+rmac("JcOneEtwoAletterSevenLamQwenSeven", _s["q"].pt, "J-C1: lambda of E2's A_L(7) at Qwen2.5-7B, the key under-read inside the margin where the natural key effect is large", SRCE8["qwen7"], G8C)
+rmac("JcOneEtwoAletterSevenPsiKQwenSeven", m.psi("LETTER", 7, "E2", "K").pt, "J-C1: psi_K of E2 under LETTER at l = 7, Qwen2.5-7B", SRCE8["qwen7"], G8C)
+rmac("JcOneEtwoAletterSevenIDKQwenSeven", m.mean("LETTER", 7, "nat", "K").pt, "J-C1: the natural ID_K under LETTER at l = 7 (nats), Qwen2.5-7B", SRCE8["qwen7"], G8C, "{:.1f}")
+_fl8 = {}
+for fl_ in (3.0, 4.0, 4.8):
+    C8LW.MIN_ID = fl_   # the channel floor of the 'channel used' rule (preregistered: 2 nats); restored below
+    _fl8[fl_] = [C8LW.law(C8M[k], Z, list(dep), "edit")[0] for (code, k, Z, dep), c in COMB8.items() if code == "J-C1"]
+C8LW.MIN_ID = 2.0
+for fl_, w in ((3.0, "Three"), (4.0, "Four"), (4.8, "FourEight")):
+    rmac(f"JcOneFloor{w}NotMet", _fl8[fl_].count(False), f"post hoc: J-C1 combos NOT MET with a channel floor of {fl_} nats in place of the preregistered 2", _src1, G8C, "{:d}")
+rmac("JcOneFloorFourEightMet", _fl8[4.8].count(True), "post hoc: J-C1 combos MET with a channel floor of 4.8 nats (all four: J-C1 would be MET)", _src1, G8C, "{:d}")
+_ls8 = []
+for (code, k, Z, dep), c in COMB8.items():
+    if code != "J-C1":
+        continue
+    m, ok = C8M[k], True
+    for s in m.stats_of(Z, list(dep), "edit")[0]:
+        fk, fv = c8cells(s["code"])
+        qL = c8lr(m.psi(fk, s["l"], Z, "K", "L"), m.psi(fv, s["l"], Z, "V", "L"))
+        inter = any(1 - (np.nanmean(m.ID(f, s["l"], Z, "K", "L")) + np.nanmean(m.ID(f, s["l"], Z, "V", "L"))) / np.nanmean(m.ID(f, s["l"], Z, "KV", "L")) > 0.5 for f in {fk, fv})
+        ok &= bool(c8tost(qL) and not inter)
+    _ls8.append((k, Z, ok))
+rmac("JcOneLscoreNotMet", sum(not o for _, _, o in _ls8), "post hoc: J-C1 combos NOT MET when every statistic is scored with L (the robustness score) in place of E (the one that passes: Mistral-7B E1, at the margin)",
+     _src1, G8C, "{:d}")
+# the outcome record's numbers (Sensitivities, where J-C1 fails) are reproduced
+assert (f"{fl(macros['JcOneNePsiKMin']):.2f}", f"{fl(macros['JcOneNePsiKMax']):.2f}", f"{fl(macros['JcOneNePsiVMin']):.2f}", f"{fl(macros['JcOneNePsiVMax']):.2f}") == ("0.75", "0.87", "0.96", "1.09")
+# the record's "natural value effects of 5.8-17 nats" leaves out one statistic: Llama-3.1-8B E2 W(P1, 7), whose V cell (P1, l = 7)
+# has a natural ID_V of 3.3 nats; JcOneNeIDVMin is the minimum over all 12 (3.32)
+assert (f"{fl(macros['JcOneNeIDKMin']):.1f}", f"{fl(macros['JcOneNeIDKMax']):.1f}", f"{fl(macros['JcOneNeIDVMax']):.0f}") == ("2.6", "4.8", "17")
+assert f"{min(r['idV'] for r in NE8 if (r['k'], r['Z'], r['code']) != ('llama8', 'E2', 'W(P1,7)')):.1f}" == "5.8" and macros["JcOneNeIDVMin"] == "3.32"
+assert (f"{fl(macros['JcOneNeShareSmallMin']):.2f}", f"{fl(macros['JcOneNeShareSmallMax']):.2f}", macros["JcOneLamThreeAbsMax"]) == ("0.15", "0.20", "0.053")
+assert (macros["JcOneEtwoAletterSevenLamQwenSeven"], macros["JcOneEtwoAletterSevenPsiKQwenSeven"], macros["JcOneEtwoAletterSevenIDKQwenSeven"]) == ("-0.154", "0.875", "14.2")
+assert [macros[f"JcOneFloor{w}NotMet"] for w in ("Three", "Four", "FourEight")][2] == "0" and all(int(macros[f"JcOneFloor{w}NotMet"]) > 0 for w in ("Three", "Four"))
+assert macros["JcOneFloorFourEightMet"] == "4" and macros["JcOneLscoreNotMet"] == "3" and [(k, Z) for k, Z, o in _ls8 if o] == [("mistral7", "E1")]
+# (7) the nu pattern (post hoc): every lambda statistic of every identity-carrying instance (phi(NONE) >= 0.3, point) against
+# the stored table statistics; Spearman over the statistics, the equivalence by nu band, the collinearity over the
+# (model, instance, depth) units, the first-order O1 prediction
+NUP8 = []
+for k in MC8:
+    m = C8M[k]
+    insts = list(FAMC8[k]) + [f"{c_}:{z}" for z in ("E1", "E2", "E3", "E4") if z in FAMC8[k] for c_ in ("PERP", "NONLEX")] + ["NONLEX:nat"]
+    for Z in insts:
+        for l in m.depths:
+            if not m.has("NONE", l, C8LW.probe(Z) + "|KV|S") or not m.psi("NONE", l, Z, "KV").pt >= 0.3:
+                continue
+            st, _ = m.stats_of(Z, [l], gate=None, formats=C8LW.COMP_FORMATS if ":" in Z else C8LW.FORMATS)
+            x = {v: c8tab(m, l, Z, v) for v in ("nu", "cos_k", "cos_v", "cos_resid", "proj_k", "proj_v")}
+            NUP8 += [dict(k=k, Z=Z, l=l, code=s["code"], lam=s["q"].pt, eq=s["equivalent"], **x) for s in st]
+_lam = [p["lam"] for p in NUP8]
+_src7 = "results/gpu_stage8c/eval/ (lambda statistics and table statistics)"
+rmac("JcNuN", len(NUP8), "post hoc nu pattern: lambda statistics of the identity-carrying instances (phi(NONE) >= 0.3; every family, E5 and the components; E3 included)", _src7, G8C, "{:d}")
+for w, v in (("Nu", "nu"), ("CosK", "cos_k"), ("ProjK", "proj_k")):
+    rmac(f"JcNuRho{w}", spearmanr([p[v] for p in NUP8], _lam)[0], f"post hoc nu pattern: Spearman correlation of lambda with {v} over those statistics", _src7, G8C, "{:.2f}")
+for w, lo, hi, d in (("Low", 0, 0.1, "nu < 0.1"), ("Mid", 0.1, 0.3, "0.1 <= nu < 0.3"), ("High", 0.3, 9, "nu >= 0.3"), ("HighBelowOne", 0.3, 1.01, "0.3 <= nu < 1.01 (the outcome record's count of 53 leaves out the 10 statistics with nu > 1.01)")):
+    B_ = [p for p in NUP8 if lo <= p["nu"] < hi]
+    rmac(f"JcNuEq{w}", sum(p["eq"] for p in B_), f"post hoc nu pattern: equivalent statistics with {d}", _src7, G8C, "{:d}")
+    rmac(f"JcNuN{w}", len(B_), f"post hoc nu pattern: statistics with {d}", _src7, G8C, "{:d}")
+_un = {}
+for p in NUP8:
+    _un[p["k"], p["Z"], p["l"]] = p
+_v5 = ("nu", "cos_k", "cos_v", "cos_resid", "proj_k")
+_cl = [abs(spearmanr([u[a] for u in _un.values()], [u[b] for u in _un.values()])[0]) for j, a in enumerate(_v5) for b in _v5[j + 1:]]
+rmac("JcNuUnits", len(_un), "post hoc nu pattern: (model, instance, depth) units behind the statistics", _src7, G8C, "{:d}")
+rmac("JcNuCollMin", min(_cl), "post hoc nu pattern: smallest pairwise |Spearman| among nu, the K, V and residual cosines and the O1 key projection over the units (collinear)", _src7, G8C, "{:.2f}")
+rmac("JcNuCollMax", max(_cl), "post hoc nu pattern: largest pairwise |Spearman| among those table statistics", _src7, G8C, "{:.2f}")
+_o1 = [np.log(max(p["proj_k"], 0.01)) - np.log(max(p["proj_v"], 0.01)) for p in NUP8]
+rmac("JcOoneMiss", np.mean(np.array(_lam) - np.array(_o1)), "post hoc: mean of lambda minus the O1 first-order prediction log(proj_k / proj_v) over those statistics (the far edits are under-predicted)", _src7, G8C, "{:.2f}")
+rmac("JcOoneRho", spearmanr(_o1, _lam)[0], "post hoc: Spearman correlation of lambda with the O1 prediction (weak)", _src7, G8C, "{:.2f}")
+# the outcome record's numbers (Sensitivities, the departures follow nu) are reproduced
+assert (macros["JcNuN"], macros["JcNuRhoNu"], macros["JcNuRhoCosK"]) == ("107", "-0.75", "0.80")
+assert [(macros[f"JcNuEq{w}"], macros[f"JcNuN{w}"]) for w in ("Low", "Mid", "HighBelowOne")] == [("11", "11"), ("24", "33"), ("0", "53")]
+assert (macros["JcNuEqHigh"], macros["JcNuNHigh"]) == ("0", "63") and (macros["JcNuCollMin"], macros["JcNuCollMax"]) == ("0.84", "0.98")
+assert f"{fl(macros['JcOoneMiss']):.1f}" == "-0.7"
+# (8) J-C4 by depth (the pooled lambda-bar of each depth's statistics) and the psi floor of W(POST, 7)
+for k in ("qwen7", "mistral7"):
+    m, t = C8M[k], K8[k]
+    st = m.stats_of("E4", m.depths, "edit")[0]
+    for l in (3, 7):
+        rmac(f"JcFourDepth{DW8[l]}{t}", np.mean([s["q"].pt for s in st if s["l"] == l]), f"J-C4: E4's pooled lambda-bar over its statistics at l = {l} alone, {SH8[k]}", SRCE8[k], G8C, "{:.2f}")
+    for C in ("K", "V"):
+        rmac(f"JcFourPsi{C}WpostSeven{t}", m.psi("POST", 7, "E4", C).pt, f"J-C4: psi_{C} of E4 under POST at l = 7 (the W(POST, 7) statistic sits at the 0.01 psi floor), {SH8[k]}", SRCE8[k], G8C)
+assert (macros["JcFourDepthThreeQwenSeven"], macros["JcFourDepthThreeMistralSeven"]) == ("-1.03", "-0.67")
+assert 2.05 <= -fl(macros["JcFourDepthSevenQwenSeven"]) < 2.85 and 2.05 <= -fl(macros["JcFourDepthSevenMistralSeven"]) < 2.85
+assert (macros["JcFourPsiKWpostSevenQwenSeven"], macros["JcFourPsiKWpostSevenMistralSeven"]) == ("0.026", "0.012")
+# (9) J-C-BOUND: how far the gated-in E5 edits write from the natural write; FR, DE and SYN against the natural displacement
+_n5 = [c8tab(C8M[k], l, Z, "nu") for (k, Z, code), v in LAMP8.items() if Z.startswith("E5") for l in [int(re.search(r"(\d+)\)$", code)[1])]]
+rmac("JcBoundNuMin", min(_n5), "J-C-BOUND: nu of the gated-in E5 edits that have lambda statistics (smallest)", "results/gpu_stage8c/eval/", G8C, "{:.2f}")
+rmac("JcBoundNuMax", max(_n5), "J-C-BOUND: nu of the gated-in E5 edits that have lambda statistics (largest)", "results/gpu_stage8c/eval/", G8C, "{:.2f}")
+_rr = [(c8tab(C8M[k], l, Z, "ratio_resid"), c8tab(C8M[k], l, Z, "cos_resid")) for k in MC8 for Z in ("E5FR", "E5DE", "E5SYN") for l in DW8 if not EFF8C[k, Z, l]]
+for w, j, d in (("Norm", 0, "norm of the edit's residual displacement at (p, l) over the natural displacement's"), ("Cos", 1, "cosine of the two displacements")):
+    for x_, f_ in (("Min", min), ("Max", max)):
+        rmac(f"JcBoundFrDeSyn{w}{x_}", f_(x[j] for x in _rr), f"J-C-BOUND: {d}, E5 FR, DE and SYN at the (model, depth) cells where they are not gated in (alpha = 2), "
+             f"{'smallest' if x_ == 'Min' else 'largest'} (the gated-in FR cells of Llama-3.1-8B, alpha = 1, write 1.3x)", "results/gpu_stage8c/eval/", G8C, "{:.2f}")
+assert (macros["JcBoundNuMin"], macros["JcBoundNuMax"]) == ("0.65", "1.29")
+assert 2.0 <= fl(macros["JcBoundFrDeSynNormMin"]) and fl(macros["JcBoundFrDeSynNormMax"]) < 3.5 and fl(macros["JcBoundFrDeSynCosMax"]) < 0.35
 
 # ---------------------------------------------------------------- stage 8, part D: the flag the reader heads write
 MD8 = ["qwen7", "mistral7"]
@@ -3298,7 +4104,7 @@ assert (macros["JdSixRhoQwenThree"], macros["JdSixRhoNatQwenThree"]) == ("-0.025
 assert (macros["JdSixNatXQwenOnefive"], macros["JdSixNatXQwenSeven"], macros["JdSixDiffXQwenOnefive"], macros["JdSixDiffXQwenSeven"]) == ("-0.113", "0.271", "-0.013", "-0.014")
 assert (macros["JdSixNatIDKQwenOnefive"], macros["JdSixNatIDKQwenSeven"], macros["JdSixDiffIDKQwenOnefive"], macros["JdSixDiffIDKQwenSeven"]) == ("-0.115", "0.290", "-0.011", "-0.033")
 
-# ---------------------------------------------------------------- stage 8, across parts A, B and D (part C to be added)
+# ---------------------------------------------------------------- stage 8, across parts A, B and D (kept as registered before part C; the ABCD totals follow)
 _vs = []   # (part, line, model, verdict) of every counted line's per-model result
 _vs += [("A", c, k, r_["v"]) for c, L in LA8.items() if L["cls"] != "D" for k, r_ in L["m"].items()]
 _vs += [("B", c, k, r_["v"]) for c, L in LB8.items() for k, r_ in L["m"].items() if k in FAM8]
@@ -3314,12 +4120,12 @@ amac("JxModels", len(_mods), f"models with a per-model verdict on a counted stag
 for w, fmt in (("Met", "{:d}"), ("Verd", "{:d}"), ("Exp", "{:.2f}")):
     vals = [macros[f"JxRisky{w}{p}"] for p in "ABD"]
     amac(f"JxRisky{w}ABD", sum((float if w == "Exp" else int)(v) for v in vals),
-         f"parts A, B and D: risky (class R) account lines {dict(Met='met', Verd='with a verdict', Exp='expected met')[w]} ({' + '.join(vals)}; part C to be added)",
+         f"parts A, B and D: risky (class R) account lines {dict(Met='met', Verd='with a verdict', Exp='expected met')[w]} ({' + '.join(vals)}; part C excluded: JxRisky...ABCD include it)",
          "STAGE8A/8B/8D_SCORE.txt SUMMARY", G8X, fmt)
 for w in ("Met", "NotMet", "NotEval", "Lines"):
     vals = [macros[f"J{p}Count{w}"] for p in "abd"]
     amac(f"Jx{w}ABD" if w != "Lines" else "JxLinesABD", sum(int(v) for v in vals),
-         f"parts A, B and D: lines {dict(Met='MET', NotMet='NOT MET', NotEval='NOT EVALUABLE', Lines='counted')[w]} ({' + '.join(vals)}; part C to be added)",
+         f"parts A, B and D: lines {dict(Met='MET', NotMet='NOT MET', NotEval='NOT EVALUABLE', Lines='counted')[w]} ({' + '.join(vals)}; part C excluded: the ...ABCD macros include it)",
          "STAGE8A/8B/8D_SCORE.txt SUMMARY", G8X, "{:d}")
 for c in ("L", "M"):
     for w, fmt in (("Met", "{:d}"), ("Exp", "{:.2f}")):
@@ -3329,6 +4135,57 @@ for c in ("L", "M"):
     amac(f"JxClass{c}VerdABD", sum(int(macros[f"J{p}Class{c}Lines"]) - int(macros[f"J{p}Class{c}NotEval"]) for p in "abd"),
          f"parts A, B and D: class-{c} account lines with a verdict", "STAGE8A/8B/8D_SCORE.txt SUMMARY", G8X, "{:d}")
 assert int(macros["JxRiskyVerdA"]) == int(macros["JaClassRLines"]) - int(macros["JaClassRNotEval"])
+
+# ---------------------------------------------------------------- stage 8, across all four parts (A-D): the entry's totals
+# The same counts with part C added (macros ending in ABCD; the ABD macros above are kept unchanged). Part C's per-model
+# verdicts: its law combos (J-C1, J-C2, J-C4), J-C-BOUND's sub-families, J-C-READa's (model, family) pairs, J-C6 (Qwen2.5-14B)
+# and the screened models; J-C5 is one pooled test over models and has no per-model verdict. The alternative reading of
+# J-C-READb (the common part's evaluability rule: E4a's KO(H*) 0.590 / 0.678 < 0.7 counts against the line) is registered
+# with the suffix Alt.
+_vsc = [("C", c, k, c_["v"]) for (c, k, Z, dep), c_ in COMB8.items() if not c_["seed"]]
+_vsc += [("C", "J-C-BOUND", k, b["v"].upper()) for (k, Z), b in BND8.items() if b]
+_vsc += [("C", "J-C-READa", k, "NOT MET") for (k, D, w) in RDP8 if D in ("E1", "E2") and w == "H"]
+_vsc += [("C", "J-C6", "qwen14", LC8["J-C6"]["v"])] + [("C", "J-C-SCREEN", k, LC8["J-C-SCREEN"]["v"]) for k in SCR8]
+_vs4 = _vs + _vsc
+_fam4 = sorted({FAM8[k] for _, _, k, v in _vs4 if v in ("MET", "NOT MET")})
+_famm4 = sorted({FAM8[k] for _, _, k, v in _vs4 if v == "MET"})
+_mods4 = sorted({k for _, _, k, v in _vs4 if v in ("MET", "NOT MET")})
+_src4 = "STAGE8A/8B/8C/8D_SCORE.txt"
+amac("JxFamiliesABCD", len(_fam4), f"model families with a confirmatory stage-8 result (a per-model verdict, met or not met) in any of the four parts: {', '.join(_fam4)}", _src4 + " PREDICTIONS", G8X, "{:d}")
+amac("JxFamiliesMetABCD", len(_famm4), f"model families with at least one per-model MET in any of the four parts: {', '.join(_famm4)}", _src4 + " PREDICTIONS", G8X, "{:d}")
+amac("JxModelsABCD", len(_mods4), f"models with a per-model verdict in any of the four parts: {', '.join(SH8[k] for k in _mods4)}", _src4 + " PREDICTIONS", G8X, "{:d}")
+for w, fmt in (("Met", "{:d}"), ("Verd", "{:d}"), ("Exp", "{:.2f}")):
+    vals = [macros[f"JxRisky{w}{p}"] for p in "ABCD"]
+    amac(f"JxRisky{w}ABCD", sum((float if w == "Exp" else int)(v) for v in vals),
+         f"the entry in total (parts A-D): risky (class R) account lines {dict(Met='met', Verd='with a verdict', Exp='expected met')[w]} ({' + '.join(vals)})", _src4 + " SUMMARY", G8X, fmt)
+for w in ("Met", "NotMet", "NotEval", "Lines"):
+    vals = [macros[f"J{p}Count{w}"] for p in "abcd"]
+    amac(f"Jx{w}ABCD", sum(int(v) for v in vals), f"the entry in total (parts A-D): lines {dict(Met='MET', NotMet='NOT MET', NotEval='NOT EVALUABLE', Lines='counted')[w]} ({' + '.join(vals)})",
+         _src4 + " SUMMARY", G8X, "{:d}")
+amac("JxAccountLinesABCD", int(macros["JxLinesABCD"]) - int(macros["JbClassValLines"]), "the entry in total: account lines (every counted line but part B's measurement-validity lines)", _src4 + " SUMMARY", G8X, "{:d}")
+for c in ("L", "M"):
+    for w, fmt in (("Met", "{:d}"), ("Exp", "{:.2f}")):
+        vals = [macros[f"J{p}Class{c}{w}"] for p in "abcd"]
+        amac(f"JxClass{c}{w}ABCD", sum((float if w == "Exp" else int)(v) for v in vals), f"the entry in total: class-{c} account lines {'met' if w == 'Met' else 'expected met'} ({' + '.join(vals)})",
+             _src4 + " SUMMARY", G8X, fmt)
+    amac(f"JxClass{c}VerdABCD", sum(int(macros[f"J{p}Class{c}Lines"]) - int(macros[f"J{p}Class{c}NotEval"]) for p in "abcd"),
+         f"the entry in total: class-{c} account lines with a verdict", _src4 + " SUMMARY", G8X, "{:d}")
+for w, fmt, d in (("Met", "{:d}", "met"), ("Exp", "{:.2f}", "expected met")):
+    amac(f"JxClassVal{w}ABCD", (float if w == "Exp" else int)(macros[f"JbClassVal{w}"]), f"the entry in total: measurement-validity lines (all class R, all in part B) {d}", _src4 + " SUMMARY", G8X, fmt)
+amac("JxClassValVerdABCD", int(macros["JbClassValLines"]) - int(macros["JbClassValNotEval"]), "the entry in total: measurement-validity lines with a verdict", _src4 + " SUMMARY", G8X, "{:d}")
+_pb8 = float(LC8["J-C-READb"]["prior"])
+for p, base in (("C", "C"), ("ABCD", "ABCD")):
+    amac(f"JxRiskyMet{p}Alt", int(macros[f"JxRiskyMet{base}"]), f"{'part C' if p == 'C' else 'the entry in total'}: risky account lines met, under the common-part reading of J-C-READb (NOT MET; no change)",
+         _src4 + " SUMMARY", G8X, "{:d}")
+    amac(f"JxRiskyVerd{p}Alt", int(macros[f"JxRiskyVerd{base}"]) + 1, f"{'part C' if p == 'C' else 'the entry in total'}: risky account lines with a verdict under that reading (J-C-READb added)",
+         _src4 + " SUMMARY", G8X, "{:d}")
+    amac(f"JxRiskyExp{p}Alt", float(macros[f"JxRiskyExp{base}"]) + _pb8, f"{'part C' if p == 'C' else 'the entry in total'}: risky account lines expected met under that reading (+ J-C-READb's prior {_pb8:.2f})",
+         _src4 + " SUMMARY", G8X, "{:.2f}")
+# the outcome record's totals (docs/PREREGISTRATION.md, "The entry in total (parts A-D)") are reproduced
+assert [macros[f"Jx{w}ABCD"] for w in ("Met", "NotMet", "NotEval", "Lines")] == ["36", "21", "12", "69"] and macros["JxAccountLinesABCD"] == "64"
+assert [macros[f"JxRisky{w}ABCD"] for w in ("Met", "Verd", "Exp")] == ["10", "27", "12.05"]
+assert [macros[f"JxClass{c}{w}ABCD"] for c in ("L", "M", "Val") for w in ("Met", "Verd", "Exp")] == ["6", "6", "5.40", "16", "19", "15.80", "4", "5", "2.60"]
+assert [macros[f"JxRisky{w}{p}Alt"] for p in ("C", "ABCD") for w in ("Met", "Verd", "Exp")] == ["1", "5", "2.30", "10", "28", "12.65"]
 
 
 # ---------------------------------------------------------------- stage 8 tables (captions and labels live in the section files)
@@ -3348,8 +4205,9 @@ for _t in ("tab_fresh.tex", "tab_mass.tex", "tab_invariance.tex"):
     (TAB / _t).write_text(_src)
     assert (TAB / _t).read_bytes() == (ROOT / "results/gpu_stage8b" / _t).read_bytes(), _t
 
-# ---- tab_prereg_j.tex: every stage-8 line of parts A, B and D (code, class, kind, prior, models met / evaluable, verdict);
-# part C is a placeholder row group. Two halves side by side: parts A and B on the left, C and D on the right.
+# ---- tab_prereg_j.tex: every stage-8 line (code, class, kind, prior, met / evaluable, verdict): parts A, B and D by models,
+# part C by its lines' units (combos, sub-families, (model, family) pairs, formats, screened models). Two halves side by
+# side: parts A and B on the left, C and D on the right; the entry's totals below both.
 _left, _right = [], []
 HALF = r"\multicolumn{6}{@{}p{0.47\textwidth}@{}}"
 
@@ -3371,8 +4229,16 @@ for code, L in LB8.items():
     _left.append(_jrow(code, L["cls"], L["kind"], L["prior"], L["met"], L["ev"], L["v"]))
 _left.append(HALF + r"{\footnotesize \JbCountMet{} met, \JbCountNotMet{} not met, \JbCountNotEval{} not evaluable of \JbCountLines{} lines; "
              r"risky account lines met: \JxRiskyMetB{} of \JxRiskyVerdB{} with a verdict (expected \JxRiskyExpB{}).}")
-_right.append(HALF + r"{\textbf{Part C}: placeholder}")
-_right.append(HALF + r"{\footnotesize Part C is not scored yet; its lines are added here when its run is scored.}")
+_right.append(HALF + r"{\textbf{Part C}: independently obtained identity edits (Qwen2.5-7B, Mistral-7B, Llama-3.1-8B; J-C6 at Qwen2.5-14B; the screen at "
+              r"Qwen2.5-7B and Llama-3.1-8B)}")
+for code, L in LC8.items():
+    _right.append(_jrow(code, L["cls"], L["kind"], L["prior"], macros[f"Jc{LWC8[code]}Met"], macros[f"Jc{LWC8[code]}Eval"], L["v"], r"$^\S$" if code == "J-C-READb" else ""))
+_right.append(HALF + r"{\footnotesize \JcCountMet{} met, \JcCountNotMet{} not met, \JcCountNotEval{} not evaluable of \JcCountLines{} lines; "
+              r"risky account lines met: \JxRiskyMetC{} of \JxRiskyVerdC{} with a verdict (expected \JxRiskyExpC{}); headline: outcome (\JcHeadline{}). "
+              r"Met: combos (J-C1--J-C4), sub-families (J-C-BOUND), (model, family) pairs (J-C-READ), formats (J-C6) or screened models (J-C-SCREEN, J-C-WIN) "
+              r"met / with a verdict; J-C5 is one pooled test. $^\S$Not met under the common part's evaluability rule (KO($H^*$) of E4, seed 101, "
+              r"\JcReadbKOEfouraQwenSeven{} and \JcReadbKOEfouraMistralSeven{} $< 0.7$, recomputed): risky lines met \JxRiskyMetCAlt{} of \JxRiskyVerdCAlt{} "
+              r"(expected \JxRiskyExpCAlt{}).}")
 _right.append(r"\addlinespace")
 _right.append(HALF + r"{\textbf{Part D}: the flag (Qwen2.5-7B, Mistral-7B; J-D6, J-D6a, J-D6-ROUTE at Qwen2.5-1.5B, 3B, 7B)}")
 for code, L in LD8.items():
@@ -3390,10 +4256,12 @@ for a, b in zip(_left, _right):
         a = " & & & & & " if a == r"\addlinespace" else a
         b = " & & & & & " if b == r"\addlinespace" else b
     lines.append(f"{a} & {b} \\\\")
-# the grand total, full width below both halves (part C to be added)
+# the entry's totals, full width below both halves
 lines += [r"\midrule",
-          r"\multicolumn{12}{@{}p{0.94\textwidth}@{}}{\textbf{Parts A, B and D}: \JxMetABD{} met, \JxNotMetABD{} not met, \JxNotEvalABD{} not evaluable of "
-          r"\JxLinesABD{} lines; risky account lines met: \JxRiskyMetABD{} of \JxRiskyVerdABD{} with a verdict (expected \JxRiskyExpABD{}; part C to be added).} \\",
+          r"\multicolumn{12}{@{}p{0.94\textwidth}@{}}{\textbf{Parts A--D}: \JxMetABCD{} met, \JxNotMetABCD{} not met, \JxNotEvalABCD{} not evaluable of "
+          r"\JxLinesABCD{} lines (\JxAccountLinesABCD{} account lines and \JxClassValVerdABCD{} measurement-validity lines); risky account lines met: \JxRiskyMetABCD{} of "
+          r"\JxRiskyVerdABCD{} with a verdict (expected \JxRiskyExpABCD{}; \JxRiskyMetABCDAlt{} of \JxRiskyVerdABCDAlt{}, expected \JxRiskyExpABCDAlt{}, under the "
+          r"common-part reading of J-C-READb).} \\",
           r"\bottomrule", r"\end{tabular}"]
 wtab("tab_prereg_j.tex", lines)
 
@@ -3474,6 +4342,58 @@ for code, rows in FS8:
         lines.append(f"{({'post hoc': 'J-D6, post hoc'}.get(code, code)) if j == 0 else ''} & {lab} & {' & '.join(cells)} & {v} \\\\")
 lines += [r"\bottomrule", r"\end{tabular}"]
 wtab("tab_flag.tex", lines)
+
+# ---- tab_law.tex: part C, every lambda statistic with its 90 % interval per model, edit and depth (appendix). * not
+# equivalent (the 90 % interval is not inside +-log 1.25); iota: a departure by the interaction rule; dagger: recomputed
+# through the scorer's classes (no printed value: E3, whose layers fail J-C-G3; E5, whose line prints only the pooled value;
+# Qwen2.5-7B E2 at l = 11, in a combo with fewer than 3 statistics)
+DAG8 = r"$^\dagger$"
+SCOL8 = ["W(P1,{})", "W(POST,{})", "A_L({})", "A_P({})"]
+ZORD8 = ["E1", "E2", "E3", "E4", "E4a", "E4b", "PERP:E2", "PERP:E4", "NONLEX:E4", "E5FR", "E5SYN", "E5NL"]
+ZTEX8 = {"E1": "E1", "E2": "E2", "E3": "E3", "E4": "E4", "E4a": "E4, seed 101", "E4b": "E4, seed 102", "PERP:E2": "PERP of E2", "PERP:E4": "PERP of E4",
+         "NONLEX:E4": "NONLEX of E4", "E5FR": "E5-FR", "E5SYN": "E5-SYN", "E5NL": "E5-NL"}
+
+
+def lline8(s_):
+    """the line a statistic belongs to, for the table."""
+    for pre, lab in (("J-C1", "J-C1"), ("J-C2 (combo not evaluable", "J-C2 (n.e.)"), ("J-C2", "J-C2"), ("J-C4 (seed level)", "J-C4 (seed)"), ("J-C4", "J-C4"),
+                     ("J-C5", "J-C5"), ("J-C-BOUND", "J-C-BOUND"), ("post hoc E3", "post hoc")):
+        if s_.startswith(pre):
+            return lab
+    raise AssertionError(s_)
+
+
+def lcell8(x):
+    """lambda [90 % interval] (a printed -0.00 is set unsigned); * not equivalent; iota: the interaction rule."""
+    if x is None:
+        return "--"
+    z = [v.lstrip("-") if fl(v) == 0 else v for v in x["t"]]
+    return tci(z) + ("" if x["eq"] else ("$^{*\iota}$" if x["inter"] else "$^{*}$"))
+
+
+_lr8 = []
+for k in MC8:
+    for Z in ZORD8:
+        for l in DW8:
+            cells = [LAMP8.get((k, Z, c.format(l))) for c in SCOL8]
+            if not any(cells):
+                continue
+            got = [x for x in cells if x]
+            assert len({x["line"] for x in got}) == 1 and len({x["rec"] for x in got}) == 1, (k, Z, l)
+            _lr8.append((k, Z, l, cells, lline8(got[0]["line"]), got[0]["rec"]))
+assert sum(sum(x is not None for x in r[3]) for r in _lr8) == len(LAMP8), (len(LAMP8), sum(sum(x is not None for x in r[3]) for r in _lr8))
+lines = [r"\footnotesize", r"\setlength{\tabcolsep}{3pt}", r"\begin{tabular}{@{}lllcccc l@{}}", r"\toprule",
+         r"Model & Edit & $l$ & $W(\mathrm{P1}, l)$ & $W(\mathrm{POST}, l)$ & $A_L(l)$ & $A_P(l)$ & Line \\", r"\midrule"]
+for n_, k in enumerate(MC8):
+    rk = [r for r in _lr8 if r[0] == k]
+    prev = None
+    for j, (k_, Z, l, cells, line, rec) in enumerate(rk):
+        zlab_ = (ZTEX8[Z] + (DAG8 if rec else "")) if Z != prev else ""
+        lines.append(f"{SH8[k] if j == 0 else ''} & {zlab_} & {l} & " + " & ".join(lcell8(x) for x in cells) + f" & {line} \\\\")
+        prev = Z
+    lines.append(r"\midrule" if n_ < len(MC8) - 1 else r"\bottomrule")
+lines.append(r"\end{tabular}")
+wtab("tab_law.tex", lines)
 
 # ---------------------------------------------------------------- stage 8 figures (no titles in the PDFs; captions come from LaTeX)
 MD8META = {"CreationDate": None}   # reproducible PDFs
@@ -3786,6 +4706,201 @@ def flag_figure():
 
 
 flag_figure()
+COLC8 = {"nat": INK2, "E1": BLUE, "E2": AQUA, "E3": PURPLE, "E4": ORANGE, "E5": BROWN}
+MKC8 = {"qwen7": "o", "mistral7": "s", "llama8": "^"}
+LAMSY8 = dict(linthresh=0.25, linscale=0.9)       # the lambda axis: linear inside +-0.25, logarithmic beyond
+LAMTK8 = ([-4, -2, -1, -0.5, -0.2, 0, 0.2], ["$-$4", "$-$2", "$-$1", "$-$0.5", "$-$0.2", "0", "0.2"])
+
+
+def lam_axis8(ax, ylo=-4.6, yhi=0.42):
+    """the lambda axis of fig_law (a) and fig_nu: symlog, the equivalence band +-log 1.25 and the copy-only bound log 0.5."""
+    ax.set_yscale("symlog", **LAMSY8)
+    ax.set_ylim(ylo, yhi)
+    ax.set_yticks(LAMTK8[0])
+    ax.set_yticklabels(LAMTK8[1])
+    ax.yaxis.set_minor_locator(matplotlib.ticker.NullLocator())
+    ax.axhspan(-np.log(1.25), np.log(1.25), color="#e9eef7", lw=0, zorder=0)
+    ax.axhline(0, color=INK2, lw=0.5, zorder=1)
+    ax.axhline(np.log(0.5), color=INK2, lw=0.5, ls=":", zorder=1)
+    ax.grid(axis="y", color=GRID, lw=0.5, zorder=0)
+
+
+def law_figure():
+    """part C: (a) lambda per edit family, depth and statistic with 90 % intervals and the +-log 1.25 band (E3 hollow: not
+    evaluable, post hoc; hollow too: Qwen2.5-7B E2 at l = 11, in a combo without a verdict); (b) kappa against sigma per cell
+    at l = 3 and 7 (descriptive); (c) phi under NONE of the PAR, LEX, PERP and NONLEX components beside the full edit; (d)
+    KO(H*) and the random-set mean KO per donor at P1, l = 7 (the natural donor's random-set mean, E3 and E4a recomputed)."""
+    fig = plt.figure(figsize=(6.75, 2.3))
+    gs = fig.add_gridspec(1, 4, width_ratios=[2.2, 1.0, 1.3, 1.0], wspace=0.42, left=0.068, right=0.99, bottom=0.2, top=0.9)
+    # (a) lambda
+    ax = fig.add_subplot(gs[0, 0])
+    lam_axis8(ax)
+    fams = [("E1", (3, 7, 11)), ("E2", (3, 7, 11)), ("E3", (3, 7, 11)), ("E4", (3, 7))]
+    x0, ticks, tlab, fx = 0.0, [], [], []
+    for F, deps in fams:
+        xs_ = []
+        for l in deps:
+            items = [(k, c.format(l)) for k in MC8 for c in SCOL8 if (k, F, c.format(l)) in LAMP8]
+            offs = np.linspace(-0.38, 0.38, len(items)) if len(items) > 1 else [0.0]
+            for (k, code), dx in zip(items, offs):
+                x = LAMP8[k, F, code]
+                y, lo, hi = (fl(v) for v in x["t"])
+                ax.plot([x0 + dx] * 2, [lo, hi], color=COLC8[F], lw=0.6, alpha=0.75, zorder=2, solid_capstyle="butt")
+                ax.plot(x0 + dx, y, marker=MKC8[k], ms=2.6, ls="none", color=COLC8[F], mfc="white" if x["rec"] else COLC8[F], mew=0.6, zorder=3)
+            ticks.append(x0), tlab.append(str(l)), xs_.append(x0)
+            x0 += 1.0
+        fx.append((F, np.mean(xs_)))
+        x0 += 0.45
+    ax.set_xticks(ticks)
+    ax.set_xticklabels(tlab, fontsize=5.6)
+    ax.tick_params(axis="x", length=0, pad=1.5)
+    ax.tick_params(axis="y", labelsize=5.8)
+    ax.set_xlim(-0.6, x0 - 0.45 - 0.4)
+    for F, xm in fx:
+        ax.text(xm, -0.085, {"E1": "E1", "E2": "E2", "E3": r"E3$^\dagger$", "E4": "E4"}[F], transform=matplotlib.transforms.blended_transform_factory(ax.transData, ax.transAxes),
+                ha="center", va="top", fontsize=6.3, color=COLC8[F], fontweight="bold")
+    ax.text(-0.6, -0.03, "$l$:", transform=matplotlib.transforms.blended_transform_factory(ax.transData, ax.transAxes), ha="right", va="top", fontsize=5.6, color=INK2)
+    ax.set_ylabel(r"$\lambda = \log \psi_K - \log \psi_V$", fontsize=6.3, labelpad=1)
+    ax.set_title(r"(a) channel ratio of the edits, $\lambda$", fontsize=7, color=INK, loc="left")
+    ax.text(x0 - 0.45 - 0.45, np.log(1.25), r"$\pm\log 1.25$", fontsize=5.0, color=INK2, ha="right", va="bottom")
+    ax.text(-0.45, np.log(0.5), r"$\log 0.5$", fontsize=5.0, color=INK2, ha="left", va="bottom")
+    hs = [matplotlib.lines.Line2D([], [], marker=MKC8[k], ls="none", color=INK2, ms=2.8, mew=0.6) for k in MC8]
+    hs.append(matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, mfc="white", ms=2.8, mew=0.6))
+    ax.legend(hs, [SH8[k] for k in MC8] + ["no verdict (recomputed)"], frameon=False, fontsize=5.2, loc="lower left", bbox_to_anchor=(0.26, 0.0), handletextpad=0.2,
+              labelspacing=0.15, borderaxespad=0.2)
+    # (b) kappa against sigma
+    bx = fig.add_subplot(gs[0, 1])
+    bx.plot([0, 1], [0, 1], color=INK2, lw=0.6, ls=(0, (3, 2)), zorder=1)
+    for (k, f, l), (sg, kp) in KS8.items():
+        if l not in (3, 7):
+            continue
+        for Z in ("E1", "E2", "E4a", "E4b"):
+            if Z in kp:
+                F = Z[:2]
+                bx.plot(fl(sg), fl(kp[Z]), marker="o" if l == 3 else "^", ms=2.6, ls="none", color=COLC8[F], mfc=COLC8[F] if l == 3 else "white", mew=0.6,
+                        zorder=3 if F != "E4" else 4, alpha=0.9)
+    bx.set_xlim(-0.05, 1.05)
+    bx.set_ylim(-0.05, 1.05)
+    bx.set_xticks([0, 0.5, 1])
+    bx.set_yticks([0, 0.5, 1])
+    bx.tick_params(labelsize=5.8)
+    bx.grid(color=GRID, lw=0.5, zorder=0)
+    bx.set_xlabel(r"$\sigma$: natural key share", fontsize=6.3, labelpad=1)
+    bx.set_ylabel(r"$\kappa$: the edit's key share", fontsize=6.3, labelpad=1)
+    bx.set_title(r"(b) $\kappa$ against $\sigma$", fontsize=7, color=INK, loc="left")
+    hs = [matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, ms=2.8, mew=0.6),
+          matplotlib.lines.Line2D([], [], marker="^", ls="none", color=INK2, mfc="white", ms=2.8, mew=0.6)]
+    bx.legend(hs, ["$l = 3$", "$l = 7$"], frameon=False, fontsize=5.2, loc="lower right", bbox_to_anchor=(1.02, 0.0), handletextpad=0.1,
+              labelspacing=0.1, borderaxespad=0.1)
+    # (c) the components
+    cx = fig.add_subplot(gs[0, 2])
+    comps = [("edit", "edit"), ("PAR", "PAR"), ("LEX", "LEX"), ("PERP", r"PERP$^\dagger$"), ("NONLEX", r"NONLEX$^\dagger$")]
+    foff = {"E1": -0.25, "E2": 0.0, "E4": 0.25}
+    moff = {"qwen7": -0.06, "mistral7": 0.0, "llama8": 0.06}
+    for j, (c_, _) in enumerate(comps):
+        for (k, Z, l), v in LEXP8.items():
+            if Z == "E3":
+                continue
+            y = {"edit": fl(v["phi"]), "PAR": fl(v["par"]), "LEX": fl(v["lex"])}.get(c_)
+            if y is None:
+                y = LEXC8[k, Z, l, c_]
+            cx.plot(j + foff[Z] + moff[k], y, marker=MKC8[k], ms=2.2, ls="none", color=COLC8[Z], mew=0.5, alpha=0.85, zorder=3)
+    cx.axhline(0.3, color=INK2, lw=0.5, ls=":", zorder=1)
+    cx.axhline(0, color=INK2, lw=0.5, zorder=1)
+    cx.text(-0.45, 0.31, "0.3", fontsize=5.0, color=INK2, ha="left", va="bottom")
+    for xv in np.arange(0.5, len(comps) - 1, 1.0):
+        cx.axvline(xv, color=GRID, lw=0.5, zorder=0)
+    cx.set_xticks(range(len(comps)))
+    cx.set_xticklabels([c[1] for c in comps], fontsize=5.2, rotation=30, ha="right", rotation_mode="anchor")
+    cx.tick_params(axis="x", length=0, pad=1.5)
+    cx.tick_params(axis="y", labelsize=5.8)
+    cx.set_xlim(-0.5, len(comps) - 0.5)
+    cx.set_ylim(-0.12, 1.12)
+    cx.set_yticks([0, 0.5, 1])
+    cx.grid(axis="y", color=GRID, lw=0.5, zorder=0)
+    cx.set_ylabel(r"$\varphi$ under NONE", fontsize=6.3, labelpad=1)
+    cx.set_title("(c) components of the edits", fontsize=7, color=INK, loc="left")
+    hs = [matplotlib.lines.Line2D([], [], marker="s", ls="none", color=COLC8[F], ms=2.8) for F in ("E1", "E2", "E4")]
+    cx.legend(hs, ["E1", "E2", "E4"], frameon=False, fontsize=5.4, loc="upper right", bbox_to_anchor=(1.02, 0.86), handletextpad=0.1, labelspacing=0.1, borderaxespad=0.1)
+    # (d) the reader heads
+    dx = fig.add_subplot(gs[0, 3])
+    donors = [("nat", r"nat.$^\dagger$"), ("E1", "E1"), ("E2", "E2"), ("E3", r"E3$^\dagger$"), ("E4a", r"E4$^\dagger$")]
+    mo = {"qwen7": -0.14, "mistral7": 0.14}
+    for j, (D, _) in enumerate(donors):
+        F = "nat" if D == "nat" else D[:2]
+        for k in ("qwen7", "mistral7"):
+            if D in ("E1", "E2"):
+                kh = tuple(fl(x) for x in RDP8[k, D, "H"])
+                kr = tuple(fl(x) for x in RDP8[k, D, "rand"])
+            elif D == "nat":
+                kh = tuple(fl(x) for x in RDP8[k, "nat", "H"])
+                kr = tuple(fl(macros[f"JcReadaRandNat{K8[k]}{s_}"]) for s_ in ("", "Lo", "Hi"))
+            elif (k, D) in RDR8:
+                kq, rq = RDR8[k, D]
+                kh, kr = (kq.pt, *kq.ci()), (rq.pt, *rq.ci())
+            else:
+                continue
+            x = j + mo[k]
+            nov = D in ("E3", "E4a")
+            for (y, lo, hi), filled in ((kh, True), (kr, False)):
+                if D != "E4a":   # E4a: point estimates only (its key read is 0.85 / 0.18 nats, so its KO intervals span the axis)
+                    dx.plot([x, x], [lo, hi], color=COLC8[F], lw=0.6, alpha=0.75, zorder=2, solid_capstyle="butt")
+                dx.plot(x, y, marker=MKC8[k], ms=2.8, ls="none", color=COLC8[F], mfc=COLC8[F] if filled else "white", mew=0.6, zorder=3)
+    dx.axhline(0.7, color=INK2, lw=0.5, ls=(0, (3, 2)), zorder=1)
+    dx.axhline(0.25, color=INK2, lw=0.5, ls=":", zorder=1)
+    dx.axhline(0, color=INK2, lw=0.5, zorder=1)
+    dx.text(3.5, 0.71, "0.7", fontsize=5.0, color=INK2, ha="center", va="bottom")
+    dx.text(3.5, 0.26, "0.25", fontsize=5.0, color=INK2, ha="center", va="bottom")
+    dx.set_xticks(range(len(donors)))
+    dx.set_xticklabels([d[1] for d in donors], fontsize=5.4)
+    dx.tick_params(axis="x", length=0, pad=1.5)
+    dx.tick_params(axis="y", labelsize=5.8)
+    dx.set_xlim(-0.5, len(donors) - 0.5)
+    dx.set_ylim(-0.2, 1.2)
+    dx.set_yticks([0, 0.5, 1])
+    dx.grid(axis="y", color=GRID, lw=0.5, zorder=0)
+    dx.set_ylabel("KO: share of the key read removed", fontsize=6.0, labelpad=1)
+    dx.set_title("(d) reader heads", fontsize=7, color=INK, loc="left")
+    hs = [matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, ms=2.8, mew=0.6), matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, mfc="white", ms=2.8, mew=0.6)]
+    dx.legend(hs, [r"$H^*$", "random sets"], frameon=False, fontsize=5.2, loc="lower left", bbox_to_anchor=(-0.02, 0.02), handletextpad=0.1, labelspacing=0.1, borderaxespad=0.1)
+    fig.savefig(FIG / "fig_law.pdf", metadata=MD8META)
+    plt.close(fig)
+
+
+def nu_figure():
+    """part C, post hoc: lambda against nu (the distance of the edit's K/V tables from the natural ones) for every statistic of
+    every identity-carrying instance (phi(NONE) >= 0.3); colour by family; circles full edits, triangles PERP, squares
+    NONLEX components; filled = equivalent; the band +-log 1.25 and the bands of nu with their equivalent counts."""
+    fig, ax = plt.subplots(figsize=(3.25, 2.25))
+    fig.subplots_adjust(left=0.15, right=0.985, bottom=0.17, top=0.9)
+    lam_axis8(ax, -4.6, 0.42)
+    for p in sorted(NUP8, key=lambda p: p["eq"]):
+        head, _, base = p["Z"].rpartition(":")
+        F = "E5" if base.startswith("E5") else base[:2]
+        mk = {"": "o", "PERP": "^", "NONLEX": "s"}[head]
+        ax.plot(p["nu"], p["lam"], marker=mk, ms=3.0, ls="none", color=COLC8[F], mfc=COLC8[F] if p["eq"] else "white", mew=0.6, alpha=0.9, zorder=3)
+    for xv in (0.1, 0.3):
+        ax.axvline(xv, color=INK2, lw=0.5, ls=(0, (3, 2)), zorder=1)
+    ymax = 0.42
+    for (lo, hi), w in (((0, 0.1), "Low"), ((0.1, 0.3), "Mid"), ((0.3, 1.42), "High")):
+        ax.text((lo + hi) / 2, 1.005, f"{macros[f'JcNuEq{w}']}/{macros[f'JcNuN{w}']}" + (" equivalent" if w == "High" else ""),
+                transform=matplotlib.transforms.blended_transform_factory(ax.transData, ax.transAxes), ha="center", va="bottom", fontsize=5.6, color=INK2)
+    ax.set_xlim(0, 1.42)
+    ax.set_xticks([0, 0.1, 0.3, 0.5, 1.0])
+    ax.set_xticklabels(["0", "0.1", "0.3", "0.5", "1"])
+    ax.tick_params(labelsize=6)
+    ax.set_xlabel(r"$\nu$: distance of the edit's K/V tables from the natural ones", fontsize=6.3, labelpad=1.5)
+    ax.set_ylabel(r"$\lambda = \log \psi_K - \log \psi_V$", fontsize=6.3, labelpad=1)
+    hs = [matplotlib.lines.Line2D([], [], marker="o", ls="none", color=COLC8[F], ms=3.0) for F in ("E1", "E2", "E3", "E4", "E5")]
+    hs += [matplotlib.lines.Line2D([], [], marker=m_, ls="none", color=INK2, mfc="white", ms=3.0, mew=0.6) for m_ in ("^", "s")]
+    ax.legend(hs, ["E1", "E2", "E3", "E4", "E5", "PERP comp.", "NONLEX comp."], frameon=False, fontsize=5.3, loc="upper left", bbox_to_anchor=(0.33, 1.0),
+              handletextpad=0.15, labelspacing=0.12, borderaxespad=0.2, ncol=2, columnspacing=0.6)
+    fig.savefig(FIG / "fig_nu.pdf", metadata=MD8META)
+    plt.close(fig)
+
+
+law_figure()
+nu_figure()
 
 
 # ---------------------------------------------------------------- checks
@@ -3822,15 +4937,15 @@ print(f"v3: {len(REG)} new macros ({sum(1 for r in REG if 'recomputed' in r[3])}
 # the new macros by group
 assert all(macros[n] == v for n, v in PRE8.items()), [n for n, v in PRE8.items() if macros[n] != v][:5]
 _s8 = REG[N_PRE8:]
-assert all(r[0] in (G8A, G8B, G8D, G8X) for r in _s8)
+assert all(r[0] in (G8A, G8B, G8C, G8D, G8X) for r in _s8)
 _s8n = {r[1] for r in _s8}
-print(f"stage 8: {len(_s8)} new macros (" + ", ".join(f"{g} {sum(1 for r in _s8 if r[0] == g)}" for g in (G8A, G8B, G8D, G8X)) +
+print(f"stage 8: {len(_s8)} new macros (" + ", ".join(f"{g} {sum(1 for r in _s8 if r[0] == g)}" for g in (G8A, G8B, G8C, G8D, G8X)) +
       f"; {sum(1 for n in SRCLINE if n in _s8n)} printed strings checked against their score-file lines, {sum(1 for r in _s8 if 'recomputed' in r[3])} recomputed, "
       f"{sum(1 for r in _s8 if 'arithmetic' in r[3])} arithmetic, the rest ranges selecting printed strings); the {len(PRE8)} earlier macros are unchanged")
 
 # ---------------------------------------------------------------- index of the new macros (for the writers)
 # MACRO_INDEX=<file> lists every registered macro by group, as before stage 8. MACRO_INDEX_GROUPS=<g1,g2,...> (optional)
-# lists only those groups in full and counts the others, e.g. MACRO_INDEX_GROUPS=S8A,S8B,S8D,S8X for docs/V5_MACROS.md.
+# lists only those groups in full and counts the others, e.g. MACRO_INDEX_GROUPS=S8A,S8B,S8C,S8D,S8X for docs/V5_MACROS.md.
 if os.environ.get("MACRO_INDEX"):
     from collections import OrderedDict
     by = OrderedDict()
@@ -3843,9 +4958,11 @@ if os.environ.get("MACRO_INDEX"):
            "'[recomputed]' = not printed by a scorer: label exploratory or post hoc in the paper.", ""]
     if len(REG) > N_PRE8:
         out += [f"Stage 8 (preregistration J; {len(REG) - N_PRE8} of the macros) has groups by part instead: S8A = part A (natural passages), "
-                "S8B = part B (fresh samples, the emitted-form score), S8D = part D (the flag), S8X = counts across parts A, B and D "
-                "(part C is still running and has no macros yet). Names: J + part (Ja, Jb, Jd, Jx) + statistic + format or arm + model tag; "
-                "...Lo and ...Hi are the interval bounds (95 %; the N4 verdict bounds of part B are 98.75 %, as each description says). "
+                "S8B = part B (fresh samples, the emitted-form score), S8C = part C (independently obtained identity edits, the channel-ratio "
+                "law), S8D = part D (the flag), S8X = counts across parts (...ABD: parts A, B and D, as registered before part C; ...ABCD: the "
+                "entry in total). Names: J + part (Ja, Jb, Jc, Jd, Jx) + statistic + format or arm + model tag; "
+                "...Lo and ...Hi are the interval bounds (95 %; the N4 verdict bounds of part B are 98.75 %; part C's lambda statistics and "
+                "pooled lambda-bars have 90 % bounds, the TOST level; each description says which). "
                 "Negative values are in math mode. '[arithmetic on printed values]' = a count or sum of printed values; a name ending "
                 "in Min or Max selects a printed string. A value of -0.000 (or -0.0) is the scorer's printed string, kept verbatim; it is "
                 "marked NEGATIVE ZERO below: in running text quote its interval or range instead.", ""]
@@ -3858,7 +4975,7 @@ if os.environ.get("MACRO_INDEX"):
         if only and g not in only:
             continue
         out += [f"## {g}", "", "| macro | value | meaning | source |", "|---|---|---|---|"]
-        out += [f"| `\\{n}` | `{v}` | {(f'**NEGATIVE ZERO: prints as {v} (a minus sign on zero); quote the interval or range instead.** ' if g in (G8A, G8B, G8D, G8X) and negz.fullmatch(v) else '') + d.replace('|', '/')} | {s} |"
+        out += [f"| `\\{n}` | `{v}` | {(f'**NEGATIVE ZERO: prints as {v} (a minus sign on zero); quote the interval or range instead.** ' if g in (G8A, G8B, G8C, G8D, G8X) and negz.fullmatch(v) else '') + d.replace('|', '/')} | {s} |"
                 for n, v, d, s in rows_]
         out.append("")
     Path(os.environ["MACRO_INDEX"]).write_text("\n".join(out) + "\n")

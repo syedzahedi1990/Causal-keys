@@ -20,6 +20,8 @@ ROOT = Path(__file__).resolve().parents[1]
 QWEN = "Qwen/Qwen2.5-0.5B-Instruct"
 BEFORE_REFACTOR = "6e253bb"  # last commit with the single-position hooks inside the experiment scripts
 PY = sys.executable
+needs_git = pytest.mark.skipif(not (ROOT / ".git").exists(), reason=f"needs the git history (the scripts at {BEFORE_REFACTOR}); "
+                               "this copy of the code has no .git")
 torch.set_grad_enabled(False)
 
 
@@ -129,6 +131,7 @@ def test_qwen_clamp_matches_single_position_hooks(qwen):
     assert torch.allclose(out, lb.expand(2, -1), atol=1e-4)
 
 
+@needs_git
 def test_format_factorial_regression(qwen):
     """Refactored run_item == the committed single-position version: the item dict byte for byte (JSON), and S/B/X
     log-probs of every row, idK, idV within 1e-4 as the explicit statement of the same."""
@@ -157,6 +160,7 @@ def test_format_factorial_regression(qwen):
     assert new.summarize([b] * 5).splitlines()[0].startswith("P1      direct      [all] n=  5")
 
 
+@needs_git
 def test_row_restricted_regression():
     """Refactored row_restricted_keys == the committed version on 2 cores (P1, POST): every group's m to 1e-4."""
     _, f = committed("experiments/row_restricted_keys.py", "rr_committed")

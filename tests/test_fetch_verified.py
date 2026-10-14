@@ -28,6 +28,8 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import fetch_verified as fv  # noqa: E402
 
 PY = sys.executable
+needs_git = pytest.mark.skipif(not (ROOT / ".git").exists(), reason="the dry run records HEAD (git rev-parse); this copy of the "
+                               "code has no .git")
 REV = {"official": "1" * 40, "m1": "2" * 40, "m2": "3" * 40, "plain": "4" * 40}
 
 
@@ -504,6 +506,7 @@ echo "FINISH_RC=$?"
 '''
 
 
+@needs_git
 def test_test_mode_dry_run(tmp_path):
     fake = tmp_path / "fake_score.py"
     fake.write_text(FAKE_SCORER)

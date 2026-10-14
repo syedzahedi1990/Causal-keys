@@ -35,6 +35,8 @@ from experiments.format_factorial import run_item as ff_run_item
 NAME = "Qwen/Qwen2.5-0.5B-Instruct"
 TOL = 1e-4
 ROOT = Path(__file__).resolve().parents[1]
+needs_git = pytest.mark.skipif(not (ROOT / ".git").exists(), reason="needs the git history (the frames script before --score); "
+                               "this copy of the code has no .git")
 SMALL = {"sigma": (" ", "The "), "E": (" ", "The ", " In the ", " {a} put it in the ")}
 MIN = {"sigma": (" ",), "E": (" ", " {a} put it in the ")}
 torch.set_grad_enabled(False)
@@ -206,6 +208,7 @@ def _old_paper1_frames():
     return src
 
 
+@needs_git
 def test_paper1_frames_default_path_byte_identical(tmp_path):
     src = _old_paper1_frames()
     (tmp_path / "old").mkdir()

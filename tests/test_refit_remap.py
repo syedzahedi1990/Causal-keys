@@ -12,6 +12,8 @@ import pytest
 sys.dont_write_bytecode = True  # Paper 1's tree is read-only
 from experiments import refit_remap as rr  # noqa: E402
 
+needs_git = pytest.mark.skipif(not (Path(__file__).resolve().parents[1] / ".git").exists(),
+                               reason="git_state reads the git checkout; this copy of the code has no .git")
 P1R = Path(os.environ.get("P1R", Path.home() / "paper1/v5.5-reviewer-repository"))
 need_p1 = pytest.mark.skipif(not (P1R / "RELEASE.json").exists(), reason="set P1R to Paper 1's reviewer repository")
 FILES = {"README.md": b"readme", "gpu/train.py": b"train", "gpu/behavior_engine.py": b"engine",
@@ -203,6 +205,7 @@ def test_scorer_population():
     assert len(sc.population({"frames": (cut, few)}, False)) == 2 and sc.population({"frames": (cut, few)}, True) == []
 
 
+@needs_git
 def test_git_state_excludes_output_root():
     g = rr.git_state(rr.REPO / "results/gpu_stage4/fit_none")
     assert g["status_excluded"] == ["results/gpu_stage4"] and rr.git_state("/tmp/x/fit_none")["status_excluded"] == []

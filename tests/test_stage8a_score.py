@@ -14,6 +14,8 @@ import numpy as np
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
+needs_runbook = pytest.mark.skipif(not (ROOT / "docs" / "GPU_RUNBOOK.md").exists(),
+                                   reason="docs/GPU_RUNBOOK.md is not in this copy of the code (withheld from the anonymous release)")
 sys.path.insert(0, str(ROOT / "analysis"))
 import stage8a_score as sc  # noqa: E402
 from stage8a_parts import common as cm  # noqa: E402
@@ -361,6 +363,7 @@ def test_holm_family_is_the_r_lines_interval_components(four):
     assert "verdict MET -> NOT MET under Holm" in text
 
 
+@needs_runbook
 def test_compute_estimate_agrees_with_the_runbook():
     """The script header's compute estimate is the runbook's Part A row (the entry's Compute): about 3.3 GPU-h for the
     core, about 4.1 h with every exploratory pass."""
@@ -371,6 +374,7 @@ def test_compute_estimate_agrees_with_the_runbook():
     assert f"about {core} h core, {total} h in all" in row and (core, total) == ("3.3", "4.1")
 
 
+@needs_runbook
 def test_runbook_stage8_names_what_the_code_does():
     """docs/GPU_RUNBOOK.md, Stage 8: every host the stage-8 code downloads from (the GPU scripts' curl lines, the
     fetcher's Hub URL, Part C's release) is named under What to rent; a download is tried up to three times per source

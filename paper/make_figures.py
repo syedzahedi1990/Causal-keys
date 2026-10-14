@@ -278,7 +278,7 @@ lines = [r"\begin{tabular}{llccccc}", r"\toprule",
          r"Remap & Format & $\varphi$ & $\psi_K$ & $\chi_K$ & $\psi_V$ & $\chi_V$ \\", r"\midrule"]
 for fam, name in (("none/", "fit\\_none"), ("p1/", "fit\\_opt"), ("", "released")):
     for i, a in enumerate(FRAME_ARMS):
-        f3 = lambda k: f"{est4[fam, a, k][0]:.2f} [{est4[fam, a, k][1]:.2f}, {est4[fam, a, k][2]:.2f}]"
+        f3 = lambda k: " ".join([tnum(f"{est4[fam, a, k][0]:.2f}"), f"[{tnum(f'{est4[fam, a, k][1]:.2f}')}, {tnum(f'{est4[fam, a, k][2]:.2f}')}]"])
         lines.append(f"{name if i == 0 else ''} & {ARM_TEX[a]} & {f3('phi')} & {f3('psiK')} & {f3('rhoK')} & {f3('psiV')} & {f3('rhoV')} \\\\")
     lines.append(r"\midrule" if fam != "" else r"\bottomrule")
 lines.append(r"\end{tabular}")
@@ -420,7 +420,7 @@ lines = [r"\begin{tabular}{llccccc}", r"\toprule",
          r"Model & Format & $\varphi$ & $\psi_K$ & $\chi_K$ & $\psi_V$ & $\chi_V$ \\", r"\midrule"]
 for label, out in frames.items():
     for i, a in enumerate(FRAME_ARMS):
-        f3 = lambda q: f"{out[a][q][0]:.2f} [{out[a][q][1]:.2f}, {out[a][q][2]:.2f}]"
+        f3 = lambda q: " ".join([tnum(f"{out[a][q][0]:.2f}"), f"[{tnum(f'{out[a][q][1]:.2f}')}, {tnum(f'{out[a][q][2]:.2f}')}]"])
         name = label if i == 0 else ""
         lines.append(f"{name} & {ARM_TEX[a]} & {f3('phi')} & {f3('psi')} & {f3('rho')} & {f3('psiV')} & {f3('rhoV')} \\\\")
     lines.append(r"\midrule" if label != list(frames)[-1] else r"\bottomrule")
@@ -438,7 +438,7 @@ for k in keys:
     for arm in ("P1", "LETTER"):
         R = [r for r in win if r["arm"] == arm]
         fr = ratio_ci([r["m"][k] - r["m_B"] for r in R], [r["m"]["choice_words"] - r["m_B"] for r in R])
-        cells.append(f"{fr[0]:+.2f} \\tiny[{fr[1]:+.2f}, {fr[2]:+.2f}]")
+        cells.append(f"{tnum(f'{fr[0]:+.2f}')} \\tiny[{tnum(f'{fr[1]:+.2f}')}, {tnum(f'{fr[2]:+.2f}')}]")
     lab = f"layers {int(k[3:])}--{int(k[3:]) + 3}" if k.startswith("win") else f"KV group {k[-1]} (all layers)"
     lines.append(f"{lab} & " + " & ".join(cells) + " \\\\")
 lines += [r"\bottomrule", r"\end{tabular}"]
@@ -1554,8 +1554,12 @@ def slash(*xs):
     return " / ".join(xs)
 
 
+_NEGZERO = re.compile(r"(?:\$-\$|(?<![\w.\-])-)(0\.0+)(?![\d])")
+
+
 def wtab(name, lines):
-    (TAB / name).write_text("\n".join(lines) + "\n")
+    # v5 pass 2: a printed score-file value that rounds to zero is shown unsigned (no negative zeros); nothing else changes
+    (TAB / name).write_text("\n".join(_NEGZERO.sub(r"\1", ln_) for ln_ in lines) + "\n")
 
 
 Q7, Q14, MI7, OL7, Q15, Q3 = ("Qwen2.5-7B-Instruct", "Qwen2.5-14B-Instruct", "Mistral-7B-Instruct-v0.3", "OLMo-2-1124-7B-Instruct",
@@ -4254,10 +4258,16 @@ VW8 = {"MET": r"\textbf{met}", "NOT MET": r"\textbf{not met}", "NOT EVALUABLE": 
 # Part B's three tables are the part-B scorer's own output: copied unchanged (read and re-written; the bytes are asserted equal)
 # v5 round 1: the arm label P1 (the discovery-sample cores' options format) is printed as the paper's format macro; nothing
 # else changes, which the assertion checks
+# v5 pass 2: and every number goes through tnum (a math minus sign; a value that rounds to zero printed unsigned), which the
+# second assertion checks changes no value
+_NUM8B = re.compile(r"(?<![\w.\-])[-+]?\d+\.\d+")
 for _t in ("tab_fresh.tex", "tab_mass.tex", "tab_invariance.tex"):
     _src = (ROOT / "results/gpu_stage8b" / _t).read_text()
-    (TAB / _t).write_text(_src.replace(" & P1 & ", r" & \fmtOpt{} & "))
-    assert (TAB / _t).read_text().replace(r" & \fmtOpt{} & ", " & P1 & ") == _src, _t
+    _out = _NUM8B.sub(lambda m_: tnum(m_.group(0)), _src.replace(" & P1 & ", r" & \fmtOpt{} & "))
+    (TAB / _t).write_text(_out)
+    _back = (TAB / _t).read_text().replace(r" & \fmtOpt{} & ", " & P1 & ").replace("$-$", "-")
+    assert _NUM8B.sub("#", _back) == _NUM8B.sub("#", _src), _t
+    assert [float(x) for x in _NUM8B.findall(_back)] == [float(x) for x in _NUM8B.findall(_src)], _t
 
 # ---- tab_prereg_j.tex: every stage-8 line (code, class, kind, prior, met / evaluable, verdict): parts A, B and D by models,
 # part C by its lines' units (combos, sub-families, (model, family) pairs, formats, screened models). Two halves side by
@@ -4462,40 +4472,42 @@ COLA8 = {"llama8": BLUE, "gemma9": ORANGE, "qwen7": AQUA, "mistral7": PURPLE}
 
 
 def fresh_figure():
-    """part B: s_ID^E per arm and model with its 95 % interval; P4 (blue) and N4 (orange) grouped; Gemma-2-2B grey and hollow."""
-    fig, ax = plt.subplots(figsize=(3.25, 2.3))
-    fig.subplots_adjust(left=0.13, right=0.99, bottom=0.14, top=0.985)
-    slots = [(k, BLUE, mk, "P4") for k, mk in zip(MB8P, "osD^")] + [(k, ORANGE, mk, "N4") for k, mk in zip(MB8N, "osD^")] + [("gemma2b", GREY, "v", "NE")]
-    pos = np.array([0, 1, 2, 3, 4.6, 5.6, 6.6, 7.6, 9.0])
-    pos = (pos - pos.mean()) * 0.083
+    """part B: s_ID^E per arm and model with its 95 % interval; P4 (blue) and N4 (orange) grouped; Gemma-2-2B grey and hollow.
+    v5 round 3: drawn at its printed size (0.49 of the text width, included at scale 1) with text of at least 7 pt."""
+    fig, ax = plt.subplots(figsize=(3.3, 1.75))
+    fig.subplots_adjust(left=0.13, right=0.995, bottom=0.175, top=0.985)
     for j, arm in enumerate(AB8):
         ax.axvspan(j - 0.46, j + 0.46, color="#f4f3f0", lw=0, zorder=0)
-        for (k, col, mk, grp), dx in zip(slots, pos):
+        for (k, col, mk, grp), dx in zip(FRESH_SLOTS8, FRESH_POS8):
             y, lo, hi = (mf8(f"JbSid{AB8[arm]}{K8[k]}{s}") for s in ("", "Lo", "Hi"))
             ax.plot([j + dx, j + dx], [lo, hi], color=col, lw=0.8, zorder=2, solid_capstyle="butt")
-            ax.plot(j + dx, y, marker=mk, ms=2.9, ls="none", color=col, mfc="white" if grp == "NE" else col, mew=0.6, zorder=3,
-                    label=(SH8[k] + (" (not evaluable)" if grp == "NE" else "")) if j == 0 else None)
+            ax.plot(j + dx, y, marker=mk, ms=3.0, ls="none", color=col, mfc="white" if grp == "NE" else col, mew=0.6, zorder=3,
+                    label=(SH8[k] + (" (n.e.)" if grp == "NE" else "")) if j == 0 else None)
     ax.axhline(0, color=INK2, lw=0.6, zorder=1)
     ax.set_xticks(range(len(AB8)))
-    ax.set_xticklabels(["list\nafter", "sentence\nafter", "null\nsentence", "no\nmention", "sentence\nbefore", "list\nbefore"], fontsize=5.6)
+    ax.set_xticklabels(["list\nafter", "sentence\nafter", "null\nsentence", "no\nmention", "sentence\nbefore", "list\nbefore"], fontsize=7)
     ax.tick_params(axis="x", length=0, pad=2)
-    ax.tick_params(axis="y", labelsize=6)
+    ax.tick_params(axis="y", labelsize=7, pad=1.5)
     ax.set_xlim(-0.5, len(AB8) - 0.5)
-    ax.set_ylim(-0.1, 0.95)
+    ax.set_ylim(-0.1, 0.97)
     ax.set_yticks([0, 0.25, 0.5, 0.75])
     ax.grid(axis="y", color=GRID, lw=0.6, zorder=0)
-    ax.set_ylabel(r"$s_{\mathrm{ID}}^E$: key share of the identity", fontsize=6.3, labelpad=1)
+    ax.set_ylabel(r"$s_{\mathrm{ID}}^E$ (key share)", fontsize=7, labelpad=1)
     h_, l_ = ax.get_legend_handles_labels()
     hdr = matplotlib.lines.Line2D([], [], ls="none")
-    lg1 = ax.legend([hdr] + h_[:4] + [hdr] + h_[4:8], [r"$\bf{discovery\ sample}$"] + l_[:4] + [r"$\bf{new\ families}$"] + l_[4:8],
-                    ncol=2, frameon=False, fontsize=5.5, loc="upper right", bbox_to_anchor=(1.0, 1.0), handletextpad=0.25, labelspacing=0.18,
-                    columnspacing=0.6, handlelength=0.9, borderaxespad=0.15)
+    lg1 = ax.legend([hdr] + h_[:4] + [hdr] + h_[4:8], [r"$\bf{discovery}$"] + l_[:4] + [r"$\bf{new\ families}$"] + l_[4:8],
+                    ncol=2, frameon=False, fontsize=7, loc="upper right", bbox_to_anchor=(1.01, 1.02), handletextpad=0.2, labelspacing=0.12,
+                    columnspacing=0.5, handlelength=0.8, borderaxespad=0.1)
     ax.add_artist(lg1)
-    ax.legend(h_[8:], l_[8:], frameon=False, fontsize=5.5, loc="upper right", bbox_to_anchor=(1.0, 0.70), handletextpad=0.25, handlelength=0.9,
-              borderaxespad=0.15)
-    fig.text(0.005, 0.995, "(b)", fontsize=7, fontweight="bold", color=INK, ha="left", va="top")   # panel tag of Figure 1
+    ax.legend(h_[8:], l_[8:], frameon=False, fontsize=7, loc="upper right", bbox_to_anchor=(1.01, 0.56), handletextpad=0.2, handlelength=0.8,
+              borderaxespad=0.1)
+    fig.text(0.005, 0.995, "(b)", fontsize=8, fontweight="bold", color=INK, ha="left", va="top")   # panel tag of Figure 1
     fig.savefig(FIG / "fig_fresh.pdf", metadata=MD8META)
     plt.close(fig)
+
+
+FRESH_SLOTS8 = [(k, BLUE, mk, "P4") for k, mk in zip(MB8P, "osD^")] + [(k, ORANGE, mk, "N4") for k, mk in zip(MB8N, "osD^")] + [("gemma2b", GREY, "v", "NE")]
+FRESH_POS8 = (np.array([0, 1, 2, 3, 4.6, 5.6, 6.6, 7.6, 9.0]) - np.array([0, 1, 2, 3, 4.6, 5.6, 6.6, 7.6, 9.0]).mean()) * 0.083
 
 
 fresh_figure()
@@ -4556,7 +4568,7 @@ def crossover_figure():
     zx.grid(axis="x", color=GRID, lw=0.6, zorder=0)
     for y_ in np.arange(0.5, len(Z8) - 1, 1.0):
         zx.axhline(y_, color=GRID, lw=0.5, zorder=0)
-    zx.set_xlabel(r"$\beta_V$ of these four arms (zoom; filled: discovery sample, hollow: new families)", fontsize=6.3, labelpad=1.5)
+    zx.set_xlabel(r"$\beta_V$, zoom (filled: discovery sample, hollow: new families)", fontsize=6.3, labelpad=1.5)
     fig.savefig(FIG / "fig_crossover.pdf", metadata=MD8META)
     plt.close(fig)
 
@@ -4565,38 +4577,36 @@ crossover_figure()
 
 
 def crossover_main_figure():
-    """Figure 1c: the scatter of fig_crossover without the zoom strip (the four arms at beta_K = 0 are spread out in the
-    appendix figure), at the size of fig_fresh, with the panel tag (c)."""
-    W, H, R_, ML, MB = 3.25, 2.3, 0.06, 0.40, 0.33
-    fig = plt.figure(figsize=(W, H))
-    ax = fig.add_axes([ML / W, MB / H, (W - ML - R_) / W, (H - MB - 0.04) / H])
-    ax.plot([0, 1], [0, 1], color=INK2, lw=0.6, ls=(0, (3, 2)), zorder=1)
-    for arm, (col, mk) in ST8.items():
-        for k in MB8P + MB8N:
-            bk = [mf8(f"JbBetaK{AB8[arm]}{K8[k]}{s_}") for s_ in ("", "Lo", "Hi")]
-            bv = [mf8(f"JbBetaV{AB8[arm]}{K8[k]}{s_}") for s_ in ("", "Lo", "Hi")]
-            ax.plot([bv[1], bv[2]], [bk[0], bk[0]], color=col, lw=0.5, alpha=0.55, zorder=2, solid_capstyle="butt")
-            ax.plot([bv[0], bv[0]], [bk[1], bk[2]], color=col, lw=0.5, alpha=0.55, zorder=2, solid_capstyle="butt")
-            ax.plot(bv[0], bk[0], marker=mk, ms=3.6, ls="none", color=col, mfc=col if k in MB8P else "white", mew=0.7, zorder=3)
-    ax.set_xlim(-0.04, 1.04)
-    ax.set_ylim(-0.04, 1.04)
-    ax.set_xticks([0, 0.25, 0.5, 0.75, 1])
-    ax.set_yticks([0, 0.25, 0.5, 0.75, 1])
-    ax.tick_params(labelsize=6)
-    ax.grid(color=GRID, lw=0.6, zorder=0)
-    ax.set_xlabel(r"$\beta_V$: answers moved by the value-only clamp", fontsize=6.5, labelpad=1.5)
-    # a shorter y label than the appendix figure's, so that the panel tag (c) in the top left corner clears it (v5 round 1)
-    ax.set_ylabel(r"$\beta_K$: moved by the key-only clamp", fontsize=6.5, labelpad=2)
-    ax.text(0.635, 0.0, r"four formats at $\beta_K = 0$ (Appendix D.4)", fontsize=5.3, color=INK2, ha="right", va="center", zorder=4)
-    hs = [matplotlib.lines.Line2D([], [], marker=mk, ls="none", color=col, ms=3.6) for col, mk in ST8.values()]
-    lg = ax.legend(hs, [ALAB8[a] for a in ST8], frameon=False, fontsize=5.6, loc="upper left", bbox_to_anchor=(0.27, 1.0), handletextpad=0.3,
-                   labelspacing=0.25, borderaxespad=0.2)
-    ax.add_artist(lg)
-    hs = [matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, ms=3.6),
-          matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, mfc="white", ms=3.6, mew=0.7)]
-    ax.legend(hs, ["discovery-sample models", "new families"], frameon=False, fontsize=5.6, loc="lower left", bbox_to_anchor=(0.30, 0.09),
-              handletextpad=0.3, labelspacing=0.25, borderaxespad=0.2)
-    fig.text(0.005, 0.995, "(c)", fontsize=7, fontweight="bold", color=INK, ha="left", va="top")
+    """Figure 1c (v5 round 3): the generated-answer crossover drawn with the encoding of Figure 1b (model by colour and marker,
+    the six formats on the x axis, the same horizontal offsets), as two strips: beta_K (key-only clamp) above, beta_V
+    (value-only clamp) below. Nothing is overplotted: at beta = 0 the models sit side by side. The scatter of beta_K against
+    beta_V, with its zoom strip, is the appendix figure fig_crossover."""
+    fig = plt.figure(figsize=(3.3, 1.75))
+    gs = fig.add_gridspec(2, 1, hspace=0.12, left=0.13, right=0.995, bottom=0.175, top=0.985)
+    for r_, (ch, lab) in enumerate((("K", r"$\beta_K$ (key)"), ("V", r"$\beta_V$ (value)"))):
+        ax = fig.add_subplot(gs[r_, 0])
+        for j, arm in enumerate(AB8):
+            ax.axvspan(j - 0.46, j + 0.46, color="#f4f3f0", lw=0, zorder=0)
+            for (k, col, mk, grp), dx in zip(FRESH_SLOTS8, FRESH_POS8):
+                if grp == "NE":
+                    continue
+                y, lo, hi = (mf8(f"JbBeta{ch}{AB8[arm]}{K8[k]}{s_}") for s_ in ("", "Lo", "Hi"))
+                ax.plot([j + dx, j + dx], [lo, hi], color=col, lw=0.8, zorder=2, solid_capstyle="butt")
+                ax.plot(j + dx, y, marker=mk, ms=2.6, ls="none", color=col, mew=0.6, zorder=3)
+        ax.set_xlim(-0.5, len(AB8) - 0.5)
+        ax.set_ylim(-0.1, 1.1)
+        ax.set_yticks([0, 0.5, 1])
+        ax.set_yticklabels(["0", "0.5", "1"])
+        ax.tick_params(axis="y", labelsize=7, pad=1.5)
+        ax.tick_params(axis="x", length=0, pad=2)
+        ax.grid(axis="y", color=GRID, lw=0.6, zorder=0)
+        ax.set_ylabel(lab, fontsize=7, labelpad=1)
+        ax.set_xticks(range(len(AB8)))
+        if r_ == 0:
+            ax.set_xticklabels([])
+        else:
+            ax.set_xticklabels(["list\nafter", "sentence\nafter", "null\nsentence", "no\nmention", "sentence\nbefore", "list\nbefore"], fontsize=7)
+    fig.text(0.005, 0.995, "(c)", fontsize=8, fontweight="bold", color=INK, ha="left", va="top")
     fig.savefig(FIG / "fig_crossover_main.pdf", metadata=MD8META)
     plt.close(fig)
 
@@ -4608,9 +4618,10 @@ def natural_figure():
     """part A: (a) s_ID per format and model with its 95 % interval (hollow: the cell is not evaluable; a dagger on a format:
     its values are recomputed, as in tab_natural8.tex); (b) cue conflict, key-source against value-source rate (whole answer;
     the crosses are the rates at the decision token)."""
-    fig = plt.figure(figsize=(6.75, 2.05))
-    # v5 round 2: panel (b) gets more width and its legend sits outside the data (to the right of the square axes)
-    gs = fig.add_gridspec(1, 2, width_ratios=[1.85, 1.35], wspace=0.22, left=0.065, right=0.99, bottom=0.15, top=0.91)
+    fig = plt.figure(figsize=(6.75, 1.72))
+    # v5 round 3: drawn at the printed size (full text width, scale 1), text of at least 7 pt; the legend of panel (b) sits
+    # inside its axes, in the empty triangle above the anti-diagonal (key-source + value-source rates cannot exceed 1)
+    gs = fig.add_gridspec(1, 2, width_ratios=[2.35, 1.0], wspace=0.16, left=0.06, right=0.995, bottom=0.17, top=0.9)
     ax = fig.add_subplot(gs[0, 0])
     offs = dict(zip(MA8, (-0.27, -0.09, 0.09, 0.27)))
     for j, f in enumerate(FA8):
@@ -4627,21 +4638,21 @@ def natural_figure():
     # the dagger marks the formats whose s_ID is recomputed from the raw results (not printed by the part-A scorer; rmac)
     rec = [f for f in FA8 if not any(f"JaSid{FA8[f]}{K8[k]}" in SRCLINE for k in MA8)]
     assert rec == ["MENA", "OPTB", "MENB"] and all(f"JaSid{FA8[f]}{K8[k]}" in SRCLINE for f in FA8 if f not in rec for k in MA8), rec
-    ax.set_xticklabels([FLAB8[f].replace(" ", "\n") + (r"$^\dagger$" if f in rec else "") for f in FA8], fontsize=6.3)
+    ax.set_xticklabels([FLAB8[f].replace(" ", "\n") + (r"$^\dagger$" if f in rec else "") for f in FA8], fontsize=7)
     ax.tick_params(axis="x", length=0, pad=2)
-    ax.tick_params(axis="y", labelsize=6)
+    ax.tick_params(axis="y", labelsize=7, pad=1.5)
     ax.set_xlim(-0.5, len(FA8) - 0.5)
     ax.set_ylim(-0.1, 1.02)
     ax.set_yticks([0, 0.25, 0.5, 0.75, 1])
     ax.grid(axis="y", color=GRID, lw=0.6, zorder=0)
-    ax.set_ylabel(r"$s_{\mathrm{ID}}$: key share of the identity", fontsize=6.5)
-    ax.set_title(r"(a) $s_{\mathrm{ID}}$ by format, counterfactual SQuAD passages", fontsize=7, color=INK, loc="left")
+    ax.set_ylabel(r"$s_{\mathrm{ID}}$ (key share)", fontsize=7, labelpad=1)
+    ax.set_title(r"(a) $s_{\mathrm{ID}}$ by format, counterfactual SQuAD passages", fontsize=7.5, color=INK, loc="left")
     # explicit handles: a model's key is its filled marker (its first plotted cell may be a hollow, not-evaluable one)
     h_ = [matplotlib.lines.Line2D([], [], marker="o", ls="none", color=COLA8[k], ms=3.6, mew=0.8) for k in MA8]
     l_ = [SH8[k] for k in MA8]
     h_.append(matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, mfc="white", ms=3.6, mew=0.8))
     l_.append("not evaluable (gate)")
-    ax.legend(h_, l_, frameon=False, fontsize=6, loc="upper right", bbox_to_anchor=(1.0, 1.0), handletextpad=0.3, labelspacing=0.25, borderaxespad=0.3)
+    ax.legend(h_, l_, frameon=False, fontsize=7, loc="upper right", bbox_to_anchor=(1.0, 1.03), handletextpad=0.2, labelspacing=0.15, borderaxespad=0.2)
     bx = fig.add_subplot(gs[0, 1])
     bx.plot([0, 1], [0, 1], color=INK2, lw=0.6, ls=(0, (3, 2)), zorder=1)
     FMK = {"OPTA": "o", "LETA": "s", "NOM": "^"}
@@ -4659,18 +4670,22 @@ def natural_figure():
     bx.set_xlim(-0.03, 1.03)
     bx.set_ylim(-0.03, 1.03)
     bx.set_aspect("equal")
-    bx.set_anchor("W")   # the square axes sit at the left of their column; the legend fills the right
+    bx.set_anchor("E")
     bx.set_xticks([0, 0.5, 1])
     bx.set_yticks([0, 0.5, 1])
-    bx.tick_params(labelsize=6)
+    bx.tick_params(labelsize=7, pad=1.5)
     bx.grid(color=GRID, lw=0.6, zorder=0)
-    bx.set_xlabel("answers the value's entity", fontsize=6.3, labelpad=1)
-    bx.set_ylabel("answers the key's entity", fontsize=6.3, labelpad=1)
-    bx.set_title("(b) cue conflict", fontsize=7, color=INK, loc="left")
+    bx.set_xlabel("answers the value's entity", fontsize=7, labelpad=1)
+    bx.set_ylabel("answers the key's entity", fontsize=7, labelpad=1)
+    bx.set_title("(b) cue conflict", fontsize=7.5, color=INK, loc="left")
     hs = [matplotlib.lines.Line2D([], [], marker=mk, ls="none", color=INK2, ms=3.6) for mk in FMK.values()]
     hs.append(matplotlib.lines.Line2D([], [], marker="x", ls=":", color=INK2, ms=2.6, mew=0.6, lw=0.5))
-    bx.legend(hs, [FLAB8[f] for f in FMK] + ["first token only"], frameon=False, fontsize=6, loc="center left", bbox_to_anchor=(1.02, 0.5),
-              handletextpad=0.3, labelspacing=0.35, borderaxespad=0.2)
+    # v5 pass 2: an opaque frame, so that the dashed diagonal does not run through the entries (nothing else lies in this
+    # triangle: the key-source and value-source rates sum to at most 1)
+    lg = bx.legend(hs, [FLAB8[f] for f in FMK] + ["first token only"], frameon=True, framealpha=1, facecolor="white", edgecolor="none",
+                   fontsize=7, loc="upper right", bbox_to_anchor=(1.04, 1.04), handletextpad=0.2, handlelength=1.2, labelspacing=0.12,
+                   borderaxespad=0.1, borderpad=0.15)
+    lg.set_zorder(5)
     fig.savefig(FIG / "fig_natural.pdf", metadata=MD8META)
     plt.close(fig)
 
@@ -4685,8 +4700,8 @@ def flag_figure():
     key and value reads under Q_IN, Q_OUT and IOI in-sentence re-mentions. The scale panel is fig_flag_scale."""
     # v5 round 1: panel (d), the scale lines, moved to its own appendix figure (fig_flag_scale), so the main figure has
     # three panels and the main text fewer symbols
-    fig = plt.figure(figsize=(6.75, 1.9))
-    gs = fig.add_gridspec(1, 3, width_ratios=[2.15, 0.9, 1.0], wspace=0.24, left=0.055, right=0.995, bottom=0.17, top=0.9)
+    fig = plt.figure(figsize=(6.75, 1.62))   # v5 round 3: printed size (full width, scale 1), text of at least 7 pt
+    gs = fig.add_gridspec(1, 3, width_ratios=[2.15, 0.9, 1.0], wspace=0.25, left=0.055, right=0.995, bottom=0.2, top=0.89)
     off = {"qwen7": -0.14, "mistral7": 0.14}
 
     def dot(ax, x, k, stem, hollow=False, ms=3.4):
@@ -4711,17 +4726,17 @@ def flag_figure():
     ax.axhline(1, color=INK2, lw=0.5, ls=":", zorder=1)
     ax.axvline(3.5, color=INK2, lw=0.5, ls=":", zorder=1)
     ax.set_xticks(range(len(cats)))
-    ax.set_xticklabels([c[1] for c in cats], fontsize=6)
+    ax.set_xticklabels([c[1] for c in cats], fontsize=7)
     ax.tick_params(axis="x", length=0, pad=2)
-    ax.tick_params(axis="y", labelsize=6)
+    ax.tick_params(axis="y", labelsize=7)
     ax.set_xlim(-0.5, len(cats) - 0.5)
     ax.set_ylim(-0.12, 1.12)
     ax.set_yticks([0, 0.5, 1])
     ax.grid(axis="y", color=GRID, lw=0.6, zorder=0)
-    ax.set_ylabel(r"$\iota$: share of the natural effect on X", fontsize=6.3, labelpad=1)
-    ax.set_title(r"(a) injecting the flag: $\iota$", fontsize=7, color=INK, loc="left")
+    ax.set_ylabel(r"$\iota$ (of the natural effect)", fontsize=7, labelpad=1)
+    ax.set_title(r"(a) injecting the flag: $\iota$", fontsize=7.5, color=INK, loc="left")
     hs = [matplotlib.lines.Line2D([], [], marker=MKD8[k], ls="none", color=COLD8[k], ms=3.4) for k in MD8]
-    ax.legend(hs, [SH8[k] for k in MD8], frameon=False, fontsize=6, loc="upper right", bbox_to_anchor=(1.0, 0.9), handletextpad=0.2,
+    ax.legend(hs, [SH8[k] for k in MD8], frameon=False, fontsize=7, loc="upper right", bbox_to_anchor=(1.0, 0.9), handletextpad=0.2,
               labelspacing=0.2, borderaxespad=0.2)
     # (b) rho_K
     bx = fig.add_subplot(gs[0, 1])
@@ -4735,18 +4750,18 @@ def flag_figure():
                     dot(bx, j + off[k] + (q - 1) * 0.06, k, f"JdRhoIso{w}{K8[k]}", ms=2.2)
     bx.axhline(0.5, color=INK2, lw=0.5, ls=(0, (3, 2)), zorder=1)
     bx.axhline(0.7, color=INK2, lw=0.5, ls=":", zorder=1)
-    bx.text(3.48, 0.5, "0.5", fontsize=6, color=INK2, ha="right", va="bottom")
-    bx.text(3.48, 0.7, "0.7", fontsize=6, color=INK2, ha="right", va="bottom")
+    bx.text(3.48, 0.5, "0.5", fontsize=7, color=INK2, ha="right", va="bottom")
+    bx.text(3.48, 0.7, "0.7", fontsize=7, color=INK2, ha="right", va="bottom")
     bx.set_xticks(range(len(cats)))
-    bx.set_xticklabels([c[1] for c in cats], fontsize=6)
+    bx.set_xticklabels([c[1] for c in cats], fontsize=7)
     bx.tick_params(axis="x", length=0, pad=2)
-    bx.tick_params(axis="y", labelsize=6)
+    bx.tick_params(axis="y", labelsize=7)
     bx.set_xlim(-0.5, len(cats) - 0.5)
     bx.set_ylim(0.3, 1.06)
     bx.set_yticks([0.4, 0.6, 0.8, 1.0])
     bx.grid(axis="y", color=GRID, lw=0.6, zorder=0)
-    bx.set_ylabel(r"$\rho_K$: key read left", fontsize=6.3, labelpad=1)
-    bx.set_title(r"(b) ablating it: $\rho_K$", fontsize=7, color=INK, loc="left")
+    bx.set_ylabel(r"$\rho_K$: key read left", fontsize=7, labelpad=1)
+    bx.set_title(r"(b) ablating it: $\rho_K$", fontsize=7.5, color=INK, loc="left")
     # (c) sign
     cx = fig.add_subplot(gs[0, 2])
     cells = [("Qin", "mentioned"), ("Qout", "not\nmentioned"), ("Inline", "IOI")]
@@ -4760,15 +4775,15 @@ def flag_figure():
                    yerr=[[y - mf8(stem + "Lo")], [mf8(stem + "Hi") - y]], error_kw=dict(lw=0.6, ecolor=INK, capsize=0))
     cx.axhline(0, color=INK2, lw=0.6, zorder=4)
     cx.set_xticks(range(len(cells)))
-    cx.set_xticklabels([c[1] for c in cells], fontsize=6)
+    cx.set_xticklabels([c[1] for c in cells], fontsize=7)
     cx.tick_params(axis="x", length=0, pad=2)
-    cx.tick_params(axis="y", labelsize=6)
+    cx.tick_params(axis="y", labelsize=7)
     cx.set_xlim(-0.5, len(cells) - 0.5)
     cx.grid(axis="y", color=GRID, lw=0.6, zorder=0)
-    cx.set_ylabel("identity read (nats)", fontsize=6.3, labelpad=1)
-    cx.set_title("(c) sign of the reads", fontsize=7, color=INK, loc="left")
+    cx.set_ylabel("identity read (nats)", fontsize=7, labelpad=1)
+    cx.set_title("(c) sign of the reads", fontsize=7.5, color=INK, loc="left")
     hs = [matplotlib.patches.Patch(facecolor=INK2, edgecolor=INK2, lw=0.6), matplotlib.patches.Patch(facecolor="white", edgecolor=INK2, hatch="////", lw=0.6)]
-    cx.legend(hs, [r"$\mathrm{ID}_K$", r"$\mathrm{ID}_V$"], frameon=False, fontsize=6, loc="lower left", handlelength=1.2, handletextpad=0.3,
+    cx.legend(hs, [r"$\mathrm{ID}_K$", r"$\mathrm{ID}_V$"], frameon=False, fontsize=7, loc="lower left", handlelength=1.2, handletextpad=0.3,
               labelspacing=0.2, borderaxespad=0.2)
     fig.savefig(FIG / "fig_flag.pdf", metadata=MD8META)
     plt.close(fig)
@@ -4845,11 +4860,24 @@ def law_figure():
     KO(H*) and the random-set mean KO per donor at P1, l = 7 (the natural donor's random-set mean, E3 and E4a recomputed).
     Marker shape is the model in every panel (circle Qwen2.5-7B, square Mistral-7B, triangle Llama-3.1-8B) and colour the
     edit family; fill is explained per panel ((a) verdict, (b) depth, (d) H* or random sets)."""
-    fig = plt.figure(figsize=(6.75, 2.3))
-    gs = fig.add_gridspec(1, 4, width_ratios=[2.2, 1.0, 1.3, 1.0], wspace=0.42, left=0.068, right=0.99, bottom=0.2, top=0.9)
-    # (a) lambda
-    ax = fig.add_subplot(gs[0, 0])
-    lam_axis8(ax)
+    fig = plt.figure(figsize=(6.75, 1.95))   # v5 round 3: printed size (full width, scale 1), text of at least 7 pt
+    gs = fig.add_gridspec(1, 4, width_ratios=[2.2, 1.0, 1.3, 1.0], wspace=0.45, left=0.07, right=0.995, bottom=0.2, top=0.9)
+    # (a) lambda, on a broken axis (v5 round 3, in place of the symlog axis): linear above lambda = -0.5, where the margin
+    # +-log 1.25 and the near-natural edits lie, and linear, compressed, below it, where the far edits lie
+    sub = gs[0, 0].subgridspec(2, 1, height_ratios=[1.35, 1.0], hspace=0.07)
+    ax_t, ax_b = fig.add_subplot(sub[0, 0]), fig.add_subplot(sub[1, 0])
+    YB8 = (-0.5, 0.42, -4.7, -0.5)
+    for a_ in (ax_t, ax_b):
+        a_.axhspan(-np.log(1.25), np.log(1.25), color="#e9eef7", lw=0, zorder=0)
+        a_.axhline(0, color=INK2, lw=0.5, zorder=1)
+        a_.axhline(np.log(0.5), color=INK2, lw=0.5, ls=":", zorder=1)
+        a_.grid(axis="y", color=GRID, lw=0.5, zorder=0)
+    ax_t.set_ylim(YB8[0], YB8[1])
+    ax_b.set_ylim(YB8[2], YB8[3])
+    ax_t.set_yticks([-0.4, -0.2, 0, 0.2])
+    ax_t.set_yticklabels(["$-$0.4", "$-$0.2", "0", "0.2"])
+    ax_b.set_yticks([-4, -3, -2, -1])
+    ax_b.set_yticklabels(["$-$4", "$-$3", "$-$2", "$-$1"])
     fams = [("E1", (3, 7, 11)), ("E2", (3, 7, 11)), ("E3", (3, 7, 11)), ("E4", (3, 7))]
     x0, ticks, tlab, fx = 0.0, [], [], []
     for F, deps in fams:
@@ -4860,29 +4888,37 @@ def law_figure():
             for (k, code), dx in zip(items, offs):
                 x = LAMP8[k, F, code]
                 y, lo, hi = (fl(v) for v in x["t"])
-                ax.plot([x0 + dx] * 2, [lo, hi], color=COLC8[F], lw=0.6, alpha=0.75, zorder=2, solid_capstyle="butt")
-                ax.plot(x0 + dx, y, marker=MKC8[k], ms=2.6, ls="none", color=COLC8[F], mfc="white" if x["rec"] else COLC8[F], mew=0.6, zorder=3)
+                for a_ in (ax_t, ax_b):
+                    a_.plot([x0 + dx] * 2, [lo, hi], color=COLC8[F], lw=0.6, alpha=0.75, zorder=2, solid_capstyle="butt")
+                    a_.plot(x0 + dx, y, marker=MKC8[k], ms=2.6, ls="none", color=COLC8[F], mfc="white" if x["rec"] else COLC8[F], mew=0.6, zorder=3)
             ticks.append(x0), tlab.append(str(l)), xs_.append(x0)
             x0 += 1.0
         fx.append((F, np.mean(xs_)))
         x0 += 0.45
-    ax.set_xticks(ticks)
-    ax.set_xticklabels(tlab, fontsize=6)
-    ax.tick_params(axis="x", length=0, pad=1.5)
-    ax.tick_params(axis="y", labelsize=6)
-    ax.set_xlim(-0.6, x0 - 0.45 - 0.4)
+    for a_ in (ax_t, ax_b):
+        a_.set_xlim(-0.6, x0 - 0.45 - 0.4)
+        a_.set_xticks(ticks)
+        a_.tick_params(axis="y", labelsize=7, pad=1.5)
+        a_.tick_params(axis="x", length=0, pad=1.5)
+    ax_t.set_xticklabels([])
+    ax_b.set_xticklabels(tlab, fontsize=7)
+    ax_t.spines["bottom"].set_visible(False)
+    ax_b.spines["top"].set_visible(False)
+    # break marks on the y axis
+    for a_, yv in ((ax_t, 0.0), (ax_b, 1.0)):
+        a_.plot([-0.012, 0.012], [yv - 0.03 * (1.0 if a_ is ax_t else 1.55), yv + 0.03 * (1.0 if a_ is ax_t else 1.55)],
+                transform=a_.transAxes, color=INK2, lw=0.7, clip_on=False)
     for F, xm in fx:
-        ax.text(xm, -0.085, {"E1": "E1", "E2": "E2", "E3": r"E3$^\dagger$", "E4": "E4"}[F], transform=matplotlib.transforms.blended_transform_factory(ax.transData, ax.transAxes),
-                ha="center", va="top", fontsize=6.3, color=COLC8[F], fontweight="bold")
-    ax.text(-0.6, -0.03, "$l$:", transform=matplotlib.transforms.blended_transform_factory(ax.transData, ax.transAxes), ha="right", va="top", fontsize=6, color=INK2)
-    ax.set_ylabel(r"$\lambda = \log \psi_K - \log \psi_V$", fontsize=6.3, labelpad=1)
-    ax.set_title(r"(a) channel ratio of the edits, $\lambda$", fontsize=7, color=INK, loc="left")
-    ax.text(x0 - 0.45 - 0.45, np.log(1.25), r"$\pm\log 1.25$", fontsize=6, color=INK2, ha="right", va="bottom")
-    ax.text(-0.45, np.log(0.5), r"$\log 0.5$", fontsize=6, color=INK2, ha="left", va="bottom")
+        ax_b.text(xm, -0.36, {"E1": "E1", "E2": "E2", "E3": r"E3$^\dagger$", "E4": "E4"}[F], transform=matplotlib.transforms.blended_transform_factory(ax_b.transData, ax_b.transAxes),
+                  ha="center", va="top", fontsize=7, color=COLC8[F], fontweight="bold")
+    ax_b.text(-0.6, -0.05, "$l$:", transform=matplotlib.transforms.blended_transform_factory(ax_b.transData, ax_b.transAxes), ha="right", va="top", fontsize=7, color=INK2)
+    fig.text(0.008, 0.55, r"$\lambda = \log \psi_K - \log \psi_V$", rotation=90, ha="left", va="center", fontsize=7, color=INK)
+    ax_t.set_title(r"(a) channel ratio of the edits, $\lambda$", fontsize=7.5, color=INK, loc="left")
+    ax_t.text(x0 - 0.45 - 0.45, np.log(1.25), r"$\pm\log 1.25$", fontsize=7, color=INK2, ha="right", va="bottom")
     hs = [matplotlib.lines.Line2D([], [], marker=MKC8[k], ls="none", color=INK2, ms=2.8, mew=0.6) for k in MC8]
     hs.append(matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, mfc="white", ms=2.8, mew=0.6))
-    ax.legend(hs, [SH8[k] for k in MC8] + ["no verdict"], frameon=False, fontsize=6, loc="lower left", bbox_to_anchor=(0.0, 0.0), handletextpad=0.2,
-              labelspacing=0.15, borderaxespad=0.3, ncol=2, columnspacing=0.8)
+    ax_b.legend(hs, [SH8[k] for k in MC8] + ["no verdict"], frameon=False, fontsize=7, loc="lower left", bbox_to_anchor=(0.0, -0.04), handletextpad=0.1,
+                labelspacing=0.05, borderaxespad=0.1, ncol=1)
     # (b) kappa against sigma: the model by shape as in (a), the depth by fill (filled l = 3, open l = 7)
     bx = fig.add_subplot(gs[0, 1])
     bx.plot([0, 1], [0, 1], color=INK2, lw=0.6, ls=(0, (3, 2)), zorder=1)
@@ -4898,14 +4934,15 @@ def law_figure():
     bx.set_ylim(-0.05, 1.05)
     bx.set_xticks([0, 0.5, 1])
     bx.set_yticks([0, 0.5, 1])
-    bx.tick_params(labelsize=6)
+    bx.tick_params(labelsize=7)
     bx.grid(color=GRID, lw=0.5, zorder=0)
-    bx.set_xlabel(r"$\sigma$: natural key share", fontsize=6.3, labelpad=1)
-    bx.set_ylabel(r"$\kappa$: the edit's key share", fontsize=6.3, labelpad=1)
-    bx.set_title(r"(b) $\kappa$ against $\sigma$", fontsize=7, color=INK, loc="left")
+    bx.set_xlabel(r"$\sigma$: natural key share", fontsize=7, labelpad=1)
+    bx.set_ylabel(r"$\kappa$: the edit's key share", fontsize=7, labelpad=1)
+    bx.set_title(r"(b) $\kappa$ against $\sigma$", fontsize=7.5, color=INK, loc="left")
     hs = [matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, ms=2.8, mew=0.6),
           matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, mfc="white", ms=2.8, mew=0.6)]
-    bx.legend(hs, ["filled: $l = 3$", "open: $l = 7$"], frameon=False, fontsize=6, loc="lower right", bbox_to_anchor=(1.03, 0.0), handletextpad=0.1,
+    # v5 pass 2: the markers show the fill, so the labels name only the depth and stay clear of the top-right points
+    bx.legend(hs, ["$l = 3$", "$l = 7$"], frameon=False, fontsize=7, loc="upper left", bbox_to_anchor=(-0.02, 1.02), handletextpad=0.1,
               labelspacing=0.1, borderaxespad=0.1)
     # (c) the components
     cx = fig.add_subplot(gs[0, 2])
@@ -4922,22 +4959,22 @@ def law_figure():
             cx.plot(j + foff[Z] + moff[k], y, marker=MKC8[k], ms=2.2, ls="none", color=COLC8[Z], mew=0.5, alpha=0.85, zorder=3)
     cx.axhline(0.3, color=INK2, lw=0.5, ls=":", zorder=1)
     cx.axhline(0, color=INK2, lw=0.5, zorder=1)
-    cx.text(-0.45, 0.31, "0.3", fontsize=6, color=INK2, ha="left", va="bottom")
+    cx.text(-0.45, 0.31, "0.3", fontsize=7, color=INK2, ha="left", va="bottom")
     for xv in np.arange(0.5, len(comps) - 1, 1.0):
         cx.axvline(xv, color=GRID, lw=0.5, zorder=0)
     cx.set_xticks(range(len(comps)))
-    cx.set_xticklabels([c[1] for c in comps], fontsize=6, rotation=30, ha="right", rotation_mode="anchor")
+    cx.set_xticklabels([c[1] for c in comps], fontsize=7, rotation=30, ha="right", rotation_mode="anchor")
     cx.tick_params(axis="x", length=0, pad=1.5)
-    cx.tick_params(axis="y", labelsize=6)
+    cx.tick_params(axis="y", labelsize=7)
     cx.set_xlim(-0.5, len(comps) - 0.5)
     cx.set_ylim(-0.12, 1.12)
     cx.set_yticks([0, 0.5, 1])
     cx.grid(axis="y", color=GRID, lw=0.5, zorder=0)
-    cx.set_ylabel(r"$\varphi$ without a mention", fontsize=6.3, labelpad=1)
-    cx.set_title("(c) components of the edits", fontsize=7, color=INK, loc="left")
+    cx.set_ylabel(r"$\varphi$ without a mention", fontsize=7, labelpad=1)
+    cx.set_title("(c) components", fontsize=7.5, color=INK, loc="left")
     # the families by colour patches (the marker shapes are the models, as in (a))
     hs = [matplotlib.patches.Patch(facecolor=COLC8[F], edgecolor="none") for F in ("E1", "E2", "E4")]
-    cx.legend(hs, ["E1", "E2", "E4"], frameon=False, fontsize=6, loc="upper right", bbox_to_anchor=(1.02, 0.86), handlelength=0.9, handleheight=0.8,
+    cx.legend(hs, ["E1", "E2", "E4"], frameon=False, fontsize=7, loc="upper right", bbox_to_anchor=(1.02, 0.86), handlelength=0.9, handleheight=0.8,
               handletextpad=0.3, labelspacing=0.15, borderaxespad=0.1)
     # (d) the reader heads
     dx = fig.add_subplot(gs[0, 3])
@@ -4970,20 +5007,17 @@ def law_figure():
     dx.axhline(0.7, color=INK2, lw=0.5, ls=(0, (3, 2)), zorder=1)
     dx.axhline(0.25, color=INK2, lw=0.5, ls=":", zorder=1)
     dx.axhline(0, color=INK2, lw=0.5, zorder=1)
-    dx.text(3.5, 0.71, "0.7", fontsize=6, color=INK2, ha="center", va="bottom")
-    dx.text(3.5, 0.26, "0.25", fontsize=6, color=INK2, ha="center", va="bottom")
     dx.set_xticks(range(len(donors)))
-    dx.set_xticklabels([d[1] for d in donors], fontsize=6)
+    dx.set_xticklabels([d[1] for d in donors], fontsize=7, rotation=35, ha="right", rotation_mode="anchor")
     dx.tick_params(axis="x", length=0, pad=1.5)
-    dx.tick_params(axis="y", labelsize=6)
+    dx.tick_params(axis="y", labelsize=7)
     dx.set_xlim(-0.5, len(donors) - 0.5)
     dx.set_ylim(*YD8)
     dx.set_yticks([0, 0.5, 1])
     dx.grid(axis="y", color=GRID, lw=0.5, zorder=0)
-    dx.set_ylabel("KO: share of the key read removed", fontsize=6.0, labelpad=1)
-    dx.set_title("(d) reader heads", fontsize=7, color=INK, loc="left")
-    hs = [matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, ms=2.8, mew=0.6), matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, mfc="white", ms=2.8, mew=0.6)]
-    dx.legend(hs, [r"$H^*$", "random sets"], frameon=False, fontsize=6, loc="lower left", bbox_to_anchor=(-0.02, 0.02), handletextpad=0.1, labelspacing=0.1, borderaxespad=0.1)
+    dx.set_ylabel("KO: share of the key read removed", fontsize=7, labelpad=1)
+    dx.set_title("(d) reader heads", fontsize=7.5, color=INK, loc="left")
+    # v5 pass 2: no legend in (d), whose E4 interval spans the axis; the caption says filled: H*, open: random sets
     fig.savefig(FIG / "fig_law.pdf", metadata=MD8META)
     plt.close(fig)
 

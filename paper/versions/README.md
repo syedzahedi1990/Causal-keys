@@ -48,3 +48,15 @@
   first-person references to the earlier work, the repository name, scratch paths and paper-numbered identifiers,
   and excludes itself. Re-frozen 2026-10-09: Table 8 printed Gate I-G3 as "not met" (a parsing error in
   `paper/make_figures.py`; the score file has it met); fixed, nothing else changed.
+- **v5** (`paper2_v5.pdf`, built from `paper/` on this branch; `paper/main.pdf` is the same file): rewritten around GPU
+  stage 8 (preregistration P-2026-10-10-J, parts A-D, all scored before writing; outcome records in
+  `docs/PREREGISTRATION.md`), following `docs/V5_PLAN.md` (three independent plans and a judge). Title: the preregistered
+  one. Claim 1 (later mentions decide look-up versus copy) now rests on 150 fresh stories in eight models from seven
+  families with emitted-form scoring, on counterfactual SQuAD passages (an options list after the passage), and on
+  generated answers (Fig. 1). Claim 2 (Sec. 4): the reader heads' shared component (the flag) suffices and is read by key,
+  but is neither specific nor the only carrier; the question sets the sign. Claim 3 (Sec. 5): the preregistered
+  channel-ratio law failed (pre-committed outcome (e) text); the remap trained at the writing token is read mainly through
+  the value; the distance pattern is post hoc. Risk summary: 10 of 27 risky predictions held (expected 12.05), with the
+  L and M tallies. Three review rounds (six reviewers each: mechanistic interpretability, statistics, skeptic, area
+  chair, practitioner, fact-check / format) with revisions; the final fact-check and format checks were clean. Own commit
+  hashes in the appendix are replaced by neutral labels. The v4 sources are in `v4_sections/`.

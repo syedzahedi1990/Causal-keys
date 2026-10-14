@@ -23,6 +23,26 @@ ARXIV = {
     "yang2024qwen25": "2412.15115", "olmo2025two": "2501.00656", "bojieli2026notes": "2606.17107",
     "pustovit2026packs": "2604.03270", "zhou2026ordinal": "2610.00910", "feucht2025dualroute": "2504.03022",
     "ma2025addressbook": "2512.10547", "tan2024steering": "2407.12404",
+    "olsson2022context": "2209.11895",
+    # v5 additions (each checked against its arxiv.org/abs page: title, authors, date, comments)
+    "kobayashi2020norm": "2004.10102",      # Attention is Not Only a Weight (EMNLP 2020)
+    "mcdougall2023copy": "2310.04625",      # Copy Suppression: Comprehensively Understanding an Attention Head
+    "merullo2024reuse": "2310.08744",       # Circuit Component Reuse Across Tasks in Transformer Language Models (ICLR 2024)
+    "dai2024binding": "2409.05448",         # Representational Analysis of Binding in Language Models
+    "prakash2024finetuning": "2402.14811",  # Fine-Tuning Enhances Existing Mechanisms (ICLR 2024)
+    "gurarieh2025mixing": "2510.06182",     # Mixing Mechanisms (ICLR 2026; OpenReview UJ2UUjT2ko)
+    "robinson2023mcsb": "2210.12353",       # Leveraging LLMs for Multiple Choice Question Answering (ICLR 2023)
+    "turner2023actadd": "2308.10248",       # Steering Language Models With Activation Engineering
+    "panickssery2023caa": "2312.06681",     # Steering Llama 2 via Contrastive Activation Addition
+    "bussmann2024batchtopk": "2412.06410",  # BatchTopK Sparse Autoencoders
+    "rajpurkar2016squad": "1606.05250",     # SQuAD (EMNLP 2016)
+    "longpre2021conflicts": "2109.05052",   # Entity-Based Knowledge Conflicts in Question Answering (EMNLP 2021)
+    "grattafiori2024llama3": "2407.21783",  # The Llama 3 Herd of Models
+    "gemma2024gemma2": "2408.00118",        # Gemma 2: Improving Open Language Models at a Practical Size
+    "abdin2024phi4": "2412.08905",          # Phi-4 Technical Report
+    "liu2024kivi": "2402.02750",            # KIVI (ICML 2024); appendix only
+    "yang2025qwen3": "2505.09388",          # Qwen3 Technical Report
+    "jiang2023mistral": "2310.06825",       # Mistral 7B
 }
 
 # Corrections to arXiv author metadata (diacritics, team names, name order), applied after fetching.
@@ -31,15 +51,40 @@ AUTHOR_FIX = {
     "yang2024qwen25": [(" Qwen and  : and ", "")],
     "olmo2025two": [("Team OLMo", "{Team OLMo}")],
     "li2026bucketing": [("Li Puyin", "Puyin Li")],
+    "gemma2024gemma2": [("Gemma Team", "{Gemma Team}")],
+    "gurarieh2025mixing": [("Gur-Arieh", "{Gur-Arieh}")],
+    "prakash2024finetuning": [("Rott Shaham", "{Rott Shaham}")],
 }
 
 MANUAL = r"""
 @inproceedings{prakash2025lookbacks,
-  title = {{Language Models use Lookbacks to Track Beliefs}},
-  author = {Nikhil Prakash and Natalie Shapira and Arnab Sen Sharma and Christoph Riedl and Yonatan Belinkov and Tamar Rott Shaham and David Bau and Atticus Geiger},
+  title = {{Language Models Use Lookbacks to Track Beliefs}},
+  author = {Nikhil Prakash and Natalie Shapira and Arnab Sen Sharma and Christoph Riedl and Yonatan Belinkov and Tamar {Rott Shaham} and David Bau and Atticus Geiger},
   booktitle = {International Conference on Learning Representations},
   year = {2026},
-  note = {arXiv:2505.14685}
+  note = {arXiv:2505.14685},
+  url = {https://openreview.net/forum?id=6gO6KTRMpG}
+}
+@misc{elhage2021framework,
+  title        = {A Mathematical Framework for Transformer Circuits},
+  author       = {Elhage, Nelson and Nanda, Neel and Olsson, Catherine and Henighan, Tom and Joseph, Nicholas and Mann, Ben and Askell, Amanda and Bai, Yuntao and Chen, Anna and Conerly, Tom and DasSarma, Nova and Drain, Dawn and Ganguli, Deep and Hatfield-Dodds, Zac and Hernandez, Danny and Jones, Andy and Kernion, Jackson and Lovitt, Liane and Ndousse, Kamal and Amodei, Dario and Brown, Tom and Clark, Jack and Kaplan, Jared and McCandlish, Sam and Olah, Chris},
+  year         = {2021},
+  howpublished = {Transformer Circuits Thread},
+  url          = {https://transformer-circuits.pub/2021/framework/index.html}
+}
+@misc{tii2024falcon3,
+  title        = {{Falcon3-7B-Instruct}},
+  author       = {{Technology Innovation Institute}},
+  year         = {2024},
+  howpublished = {Hugging Face model card},
+  url          = {https://huggingface.co/tiiuae/Falcon3-7B-Instruct}
+}
+@misc{andyrdt2025saes,
+  title        = {Residual stream {SAEs} for {Qwen2.5-7B-Instruct}},
+  author       = {{andyrdt}},
+  year         = {2025},
+  howpublished = {Hugging Face repository andyrdt/saes-qwen2.5-7b-instruct, revision c37e53c4},
+  url          = {https://huggingface.co/andyrdt/saes-qwen2.5-7b-instruct}
 }
 @misc{anonymous2026fitted,
   title  = {Beyond the Fitted Answer: Causal Dissection and Downstream Consequences of Learned Activation Interventions},
@@ -55,7 +100,7 @@ MANUAL = r"""
   url    = {https://transformer-circuits.pub/2025/attention-qk/index.html}
 }
 @misc{mistral2025small,
-  title  = {Mistral-Small-24B-Instruct-2501},
+  title  = {{Mistral-Small-24B-Instruct-2501}},
   author = {{Mistral AI}},
   year   = {2025},
   howpublished = {Model card},

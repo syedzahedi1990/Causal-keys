@@ -1,60 +1,103 @@
-"""Figure 1 schematic: the writing token's key (looked up by later candidate mentions, hop 1; the answer then reads the option word, hop 2) vs value (copied), and the format arms."""
+"""Figure 1, panel (a): the two routes from the token that wrote a value. A later mention of a candidate matches the
+writing token's key (hop 1; heads enriched for duplicate-token heads) and writes a flag into its own row; the answer reads the
+flagged mention by key (hop 2). Without a later mention the answer copies the writing token's value. A mention placed
+before the writing token cannot attend to it (causal mask). Panels (b) and (c) of Figure 1 are fig_fresh.pdf and
+fig_crossover_main.pdf (paper/make_figures.py); the LaTeX figure sets the three side by side.
+
+Run from the repository root: python paper/make_schematic.py
+"""
 from pathlib import Path
 
 import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
-from matplotlib.patches import FancyArrowPatch, FancyBboxPatch  # noqa: E402
+from matplotlib.patches import FancyArrowPatch, FancyBboxPatch, Polygon  # noqa: E402
 
 BLUE, ORANGE, INK, INK2, FILL = "#2a78d6", "#eb6834", "#0b0b0b", "#52514e", "#f1f0ec"
-DARK = "#a8401a"
+DARK, FADE, LBLUE, LORANGE = "#a8401a", "#a3a19c", "#dcebfb", "#fde3d8"
 plt.rcParams.update({"font.size": 7, "font.family": "DejaVu Sans", "pdf.fonttype": 42})
-fig, ax = plt.subplots(figsize=(6.8, 2.6))
+
+W_IN, H_IN = 6.8, 1.9
+fig = plt.figure(figsize=(W_IN, H_IN))
+ax = fig.add_axes([0, 0, 1, 1])
 ax.set_xlim(0, 100)
-ax.set_ylim(0, 40)
+ax.set_ylim(0, 100 * H_IN / W_IN)   # equal units in x and y (1 unit = 0.068 in), so the arcs are not distorted
 ax.axis("off")
 
-
-def box(x, y, w, h, text, fc=FILL, ec=INK2, fs=6.6, weight="normal", color=INK):
-    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.2,rounding_size=0.8", fc=fc, ec=ec, lw=0.7))
-    ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=fs, weight=weight, color=color)
+ROW, RH = 11.0, 3.4                 # token row: bottom and height
+CELL = 2.3                          # height of the cache cells K (above the writing token) and V (below it)
 
 
-def arrow(x0, y0, x1, y1, color, rad=0.0, ls="-"):
-    ax.add_patch(FancyArrowPatch((x0, y0), (x1, y1), arrowstyle="-|>", mutation_scale=7, color=color, lw=1.2,
-                                 connectionstyle=f"arc3,rad={rad}", linestyle=ls))
+def box(x0, x1, y, h, text, fc=FILL, ec=INK2, fs=6.6, weight="normal", color=INK, ls="-", lw=0.7):
+    ax.add_patch(FancyBboxPatch((x0, y), x1 - x0, h, boxstyle="round,pad=0,rounding_size=0.7", fc=fc, ec=ec, lw=lw, ls=ls))
+    ax.text((x0 + x1) / 2, y + h / 2, text, ha="center", va="center_baseline", fontsize=fs, weight=weight, color=color)
 
 
-# panel (a): token stream
-ax.text(0.5, 38.3, "(a) Two ways later tokens can read the token that wrote a value", fontsize=7.4, weight="bold", color=INK)
-y = 21
-box(1, y, 20, 5, "…moved to the")
-box(23, y, 9, 5, "shelf", fc="#dcebfb", ec=BLUE, weight="bold")
-box(34, y, 15, 5, "… Question …")
-box(51, y, 17, 5, "Choices: box,")
-box(70, y, 8, 5, "shelf", fc="#fde3d8", ec=ORANGE, weight="bold")
-box(80, y, 18, 5, "… Answer: ▢")
-ax.text(27.5, 18.2, "writing token\nkey $K$ · value $V$", ha="center", va="top", fontsize=6.2, color=BLUE)
-arrow(74, 26.4, 28.5, 26.4, ORANGE, rad=0.25)
-ax.text(47, 33.2, "key lookup, hop 1 (duplicate-token heads): a later mention of the candidate matches the writing token's key",
-        ha="center", fontsize=6.0, color=ORANGE)
-arrow(88, 26.4, 75.5, 26.4, DARK, rad=0.45)
-ax.text(89.5, 30.6, "hop 2: the answer\nreads the option word", ha="center", va="bottom", fontsize=5.6, color=DARK)
-arrow(31, 20.6, 88, 20.6, BLUE, rad=0.18, ls="--")
-ax.text(60, 13.4, "value copy: later tokens copy the writing token's value", ha="center", fontsize=6.3, color=BLUE)
+def arrow(p0, p1, color, rad=0.0, ls="-", lw=1.1):
+    a = FancyArrowPatch(p0, p1, arrowstyle="-|>", mutation_scale=7, color=color, lw=lw, connectionstyle=f"arc3,rad={rad}",
+                        linestyle=ls, shrinkA=0.5, shrinkB=0.8)
+    ax.add_patch(a)
+    return a
 
-# panel (b): format arms
-ax.text(0.5, 8.6, "(b) Prompt formats (same story; candidates named after, before or not at all)", fontsize=7.4, weight="bold", color=INK)
-arms = [("options-after", "story · Q · Choices: … · Answer:"), ("letters-after", "story · Q · A) … F) · Answer:"),
-        ("sentence-after", "story · \"…has a box, …\" · Q"), ("no-mention", "story · Q · Answer:"),
-        ("list-before", "Choices: … · story · Q")]
-for i, (name, desc) in enumerate(arms):
-    x = 1 + i * 19.8
-    box(x, 0.6, 18.6, 5.6, "", fc="white")
-    ax.text(x + 9.3, 4.6, name, ha="center", fontsize=6.4, weight="bold", color=INK)
-    ax.text(x + 9.3, 2.1, desc, ha="center", fontsize=5.2, color=INK2)
-fig.tight_layout(pad=0.2)
+
+# panel title
+ax.text(0.6, 26.55, "(a) Two routes from the token that wrote a value", fontsize=7.4, weight="bold", color=INK, va="center")
+
+# token stream: a faded list before the story (the alternative placement), the story, the question, a later list, the answer
+xs = {"early": (0.6, 15.6), "moved": (19.0, 31.6), "write": (33.4, 41.6), "quest": (43.4, 55.0), "list": (56.8, 68.6),
+      "mention": (70.4, 78.6), "answer": (80.4, 92.0)}
+box(*xs["early"], ROW, RH, "Choices: … shelf …", fc="white", ec=FADE, color=FADE, ls=(0, (2, 1.5)))
+box(*xs["moved"], ROW, RH, "… moved to the")
+box(*xs["write"], ROW, RH, "shelf", fc=LBLUE, ec=BLUE, weight="bold")
+box(*xs["quest"], ROW, RH, "… Question …")
+box(*xs["list"], ROW, RH, "Choices: box,")
+box(*xs["mention"], ROW, RH, "shelf", fc=LORANGE, ec=ORANGE, weight="bold")
+box(*xs["answer"], ROW, RH, "… Answer: ▢")
+
+# the writing token's cache: key K above it, value V below it
+wx0, wx1 = xs["write"]
+wc = (wx0 + wx1) / 2
+kb, vb = ROW + RH + 0.45, ROW - 0.45 - CELL
+box(wx0, wx1, kb, CELL, "key $K$", fc="white", ec=BLUE, color=BLUE, fs=6.2, lw=0.6)
+box(wx0, wx1, vb, CELL, "value $V$", fc="white", ec=BLUE, color=BLUE, fs=6.2, lw=0.6)
+ax.text(wx0 - 0.9, kb + CELL / 2, "writing token", ha="right", va="center_baseline", fontsize=6.2, color=BLUE)
+
+# the flag written into the later mention's own row (a small pennant on its box)
+mx0, mx1 = xs["mention"]
+mc = (mx0 + mx1) / 2
+px, py = mx1 - 1.6, ROW + RH
+ax.plot([px, px], [py, py + 2.7], color=DARK, lw=0.8, solid_capstyle="butt")
+ax.add_patch(Polygon([(px, py + 2.7), (px + 2.1, py + 2.1), (px, py + 1.5)], closed=True, fc=DARK, ec=DARK, lw=0.4))
+
+# hop 1: the later mention matches the writing token's key (query at the mention, key at the writing token)
+arrow((mc - 1.2, ROW + RH), (wc + 1.0, kb + CELL), ORANGE, rad=0.22)
+ax.text(57.0, 23.15, "hop 1: a later mention of the candidate matches the writing token's key\n"
+        "(heads enriched for duplicate-token heads) and writes a flag into its own row",
+        ha="center", va="center", fontsize=6.3, color=ORANGE, linespacing=1.25)
+
+# hop 2: the answer reads the flagged mention by key
+ax.add_patch(FancyArrowPatch(((xs["answer"][0] + xs["answer"][1]) / 2 - 1.5, ROW + RH), (px + 1.2, py + 2.5), arrowstyle="-|>",
+                             mutation_scale=7, color=DARK, lw=1.1, connectionstyle="arc3,rad=0.55", shrinkA=0.5, shrinkB=0.6))
+ax.text(99.6, 17.0, "hop 2: the answer\nreads the flagged\nmention by key", ha="right", va="center", fontsize=6.3, color=DARK,
+        linespacing=1.2)
+
+# value copy: without a later mention the answer copies the writing token's value
+ax.add_patch(FancyArrowPatch((wc, vb), ((xs["answer"][0] + xs["answer"][1]) / 2 + 1.0, ROW), arrowstyle="-|>", mutation_scale=7,
+                             color=BLUE, lw=1.1, linestyle=(0, (3, 2)), connectionstyle="arc3,rad=0.16", shrinkA=0.5, shrinkB=0.8))
+ax.text(62.0, 3.0, "value copy: later tokens copy the writing token's value", ha="center", va="center", fontsize=6.3, color=BLUE)
+
+# a mention before the writing token cannot attend to it: a dotted arrow, crossed out
+ex0, ex1 = xs["early"]
+a = FancyArrowPatch(((ex0 + ex1) / 2, ROW), (wx0 - 0.1, ROW + 0.9), arrowstyle="-|>", mutation_scale=6, color=FADE, lw=0.9,
+                    linestyle=(0, (1, 1.4)), connectionstyle="arc3,rad=0.3", shrinkA=0.5, shrinkB=0.8)
+ax.add_patch(a)
+mid_x = ((ex0 + ex1) / 2 + wx0 - 0.1) / 2
+mid_y = ROW + 0.45 - 0.3 * ((wx0 - 0.1) - (ex0 + ex1) / 2) / 2   # the arc's lowest point (arc3: sagitta = rad x chord / 2)
+ax.text(mid_x, mid_y, "×", ha="center", va="center", fontsize=9, color=INK2, weight="bold")
+ax.text(0.6, 4.3, "a mention before the token cannot\nattend to it (causal mask)", ha="left", va="center", fontsize=6.3, color=INK2,
+        linespacing=1.2)
+
 out = Path(__file__).resolve().parent / "figures" / "fig_schematic.pdf"
-fig.savefig(out)
+fig.savefig(out, metadata={"CreationDate": None})   # reproducible PDF; no metadata beyond matplotlib's defaults
 print("wrote", out)

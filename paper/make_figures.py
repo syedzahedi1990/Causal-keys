@@ -275,7 +275,7 @@ mac("refLossFirstMin", min(np.mean(v[:100]) for v in loss.values()), "{:.1f}"); 
 mac("refLossLastMin", min(np.mean(v[-100:]) for v in loss.values())); mac("refLossLastMax", max(np.mean(v[-100:]) for v in loss.values()))
 mac("refGOneMin", min(cos["G1"]), "{:.3f}")
 lines = [r"\begin{tabular}{llccccc}", r"\toprule",
-         r"Remap & Format & $\varphi$ & $\psi_K$ & $\rho_K$ & $\psi_V$ & $\rho_V$ \\", r"\midrule"]
+         r"Remap & Format & $\varphi$ & $\psi_K$ & $\chi_K$ & $\psi_V$ & $\chi_V$ \\", r"\midrule"]
 for fam, name in (("none/", "fit\\_none"), ("p1/", "fit\\_opt"), ("", "released")):
     for i, a in enumerate(FRAME_ARMS):
         f3 = lambda k: f"{est4[fam, a, k][0]:.2f} [{est4[fam, a, k][1]:.2f}, {est4[fam, a, k][2]:.2f}]"
@@ -417,7 +417,7 @@ lines += [r"\bottomrule", r"\end{tabular}"]
 (TAB / "tab_onset.tex").write_text("\n".join(lines) + "\n")
 
 lines = [r"\begin{tabular}{llccccc}", r"\toprule",
-         r"Model & Format & $\varphi$ & $\psi_K$ & $\rho_K$ & $\psi_V$ & $\rho_V$ \\", r"\midrule"]
+         r"Model & Format & $\varphi$ & $\psi_K$ & $\chi_K$ & $\psi_V$ & $\chi_V$ \\", r"\midrule"]
 for label, out in frames.items():
     for i, a in enumerate(FRAME_ARMS):
         f3 = lambda q: f"{out[a][q][0]:.2f} [{out[a][q][1]:.2f}, {out[a][q][2]:.2f}]"
@@ -644,7 +644,10 @@ def smac3(name, tag, idx, t, desc, group):
 
 
 def rmac(name, value, desc, src, group, fmt="{:.3f}"):
-    """recomputed from raw results (not printed by a scorer)."""
+    """recomputed from raw results (not printed by a scorer). Stage 8 (groups S8*): a value that rounds to zero is printed
+    unsigned ('0.000', never '-0.000'); the earlier groups keep their printed strings unchanged."""
+    if group.startswith("S8") and not isinstance(value, str) and fmt.format(value).lstrip("-").strip("0.") == "":
+        value = abs(value)
     nm(name, value, desc + " [recomputed; label exploratory/post hoc]", src, group, fmt)
 
 
@@ -1642,7 +1645,7 @@ wtab("tab_prakash.tex", lines)
 
 # ---- tab_exchange.tex: all 13 exchange cells (appendix)
 lines = [r"\begin{tabular}{@{}llccccccccc@{}}", r"\toprule",
-         r"Edit & Format & $\Phi$ (nats) & flips & $\psi_K$ & $\psi_V$ & interaction & $\kappa$ & $\kappa_w$ & $\rho_K$ & $\rho_V$ \\", r"\midrule"]
+         r"Edit & Format & $\Phi$ (nats) & flips & $\psi_K$ & $\psi_V$ & interaction & $\kappa$ & $\kappa_w$ & $\chi_K$ & $\chi_V$ \\", r"\midrule"]
 FMTX = dict(zip(PKCOL, [r"\fmtNone{}", r"\textsc{qnames}", r"\fmtOpt{}", r"\fmtLetter{}", r"\textsc{qnames2}"]))
 for a_, lab in (("Bind", r"BIND@28"), ("IdZero", r"ID@0"), ("IdTwentyeight", r"ID@28")):
     first = True
@@ -3610,6 +3613,7 @@ assert (macros["JcThreePosthocLayerThreeNeq"], macros["JcThreePosthocLayerThreeN
 assert (macros["JcThreePosthocAllNeq"], macros["JcThreePosthocAllNstat"], macros["JcThreePosthocAllPool"], macros["JcThreePosthocAllPoolLo"],
         macros["JcThreePosthocAllPoolHi"], macros["JcThreePosthocCarriers"]) == ("1", "10", "-0.640", "-0.772", "-0.542", "0")
 # (2) J-C5: every carrying component's phi and statistics are reproduced
+JC5INTER8 = []   # J-C5 statistics with an interaction cell (iota > 0.5), from the scorer's own stats_of
 for c in CAR8:
     m = C8M[c["k"]]
     ok, ctxt = m.effective(c["l"], c["Z"], "carry")
@@ -3617,6 +3621,20 @@ for c in CAR8:
     i = find(S8C, f"    {c['k']} {c['Z']} l={c['l']} carries identity", start=LC8["J-C5"]["i"], end=LC8["J-C-BOUND"]["i"])
     assert ok and f"({ctxt})" in S8C[i] and len(st) == c["n"], (c, ctxt)
     assert all(f"{s['code']} {s['q'].pt:+.2f} [{s['q'].lower(0.9):+.2f},{s['q'].upper(0.9):+.2f}]" + ("" if s["equivalent"] else "*") in S8C[i] for s in st), S8C[i]
+    # the scorer's J-C5 lines print '*' but not '(iota)': the interaction flag of each statistic comes from the same scorer
+    # call (a statistic with an interaction cell is never equivalent, so it carries '*' too)
+    for s in st:
+        x = LAMP8[c["k"], c["Z"], s["code"]]
+        assert not x["inter"] and (s["interaction"] == [] or not x["eq"]), (c, s["code"])
+        x["inter"] = bool(s["interaction"])
+        if x["inter"]:
+            JC5INTER8.append((c["k"], c["Z"], s["code"]))
+            # the index description of the statistic's macros says so too (their values are unchanged)
+            _nm5 = f"JcLam{zw8(c['Z'])}{sw8(s['code'])}{K8[c['k']]}"
+            for i_, r in enumerate(REG):
+                if r[1] in (_nm5, _nm5 + "Lo", _nm5 + "Hi"):
+                    assert "; not equivalent, " in r[3], r
+                    REG[i_] = (r[0], r[1], r[2], r[3].replace("; not equivalent, ", "; not equivalent (iota > 0.5 in a cell: a departure by the interaction rule), "), r[4])
 # (3) J-C-BOUND: each sub-family's statistics (recomputed; their pooled value and E2's reproduce the printed ones)
 for (k, Z), b in BND8.items():
     m = C8M[k]
@@ -3755,6 +3773,40 @@ assert (f"{fl(macros['JcOneNeShareSmallMin']):.2f}", f"{fl(macros['JcOneNeShareS
 assert (macros["JcOneEtwoAletterSevenLamQwenSeven"], macros["JcOneEtwoAletterSevenPsiKQwenSeven"], macros["JcOneEtwoAletterSevenIDKQwenSeven"]) == ("-0.154", "0.875", "14.2")
 assert [macros[f"JcOneFloor{w}NotMet"] for w in ("Three", "Four", "FourEight")][2] == "0" and all(int(macros[f"JcOneFloor{w}NotMet"]) > 0 for w in ("Three", "Four"))
 assert macros["JcOneFloorFourEightMet"] == "4" and macros["JcOneLscoreNotMet"] == "3" and [(k, Z) for k, Z, o in _ls8 if o] == [("mistral7", "E1")]
+# (6b) v5 round 2: how the core test (J-C1) fails, as counts over its printed statistics: how many of its statistics are not
+# equivalent, at which depths, and how many of those have a 90 % interval wholly outside the margin (a shown departure, not an
+# inconclusive TOST); and the same count for Llama-3.1-8B's E2 combo of J-C2. Each count is cross-checked against the printed
+# strings (equivalence flag; interval bounds at two decimals against log 1.25 = 0.223).
+_L125 = float(np.log(1.25))
+_jc1 = dict(n=0, ne=0, out=0, dep=[])
+_jc2l = dict(n=0, ne=0, out=0)
+for (code, k, Z, dep), c in COMB8.items():
+    if c["seed"] or c["v"] == "NOT EVALUABLE" or not (code == "J-C1" or (code == "J-C2" and k == "llama8" and Z == "E2")):
+        continue
+    acc = _jc1 if code == "J-C1" else _jc2l
+    for s in C8M[k].stats_of(Z, list(dep), "edit")[0]:
+        p_ = LAMP8[k, Z, s["code"]]
+        assert p_["eq"] == s["equivalent"], (k, Z, s["code"])
+        acc["n"] += 1
+        if s["equivalent"]:
+            continue
+        acc["ne"] += 1
+        acc.setdefault("dep", []).append(s["l"])
+        lo_, hi_ = s["q"].ci(0.90)
+        out_ = hi_ < -_L125 or lo_ > _L125
+        assert out_ == (fl(p_["t"][2]) < -0.223 or fl(p_["t"][1]) > 0.223), (k, Z, s["code"], p_["t"])
+        acc["out"] += int(out_)
+_jc1src = "results/gpu_stage8c/STAGE8C_SCORE.txt (J-C1 and J-C2 combos)"
+amac("JcOneCoreN", _jc1["n"], "J-C1 (the core test: E1 and E2 at Qwen2.5-7B and Mistral-7B): lambda statistics in its four combos", _jc1src, G8C, "{:d}")
+amac("JcOneCoreNe", _jc1["ne"], "J-C1: lambda statistics that are not equivalent (90 % interval not inside +-log 1.25)", _jc1src, G8C, "{:d}")
+amac("JcOneCoreNeOut", _jc1["out"], "J-C1: non-equivalent lambda statistics whose 90 % interval lies wholly outside +-log 1.25 (a shown departure); the rest are inconclusive", _jc1src, G8C, "{:d}")
+amac("JcOneCoreNeDepthMin", min(_jc1["dep"]), "J-C1: the shallowest block of a non-equivalent lambda statistic (every statistic at block 3 is equivalent)", _jc1src, G8C, "{:d}")
+amac("JcTwoLlamaEtwoNe", _jc2l["ne"], "J-C2, Llama-3.1-8B E2 (vectors from unrelated sentences): non-equivalent lambda statistics", _jc1src, G8C, "{:d}")
+amac("JcTwoLlamaEtwoNeOut", _jc2l["out"], "J-C2, Llama-3.1-8B E2: non-equivalent lambda statistics whose 90 % interval lies wholly outside +-log 1.25", _jc1src, G8C, "{:d}")
+# the outcome record: Qwen E1 8/10, Mistral E1 5/6, Qwen E2 7/8, Mistral E2 3/6 equivalent (7 of 30 not, all at block 7 or deeper,
+# none wholly outside); Llama E2 4/7 (A_L(7) -0.32 [-0.42, -0.24] wholly outside)
+assert (macros["JcOneCoreN"], macros["JcOneCoreNe"], macros["JcOneCoreNeOut"], macros["JcOneCoreNeDepthMin"]) == ("30", "7", "0", "7")
+assert (macros["JcTwoLlamaEtwoNe"], macros["JcTwoLlamaEtwoNeOut"]) == ("3", "1")
 # (7) the nu pattern (post hoc): every lambda statistic of every identity-carrying instance (phi(NONE) >= 0.3, point) against
 # the stored table statistics; Spearman over the statistics, the equivalence by nu band, the collinearity over the
 # (model, instance, depth) units, the first-order O1 prediction
@@ -3768,7 +3820,7 @@ for k in MC8:
                 continue
             st, _ = m.stats_of(Z, [l], gate=None, formats=C8LW.COMP_FORMATS if ":" in Z else C8LW.FORMATS)
             x = {v: c8tab(m, l, Z, v) for v in ("nu", "cos_k", "cos_v", "cos_resid", "proj_k", "proj_v")}
-            NUP8 += [dict(k=k, Z=Z, l=l, code=s["code"], lam=s["q"].pt, eq=s["equivalent"], **x) for s in st]
+            NUP8 += [dict(k=k, Z=Z, l=l, code=s["code"], lam=s["q"].pt, eq=s["equivalent"], q=s["q"], **x) for s in st]
 _lam = [p["lam"] for p in NUP8]
 _src7 = "results/gpu_stage8c/eval/ (lambda statistics and table statistics)"
 rmac("JcNuN", len(NUP8), "post hoc nu pattern: lambda statistics of the identity-carrying instances (phi(NONE) >= 0.3; every family, E5 and the components; E3 included)", _src7, G8C, "{:d}")
@@ -4200,15 +4252,19 @@ def mci8(name, sign=False):
 
 VW8 = {"MET": r"\textbf{met}", "NOT MET": r"\textbf{not met}", "NOT EVALUABLE": r"\textbf{not evaluable}"}
 # Part B's three tables are the part-B scorer's own output: copied unchanged (read and re-written; the bytes are asserted equal)
+# v5 round 1: the arm label P1 (the discovery-sample cores' options format) is printed as the paper's format macro; nothing
+# else changes, which the assertion checks
 for _t in ("tab_fresh.tex", "tab_mass.tex", "tab_invariance.tex"):
     _src = (ROOT / "results/gpu_stage8b" / _t).read_text()
-    (TAB / _t).write_text(_src)
-    assert (TAB / _t).read_bytes() == (ROOT / "results/gpu_stage8b" / _t).read_bytes(), _t
+    (TAB / _t).write_text(_src.replace(" & P1 & ", r" & \fmtOpt{} & "))
+    assert (TAB / _t).read_text().replace(r" & \fmtOpt{} & ", " & P1 & ") == _src, _t
 
 # ---- tab_prereg_j.tex: every stage-8 line (code, class, kind, prior, met / evaluable, verdict): parts A, B and D by models,
 # part C by its lines' units (combos, sub-families, (model, family) pairs, formats, screened models). Two halves side by
 # side: parts A and B on the left, C and D on the right; the entry's totals below both.
 _left, _right = [], []
+# a row spanning one half: the left half keeps the 1.5em gap to the right half that the column spec puts after column 6
+LHALF = r"\multicolumn{6}{@{}p{0.47\textwidth}@{\hspace{1.5em}}}"
 HALF = r"\multicolumn{6}{@{}p{0.47\textwidth}@{}}"
 
 
@@ -4217,17 +4273,17 @@ def _jrow(code, cls, kind, prior, met, ev, v, note=""):
 
 
 assert "all part-A lines are account lines" in S8A[SA8]
-_left.append(HALF + r"{\textbf{Part A}: natural passages (Llama-3.1-8B, Gemma-2-9B, Qwen2.5-7B, Mistral-7B)}")
+_left.append(LHALF + r"{\textbf{Part A}: natural passages (Llama-3.1-8B, Gemma-2-9B, Qwen2.5-7B, Mistral-7B)}")
 for code, L in LA8.items():
     _left.append(_jrow(code, L["cls"], "--" if L["cls"] == "D" else "A", L["prior"], L["met"], L["ev"], L["v"],
                        r"$^\ddagger$" if L["cls"] == "D" else ""))
-_left.append(HALF + r"{\footnotesize \JaCountMet{} met, \JaCountNotMet{} not met, \JaCountNotEval{} not evaluable of \JaCountLines{} counted lines; "
+_left.append(LHALF + r"{\footnotesize \JaCountMet{} met, \JaCountNotMet{} not met, \JaCountNotEval{} not evaluable of \JaCountLines{} counted lines; "
              r"risky account lines met: \JxRiskyMetA{} of \JxRiskyVerdA{} with a verdict (expected \JxRiskyExpA{}).}")
 _left.append(r"\addlinespace")
-_left.append(HALF + r"{\textbf{Part B}: fresh samples (P4: Qwen2.5-7B, Qwen2.5-14B, Mistral-7B, OLMo-2-7B; N4: Llama-3.1-8B, Gemma-2-9B, Phi-4, Falcon3-7B)}")
+_left.append(LHALF + r"{\textbf{Part B}: fresh samples (P4: Qwen2.5-7B, Qwen2.5-14B, Mistral-7B, OLMo-2-7B; N4: Llama-3.1-8B, Gemma-2-9B, Phi-4, Falcon3-7B)}")
 for code, L in LB8.items():
     _left.append(_jrow(code, L["cls"], L["kind"], L["prior"], L["met"], L["ev"], L["v"]))
-_left.append(HALF + r"{\footnotesize \JbCountMet{} met, \JbCountNotMet{} not met, \JbCountNotEval{} not evaluable of \JbCountLines{} lines; "
+_left.append(LHALF + r"{\footnotesize \JbCountMet{} met, \JbCountNotMet{} not met, \JbCountNotEval{} not evaluable of \JbCountLines{} lines; "
              r"risky account lines met: \JxRiskyMetB{} of \JxRiskyVerdB{} with a verdict (expected \JxRiskyExpB{}).}")
 _right.append(HALF + r"{\textbf{Part C}: independently obtained identity edits (Qwen2.5-7B, Mistral-7B, Llama-3.1-8B; J-C6 at Qwen2.5-14B; the screen at "
               r"Qwen2.5-7B and Llama-3.1-8B)}")
@@ -4259,7 +4315,7 @@ for a, b in zip(_left, _right):
 # the entry's totals, full width below both halves
 lines += [r"\midrule",
           r"\multicolumn{12}{@{}p{0.94\textwidth}@{}}{\textbf{Parts A--D}: \JxMetABCD{} met, \JxNotMetABCD{} not met, \JxNotEvalABCD{} not evaluable of "
-          r"\JxLinesABCD{} lines (\JxAccountLinesABCD{} account lines and \JxClassValVerdABCD{} measurement-validity lines); risky account lines met: \JxRiskyMetABCD{} of "
+          r"\JxLinesABCD{} lines (\JxAccountLinesABCD{} account lines and \JbClassValLines{} measurement-validity lines); risky account lines met: \JxRiskyMetABCD{} of "
           r"\JxRiskyVerdABCD{} with a verdict (expected \JxRiskyExpABCD{}; \JxRiskyMetABCDAlt{} of \JxRiskyVerdABCDAlt{}, expected \JxRiskyExpABCDAlt{}, under the "
           r"common-part reading of J-C-READb).} \\",
           r"\bottomrule", r"\end{tabular}"]
@@ -4318,13 +4374,13 @@ for code, rows in FR8:
         lines.append(f"{code if j == 0 else ''} & {lab} & {_dcell(stem, 'qwen7', ci)} & {_dcell(stem, 'mistral7', ci)} & {VW8[LD8[code]['v']] if j == 0 else ''} \\\\")
 lines += [r"\bottomrule", r"\end{tabular}", r"", r"\medskip", r"",
           r"\begin{tabular}{@{}llcccl@{}}", r"\toprule", r"Line & Statistic & Qwen2.5-1.5B & Qwen2.5-3B & Qwen2.5-7B & Verdict \\", r"\midrule"]
-FS8 = [("J-D6a", [(r"$\omega$", "JdSixaOmega", True), (r"$\kappa$", "JdSixaKappa", False)]),
+FS8 = [("J-D6a", [(r"$\omega$", "JdSixaOmega", True), (r"$c_{\mathrm{fl}}$", "JdSixaKappa", False)]),
        ("J-D6", [(r"$\rho$", "JdSixRho", True), (r"$\rho_{\mathrm{nat}}$", "JdSixRhoNat", True), (r"$\rho - \rho_{\mathrm{nat}}$", "JdSixDiff", True)]),
        ("J-D6-ROUTE", [(r"$r^{\mathrm{inj}}_{\mathrm{ans}}(V)$", "JdSixRouteV", True), (r"$r^{\mathrm{inj}}_{\mathrm{ans}}(K)$", "JdSixRouteK", True),
                        (r"$r^{\mathrm{inj}}_{\mathrm{ans}}(V) - r^{\mathrm{inj}}_{\mathrm{ans}}(K)$", "JdSixRouteVmK", True)]),
        ("post hoc", [(r"natural ratio, $X$-specific contrast$^\dagger$", "JdSixNatX", True), (r"$\rho$ minus it$^\dagger$", "JdSixDiffX", True),
                      (r"natural ratio on $\mathrm{ID}_K$$^\dagger$", "JdSixNatIDK", True), (r"$\rho$ minus it$^\dagger$", "JdSixDiffIDK", True)]),
-       ("D6b", [(r"$\Delta^{\mathrm{POST}}/\Delta^{\mathrm{P1}}$ at the list row", "JdSixb", True)])]
+       ("D6b", [(r"$\Delta^{\mathrm{sentence}}/\Delta^{\mathrm{list}}$ at the list row", "JdSixb", True)])]
 for code, rows in FS8:
     for j, (lab, stem, ci) in enumerate(rows):
         cells = []
@@ -4346,7 +4402,8 @@ wtab("tab_flag.tex", lines)
 # ---- tab_law.tex: part C, every lambda statistic with its 90 % interval per model, edit and depth (appendix). * not
 # equivalent (the 90 % interval is not inside +-log 1.25); iota: a departure by the interaction rule; dagger: recomputed
 # through the scorer's classes (no printed value: E3, whose layers fail J-C-G3; E5, whose line prints only the pooled value;
-# Qwen2.5-7B E2 at l = 11, in a combo with fewer than 3 statistics)
+# Qwen2.5-7B E2 at l = 11, in a combo with fewer than 3 statistics: its dagger is on the depth). The J-C5 statistics take
+# their iota mark from the scorer's stats_of (the J-C5 lines print '*' only).
 DAG8 = r"$^\dagger$"
 SCOL8 = ["W(P1,{})", "W(POST,{})", "A_L({})", "A_P({})"]
 ZORD8 = ["E1", "E2", "E3", "E4", "E4a", "E4b", "PERP:E2", "PERP:E4", "NONLEX:E4", "E5FR", "E5SYN", "E5NL"]
@@ -4382,14 +4439,18 @@ for k in MC8:
             assert len({x["line"] for x in got}) == 1 and len({x["rec"] for x in got}) == 1, (k, Z, l)
             _lr8.append((k, Z, l, cells, lline8(got[0]["line"]), got[0]["rec"]))
 assert sum(sum(x is not None for x in r[3]) for r in _lr8) == len(LAMP8), (len(LAMP8), sum(sum(x is not None for x in r[3]) for r in _lr8))
-lines = [r"\footnotesize", r"\setlength{\tabcolsep}{3pt}", r"\begin{tabular}{@{}lllcccc l@{}}", r"\toprule",
-         r"Model & Edit & $l$ & $W(\mathrm{P1}, l)$ & $W(\mathrm{POST}, l)$ & $A_L(l)$ & $A_P(l)$ & Line \\", r"\midrule"]
+lines = [r"\scriptsize", r"\setlength{\tabcolsep}{3pt}", r"\begin{tabular}{@{}lllcccc l@{}}", r"\toprule",
+         r"Model & Edit & $l$ & $W(l)$, \fmtOpt{} & $W(l)$, \fmtPost{} & $A_L(l)$ & $A_P(l)$ & Line \\", r"\midrule"]
 for n_, k in enumerate(MC8):
     rk = [r for r in _lr8 if r[0] == k]
     prev = None
     for j, (k_, Z, l, cells, line, rec) in enumerate(rk):
-        zlab_ = (ZTEX8[Z] + (DAG8 if rec else "")) if Z != prev else ""
-        lines.append(f"{SH8[k] if j == 0 else ''} & {zlab_} & {l} & " + " & ".join(lcell8(x) for x in cells) + f" & {line} \\\\")
+        # the dagger sits on the edit when all its rows are recomputed (E3, E5), else on the depth of each recomputed row
+        # (Qwen2.5-7B E2 at l = 11)
+        allrec = all(r[5] for r in rk if r[1] == Z)
+        zlab_ = (ZTEX8[Z] + (DAG8 if allrec else "")) if Z != prev else ""
+        lab_l = f"{l}{DAG8 if rec and not allrec else ''}"
+        lines.append(f"{SH8[k] if j == 0 else ''} & {zlab_} & {lab_l} & " + " & ".join(lcell8(x) for x in cells) + f" & {line} \\\\")
         prev = Z
     lines.append(r"\midrule" if n_ < len(MC8) - 1 else r"\bottomrule")
 lines.append(r"\end{tabular}")
@@ -4426,12 +4487,13 @@ def fresh_figure():
     ax.set_ylabel(r"$s_{\mathrm{ID}}^E$: key share of the identity", fontsize=6.3, labelpad=1)
     h_, l_ = ax.get_legend_handles_labels()
     hdr = matplotlib.lines.Line2D([], [], ls="none")
-    lg1 = ax.legend([hdr] + h_[:4] + [hdr] + h_[4:8], [r"$\bf{earlier\ models\ (P4)}$"] + l_[:4] + [r"$\bf{new\ families\ (N4)}$"] + l_[4:8],
+    lg1 = ax.legend([hdr] + h_[:4] + [hdr] + h_[4:8], [r"$\bf{discovery\ sample}$"] + l_[:4] + [r"$\bf{new\ families}$"] + l_[4:8],
                     ncol=2, frameon=False, fontsize=5.5, loc="upper right", bbox_to_anchor=(1.0, 1.0), handletextpad=0.25, labelspacing=0.18,
                     columnspacing=0.6, handlelength=0.9, borderaxespad=0.15)
     ax.add_artist(lg1)
     ax.legend(h_[8:], l_[8:], frameon=False, fontsize=5.5, loc="upper right", bbox_to_anchor=(1.0, 0.70), handletextpad=0.25, handlelength=0.9,
               borderaxespad=0.15)
+    fig.text(0.005, 0.995, "(b)", fontsize=7, fontweight="bold", color=INK, ha="left", va="top")   # panel tag of Figure 1
     fig.savefig(FIG / "fig_fresh.pdf", metadata=MD8META)
     plt.close(fig)
 
@@ -4479,7 +4541,7 @@ def crossover_figure():
     ax.add_artist(lg)
     hs = [matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, ms=3.6),
           matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, mfc="white", ms=3.6, mew=0.7)]
-    ax.legend(hs, ["earlier models (P4)", "new families (N4)"], frameon=False, fontsize=5.6, loc="lower left", bbox_to_anchor=(0.30, 0.09),
+    ax.legend(hs, ["discovery-sample models", "new families"], frameon=False, fontsize=5.6, loc="lower left", bbox_to_anchor=(0.30, 0.09),
               handletextpad=0.3, labelspacing=0.25, borderaxespad=0.2)
     lo = min(mf8(f"JbBetaV{AB8[a]}{K8[k]}Lo") for a in Z8 for k in MB8P + MB8N)
     zx.set_xlim(np.floor((lo - 0.02) * 20) / 20, 1.02)
@@ -4494,7 +4556,7 @@ def crossover_figure():
     zx.grid(axis="x", color=GRID, lw=0.6, zorder=0)
     for y_ in np.arange(0.5, len(Z8) - 1, 1.0):
         zx.axhline(y_, color=GRID, lw=0.5, zorder=0)
-    zx.set_xlabel(r"$\beta_V$ of these four arms (zoom; filled P4, hollow N4)", fontsize=6.3, labelpad=1.5)
+    zx.set_xlabel(r"$\beta_V$ of these four arms (zoom; filled: discovery sample, hollow: new families)", fontsize=6.3, labelpad=1.5)
     fig.savefig(FIG / "fig_crossover.pdf", metadata=MD8META)
     plt.close(fig)
 
@@ -4502,12 +4564,53 @@ def crossover_figure():
 crossover_figure()
 
 
+def crossover_main_figure():
+    """Figure 1c: the scatter of fig_crossover without the zoom strip (the four arms at beta_K = 0 are spread out in the
+    appendix figure), at the size of fig_fresh, with the panel tag (c)."""
+    W, H, R_, ML, MB = 3.25, 2.3, 0.06, 0.40, 0.33
+    fig = plt.figure(figsize=(W, H))
+    ax = fig.add_axes([ML / W, MB / H, (W - ML - R_) / W, (H - MB - 0.04) / H])
+    ax.plot([0, 1], [0, 1], color=INK2, lw=0.6, ls=(0, (3, 2)), zorder=1)
+    for arm, (col, mk) in ST8.items():
+        for k in MB8P + MB8N:
+            bk = [mf8(f"JbBetaK{AB8[arm]}{K8[k]}{s_}") for s_ in ("", "Lo", "Hi")]
+            bv = [mf8(f"JbBetaV{AB8[arm]}{K8[k]}{s_}") for s_ in ("", "Lo", "Hi")]
+            ax.plot([bv[1], bv[2]], [bk[0], bk[0]], color=col, lw=0.5, alpha=0.55, zorder=2, solid_capstyle="butt")
+            ax.plot([bv[0], bv[0]], [bk[1], bk[2]], color=col, lw=0.5, alpha=0.55, zorder=2, solid_capstyle="butt")
+            ax.plot(bv[0], bk[0], marker=mk, ms=3.6, ls="none", color=col, mfc=col if k in MB8P else "white", mew=0.7, zorder=3)
+    ax.set_xlim(-0.04, 1.04)
+    ax.set_ylim(-0.04, 1.04)
+    ax.set_xticks([0, 0.25, 0.5, 0.75, 1])
+    ax.set_yticks([0, 0.25, 0.5, 0.75, 1])
+    ax.tick_params(labelsize=6)
+    ax.grid(color=GRID, lw=0.6, zorder=0)
+    ax.set_xlabel(r"$\beta_V$: answers moved by the value-only clamp", fontsize=6.5, labelpad=1.5)
+    # a shorter y label than the appendix figure's, so that the panel tag (c) in the top left corner clears it (v5 round 1)
+    ax.set_ylabel(r"$\beta_K$: moved by the key-only clamp", fontsize=6.5, labelpad=2)
+    ax.text(0.635, 0.0, r"four formats at $\beta_K = 0$ (Appendix D.4)", fontsize=5.3, color=INK2, ha="right", va="center", zorder=4)
+    hs = [matplotlib.lines.Line2D([], [], marker=mk, ls="none", color=col, ms=3.6) for col, mk in ST8.values()]
+    lg = ax.legend(hs, [ALAB8[a] for a in ST8], frameon=False, fontsize=5.6, loc="upper left", bbox_to_anchor=(0.27, 1.0), handletextpad=0.3,
+                   labelspacing=0.25, borderaxespad=0.2)
+    ax.add_artist(lg)
+    hs = [matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, ms=3.6),
+          matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, mfc="white", ms=3.6, mew=0.7)]
+    ax.legend(hs, ["discovery-sample models", "new families"], frameon=False, fontsize=5.6, loc="lower left", bbox_to_anchor=(0.30, 0.09),
+              handletextpad=0.3, labelspacing=0.25, borderaxespad=0.2)
+    fig.text(0.005, 0.995, "(c)", fontsize=7, fontweight="bold", color=INK, ha="left", va="top")
+    fig.savefig(FIG / "fig_crossover_main.pdf", metadata=MD8META)
+    plt.close(fig)
+
+
+crossover_main_figure()
+
+
 def natural_figure():
     """part A: (a) s_ID per format and model with its 95 % interval (hollow: the cell is not evaluable; a dagger on a format:
     its values are recomputed, as in tab_natural8.tex); (b) cue conflict, key-source against value-source rate (whole answer;
     the crosses are the rates at the decision token)."""
     fig = plt.figure(figsize=(6.75, 2.05))
-    gs = fig.add_gridspec(1, 2, width_ratios=[2.3, 1], wspace=0.25, left=0.065, right=0.99, bottom=0.15, top=0.91)
+    # v5 round 2: panel (b) gets more width and its legend sits outside the data (to the right of the square axes)
+    gs = fig.add_gridspec(1, 2, width_ratios=[1.85, 1.35], wspace=0.22, left=0.065, right=0.99, bottom=0.15, top=0.91)
     ax = fig.add_subplot(gs[0, 0])
     offs = dict(zip(MA8, (-0.27, -0.09, 0.09, 0.27)))
     for j, f in enumerate(FA8):
@@ -4532,7 +4635,7 @@ def natural_figure():
     ax.set_yticks([0, 0.25, 0.5, 0.75, 1])
     ax.grid(axis="y", color=GRID, lw=0.6, zorder=0)
     ax.set_ylabel(r"$s_{\mathrm{ID}}$: key share of the identity", fontsize=6.5)
-    ax.set_title(r"(a) $s_{\mathrm{ID}}$ by format, natural passages", fontsize=7, color=INK, loc="left")
+    ax.set_title(r"(a) $s_{\mathrm{ID}}$ by format, counterfactual SQuAD passages", fontsize=7, color=INK, loc="left")
     # explicit handles: a model's key is its filled marker (its first plotted cell may be a hollow, not-evaluable one)
     h_ = [matplotlib.lines.Line2D([], [], marker="o", ls="none", color=COLA8[k], ms=3.6, mew=0.8) for k in MA8]
     l_ = [SH8[k] for k in MA8]
@@ -4552,10 +4655,11 @@ def natural_figure():
             bx.plot(vd, kd, marker="x", ms=2.6, mew=0.6, ls="none", color=COLA8[k], zorder=4)
             bx.plot([vl, vh], [ky, ky], color=COLA8[k], lw=0.5, alpha=0.4, zorder=2, solid_capstyle="butt")
             bx.plot([vy, vy], [kl, kh], color=COLA8[k], lw=0.5, alpha=0.4, zorder=2, solid_capstyle="butt")
-            bx.plot(vy, ky, marker=mk, ms=3.6, ls="none", color=COLA8[k], mfc="white" if ne else COLA8[k], mew=0.8, zorder=3)
+            bx.plot(vy, ky, marker=mk, ms=4.2, ls="none", color=COLA8[k], mfc="white" if ne else COLA8[k], mew=0.8, zorder=3)
     bx.set_xlim(-0.03, 1.03)
     bx.set_ylim(-0.03, 1.03)
     bx.set_aspect("equal")
+    bx.set_anchor("W")   # the square axes sit at the left of their column; the legend fills the right
     bx.set_xticks([0, 0.5, 1])
     bx.set_yticks([0, 0.5, 1])
     bx.tick_params(labelsize=6)
@@ -4565,8 +4669,8 @@ def natural_figure():
     bx.set_title("(b) cue conflict", fontsize=7, color=INK, loc="left")
     hs = [matplotlib.lines.Line2D([], [], marker=mk, ls="none", color=INK2, ms=3.6) for mk in FMK.values()]
     hs.append(matplotlib.lines.Line2D([], [], marker="x", ls=":", color=INK2, ms=2.6, mew=0.6, lw=0.5))
-    bx.legend(hs, [FLAB8[f] for f in FMK] + ["first token only"], frameon=False, fontsize=5.6, loc="lower right", bbox_to_anchor=(1.03, 0.07),
-              handletextpad=0.3, labelspacing=0.25, borderaxespad=0.2)
+    bx.legend(hs, [FLAB8[f] for f in FMK] + ["first token only"], frameon=False, fontsize=6, loc="center left", bbox_to_anchor=(1.02, 0.5),
+              handletextpad=0.3, labelspacing=0.35, borderaxespad=0.2)
     fig.savefig(FIG / "fig_natural.pdf", metadata=MD8META)
     plt.close(fig)
 
@@ -4578,9 +4682,11 @@ MKD8 = {"qwen7": "o", "mistral7": "s"}
 
 def flag_figure():
     """part D: (a) iota of the dose, the move and the structured and isotropic controls; (b) rho_K; (c) the sign of the
-    key and value reads under Q_IN, Q_OUT and IOI in-sentence re-mentions; (d) omega, rho and rho_nat by scale."""
-    fig = plt.figure(figsize=(6.75, 1.95))
-    gs = fig.add_gridspec(1, 4, width_ratios=[1.95, 0.9, 1.05, 0.9], wspace=0.4, left=0.055, right=0.995, bottom=0.17, top=0.9)
+    key and value reads under Q_IN, Q_OUT and IOI in-sentence re-mentions. The scale panel is fig_flag_scale."""
+    # v5 round 1: panel (d), the scale lines, moved to its own appendix figure (fig_flag_scale), so the main figure has
+    # three panels and the main text fewer symbols
+    fig = plt.figure(figsize=(6.75, 1.9))
+    gs = fig.add_gridspec(1, 3, width_ratios=[2.15, 0.9, 1.0], wspace=0.24, left=0.055, right=0.995, bottom=0.17, top=0.9)
     off = {"qwen7": -0.14, "mistral7": 0.14}
 
     def dot(ax, x, k, stem, hollow=False, ms=3.4):
@@ -4592,8 +4698,8 @@ def flag_figure():
     # (a) iota
     ax = fig.add_subplot(gs[0, 0])
     cats = [("JdDoseHalf", "add\n" + r"0.5$\Delta$"), ("JdDoseOne", "add\n" + r"1$\Delta$"), ("JdDoseTwo", "add\n" + r"2$\Delta$"),
-            ("JdTwoIotaMove", "move\n" + r"$\Delta$"), ("JdTwoIotaOrth", "orth."), ("JdTwoIotaMeanH", "mean\n" + r"$H^*$"),
-            ("JdTwoIotaActive", "active"), (None, "iso.")]
+            ("JdTwoIotaMove", "move\n" + r"$\Delta$"), ("JdTwoIotaOrth", "orth."), ("JdTwoIotaActive", "active"),
+            ("JdTwoIotaMeanH", "mean\n" + r"$H^*$"), (None, "iso.")]
     for j, (stem, _) in enumerate(cats):
         for k in MD8:
             if stem:
@@ -4605,17 +4711,17 @@ def flag_figure():
     ax.axhline(1, color=INK2, lw=0.5, ls=":", zorder=1)
     ax.axvline(3.5, color=INK2, lw=0.5, ls=":", zorder=1)
     ax.set_xticks(range(len(cats)))
-    ax.set_xticklabels([c[1] for c in cats], fontsize=5.3)
+    ax.set_xticklabels([c[1] for c in cats], fontsize=6)
     ax.tick_params(axis="x", length=0, pad=2)
     ax.tick_params(axis="y", labelsize=6)
     ax.set_xlim(-0.5, len(cats) - 0.5)
     ax.set_ylim(-0.12, 1.12)
     ax.set_yticks([0, 0.5, 1])
     ax.grid(axis="y", color=GRID, lw=0.6, zorder=0)
-    ax.set_ylabel(r"$\iota$: share of the natural $N_X$", fontsize=6.3, labelpad=1)
+    ax.set_ylabel(r"$\iota$: share of the natural effect on X", fontsize=6.3, labelpad=1)
     ax.set_title(r"(a) injecting the flag: $\iota$", fontsize=7, color=INK, loc="left")
     hs = [matplotlib.lines.Line2D([], [], marker=MKD8[k], ls="none", color=COLD8[k], ms=3.4) for k in MD8]
-    ax.legend(hs, [SH8[k] for k in MD8], frameon=False, fontsize=5.8, loc="upper right", bbox_to_anchor=(1.0, 0.9), handletextpad=0.2,
+    ax.legend(hs, [SH8[k] for k in MD8], frameon=False, fontsize=6, loc="upper right", bbox_to_anchor=(1.0, 0.9), handletextpad=0.2,
               labelspacing=0.2, borderaxespad=0.2)
     # (b) rho_K
     bx = fig.add_subplot(gs[0, 1])
@@ -4629,10 +4735,10 @@ def flag_figure():
                     dot(bx, j + off[k] + (q - 1) * 0.06, k, f"JdRhoIso{w}{K8[k]}", ms=2.2)
     bx.axhline(0.5, color=INK2, lw=0.5, ls=(0, (3, 2)), zorder=1)
     bx.axhline(0.7, color=INK2, lw=0.5, ls=":", zorder=1)
-    bx.text(3.48, 0.5, "0.5", fontsize=5.2, color=INK2, ha="right", va="bottom")
-    bx.text(3.48, 0.7, "0.7", fontsize=5.2, color=INK2, ha="right", va="bottom")
+    bx.text(3.48, 0.5, "0.5", fontsize=6, color=INK2, ha="right", va="bottom")
+    bx.text(3.48, 0.7, "0.7", fontsize=6, color=INK2, ha="right", va="bottom")
     bx.set_xticks(range(len(cats)))
-    bx.set_xticklabels([c[1] for c in cats], fontsize=5.6)
+    bx.set_xticklabels([c[1] for c in cats], fontsize=6)
     bx.tick_params(axis="x", length=0, pad=2)
     bx.tick_params(axis="y", labelsize=6)
     bx.set_xlim(-0.5, len(cats) - 0.5)
@@ -4643,7 +4749,7 @@ def flag_figure():
     bx.set_title(r"(b) ablating it: $\rho_K$", fontsize=7, color=INK, loc="left")
     # (c) sign
     cx = fig.add_subplot(gs[0, 2])
-    cells = [("Qin", "$Q_{\\mathrm{IN}}$"), ("Qout", "$Q_{\\mathrm{OUT}}$"), ("Inline", "IOI")]
+    cells = [("Qin", "mentioned"), ("Qout", "not\nmentioned"), ("Inline", "IOI")]
     w_ = 0.18
     for j, (cw, _) in enumerate(cells):
         for q, (k, ch) in enumerate([(k, ch) for k in MD8 for ch in ("IDK", "IDV")]):
@@ -4662,10 +4768,16 @@ def flag_figure():
     cx.set_ylabel("identity read (nats)", fontsize=6.3, labelpad=1)
     cx.set_title("(c) sign of the reads", fontsize=7, color=INK, loc="left")
     hs = [matplotlib.patches.Patch(facecolor=INK2, edgecolor=INK2, lw=0.6), matplotlib.patches.Patch(facecolor="white", edgecolor=INK2, hatch="////", lw=0.6)]
-    cx.legend(hs, [r"$\mathrm{ID}_K$", r"$\mathrm{ID}_V$"], frameon=False, fontsize=5.8, loc="lower left", handlelength=1.2, handletextpad=0.3,
+    cx.legend(hs, [r"$\mathrm{ID}_K$", r"$\mathrm{ID}_V$"], frameon=False, fontsize=6, loc="lower left", handlelength=1.2, handletextpad=0.3,
               labelspacing=0.2, borderaxespad=0.2)
-    # (d) scale
-    dx = fig.add_subplot(gs[0, 3])
+    fig.savefig(FIG / "fig_flag.pdf", metadata=MD8META)
+    plt.close(fig)
+
+
+def flag_scale_figure():
+    """part D, appendix (v5 round 1; the former panel (d) of fig_flag): omega, rho and rho_nat at Qwen2.5-1.5B, 3B and 7B."""
+    fig, dx = plt.subplots(figsize=(3.25, 2.1))
+    fig.subplots_adjust(left=0.13, right=0.985, bottom=0.11, top=0.98)
     # hollow: J-D6 is not evaluable at 3B (J-D-G6), and its rho and rho_nat there are recomputed (dagger); omega (J-D6a) is
     # evaluable at every scale. The post hoc X-specific ratio (recomputed; dagger) exists at 1.5B and 7B only: no line through 3B.
     SC8 = [("JdSixaOmega", INK, "o", r"$\omega$"), ("JdSixRho", AQUA, "D", r"$\rho$"), ("JdSixRhoNat", PURPLE, "s", r"$\rho_{\mathrm{nat}}$"),
@@ -4690,22 +4802,23 @@ def flag_figure():
     ls.append(r"not evaluable$^\dagger$")
     dx.axhline(0, color=INK2, lw=0.6, zorder=1)
     dx.set_xticks(range(len(MD8S)))
-    dx.set_xticklabels(["1.5B", "3B", "7B"], fontsize=5.8)
+    dx.set_xticklabels(["1.5B", "3B", "7B"], fontsize=6)
     dx.tick_params(axis="x", length=0, pad=2)
     dx.tick_params(axis="y", labelsize=6)
-    dx.set_xlim(-0.85, len(MD8S) - 0.5)   # a margin at the left for the legend handles, clear of the 1.5B column
+    dx.set_xlim(-1.2, len(MD8S) - 0.5)   # a margin at the left for the legend, clear of the 1.5B column and of the 7B points
     dx.set_ylim(-0.25, 1.05)
     dx.set_yticks([0, 0.5, 1])
     dx.grid(axis="y", color=GRID, lw=0.6, zorder=0)
-    dx.set_title("(d) by scale", fontsize=7, color=INK, loc="left")
+    dx.set_ylabel(r"$\omega$; $\rho$ and $\rho_{\mathrm{nat}}$ (ratios)", fontsize=6.3, labelpad=1)
     # in the empty band under omega and above rho_nat (one column: two would run past the panel)
-    dx.legend(hs, ls, frameon=False, fontsize=5.4, loc="upper left", bbox_to_anchor=(0.0, 0.935), handletextpad=0.2, labelspacing=0.1,
+    dx.legend(hs, ls, frameon=False, fontsize=6, loc="upper left", bbox_to_anchor=(0.0, 0.935), handletextpad=0.2, labelspacing=0.1,
               borderaxespad=0.1)
-    fig.savefig(FIG / "fig_flag.pdf", metadata=MD8META)
+    fig.savefig(FIG / "fig_flag_scale.pdf", metadata=MD8META)
     plt.close(fig)
 
 
 flag_figure()
+flag_scale_figure()
 COLC8 = {"nat": INK2, "E1": BLUE, "E2": AQUA, "E3": PURPLE, "E4": ORANGE, "E5": BROWN}
 MKC8 = {"qwen7": "o", "mistral7": "s", "llama8": "^"}
 LAMSY8 = dict(linthresh=0.25, linscale=0.9)       # the lambda axis: linear inside +-0.25, logarithmic beyond
@@ -4729,7 +4842,9 @@ def law_figure():
     """part C: (a) lambda per edit family, depth and statistic with 90 % intervals and the +-log 1.25 band (E3 hollow: not
     evaluable, post hoc; hollow too: Qwen2.5-7B E2 at l = 11, in a combo without a verdict); (b) kappa against sigma per cell
     at l = 3 and 7 (descriptive); (c) phi under NONE of the PAR, LEX, PERP and NONLEX components beside the full edit; (d)
-    KO(H*) and the random-set mean KO per donor at P1, l = 7 (the natural donor's random-set mean, E3 and E4a recomputed)."""
+    KO(H*) and the random-set mean KO per donor at P1, l = 7 (the natural donor's random-set mean, E3 and E4a recomputed).
+    Marker shape is the model in every panel (circle Qwen2.5-7B, square Mistral-7B, triangle Llama-3.1-8B) and colour the
+    edit family; fill is explained per panel ((a) verdict, (b) depth, (d) H* or random sets)."""
     fig = plt.figure(figsize=(6.75, 2.3))
     gs = fig.add_gridspec(1, 4, width_ratios=[2.2, 1.0, 1.3, 1.0], wspace=0.42, left=0.068, right=0.99, bottom=0.2, top=0.9)
     # (a) lambda
@@ -4752,23 +4867,23 @@ def law_figure():
         fx.append((F, np.mean(xs_)))
         x0 += 0.45
     ax.set_xticks(ticks)
-    ax.set_xticklabels(tlab, fontsize=5.6)
+    ax.set_xticklabels(tlab, fontsize=6)
     ax.tick_params(axis="x", length=0, pad=1.5)
-    ax.tick_params(axis="y", labelsize=5.8)
+    ax.tick_params(axis="y", labelsize=6)
     ax.set_xlim(-0.6, x0 - 0.45 - 0.4)
     for F, xm in fx:
         ax.text(xm, -0.085, {"E1": "E1", "E2": "E2", "E3": r"E3$^\dagger$", "E4": "E4"}[F], transform=matplotlib.transforms.blended_transform_factory(ax.transData, ax.transAxes),
                 ha="center", va="top", fontsize=6.3, color=COLC8[F], fontweight="bold")
-    ax.text(-0.6, -0.03, "$l$:", transform=matplotlib.transforms.blended_transform_factory(ax.transData, ax.transAxes), ha="right", va="top", fontsize=5.6, color=INK2)
+    ax.text(-0.6, -0.03, "$l$:", transform=matplotlib.transforms.blended_transform_factory(ax.transData, ax.transAxes), ha="right", va="top", fontsize=6, color=INK2)
     ax.set_ylabel(r"$\lambda = \log \psi_K - \log \psi_V$", fontsize=6.3, labelpad=1)
     ax.set_title(r"(a) channel ratio of the edits, $\lambda$", fontsize=7, color=INK, loc="left")
-    ax.text(x0 - 0.45 - 0.45, np.log(1.25), r"$\pm\log 1.25$", fontsize=5.0, color=INK2, ha="right", va="bottom")
-    ax.text(-0.45, np.log(0.5), r"$\log 0.5$", fontsize=5.0, color=INK2, ha="left", va="bottom")
+    ax.text(x0 - 0.45 - 0.45, np.log(1.25), r"$\pm\log 1.25$", fontsize=6, color=INK2, ha="right", va="bottom")
+    ax.text(-0.45, np.log(0.5), r"$\log 0.5$", fontsize=6, color=INK2, ha="left", va="bottom")
     hs = [matplotlib.lines.Line2D([], [], marker=MKC8[k], ls="none", color=INK2, ms=2.8, mew=0.6) for k in MC8]
     hs.append(matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, mfc="white", ms=2.8, mew=0.6))
-    ax.legend(hs, [SH8[k] for k in MC8] + ["no verdict (recomputed)"], frameon=False, fontsize=5.2, loc="lower left", bbox_to_anchor=(0.26, 0.0), handletextpad=0.2,
-              labelspacing=0.15, borderaxespad=0.2)
-    # (b) kappa against sigma
+    ax.legend(hs, [SH8[k] for k in MC8] + ["no verdict"], frameon=False, fontsize=6, loc="lower left", bbox_to_anchor=(0.0, 0.0), handletextpad=0.2,
+              labelspacing=0.15, borderaxespad=0.3, ncol=2, columnspacing=0.8)
+    # (b) kappa against sigma: the model by shape as in (a), the depth by fill (filled l = 3, open l = 7)
     bx = fig.add_subplot(gs[0, 1])
     bx.plot([0, 1], [0, 1], color=INK2, lw=0.6, ls=(0, (3, 2)), zorder=1)
     for (k, f, l), (sg, kp) in KS8.items():
@@ -4777,20 +4892,20 @@ def law_figure():
         for Z in ("E1", "E2", "E4a", "E4b"):
             if Z in kp:
                 F = Z[:2]
-                bx.plot(fl(sg), fl(kp[Z]), marker="o" if l == 3 else "^", ms=2.6, ls="none", color=COLC8[F], mfc=COLC8[F] if l == 3 else "white", mew=0.6,
+                bx.plot(fl(sg), fl(kp[Z]), marker=MKC8[k], ms=2.6, ls="none", color=COLC8[F], mfc=COLC8[F] if l == 3 else "white", mew=0.6,
                         zorder=3 if F != "E4" else 4, alpha=0.9)
     bx.set_xlim(-0.05, 1.05)
     bx.set_ylim(-0.05, 1.05)
     bx.set_xticks([0, 0.5, 1])
     bx.set_yticks([0, 0.5, 1])
-    bx.tick_params(labelsize=5.8)
+    bx.tick_params(labelsize=6)
     bx.grid(color=GRID, lw=0.5, zorder=0)
     bx.set_xlabel(r"$\sigma$: natural key share", fontsize=6.3, labelpad=1)
     bx.set_ylabel(r"$\kappa$: the edit's key share", fontsize=6.3, labelpad=1)
     bx.set_title(r"(b) $\kappa$ against $\sigma$", fontsize=7, color=INK, loc="left")
     hs = [matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, ms=2.8, mew=0.6),
-          matplotlib.lines.Line2D([], [], marker="^", ls="none", color=INK2, mfc="white", ms=2.8, mew=0.6)]
-    bx.legend(hs, ["$l = 3$", "$l = 7$"], frameon=False, fontsize=5.2, loc="lower right", bbox_to_anchor=(1.02, 0.0), handletextpad=0.1,
+          matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, mfc="white", ms=2.8, mew=0.6)]
+    bx.legend(hs, ["filled: $l = 3$", "open: $l = 7$"], frameon=False, fontsize=6, loc="lower right", bbox_to_anchor=(1.03, 0.0), handletextpad=0.1,
               labelspacing=0.1, borderaxespad=0.1)
     # (c) the components
     cx = fig.add_subplot(gs[0, 2])
@@ -4807,25 +4922,28 @@ def law_figure():
             cx.plot(j + foff[Z] + moff[k], y, marker=MKC8[k], ms=2.2, ls="none", color=COLC8[Z], mew=0.5, alpha=0.85, zorder=3)
     cx.axhline(0.3, color=INK2, lw=0.5, ls=":", zorder=1)
     cx.axhline(0, color=INK2, lw=0.5, zorder=1)
-    cx.text(-0.45, 0.31, "0.3", fontsize=5.0, color=INK2, ha="left", va="bottom")
+    cx.text(-0.45, 0.31, "0.3", fontsize=6, color=INK2, ha="left", va="bottom")
     for xv in np.arange(0.5, len(comps) - 1, 1.0):
         cx.axvline(xv, color=GRID, lw=0.5, zorder=0)
     cx.set_xticks(range(len(comps)))
-    cx.set_xticklabels([c[1] for c in comps], fontsize=5.2, rotation=30, ha="right", rotation_mode="anchor")
+    cx.set_xticklabels([c[1] for c in comps], fontsize=6, rotation=30, ha="right", rotation_mode="anchor")
     cx.tick_params(axis="x", length=0, pad=1.5)
-    cx.tick_params(axis="y", labelsize=5.8)
+    cx.tick_params(axis="y", labelsize=6)
     cx.set_xlim(-0.5, len(comps) - 0.5)
     cx.set_ylim(-0.12, 1.12)
     cx.set_yticks([0, 0.5, 1])
     cx.grid(axis="y", color=GRID, lw=0.5, zorder=0)
-    cx.set_ylabel(r"$\varphi$ under NONE", fontsize=6.3, labelpad=1)
+    cx.set_ylabel(r"$\varphi$ without a mention", fontsize=6.3, labelpad=1)
     cx.set_title("(c) components of the edits", fontsize=7, color=INK, loc="left")
-    hs = [matplotlib.lines.Line2D([], [], marker="s", ls="none", color=COLC8[F], ms=2.8) for F in ("E1", "E2", "E4")]
-    cx.legend(hs, ["E1", "E2", "E4"], frameon=False, fontsize=5.4, loc="upper right", bbox_to_anchor=(1.02, 0.86), handletextpad=0.1, labelspacing=0.1, borderaxespad=0.1)
+    # the families by colour patches (the marker shapes are the models, as in (a))
+    hs = [matplotlib.patches.Patch(facecolor=COLC8[F], edgecolor="none") for F in ("E1", "E2", "E4")]
+    cx.legend(hs, ["E1", "E2", "E4"], frameon=False, fontsize=6, loc="upper right", bbox_to_anchor=(1.02, 0.86), handlelength=0.9, handleheight=0.8,
+              handletextpad=0.3, labelspacing=0.15, borderaxespad=0.1)
     # (d) the reader heads
     dx = fig.add_subplot(gs[0, 3])
     donors = [("nat", r"nat.$^\dagger$"), ("E1", "E1"), ("E2", "E2"), ("E3", r"E3$^\dagger$"), ("E4a", r"E4$^\dagger$")]
     mo = {"qwen7": -0.14, "mistral7": 0.14}
+    YD8 = (-0.2, 1.2)
     for j, (D, _) in enumerate(donors):
         F = "nat" if D == "nat" else D[:2]
         for k in ("qwen7", "mistral7"):
@@ -4841,28 +4959,31 @@ def law_figure():
             else:
                 continue
             x = j + mo[k]
-            nov = D in ("E3", "E4a")
             for (y, lo, hi), filled in ((kh, True), (kr, False)):
-                if D != "E4a":   # E4a: point estimates only (its key read is 0.85 / 0.18 nats, so its KO intervals span the axis)
-                    dx.plot([x, x], [lo, hi], color=COLC8[F], lw=0.6, alpha=0.75, zorder=2, solid_capstyle="butt")
+                # every interval is drawn; one that runs past the axis is cut at it and marked with a caret there (E4a at
+                # Mistral-7B, whose key read is 0.18 nats: its random-set interval runs past both ends)
+                dx.plot([x, x], [max(lo, YD8[0]), min(hi, YD8[1])], color=COLC8[F], lw=0.6, alpha=0.75, zorder=2, solid_capstyle="butt")
+                for cut, end, mk_ in ((lo < YD8[0], YD8[0] + 0.035, "v"), (hi > YD8[1], YD8[1] - 0.035, "^")):
+                    if cut:
+                        dx.plot(x, end, marker=mk_, ms=2.4, ls="none", color=COLC8[F], mew=0, alpha=0.75, zorder=2)
                 dx.plot(x, y, marker=MKC8[k], ms=2.8, ls="none", color=COLC8[F], mfc=COLC8[F] if filled else "white", mew=0.6, zorder=3)
     dx.axhline(0.7, color=INK2, lw=0.5, ls=(0, (3, 2)), zorder=1)
     dx.axhline(0.25, color=INK2, lw=0.5, ls=":", zorder=1)
     dx.axhline(0, color=INK2, lw=0.5, zorder=1)
-    dx.text(3.5, 0.71, "0.7", fontsize=5.0, color=INK2, ha="center", va="bottom")
-    dx.text(3.5, 0.26, "0.25", fontsize=5.0, color=INK2, ha="center", va="bottom")
+    dx.text(3.5, 0.71, "0.7", fontsize=6, color=INK2, ha="center", va="bottom")
+    dx.text(3.5, 0.26, "0.25", fontsize=6, color=INK2, ha="center", va="bottom")
     dx.set_xticks(range(len(donors)))
-    dx.set_xticklabels([d[1] for d in donors], fontsize=5.4)
+    dx.set_xticklabels([d[1] for d in donors], fontsize=6)
     dx.tick_params(axis="x", length=0, pad=1.5)
-    dx.tick_params(axis="y", labelsize=5.8)
+    dx.tick_params(axis="y", labelsize=6)
     dx.set_xlim(-0.5, len(donors) - 0.5)
-    dx.set_ylim(-0.2, 1.2)
+    dx.set_ylim(*YD8)
     dx.set_yticks([0, 0.5, 1])
     dx.grid(axis="y", color=GRID, lw=0.5, zorder=0)
     dx.set_ylabel("KO: share of the key read removed", fontsize=6.0, labelpad=1)
     dx.set_title("(d) reader heads", fontsize=7, color=INK, loc="left")
     hs = [matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, ms=2.8, mew=0.6), matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, mfc="white", ms=2.8, mew=0.6)]
-    dx.legend(hs, [r"$H^*$", "random sets"], frameon=False, fontsize=5.2, loc="lower left", bbox_to_anchor=(-0.02, 0.02), handletextpad=0.1, labelspacing=0.1, borderaxespad=0.1)
+    dx.legend(hs, [r"$H^*$", "random sets"], frameon=False, fontsize=6, loc="lower left", bbox_to_anchor=(-0.02, 0.02), handletextpad=0.1, labelspacing=0.1, borderaxespad=0.1)
     fig.savefig(FIG / "fig_law.pdf", metadata=MD8META)
     plt.close(fig)
 
@@ -4870,7 +4991,8 @@ def law_figure():
 def nu_figure():
     """part C, post hoc: lambda against nu (the distance of the edit's K/V tables from the natural ones) for every statistic of
     every identity-carrying instance (phi(NONE) >= 0.3); colour by family; circles full edits, triangles PERP, squares
-    NONLEX components; filled = equivalent; the band +-log 1.25 and the bands of nu with their equivalent counts."""
+    NONLEX components; filled = equivalent; the band +-log 1.25, the copy-only bound log 0.5 and the bands of nu with their
+    equivalent counts."""
     fig, ax = plt.subplots(figsize=(3.25, 2.25))
     fig.subplots_adjust(left=0.15, right=0.985, bottom=0.17, top=0.9)
     lam_axis8(ax, -4.6, 0.42)
@@ -4881,26 +5003,128 @@ def nu_figure():
         ax.plot(p["nu"], p["lam"], marker=mk, ms=3.0, ls="none", color=COLC8[F], mfc=COLC8[F] if p["eq"] else "white", mew=0.6, alpha=0.9, zorder=3)
     for xv in (0.1, 0.3):
         ax.axvline(xv, color=INK2, lw=0.5, ls=(0, (3, 2)), zorder=1)
-    ymax = 0.42
     for (lo, hi), w in (((0, 0.1), "Low"), ((0.1, 0.3), "Mid"), ((0.3, 1.42), "High")):
         ax.text((lo + hi) / 2, 1.005, f"{macros[f'JcNuEq{w}']}/{macros[f'JcNuN{w}']}" + (" equivalent" if w == "High" else ""),
-                transform=matplotlib.transforms.blended_transform_factory(ax.transData, ax.transAxes), ha="center", va="bottom", fontsize=5.6, color=INK2)
+                transform=matplotlib.transforms.blended_transform_factory(ax.transData, ax.transAxes), ha="center", va="bottom", fontsize=6, color=INK2)
+    ax.text(0.015, np.log(0.5), r"$\log 0.5$", fontsize=6, color=INK2, ha="left", va="bottom", zorder=4)
     ax.set_xlim(0, 1.42)
     ax.set_xticks([0, 0.1, 0.3, 0.5, 1.0])
     ax.set_xticklabels(["0", "0.1", "0.3", "0.5", "1"])
     ax.tick_params(labelsize=6)
     ax.set_xlabel(r"$\nu$: distance of the edit's K/V tables from the natural ones", fontsize=6.3, labelpad=1.5)
     ax.set_ylabel(r"$\lambda = \log \psi_K - \log \psi_V$", fontsize=6.3, labelpad=1)
-    hs = [matplotlib.lines.Line2D([], [], marker="o", ls="none", color=COLC8[F], ms=3.0) for F in ("E1", "E2", "E3", "E4", "E5")]
-    hs += [matplotlib.lines.Line2D([], [], marker=m_, ls="none", color=INK2, mfc="white", ms=3.0, mew=0.6) for m_ in ("^", "s")]
-    ax.legend(hs, ["E1", "E2", "E3", "E4", "E5", "PERP comp.", "NONLEX comp."], frameon=False, fontsize=5.3, loc="upper left", bbox_to_anchor=(0.33, 1.0),
-              handletextpad=0.15, labelspacing=0.12, borderaxespad=0.2, ncol=2, columnspacing=0.6)
+    # shape: full edit or component (grey half-tone handles); fill: equivalent (filled) or not (open); at the top, clear of
+    # every point. Colour: the family, in the empty lower left.
+    hs = [matplotlib.lines.Line2D([], [], marker=m_, ls="none", color=INK2, mfc=LGREY, ms=3.0, mew=0.6) for m_ in ("o", "^", "s")]
+    hs += [matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, ms=3.0, mew=0.6),
+           matplotlib.lines.Line2D([], [], marker="o", ls="none", color=INK2, mfc="white", ms=3.0, mew=0.6)]
+    lg = ax.legend(hs, ["full edit", "PERP comp.", "NONLEX comp.", "filled: equivalent", "open: not equivalent"], frameon=False, fontsize=6,
+                   loc="upper right", bbox_to_anchor=(1.0, 1.0), handletextpad=0.25, labelspacing=0.12, borderaxespad=0.2, ncol=2, columnspacing=0.8,
+                   handlelength=0.9)
+    ax.add_artist(lg)
+    hs = [matplotlib.patches.Patch(facecolor=COLC8[F], edgecolor="none") for F in ("E1", "E2", "E3", "E4", "E5")]
+    lg = ax.legend(hs, ["E1", "E2", "E3", "E4", "E5"], frameon=True, fontsize=6, loc="lower left", bbox_to_anchor=(0.0, 0.0), handletextpad=0.25,
+                   labelspacing=0.12, borderaxespad=0.15, borderpad=0.25, ncol=3, columnspacing=0.6, handlelength=0.9, handleheight=0.7)
+    lg.get_frame().set(facecolor="white", edgecolor="none", alpha=1.0)   # the nu lines pass behind it
+    lg.set_zorder(5)
     fig.savefig(FIG / "fig_nu.pdf", metadata=MD8META)
     plt.close(fig)
-
-
 law_figure()
 nu_figure()
+
+
+# ---------------------------------------------------------------- v5 revision, round 1: post hoc summaries the reviews asked for
+# All of these are computed after the data, from printed verdicts and recorded priors or from the stored statistics; the
+# paper labels them post hoc. (a) Poisson-binomial tails of the class tallies under the recorded priors (independent lines).
+def _pb_pmf(ps):
+    pmf = np.zeros(len(ps) + 1)
+    pmf[0] = 1.0
+    for p_ in ps:
+        pmf[1:] = pmf[1:] * (1 - p_) + pmf[:-1] * p_
+        pmf[0] *= 1 - p_
+    return pmf
+
+
+_LINES8 = ([("A", c, L["cls"], "A", float(L["prior"]), L["v"]) for c, L in LA8.items() if L["cls"] != "D"]
+           + [("B", c, L["cls"], L["kind"], float(L["prior"]), L["v"]) for c, L in LB8.items()]
+           + [("C", c, L["cls"], L["kind"], float(L["prior"]), L["v"]) for c, L in LC8.items()]
+           + [("D", c, L["cls"], L["kind"], float(L["prior"]), L["v"]) for c, L in LD8.items()])
+assert len(_LINES8) == 69, len(_LINES8)
+_VD8 = ("MET", "NOT MET")
+_R8 = [x for x in _LINES8 if x[2] == "R" and x[3] == "A" and x[5] in _VD8]
+assert (len(_R8), sum(x[5] == "MET" for x in _R8), f"{sum(x[4] for x in _R8):.2f}") == (27, 10, "12.05")
+_src_pb = "docs/PREREGISTRATION.md (recorded priors) and the four STAGE8*_SCORE.txt verdicts"
+_pm = _pb_pmf([x[4] for x in _R8])
+rmac("JxRiskyTailP", _pm[:11].sum(), "post hoc: P(at most 10 of the 27 risky account lines met) under the recorded priors (Poisson binomial, lines independent)", _src_pb, G8X, "{:.2f}")
+for P_, w, tail in (("A", "le", 3), ("B", "ge", 4), ("C", "le", 1), ("D", "le", 2)):
+    _ps = [x[4] for x in _R8 if x[0] == P_]
+    _m = _pb_pmf(_ps)
+    rmac(f"JxRiskyTailP{P_}", _m[:tail + 1].sum() if w == "le" else _m[tail:].sum(),
+         f"post hoc: P(at {'most' if w == 'le' else 'least'} {tail} of part {P_}'s {len(_ps)} risky account lines met) under the recorded priors", _src_pb, G8X, "{:.2f}")
+_MC8 = [x for x in _LINES8 if x[2] == "M" and x[0] == "C" and x[5] in _VD8]
+assert (len(_MC8), sum(x[5] == "MET" for x in _MC8), f"{sum(x[4] for x in _MC8):.2f}") == (4, 1, "3.30")
+rmac("JcClassMTailP", _pb_pmf([x[4] for x in _MC8])[:2].sum(), "post hoc: P(at most 1 of part C's 4 extrapolation lines met) under the recorded priors", _src_pb, G8X, "{:.3f}")
+_MABD = [x for x in _LINES8 if x[2] == "M" and x[0] != "C" and x[5] in _VD8]
+assert (macros["JxClassMMetABD"], macros["JxClassMVerdABD"], macros["JxClassMExpABD"]) == ("15", "15", "12.50")   # defined above
+assert (sum(x[5] == "MET" for x in _MABD), len(_MABD), f"{sum(x[4] for x in _MABD):.2f}") == (15, 15, "12.50")
+rmac("JxClassMTailPABD", _pb_pmf([x[4] for x in _MABD])[15:].sum(), "post hoc: P(all 15 extrapolation lines of parts A, B and D met) under the recorded priors", _src_pb, G8X, "{:.2f}")
+# (b) the risky account lines that a gate made not evaluable, resolved as the outcome records' sensitivity notes say they
+# would have come out had the gate passed or been read otherwise (post hoc; J-C-WIN has no window and cannot be resolved)
+_CF8 = {"J-A6d": False,      # part A: had Llama's options-after cell passed J-A-G1 by one item (Llama S-rate 0.541 < 0.6)
+        "J-A-HA1": True, "J-A-HA2": True, "J-A-HA3a": False, "J-A-HA3b": False,   # part A: with Qwen's heads gate waived
+        "J-B-SMALL": False,  # part B: had Gemma-2-2B passed competence
+        "J-C3": False,       # part C: under either post hoc dictionary gate
+        "J-C-READb": False,  # part C: under the common part's evaluability rule
+        "J-D8-IOI": True}    # part D: had Mistral's INLINE cell passed J-D-G4 (missed by 0.021)
+_RNE8 = [x for x in _LINES8 if x[2] == "R" and x[3] == "A" and x[5] == "NOT EVALUABLE"]
+assert {x[1] for x in _RNE8} == set(_CF8) | {"J-C-WIN"}, sorted(x[1] for x in _RNE8)
+_cf = [(x[4], _CF8[x[1]]) for x in _RNE8 if x[1] in _CF8]
+amac("JxRiskyNotEvalABCD", len(_RNE8), "risky account lines not evaluable (parts A-D)", _src_pb, G8X, "{:d}")
+amac("JxRiskySensResolved", len(_cf), "post hoc: risky account lines not evaluable whose outcome the outcome records resolve (J-C-WIN cannot be)", _src_pb, G8X, "{:d}")
+amac("JaGateFailCells", len(NE8A), "part A: model x format cells that failed a gate (J-A-G1 or J-A-G2), of 24", SRCA + " GATES", G8X, "{:d}")
+amac("JxRiskySensHeld", sum(v for _, v in _cf), "post hoc: risky account lines not evaluable through a gate that would have been met (the outcome records' sensitivity notes)", _src_pb, G8X, "{:d}")
+amac("JxRiskySensNotHeld", sum(not v for _, v in _cf), "post hoc: risky account lines not evaluable through a gate that would not have been met (the outcome records' sensitivity notes)", _src_pb, G8X, "{:d}")
+amac("JxRiskySensMet", 10 + sum(v for _, v in _cf), "post hoc: risky account lines met with those lines resolved", _src_pb, G8X, "{:d}")
+amac("JxRiskySensVerd", 27 + len(_cf), "post hoc: risky account lines with a verdict with those lines resolved", _src_pb, G8X, "{:d}")
+amac("JxRiskySensExp", 12.05 + sum(p_ for p_, _ in _cf), "post hoc: risky account lines expected met with those lines resolved", _src_pb, G8X, "{:.2f}")
+rmac("JxRiskySensTailP", _pb_pmf([x[4] for x in _R8] + [p_ for p_, _ in _cf])[:10 + sum(v for _, v in _cf) + 1].sum(),
+     "post hoc: P(at most that many met) under the recorded priors, with those lines resolved", _src_pb, G8X, "{:.2f}")
+assert (macros["JxRiskySensHeld"], macros["JxRiskySensNotHeld"], macros["JxRiskySensMet"], macros["JxRiskySensVerd"], macros["JxRiskySensExp"]) == ("3", "6", "13", "36", "16.70")
+# (c) the discovery entries G-I counted over the predictions with a verdict (H6 not evaluable and H12 not run left out)
+amac("GHIcountVerd", int(macros["GcountMet"]) + int(macros["GcountNotMet"]) + int(macros["HcountMet"]) + int(macros["HcountNotMet"])
+     + int(macros["IcountMet"]) + int(macros["IcountNotMet"]), "predictions of G, H and I with a verdict (H6 not evaluable and H12 not run left out)", SNAME["S7"], G8X, "{:d}")
+assert macros["GHIcountVerd"] == "39"
+# (d) the nu pattern by edit family: steering vectors (full E1 and E2 edits), E3 (gate failed) and the rest (the remap, the
+# non-lexical vectors and the PERP and NONLEX components); within-family Spearman correlations; the statistics with nu >= 0.3
+# split into those whose 90 % interval lies wholly outside the margin and the inconclusive rest; a bootstrap over the units
+def _fam8(p):
+    return "steer" if p["Z"] in ("E1", "E2") else "E3" if p["Z"] == "E3" else "other"
+
+
+_LOW8 = [p for p in NUP8 if p["nu"] < 0.3]
+_HIGH8 = [p for p in NUP8 if p["nu"] >= 0.3]
+for w, B_ in (("Below", _LOW8), ("Above", _HIGH8)):
+    for f_, fw in (("steer", "Steer"), ("E3", "Ethree"), ("other", "Other")):
+        rmac(f"JcNu{fw}{w}", sum(_fam8(p) == f_ for p in B_), f"post hoc nu pattern: statistics of family {f_} with nu {'< 0.3' if w == 'Below' else '>= 0.3'}", _src7, G8C, "{:d}")
+rmac("JcNuNBelow", len(_LOW8), "post hoc nu pattern: statistics with nu < 0.3", _src7, G8C, "{:d}")
+for f_, fw in (("steer", "Steer"), ("other", "Other")):
+    _B = [p for p in NUP8 if _fam8(p) == f_]
+    rmac(f"JcNuRho{fw}", spearmanr([p["nu"] for p in _B], [p["lam"] for p in _B])[0], f"post hoc nu pattern: Spearman of lambda with nu within family {f_} ({len(_B)} statistics)", _src7, G8C, "{:.2f}")
+    rmac(f"JcNuN{fw}", len(_B), f"post hoc nu pattern: statistics of family {f_}", _src7, G8C, "{:d}")
+_out8 = [p for p in _HIGH8 if (lambda lo, hi: hi < -np.log(1.25) or lo > np.log(1.25))(*p["q"].ci(0.90))]
+rmac("JcNuOutHigh", len(_out8), "post hoc nu pattern: statistics with nu >= 0.3 whose 90 % interval lies wholly outside +-log 1.25 (a shown departure; the rest are inconclusive)", _src7, G8C, "{:d}")
+_uk8 = sorted({(p["k"], p["Z"], p["l"]) for p in NUP8})
+_ix8 = {u: [i for i, p in enumerate(NUP8) if (p["k"], p["Z"], p["l"]) == u] for u in _uk8}
+_rs8 = np.random.default_rng(20261014)
+_bo8 = []
+for _ in range(2000):
+    _ii = [i for u in _rs8.choice(len(_uk8), len(_uk8)) for i in _ix8[_uk8[u]]]
+    _bo8.append(spearmanr([NUP8[i]["nu"] for i in _ii], [NUP8[i]["lam"] for i in _ii])[0])
+rmac("JcNuRhoNuLo", np.percentile(_bo8, 2.5), "post hoc nu pattern: Spearman of lambda with nu, lower 95 % bound of a bootstrap over the units (model, instance, depth)", _src7, G8C, "{:.2f}")
+rmac("JcNuRhoNuHi", np.percentile(_bo8, 97.5), "post hoc nu pattern: Spearman of lambda with nu, upper 95 % bound of a bootstrap over the units (model, instance, depth)", _src7, G8C, "{:.2f}")
+print("v5 round 1:", {n: macros[n] for n in ("JxRiskyTailP", "JcClassMTailP", "JxClassMTailPABD", "JxRiskySensTailP", "JcNuSteerBelow", "JcNuEthreeBelow", "JcNuOtherBelow",
+      "JcNuSteerAbove", "JcNuEthreeAbove", "JcNuOtherAbove", "JcNuRhoSteer", "JcNuRhoOther", "JcNuOutHigh", "JcNuRhoNuLo", "JcNuRhoNuHi",
+      "JxRiskyTailPA", "JxRiskyTailPB", "JxRiskyTailPC", "JxRiskyTailPD")})
 
 
 # ---------------------------------------------------------------- checks

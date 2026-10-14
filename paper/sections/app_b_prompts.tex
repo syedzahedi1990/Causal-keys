@@ -1,0 +1,242 @@
+% Appendix B: prompts and items. Input by sections/appendix.tex.
+\section{Prompts and items}\label{app:prompts}
+
+\subsection{The discovery sample: belief stories, tasks and formats}\label{app:prompts-discovery}
+
+\paragraph{Belief task.} The story generator (\texttt{ckeys/story.py}) is ported from the released generator of \citet{anonymous2026fitted}. Each story core draws an agent and an other agent (Alice, Bob), an object and a distractor object from twenty objects, and four locations from the six candidates \emph{box, basket, shelf, drawer, cabinet, closet}. The initial location, the base location and the source location must differ, and the distractor's location must differ from the base and source locations. The two ``initially sees'' sentences are sorted by object name. The direct question is ``Where does \{$A$\} believe the \{$o$\} is?''. Base B and source S differ only at the writing token, the word after ``moved to the''. The third value X used for $\mathrm{ID}_K$ and $\mathrm{ID}_V$ is drawn, with a seed fixed by the core, from the candidates other than the base, source, initial and distractor locations, so it appears nowhere in the story. We keep a core only if the B, S and X prompts have the same token length and differ at exactly one token.
+
+We show the first core generated with seed 0: agent Alice, other agent Bob, object \emph{lamp}, distractor \emph{coin}, initial location \emph{basket} (the distractor is also in the basket), base location \emph{cabinet}, source location \emph{drawer}, third value \emph{box}. Below are the raw user-turn prompts of the base run in all seven formats, as built by \texttt{ckeys/encoding.py}. Line breaks inside the story are added here for width; in the prompts the story is one line.
+
+\paragraph{\fmtOpt{} (the format of the key-exchange experiments of \citealt{anonymous2026fitted}).}\mbox{}
+{\small
+\begin{verbatim}
+Read the story and answer the question.
+
+Story: Everyone initially sees that the coin is in the basket. Everyone
+initially sees that the lamp is in the basket. Alice watches as the lamp is
+moved to the cabinet. Bob does not see this happen.
+Question: Where does Alice believe the lamp is?
+Choices: box, basket, shelf, drawer, cabinet, closet
+Answer with exactly one choice.
+Answer:
+\end{verbatim}
+}
+
+\paragraph{\fmtListA{}.} As \fmtOpt{}, with the last instruction line replaced by ``Answer with one word.''.
+{\small
+\begin{verbatim}
+...
+Question: Where does Alice believe the lamp is?
+Choices: box, basket, shelf, drawer, cabinet, closet
+Answer with one word.
+Answer:
+\end{verbatim}
+}
+
+\paragraph{\fmtLetter{}.}\mbox{}
+{\small
+\begin{verbatim}
+Read the story and answer the question.
+
+Story: Everyone initially sees that the coin is in the basket. Everyone
+initially sees that the lamp is in the basket. Alice watches as the lamp is
+moved to the cabinet. Bob does not see this happen.
+Question: Where does Alice believe the lamp is?
+Choices: A) box, B) basket, C) shelf, D) drawer, E) cabinet, F) closet
+Answer with one letter.
+Answer:
+\end{verbatim}
+}
+
+\paragraph{\fmtPost{}.}\mbox{}
+{\small
+\begin{verbatim}
+Read the story and answer the question.
+
+Story: Everyone initially sees that the coin is in the basket. Everyone
+initially sees that the lamp is in the basket. Alice watches as the lamp is
+moved to the cabinet. Bob does not see this happen. The room has a box, a
+basket, a shelf, a drawer, a cabinet and a closet.
+Question: Where does Alice believe the lamp is?
+Answer with one word.
+Answer:
+\end{verbatim}
+}
+
+\paragraph{\fmtSentB{}.}\mbox{}
+{\small
+\begin{verbatim}
+Read the story and answer the question.
+
+Story: The room has a box, a basket, a shelf, a drawer, a cabinet and a
+closet. Everyone initially sees that the coin is in the basket. Everyone
+initially sees that the lamp is in the basket. Alice watches as the lamp is
+moved to the cabinet. Bob does not see this happen.
+Question: Where does Alice believe the lamp is?
+Answer with one word.
+Answer:
+\end{verbatim}
+}
+
+\paragraph{\fmtNone{}.}\mbox{}
+{\small
+\begin{verbatim}
+Read the story and answer the question.
+
+Story: Everyone initially sees that the coin is in the basket. Everyone
+initially sees that the lamp is in the basket. Alice watches as the lamp is
+moved to the cabinet. Bob does not see this happen.
+Question: Where does Alice believe the lamp is?
+Answer with one word.
+Answer:
+\end{verbatim}
+}
+
+\paragraph{\fmtBefore{}.}\mbox{}
+{\small
+\begin{verbatim}
+Read the story and answer the question.
+Choices: box, basket, shelf, drawer, cabinet, closet
+
+Story: Everyone initially sees that the coin is in the basket. Everyone
+initially sees that the lamp is in the basket. Alice watches as the lamp is
+moved to the cabinet. Bob does not see this happen.
+Question: Where does Alice believe the lamp is?
+Answer with one word.
+Answer:
+\end{verbatim}
+}
+
+\paragraph{Chat wrapper and scoring.} Each raw prompt is wrapped as in the \texttt{Answer:}-prefill interface of \citet{anonymous2026fitted} and its released encoder: a system turn ``You are a helpful assistant.'', a user turn holding the raw prompt, the model's generation prompt, and the assistant prefill ``Answer:''. We also disable thinking (\texttt{enable\_thinking=False}, which matters for Qwen3 and is ignored by other templates). The raw prompt itself ends in ``Answer:'', so this string appears twice. For Qwen2.5 the full input is
+{\small
+\begin{verbatim}
+<|im_start|>system
+You are a helpful assistant.<|im_end|>
+<|im_start|>user
+Read the story and answer the question.
+...
+Answer:<|im_end|>
+<|im_start|>assistant
+Answer:
+\end{verbatim}
+}
+The wrapper asserts that the raw prompt occurs exactly once in the templated text. Templates that reject a system role fall back to merging the system text into the user turn; every output file records whether this happened. No model of the discovery sample needed it; Gemma-2-9B and Gemma-2-2B, whose template rejects a system turn, do, and their files record the merge. In the discovery sample we read full-vocabulary log-probabilities at the last position and score the candidates as single tokens with a leading space (`` box'', `` basket'', \ldots, or `` A'' to `` F'' under \fmtLetter{}); the code asserts that each candidate is one token. This is the lower-case score; the final round scores the forms the models emit (\cref{app:emitted}).
+
+\paragraph{Role-swap control.} The role-swapped story R exchanges the two names in the event and keeps the location word. For the core above, the base event and the role-swapped event are
+{\small
+\begin{verbatim}
+B: Alice watches as the lamp is moved to the cabinet. Bob does not see this happen.
+R: Bob watches as the lamp is moved to the cabinet. Alice does not see this happen.
+\end{verbatim}
+}
+The question still asks for Alice's belief, so the correct answer moves from the writing token's location (\emph{cabinet}) to the initial location (\emph{basket}). The role effect is measured with $m = \log p(\text{initial}) - \log p(\textsc{loc})$, and $f_C$ is the effect of clamping channel $C$ at the writing token to R's, divided by the full R$-$B difference in $m$.
+
+\paragraph{Intervention frames.} The stage-2, stage-3b and stage-4 runs with the bases of \citet{anonymous2026fitted} use their released native story cores, rendered with the same generator, the same format builders and the same wrapper. The patched span is the move event, from the observer's name to the end of the story; the writing token is the location word inside it.
+
+\paragraph{Paint and schedule tasks.} The two new tasks (\texttt{ckeys/tasks.py}) follow the same structure: two sentences give the starting values of two things, sorted by name, and a final sentence writes the new value at the writing token. They use the formats \fmtOpt{}, \fmtLetter{}, \fmtPost{}, \fmtNone{} and \fmtBefore{}, built exactly as above with the task's candidates; the neutral sentence of \fmtPost{} is task-specific. The agent is drawn from six names (Alice, Bob, Carol, David, Emma, Frank) and the things from ten per task.
+\begin{center}
+\footnotesize
+\begin{tabular}{p{0.16\textwidth}p{0.37\textwidth}p{0.37\textwidth}}
+\toprule
+ & paint & schedule \\
+\midrule
+Candidates & red, blue, green, yellow, black, white & Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday \\
+Things & fence, door, bench, shed, gate, chair, table, wall, boat, bike & meeting, dinner, appointment, party, class, interview, concert, match, lecture, trip \\
+Starting value & ``The \{thing\} was painted \{value\}.'' & ``The \{thing\} was scheduled for \{value\}.'' \\
+Writing sentence & ``Later, \{agent\} repainted the \{thing\} \{value\}.'' & ``Later, \{agent\} moved the \{thing\} to \{value\}.'' \\
+Question & ``What color is the \{thing\} now?'' & ``On which day is the \{thing\} now?'' \\
+\fmtPost{} sentence & ``The shop sells red, blue, green, yellow, black and white paint.'' & ``The calendar shows Monday, Tuesday, Wednesday, Thursday, Friday, Saturday and Sunday.'' \\
+\fmtLetter{} options & A) red, \ldots, F) white & A) Monday, \ldots, G) Sunday \\
+\bottomrule
+\end{tabular}
+\end{center}
+The first cores generated with seed 0 give, under \fmtOpt{} and \fmtPost{},
+{\small
+\begin{verbatim}
+Read the story and answer the question.
+
+Story: The boat was painted yellow. The shed was painted yellow. Later, Emma repainted the
+shed black.
+Question: What color is the shed now?
+Choices: red, blue, green, yellow, black, white
+Answer with exactly one choice.
+Answer:
+
+Read the story and answer the question.
+
+Story: The interview was scheduled for Friday. The match was scheduled for Monday. Later,
+Frank moved the interview to Wednesday. The calendar shows Monday, Tuesday, Wednesday,
+Thursday, Friday, Saturday and Sunday.
+Question: On which day is the interview now?
+Answer with one word.
+Answer:
+\end{verbatim}
+}
+with source values \emph{green} and \emph{Thursday} and third values \emph{blue} and \emph{Tuesday}.
+
+\subsection{Fresh stories}\label{app:prompts-fresh}
+
+\paragraph{Population.} The fresh stories are the first 150 story cores of a stream with a new seed whose full tuple (agent, other agent, object, distractor, initial location, distractor's location, base, source) occurs in no earlier stage; a further 30 cores from another new seed serve only to discover each model's answer frames (calibration). The mention sentences and the second lexicon are new; the story sentences follow the template of the discovery sample. Half of the cores (those with the smallest hash of the core tuple) are rendered in a second six-word lexicon, \emph{bin, crate, tray, jar, bucket, chest}, the others in the original one; a core is drawn in the original lexicon and rendered by index, so every rule of the generator holds in either. Each core has its own order of the six candidates, drawn with a seed fixed by its hash, used in the list and in the sentence of every arm. The bootstrap clusters are the cells (lexicon, base, source); 55 of the 60 possible cells occur. The discovery-sample cores (the first 150 cores of seed 0) are re-measured with the original lexicon, the canonical order and the room sentence. % verbatim: entry J, part B
+
+\paragraph{Arms.} Every arm uses the chat wrapper and the ``Answer:'' prefill above and the instruction ``Answer with one word.'': \fmtListA{} (``Choices:'' and the six candidates after the question), \fmtBefore{} (the same line before the story), \fmtNone{}, \fmtPost{} (a neutral sentence naming the six candidates after the story), \fmtSentB{} (the same sentence before the story) and \fmtNull{} (the neutral sentence with six nouns that name no candidate, at the position of \fmtPost{}). In the tables of \cref{app:fresh,app:measure} these arms are AFTER, BEFORE, NONE, POST, PRE and POST-NULL, and \fmtOpt{} is used on the discovery-sample cores. With the original lexicon, the canonical order and the room sentence, every builder equals the discovery-sample builder byte for byte (a unit test).
+
+\paragraph{The eight sentences.} Each core uses one of eight sentences (by the rank of its hash modulo 8; 18 or 19 cores each), with its six candidates in the core's order; in \fmtNull{} the same sentence holds the null nouns \emph{rug, clock, mirror, poster, radio, globe} in the same order:
+\begin{enumerate}\setlength\itemsep{0pt}
+  \item ``There is a \{0\}, a \{1\}, a \{2\}, a \{3\}, a \{4\} and a \{5\} in the house.''
+  \item ``The hallway also has a \{0\}, a \{1\}, a \{2\}, a \{3\}, a \{4\} and a \{5\}.''
+  \item ``In the kitchen there are a \{0\}, a \{1\}, a \{2\}, a \{3\}, a \{4\} and a \{5\}.''
+  \item ``A \{0\}, a \{1\}, a \{2\}, a \{3\}, a \{4\} and a \{5\} stand along the wall.''
+  \item ``The house contains a \{0\}, a \{1\}, a \{2\}, a \{3\}, a \{4\} and a \{5\}.''
+  \item ``Nearby there are a \{0\}, a \{1\}, a \{2\}, a \{3\}, a \{4\} and a \{5\}.''
+  \item ``The attic holds a \{0\}, a \{1\}, a \{2\}, a \{3\}, a \{4\} and a \{5\}.''
+  \item ``Along one wall sit a \{0\}, a \{1\}, a \{2\}, a \{3\}, a \{4\} and a \{5\}.''
+\end{enumerate}
+Each of the 18 words is one token after a space and before ``,'', ``.'' and `` and'' in every tokenizer of the round, so a null sentence has its sentence's length in every lexicon and order, and every sentence is within three tokens of the room sentence (checked by the tokenizer gate on each model's verified files). No null noun is a candidate of either lexicon or a story object. The first fresh core (sentence 2, original lexicon) gives, under \fmtListA{}, \fmtPost{} and \fmtNull{} (the system turn, generation prompt and prefill as above):
+{\small
+\begin{verbatim}
+Read the story and answer the question.
+
+Story: Everyone initially sees that the hat is in the closet. Everyone
+initially sees that the pen is in the closet. Bob watches as the pen is
+moved to the drawer. Alice does not see this happen.
+Question: Where does Bob believe the pen is?
+Choices: cabinet, shelf, box, basket, drawer, closet
+Answer with one word.
+Answer:
+
+Story: ... Alice does not see this happen. The hallway also has a cabinet,
+a shelf, a box, a basket, a drawer and a closet.
+Question: Where does Bob believe the pen is?
+Answer with one word.
+Answer:
+
+Story: ... Alice does not see this happen. The hallway also has a radio,
+a mirror, a rug, a clock, a poster and a globe.
+\end{verbatim}
+}
+\noindent A core of the second lexicon reads, under \fmtPost{}: ``Everyone initially sees that the bag is in the jar. Everyone initially sees that the cup is in the crate. Bob watches as the bag is moved to the chest. Alice does not see this happen. The hallway also has a tray, a crate, a bin, a bucket, a chest and a jar.''
+
+\paragraph{Generations.} Greedy generations (at most 16 new tokens) stop at a newline, at an end-of-sequence or chat end-of-turn token, or once the text names a candidate; the answer is the first candidate of the core's lexicon in the text (plurals allowed), else ``other''. One batch per item and arm holds the clean B, S and X runs and the self-clamp, key-only and value-only rows to S and to X; decoding reads the clamped cache, which a unit test checks against cache-free stepwise decoding under the same clamps.
+
+\subsection{Natural passages}\label{app:prompts-natural}
+
+\paragraph{Items.} From the SQuAD v1.1 development set \citep{rajpurkar2016squad} (CC BY-SA 4.0; 48 articles, file hash asserted), a question is kept when its majority answer $e_B$ (given by at least two of three annotators) is a person, a place (with a place head noun in the question) or a number, occurs exactly once in the passage and not in the question, and no content word of it occurs elsewhere in the passage or the question (items failing only this last rule form an exploratory stratum, LEAK). Three substitutes S, X and Z of the same type, place class and word count are drawn from the majority answers of other articles (numbers: the leading digit replaced); each shares no word with $e_B$, with the other substitutes or with the distractor D, and no content word of it occurs in the passage or the question. Z is only ever clamped, never shown. The fourth option D is another answer of the same paragraph and type that occurs in the passage, else an absent entity of the pool. The counterfactual passages write S, X or Z in place of $e_B$ \citep{longpre2021conflicts}; per tokenizer and format, the S, X and Z prompts have B's length and differ from it only inside the answer span. A type audit of the entity lists (no model output) excluded 44 entities and corrected nine place classes. Twelve articles (drawn with a fixed seed) give 71 items for the answer frames and the head ranking; the other articles give the 185 evaluation items, from 34 articles (80 persons, 77 numbers, 28 places; at most ten per article and two per paragraph). A year stratum (80 items) and the LEAK stratum (65 items) are exploratory. % verbatim: entry J, part A
+
+\paragraph{Formats.} Every prompt has the system turn ``You are a helpful assistant.'', the generation prompt with thinking disabled and the prefill ``Answer:''. With PRE = ``Read the passage and answer the question.'' and a blank line, FREE = ``Answer with the exact words from the passage.'', MC = ``Answer with exactly one of the options.'' and o1--o4 the four options in the item's fixed order:
+\begin{itemize}\setlength\itemsep{0pt}
+  \item free form (NOM): PRE, ``Passage: '' + passage, ``Question: '' + question, FREE;
+  \item options after (OPTA): as free form, with the line ``Options: o1; o2; o3; o4'' after the question and MC;
+  \item options before (OPTB): PRE, ``Options: o1; o2; o3; o4'', a blank line, the passage and the question, MC;
+  \item a related-articles sentence after the passage (MENA): the passage followed by `` Related articles mention o1, o2, o3 and o4.'', the question, FREE; before the passage (MENB): the same sentence placed before the passage;
+  \item lettered options (LETA): the passage and question, ``Options:'', the lines ``A. o1'' to ``D. o4'', and ``Answer with the letter of the correct option.'';
+  \item closed book (no passage): ``Answer the question.'', the question and the options, as MC or with letters.
+\end{itemize}
+\paragraph{Answer frame and scoring.} Before any test, each model's answer frame (the text it writes between the prefill and the entity) was chosen from its greedy generations on 30 frame items, among six fixed frames; it is a single space for all four models. The decision token is the first token of the entity after the frame (the letter under LETA); the decision tokens of B, S, X, Z and D must be distinct. The clamps act at every position of the answer span in every layer from 0. Generated answers (greedy, at most 16 tokens; the clamps act in the prompt pass and decoding reads the clamped cache) are matched to the candidates after SQuAD normalisation; an answer that starts with one candidate's first word but does not complete it is ``other''.
+
+\subsection{Questions and IOI prompts of the mechanism tests}\label{app:prompts-mechanism}
+
+The mechanism tests use \fmtOpt{} and \fmtPost{} of the discovery sample on new cores (100 evaluation stories; the flags are fit on the first 60 discovery-sample cores, the stories on which the reader heads were ranked). The question arms replace the question line of \fmtOpt{} by ``Which of the choices is mentioned in the story?'' ($Q_{\mathrm{IN}}$) or ``Which of the choices is not mentioned in the story?'' ($Q_{\mathrm{OUT}}$). The IOI prompts follow the templates of \citet{wang2022ioi} (\cref{app:sign}); the in-sentence arm (INLINE) lists the four names as a parenthetical right after the indirect object's mention, without a chat template; INLINE\_CHAT puts the same sentence in the chat wrapper and instruction of the list arm. The binding test uses 100 cores whose distractor is in another location than the object, so that two initial-state sentences can be told apart. % verbatim: entry J, part D
+
+\subsection{Intervention stories}\label{app:prompts-intervention}
+
+The interventions use 80 new story cores (24 ordered base--source pairs) in which the pair-swap of the released remap, $\pi$ (box $\leftrightarrow$ basket, shelf $\leftrightarrow$ drawer, cabinet $\leftrightarrow$ closet), maps neither S nor X to B, under \fmtLetter{}, \fmtOpt{}, \fmtPost{} and \fmtNone{}; 200 further cores give the steering vectors (150) and the calibration (50), and 1{,}000 and 100 more train and hold out the remap trained at the writing token. The prefix up to the writing token is the same in the four formats, so an edit's cached keys and values are the same tensors in all four. The steering vectors from unrelated sentences are means over 24 fixed neutral sentences, each a user turn of the chat template without prefill that contains every candidate exactly once; the boundary family uses the French, German or synonym form of each value in the same sentences. % verbatim: entry J, part C

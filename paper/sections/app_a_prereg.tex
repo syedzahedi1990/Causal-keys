@@ -1,0 +1,513 @@
+% Appendix A: preregistrations and claim status. Input by sections/appendix.tex.
+\section{Preregistrations and claim status}\label{app:prereg}
+
+\subsection{How the predictions were made}\label{app:prereg-how}
+
+We made ten preregistrations, A--J. The first nine (A--I) produced the discovery sample of \cref{app:discovery}; the tenth (J), in four parts, is the final round reported in the main text. Each was committed to version control before its run, and each scoring script was committed before its outputs were inspected. H was finalised before any output of G was inspected (item~10 of \cref{app:prereg-ai}), preregistration~I before any stage-7 run (item~11), and every part of J before any output of its run (item~12). \Cref{tab:prereg-ab,tab:prereg-c,tab:prereg-de,tab:prereg-f,tab:prereg-g,tab:prereg-h,tab:prereg-i,tab:prereg-j} give every prediction and gate with its outcome as recorded in the preregistration log of the repository; a NOT MET is listed as plainly as a MET. The anonymised code release adds a history file that lists, without author information, every commit that changed the log or a scoring script, with its time and diff, and every commit that changed the results, experiment code or GPU scripts, so that the order of preregistration, run and scoring can be checked; each result file also records the commit of the code that produced it. In this anonymous version, commits of our repository are named by neutral labels (for example \texttt{stage1-run}) in place of their hashes; third-party commits and model revisions keep theirs. We keep the wording of the log, with two changes: format names are replaced by ours, and long entries are shortened without changing their content. In the log, the ``critical token'' or ``state token'' is the writing token, identity(K) is $\mathrm{ID}_K$, and $l_0$ is $\ell_0$; in preregistration H, ``state token'' keeps the meaning of \citet{prakash2025lookbacks}, the token that names a state (our writing token in their stories). The log rounds independently of the tables in \cref{app:discovery}, so a few values and intervals differ in the last digit (for example, the interval of the Qwen2.5-32B key share). The tables of G, H, I and J are generated from the score files; where a value was recomputed from the raw files for the log, we print the recomputed value and say so.
+
+\paragraph{The final entry (J).} Entry J has a common part and four parts: passages (A), fresh stories (B), interventions (C) and mechanism (D). The common part fixed, for every part, the scripts, the model files and their hashes, the statistics, the risk classes, the codes, the populations and the disclosure of pilots. Each part was finalised in one commit together with its scorer, the shared Holm helper, its FP32 exactness tests and its populations, before any of its outputs existed; each GPU script refused to run on a draft entry, a modified tree or code that differed from the finalising commit, and ran its part's FP32 tests before loading any model. Every pilot that ran a model ran it on the CPU in FP32 at 1.5B parameters or fewer and is listed with its numbers in the entry; no output of a final-round population was seen before its run. After each run, re-scoring the archive with the committed scorer reproduced the score file byte for byte, and four independent checks (five for part C) were made before the outcome was recorded: a recomputation from the raw files that imports no scorer code, a verdict audit from the printed numbers and the entry's rules, an anomaly hunt in the run data, and an integrity check of the manifest, the model files and the timeline (\cref{app:impl-j}). The outcome records list every discrepancy these checks found; all were cosmetic and none changed a verdict. % verbatim: entry J (G1, G7) and its outcomes
+
+\paragraph{Risk classes and priors.} Before any output of the final round, the entry recorded for every prediction (``line'') a prior, the probability that it holds given that it is evaluable, with a one-line justification from data in hand, and a class that follows the prior: \emph{replication} (L), implied by data in hand on the same models and material, prior at least 0.9; \emph{extrapolation} (M), prior at least 0.8; \emph{risky} (R), prior below 0.8, including every line on which no data in hand bears. Each line is an \emph{account line}, which tests the paper's account, or a \emph{measurement-validity line}, which tests a measurement (all five of these are in part B and all are risky); the two kinds are tallied apart, and gates are not tallied. A line is met, not met or not evaluable; evaluability is decided only by gates and by rows the tested manipulation does not change, and a quantity that the tested arm itself makes undefined counts against the line. A line over several models is an intersection-union test: not met as soon as one evaluable model fails it. For each class the scorers print the met count against the expected count (the sum of the priors of the lines with a verdict) and the Brier score; the abstract reports the risky account lines met against their expected count. For every primary line the entry pre-wrote the paper's text for both outcomes (abstract clause, title, Table~1 row, figure); the main text uses these texts, and \cref{app:decisions} lists every place where none fitted. % verbatim: entry J (G4)
+
+\paragraph{Line codes.} Lines are named J-A1, J-B3-N4, J-C-BOUND, \ldots{} by part. In part B, the suffix P4f marks a line on the fresh stories in the four discovery-sample models (Qwen2.5-7B, Qwen2.5-14B, Mistral-7B, OLMo-2-7B), which must hold in every evaluable model at 95\,\%, and N4 a line in the four new families (Llama-3.1-8B, Gemma-2-9B, Phi-4, Falcon3-7B), which must hold in at least three of four at 98.75\,\% (Bonferroni over four models at one-sided 2.5\,\%). In part A a line must hold in every evaluable model, with at least three evaluable models including a new family; in parts C and D in every evaluable model or combination, with the minimum numbers the entry states. Gates are coded J-A-G1, \ldots; G-codes without a part letter (G1--G8) name rules of the common part and, in \cref{app:prereg-ai}, the predictions of entry G.
+
+\subsection{Entry J: every prediction}\label{app:prereg-j}
+
+\begin{table*}[!ht]
+\centering
+\caption{\textbf{Preregistration J (the final round): every line.} Cl.: class (L replication, M extrapolation, R risky; D derived, not counted). Kind: A account line, V measurement-validity line. Prior: the recorded probability of holding, given evaluability. Met: the models (or, in part C, the combinations, sub-families, model--family pairs, formats or screened models) that meet the line, of those with a verdict. P4, N4: the discovery-sample models and the new families of part B (\cref{app:prereg-how}). $^\ddagger$J-A3 is derived from J-A1 and J-A2 and not counted; it is met in both models where it is evaluable. Reasons for every line that is not met or not evaluable: \cref{tab:failures-j}.}
+\label{tab:prereg-j}
+\scalebox{0.86}{\begin{minipage}{\textwidth}\centering\input{tables/tab_prereg_j.tex}\end{minipage}}
+\end{table*}
+
+\begin{table}[!ht]
+\centering
+\footnotesize
+\caption{\textbf{Calibration of the final round, by part and class.} Lines: account lines of the class (measurement-validity lines in their own row); met, not met and not evaluable (n.e.) as scored; expected: the sum of the recorded priors of the lines with a verdict; Brier: the mean of $(\text{prior} - 1[\text{met}])^2$ over the same lines. The totals give met of the lines with a verdict. Part C has no line of class L.}
+\label{tab:calibration-j}
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{@{}llcccccc@{}}
+\toprule
+Part & Class & Lines & Met & Not met & n.e. & Expected & Brier \\
+\midrule
+A, passages & L & \JaClassLLines{} & \JaClassLMet{} & \JaClassLNotMet{} & \JaClassLNotEval{} & \JaClassLExp{} & \JaClassLBrier{} \\
+ & M & \JaClassMLines{} & \JaClassMMet{} & \JaClassMNotMet{} & \JaClassMNotEval{} & \JaClassMExp{} & \JaClassMBrier{} \\
+ & R & \JaClassRLines{} & \JaClassRMet{} & \JaClassRNotMet{} & \JaClassRNotEval{} & \JaClassRExp{} & \JaClassRBrier{} \\
+\addlinespace[2pt]
+B, fresh stories & L & \JbClassLLines{} & \JbClassLMet{} & \JbClassLNotMet{} & \JbClassLNotEval{} & \JbClassLExp{} & \JbClassLBrier{} \\
+ & M & \JbClassMLines{} & \JbClassMMet{} & \JbClassMNotMet{} & \JbClassMNotEval{} & \JbClassMExp{} & \JbClassMBrier{} \\
+ & R & \JbClassRLines{} & \JbClassRMet{} & \JbClassRNotMet{} & \JbClassRNotEval{} & \JbClassRExp{} & \JbClassRBrier{} \\
+ & validity (R) & \JbClassValLines{} & \JbClassValMet{} & \JbClassValNotMet{} & \JbClassValNotEval{} & \JbClassValExp{} & \JbClassValBrier{} \\
+\addlinespace[2pt]
+C, interventions & M & \JcClassMLines{} & \JcClassMMet{} & \JcClassMNotMet{} & \JcClassMNotEval{} & \JcClassMExp{} & \JcClassMBrier{} \\
+ & R & \JcClassRLines{} & \JcClassRMet{} & \JcClassRNotMet{} & \JcClassRNotEval{} & \JcClassRExp{} & \JcClassRBrier{} \\
+\addlinespace[2pt]
+D, mechanism & L & \JdClassLLines{} & \JdClassLMet{} & \JdClassLNotMet{} & \JdClassLNotEval{} & \JdClassLExp{} & \JdClassLBrier{} \\
+ & M & \JdClassMLines{} & \JdClassMMet{} & \JdClassMNotMet{} & \JdClassMNotEval{} & \JdClassMExp{} & \JdClassMBrier{} \\
+ & R & \JdClassRLines{} & \JdClassRMet{} & \JdClassRNotMet{} & \JdClassRNotEval{} & \JdClassRExp{} & \JdClassRBrier{} \\
+\midrule
+All parts & L & & \multicolumn{3}{c}{\JxClassLMetABCD{} of \JxClassLVerdABCD{}} & \JxClassLExpABCD{} & \\
+ & M & & \multicolumn{3}{c}{\JxClassMMetABCD{} of \JxClassMVerdABCD{}} & \JxClassMExpABCD{} & \\
+ & R & & \multicolumn{3}{c}{\JxRiskyMetABCD{} of \JxRiskyVerdABCD{}} & \JxRiskyExpABCD{} & \\
+ & validity (R) & & \multicolumn{3}{c}{\JxClassValMetABCD{} of \JxClassValVerdABCD{}} & \JxClassValExpABCD{} & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{The tally.} The entry has \JxLinesABCD{} counted lines (\JxAccountLinesABCD{} account lines and \JxClassValVerdABCD{} measurement-validity lines): \JxMetABCD{} met, \JxNotMetABCD{} not met and \JxNotEvalABCD{} not evaluable (\cref{tab:prereg-j,tab:calibration-j}). Replications held \JxClassLMetABCD{} of \JxClassLVerdABCD{} (expected \JxClassLExpABCD{}) and extrapolations \JxClassMMetABCD{} of \JxClassMVerdABCD{} (expected \JxClassMExpABCD{}): in aggregate about as often as their priors implied, but not uniformly. Those of parts A, B and D all held (\JxClassMMetABD{} of \JxClassMVerdABD{}, expected \JxClassMExpABD{}; the probability that all hold under the recorded priors is \JxClassMTailPABD{}), so these priors were if anything too low; those of part C, the intervention law, held \JcClassMMet{} of \JcClassMLines{} against \JcClassMExp{} expected (probability of so few or fewer \JcClassMTailP{} if the four lines are independent; Brier \JcClassMBrier{}), the one class whose priors were too high. The independence assumption overstates this evidence: J-C1 and J-C2 test the same law on overlapping steering-vector families, and J-C-READa failed through a random-set control that the natural value also fails. Risky account lines held \JxRiskyMetABCD{} of \JxRiskyVerdABCD{} with a verdict, against \JxRiskyExpABCD{} expected: \JxRiskyMetA{} of \JxRiskyVerdA{} on passages (expected \JxRiskyExpA{}), \JxRiskyMetB{} of \JxRiskyVerdB{} on fresh stories (\JxRiskyExpB{}), \JxRiskyMetC{} of \JxRiskyVerdC{} for the interventions (\JxRiskyExpC{}) and \JxRiskyMetD{} of \JxRiskyVerdD{} for the mechanism (\JxRiskyExpD{}). Under the recorded priors, with the lines treated as independent, so few or fewer would occur with probability \JxRiskyTailP{}: the shortfall is within chance. The per-part pattern is descriptive (tail probabilities \JxRiskyTailPA{} for passages, \JxRiskyTailPC{} for the interventions and \JxRiskyTailPD{} for the mechanism, and \JxRiskyTailPB{} for so many or more on fresh stories). Measurement-validity lines held \JxClassValMetABCD{} of \JxClassValVerdABCD{} (expected \JxClassValExpABCD{}). The tail probabilities are post hoc: they were not part of the entry's reporting plan.
+
+\paragraph{The risky lines that gates made not evaluable (post hoc).} Not-evaluable lines are left out of the tallies, but the gates did not remove lines at random. Of the \JxRiskyNotEvalABCD{} risky account lines without a verdict, the outcome records say how \JxRiskySensResolved{} would have come out had the gate passed or been read otherwise: J-A6d would not have been met had Llama's options-after cell passed its BF16 gate by one more item; with Qwen's heads gate waived, J-A-HA1 and J-A-HA2 would have been met and J-A-HA3a and J-A-HA3b not; J-B-SMALL would not have been met had Gemma-2-2B passed competence; J-C3 would not have been met under either post hoc dictionary gate; J-C-READb would not have been met under the common part's rule; and J-D8-IOI would have been met had Mistral's cell passed its transfer gate. J-C-WIN cannot be resolved (no window). Resolved in this way, \JxRiskySensNotHeld{} would not have held and \JxRiskySensHeld{} would have, and the risky tally would read \JxRiskySensMet{} of \JxRiskySensVerd{} against \JxRiskySensExp{} expected (probability of so few or fewer \JxRiskySensTailP{}). This reading is post hoc and does not replace the official tally.
+
+\paragraph{The tally under the common part's reading of J-C-READb.} The part's own text leaves J-C-READb not evaluable (the remap's key read is below the line's 2-nat floor); under the common part's evaluability rule, by which a quantity that the tested arm makes undefined counts against the line, it would be not met. The risky tally would then read \JxRiskyMetABCDAlt{} of \JxRiskyVerdABCDAlt{} (expected \JxRiskyExpABCDAlt{}); for part C alone \JxRiskyMetCAlt{} of \JxRiskyVerdCAlt{} (expected \JxRiskyExpCAlt{}). We use the official verdict and state the conflict (\cref{app:decisions}).
+
+\paragraph{Holm sensitivity, per part.} Each scorer applied Holm's step-down at a familywise one-sided 0.025 to the interval components of its risky account lines; no verdict uses it. Passages: one decision changes (J-A5's component at Qwen2.5-7B, $p$ = \JaHolmP{} against \JaHolmThr{}) and no verdict; J-A6b's Mistral component passes by a relative margin within the Monte Carlo error, so J-A6b should not be described as robust to Holm. Fresh stories: no decision and no verdict changes; Phi-4's component of J-B5b-N4 passes narrowly. Interventions: \JcHolmChanged{} decisions change (of \JcHolmN{} components) and no verdict. Mechanism: no decision and no verdict changes.
+
+\subsection{Every prediction that did not hold or could not be evaluated}\label{app:failures-j}
+
+\Cref{tab:failures-j} lists every line of the final round that was not met (\JxNotMetABCD{}) or not evaluable (\JxNotEvalABCD{}), plus the derived line J-A3, sorted by what happened, with the main-text section that names it in words.
+
+\begin{table*}[p]
+\centering
+\scriptsize
+\caption{\textbf{Every line of the final round that did not hold or could not be evaluated, by kind.} Class and prior as recorded before the run (\cref{tab:prereg-j}). Kinds: \emph{contradicted}, the predicted effect is absent or reversed; \emph{direction kept, threshold missed}; \emph{failed in one model} of those required; \emph{failed through a control or a definition}, where the outcome record finds that the control or the preregistered quantity, not the predicted effect, carries the failure (a post hoc reading that does not change the verdict); \emph{not evaluable}, with the gate or rule. Where: the main-text section that names the result in words, and the appendix section with the numbers.}
+\label{tab:failures-j}
+% verbatim (outcomes J): "3 of 150", "about 2x (Qwen) to 5x (Mistral)", "misses J-D-G4 by 0.021", "31 % and 44 %"
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}p{0.085\textwidth}p{0.06\textwidth}p{0.36\textwidth}p{0.33\textwidth}p{0.11\textwidth}@{}}
+\toprule
+Line & Class & Prediction & What happened & Where \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{Contradicted}} \\
+J-A7 & R, 0.30 & 2-bit KIVI quantization of the passage's values hurts free-form answers more than multiple-choice ones, beyond the keys' & one evaluable model (Qwen), low power; on all competent items 2-bit keys cost free-form answers more & \cref{sec:natural}; \cref{app:natural} \\
+J-B6b & R, 0.45 (V) & under emitted forms $s_{\mathrm{ID}}$ and $r$ move by less than 0.05 & $s_{\mathrm{ID}}$ held; $r$(\fmtPost{}) rose at Mistral-7B and Qwen2.5-14B (equivalence not shown) & \cref{sec:fresh}; \cref{app:measure} \\
+J-C4 & R, 0.35 & a remap trained at the writing token keeps the natural channel ratio & copy-only (R1) in both models & \cref{sec:claim3}; \cref{app:lawresults} \\
+J-C5 & R, 0.35 & identity-carrying components orthogonal to the natural write or outside the lexical span keep it & \JcFiveNeq{} of \JcFiveNstat{} statistics equivalent; read mainly through the value & \cref{sec:claim3}; \cref{app:lawresults} \\
+J-D2 & R, 0.55 & structured controls move the answer at most 0.3 as much as the flag & mean reader output (Qwen) and the own write without the flag (Mistral) move it too; the Qwen control overlaps the flag & \cref{sec:claim2}; \cref{app:flag} \\
+J-D-KN & R, 0.40 & a key naming no candidate acts as removing B's flag & removes about two (Qwen) to five (Mistral) times more support for B; per-story correlation only at Qwen & \cref{sec:claim2}; \cref{app:flag} \\
+J-D5 & R, 0.25 & initial-state flags carry binding in both sentence orders & below zero at Qwen, with an order effect & \cref{sec:claim2}; \cref{app:flag} \\
+J-D-HOP2 & R, 0.25 & the top-10 hop-2 heads of lists also carry the negative reads & they carry almost none (``different reader''); even in lists they carry only part of hop 2 & \cref{sec:claim2}; \cref{app:sign} \\
+J-D6-ROUTE & R, 0.35 & at 1.5B the injected flag is read by value under \fmtPost{} & read by key & \cref{sec:claim2}; \cref{app:scale} \\
+\addlinespace[2pt]
+\multicolumn{5}{@{}l}{\textit{Direction kept, threshold missed}} \\
+J-A5 & R, 0.50 & a related-articles sentence after the passage raises $s_{\mathrm{ID}}$ by at least 0.10 & positive key read, gain below 0.10 (Gemma, Qwen) & \cref{sec:natural}; \cref{app:natural} \\
+J-A6c & R, 0.45 & in free form, cue conflict answers the value's entity in at least 0.6 & value wins at the decision token; whole answers break into hybrids (Llama, Qwen below 0.6) & \cref{sec:natural}; \cref{app:natural} \\
+J-A7b & R, 0.35 & the value drop is larger in free form by at least 0.10 & \JaSevenbDiffQwenSeven{} at the one evaluable model & \cref{sec:natural}; \cref{app:natural} \\
+J-A8d & R, 0.60 & hybrids under a non-matching key in at least 0.2 of free-form answers & \JaEightdNomGemmaNine{} at Gemma, the one evaluable model & \cref{sec:natural}; \cref{app:natural} \\
+J-C1 & M, 0.80 & every statistic of the near-natural steering vectors equivalent (Qwen2.5-7B, Mistral-7B) & graded key under-reads at block 7 and deeper; every pooled $\bar\lambda$ inside the margin & \cref{sec:claim3}; \cref{app:lawresults} \\
+J-C2 & M, 0.80 & the same deeper and at Llama-3.1-8B & E1 held at Llama; E2 did not & \cref{sec:claim3}; \cref{app:lawresults} \\
+\addlinespace[2pt]
+\multicolumn{5}{@{}l}{\textit{Failed in one model of those required}} \\
+J-A6a & R, 0.45 & with options answered by name, cue conflict answers the key's entity in at least 0.6 & key wins at Gemma and Qwen, not at Mistral & \cref{sec:natural}; \cref{app:natural} \\
+J-B5b-P4f & R, 0.45 & the sentence read changes generated answers in the four discovery-sample models & held in three; at OLMo-2-7B 3 of 150 answers flip & \cref{sec:fresh}; \cref{app:generated} \\
+\addlinespace[2pt]
+\multicolumn{5}{@{}l}{\textit{Failed through a control or a definition (post hoc reading; verdict unchanged)}} \\
+J-C-READa & M, 0.85 & the reader heads read the steering vectors; random sets do not & readers read them as they read the natural write; the random-set control fails for the natural write too & \cref{sec:claim3}; \cref{app:lawresults} \\
+J-C-BOUND & R, 0.50 & non-lexical identity edits are under-read by the key where E2 is not & met in two of the \JcBoundVerd{} sub-families with a verdict; failures partly from E2's own departure; boundary not isolated & \cref{sec:claim3}; \cref{app:lawresults} \\
+J-D3 & R, 0.50 & removing the flag direction removes the key read; control directions do not & about half left in both models; Qwen's controls, which overlap the flag, remove 31\,\% and 44\,\% & \cref{sec:claim2}; \cref{app:flag} \\
+J-D6 & R, 0.35 & the injected sentence-row flag reproduces the natural sentence-to-list ratio & fails at 1.5B and 7B on the preregistered ratio; reproduced on contrasts specific to the absent option (post hoc) & \cref{sec:claim2}; \cref{app:scale} \\
+\addlinespace[2pt]
+\multicolumn{5}{@{}l}{\textit{Not evaluable}} \\
+J-A3 & derived & options after minus free form $\geq 0.4$ & met in both evaluable models; Llama's options-after and Mistral's free-form cells fail gates (not counted) & \cref{app:natural} \\
+J-A5B & M, 0.80 & the sentence after reads more than before & met in both evaluable models; three needed & \cref{sec:natural}; \cref{app:natural} \\
+J-A6d & R, 0.45 & the key alone moves answers with options, not in free form & met in both evaluable models; three needed (would not have been met had Llama's options-after cell passed its BF16 gate by one more item; post hoc) & \cref{sec:natural}; \cref{app:natural} \\
+J-A8 & M, 0.80 & continuations are read through the K--V interaction & pattern in all four models; two evaluable & \cref{sec:natural}; \cref{app:natural} \\
+J-A-HA1--HA3b & R & reader heads on passages (sparse set; transfer; ablation effects) & Qwen's heads BF16 floor failed; lines need both models (with Qwen's gate waived, HA1 and HA2 met, HA3a and HA3b not met; post hoc) & \cref{sec:natural}; \cref{app:natural} \\
+J-B-SMALL & R, 0.40 & no sentence read beyond 0.1 at Gemma-2-2B & competence gate failed (would not have been met) & \cref{sec:fresh}; \cref{app:fresh} \\
+J-C3 & R, 0.55 & sparse-autoencoder features keep the channel ratio & dictionary gate failed through its specification (not met under either post hoc gate) & \cref{sec:claim3}; \cref{app:edits} \\
+J-C-READb & R, 0.60 & the readers read the autoencoder and remap edits & E3 gate; E4's key read below 2 nats (not met under the common part's rule) & \cref{sec:claim3}; \cref{app:lawresults} \\
+J-C-WIN & R, 0.30 & inside an overlap window the binding swap follows the law & no window & \cref{sec:claim3}; \cref{app:binding-j} \\
+J-D8-IOI & R, 0.55 & the frozen belief readers carry the IOI read & met at Qwen; Mistral's transfer gate missed by 0.021 (met had it passed) & \cref{sec:claim2}; \cref{app:sign} \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{The pre-written Table~1 rows}\label{app:table1-rows}
+
+Each part of the entry pre-wrote a ``Table~1 row'' for each primary line, with its text for both outcomes. The main text's \cref{tab:qkov} is the question-by-question table that the rewrite rule of the entry asked for, so the pre-written rows are given here, each with its numbers and verdict (\cref{tab:table1-rows}); the row texts are those of the outcome that occurred.
+
+\begin{table*}[p]
+\centering
+\scriptsize
+\caption{\textbf{The pre-written Table~1 rows of the final entry, with their numbers.} Quadruples are Llama-3.1-8B / Gemma-2-9B / Phi-4 / Falcon3-7B (the new families) or Llama-3.1-8B / Gemma-2-9B / Qwen2.5-7B / Mistral-7B (passages); pairs are Qwen2.5-7B / Mistral-7B; triples are Qwen2.5-1.5B / 3B / 7B. n.e.: not evaluable in that model. Recomputed values are marked $^\dagger$ (post hoc).}
+\label{tab:table1-rows}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}p{0.17\textwidth}p{0.47\textwidth}p{0.31\textwidth}@{}}
+\toprule
+Row (primary line) & Numbers & Verdict and row \\
+\midrule
+\multicolumn{3}{@{}l}{\textit{Natural passages}} \\
+Options after: key read (J-A1, with J-A2; J-A3 derived) & $s_{\mathrm{ID}}$ with options after n.e. / \JaSidOptaGemmaNine{} / \JaSidOptaQwenSeven{} / \JaSidOptaMistralSeven{}; in free form \JaSidNomLlamaEight{} / \JaSidNomGemmaNine{} / \JaSidNomQwenSeven{} / n.e. & met (3 of 3 evaluable, with a new family); ``supported''; title kept (\cref{app:decisions}) \\
+Natural mention sentence (J-A5) & $s_{\mathrm{ID}}$ gain over free form n.e. / \JaFiveDiffGemmaNine{} / \JaFiveDiffQwenSeven{} / n.e. & not met; ``not shown on natural text'' \\
+Behaviour follows the channel (J-A6a, J-A6c; with J-A6b, d, e) & key-source rate with options by name n.e. / \JaKeySrcOptaGemmaNine{} / \JaKeySrcOptaQwenSeven{} / \JaKeySrcOptaMistralSeven{}; value-source rate in free form \JaValSrcNomLlamaEight{} / \JaValSrcNomGemmaNine{} / \JaValSrcNomQwenSeven{} / n.e.; with letters the key wins in all four & not met (J-A6b, J-A6e met); not shown to decide behaviour on natural text; reported as a boundary \\
+Natural readers (J-A-HA3a, with HA1, HA2) & Qwen's heads gate failed & not evaluable \\
+\addlinespace[2pt]
+\multicolumn{3}{@{}l}{\textit{Fresh stories}} \\
+Later list, new families (J-B1-N4) & $s_{\mathrm{ID}}$ with the list after \JbSidAfterLlamaEight{} / \JbSidAfterGemmaNine{} / \JbSidAfterPhiFour{} / \JbSidAfterFalconSeven{} & met (4 of 4) \\
+Later sentence, new families (J-B3-N4) & $r$ with the sentence after \JbRPostLlamaEight{} / \JbRPostGemmaNine{} / \JbRPostPhiFour{} / \JbRPostFalconSeven{}; null control (J-B-NULL-N4): $r$ with the null sentence \JbRPostNullLlamaEight{} / \JbRPostNullGemmaNine{} / \JbRPostNullPhiFour{} / \JbRPostNullFalconSeven{} & met (4 of 4); the null control met (3 of 4; Llama's no-mention baseline, \cref{app:fresh}) \\
+No mention (J-B4-N4) & $s_{\mathrm{ID}}$ without a mention \JbSidNoneLlamaEight{} / \JbSidNoneGemmaNine{} / \JbSidNonePhiFour{} / \JbSidNoneFalconSeven{} & met (4 of 4) \\
+Generated answers (J-B5-N4, with J-B5-P4f) & over the eight models $\beta_K$ with the list after \JbRangeBetaKAfterEightMin{}--\JbRangeBetaKAfterEightMax{}; $\beta_V$ without a mention \JbRangeBetaVNoneEightMin{}--\JbRangeBetaVNoneEightMax{} & met (4 of 4 and 4 of 4) \\
+Sentence, generated (J-B5b-P4f, J-B5b-N4) & flip rate after the sentence \JbFivebFlipPostMetMin{}--\JbFivebFlipPostMetMax{} in seven models, \JbFivebFlipPostOlmoSeven{} at OLMo-2-7B; before it \JbRangeFlipPreEightMax{} in all & N4 met, P4f not met (OLMo-2); split worded as disclosed (\cref{app:decisions}) \\
+\addlinespace[2pt]
+\multicolumn{3}{@{}l}{\textit{Mechanism}} \\
+What the readers write (J-D1, J-D3, J-D4) & $\mathrm{ID}_{\mathrm{inj}}^{\mathrm{LOO}}/\mathrm{ID}_K$ \JdOneRatioQwenSeven{} / \JdOneRatioMistralSeven{}; $\rho_K$ \JdThreeRhoFlagQwenSeven{} / \JdThreeRhoFlagMistralSeven{}; $r_{\mathrm{ans}}^{\mathrm{inj}}(K)$ \JdFourKQwenSeven{} / \JdFourKMistralSeven{} & J-D1 met, J-D4 met, J-D3 not met: ``sufficient but not necessary'' \\
+Sign (J-D-SIGN-IOI, with J-D8-IOI) & \fmtOpt{}: $\mathrm{ID}_K$ \JdOneIDKQwenSeven{} / \JdOneIDKMistralSeven{} nats, $R(H^*)$ \HoneRQwenSeven{} / \HoneRMistralSeven{} (discovery sample); not mentioned: $\mathrm{ID}_K$ \JdSevenQoutQwenSeven{} / \JdSevenQoutMistralSeven{}, $\mathrm{ID}_V$ \JdSignQIDVQwenSeven{} / \JdSignQIDVMistralSeven{}, $R(H^*)$ \JdEightQoutRQwenSeven{} / \JdEightQoutRMistralSeven{}; IOI in-sentence: $\mathrm{ID}_K$ \JdSignIoiIDKQwenSeven{} / \JdSignIoiIDKMistralSeven{}, $\mathrm{ID}_V$ \JdSignIoiIDVQwenSeven{} / \JdSignIoiIDVMistralSeven{}, $R(H^*)$ \JdEightIoiRQwenSeven{} / n.e. & J-D-SIGN-IOI met; J-D8-IOI not evaluable (met at Qwen); the joint clause not used (\cref{app:decisions}) \\
+Scale (J-D6, with J-D6-ROUTE) & $\omega$ \JdSixaOmegaQwenOnefive{} / \JdSixaOmegaQwenThree{} / \JdSixaOmegaQwenSeven{}; $\rho$ \JdSixRhoQwenOnefive{} / \JdSixRhoQwenThree{}$^\dagger$ / \JdSixRhoQwenSeven{}; $\rho_{\mathrm{nat}}$ \JdSixRhoNatQwenOnefive{} / \JdSixRhoNatQwenThree{}$^\dagger$ / \JdSixRhoNatQwenSeven{} (3B not evaluable; its values recomputed, post hoc) & not met; outcome (\JdSixTable{}), ``Mixed.'' \\
+\addlinespace[2pt]
+\multicolumn{3}{@{}l}{\textit{Interventions}} \\
+Near-natural edits, E1 and E2 (J-C1) & pooled $\bar\lambda$ E1 \JcOnePoolEoneQwenSeven{} / \JcOnePoolEoneMistralSeven{}, E2 \JcOnePoolEtwoQwenSeven{} / \JcOnePoolEtwoMistralSeven{} & not met: ``Even steering vectors close to the natural edit depart from the natural channel ratio ($\bar\lambda$ = \JcOnePoolEoneMistralSeven{} to \JcOnePoolEtwoMistralSeven{}): the format law does not transfer to edits as a channel-ratio law.'' \\
+Independent edits, E3 and E4 (J-C3 with J-C4) & E4 pooled $\bar\lambda$ \JcFourPoolEfourQwenSeven{} / \JcFourPoolEfourMistralSeven{} (copy-only, R1); E3 not evaluable & J-C4 not met (R1), J-C3 not evaluable: ``Edits that change the value through a learned remap are read mainly through the value'' \\
+Boundary, E5 (J-C-BOUND) & $\bar\lambda_{\mathrm{E5}}$ (E2 at the same cells): Qwen2.5-7B NL \JcBoundNlQwenSeven{} (\JcBoundEtwoNlQwenSeven{}); Mistral-7B FR \JcBoundFrMistralSeven{} (\JcBoundEtwoFrMistralSeven{}), NL \JcBoundNlMistralSeven{} (\JcBoundEtwoNlMistralSeven{}); Llama-3.1-8B FR \JcBoundFrLlamaEight{} (\JcBoundEtwoFrLlamaEight{}), SYN \JcBoundSynLlamaEight{} (\JcBoundEtwoSynLlamaEight{}), NL \JcBoundNlLlamaEight{} (\JcBoundEtwoNlLlamaEight{}) & not met; the boundary is not isolated; the pre-written row text is not used (\cref{app:decisions}) \\
+Note under ``Prakash et al.'s binding swap'' (J-C-SCREEN) & the swap works at blocks \JcScreenWbFirstQwenSeven{}--\JcScreenWbLastQwenSeven{} (Qwen2.5-7B) and \JcScreenWbFirstLlamaEight{}--\JcScreenWbLastLlamaEight{} (Llama-3.1-8B), where $s_{\mathrm{ID}}$ is at most \JcScreenSidWbMaxQwenSeven{} and \JcScreenSidWbMaxLlamaEight{} & met: ``Binding forms only after the identity key route closes in every model screened (no block with a working binding swap and $s_{\mathrm{ID}} \geq 0.4$).'' \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{Entries A--I: the discovery sample}\label{app:prereg-ai}\label{sec:failed}
+
+Entries A--I produced the results of the discovery sample (\cref{app:discovery,app:readers,app:heads,app:remap,app:binding}); \cref{app:crosswalk} maps each main-text claim that rests on them to its prediction. Their tables are unchanged from the earlier report. The common part of entry J promised post hoc risk labels for the predictions of entries A--I; we did not compute them, because those entries' records of what was seen before finalisation are free text that a script cannot classify without judgment; their verdicts are in \cref{tab:prereg-ab} to \cref{tab:prereg-i}. Of the \GHIcountPred{} predictions of G, H and I, \GHIcountFailed{} failed (H6 not evaluable, H12 not run; \cref{tab:failures}); a transfer law from clamping-estimated value completeness (C1, C2) failed at Mistral-Small-24B and held only marginally at Qwen2.5-72B, and $s_K \geq 0.80$ under \fmtOpt{} (C4) held only at Qwen2.5-32B of the three largest models.
+
+\begin{table}[!ht]
+\centering
+\footnotesize
+\caption{\textbf{Preregistrations A and B.} A: Qwen2.5-1.5B-Instruct in FP32 on CPU, seed 1 (new story cores), $n = 40$ per format, all items, keys clamped from layer~0, 95\% core-bootstrap CIs. Predictions committed at \texttt{prereg-AB}, run at \texttt{stageA-run}. B: GPU stage 1 on held-out models (Qwen2.5-3B/7B, Qwen3-8B, Mistral-7B-v0.3, OLMo-2-7B), $n = 150$ per format, all items, 95\% core-bootstrap CIs. Predictions committed at \texttt{prereg-AB}, code at \texttt{stage1-run}, scoring script \texttt{analysis/stage1\_prereg.py} committed before inspection at \texttt{stage1-score}.}
+\label{tab:prereg-ab}
+\begin{tabular}{p{0.06\textwidth}p{0.36\textwidth}p{0.40\textwidth}p{0.08\textwidth}}
+\toprule
+ & Prediction & Observed & Verdict \\
+\midrule
+A1 & identity(K) $> 1.0$ nats with a CI excluding 0, in \fmtOpt{} and in \fmtLetter{} & \fmtOpt{} $+2.85$ [2.38, 3.33]; \fmtLetter{} $+4.10$ [3.45, 4.77] & \textbf{met} \\
+A2 & identity(K) CI within the equivalence margin $\pm 1.0$ in \fmtNone{}, \fmtBefore{} and \fmtPost{} & \fmtNone{} $+0.10$ [$-0.01$, 0.21]; \fmtBefore{} $-0.20$ [$-0.28$, $-0.13$]; \fmtPost{} $-0.41$ [$-0.56$, $-0.26$] & \textbf{met} \\
+A3 & Key share ($l_0 = 0$) in \fmtOpt{} within [0.25, 0.50] & 0.38 [0.35, 0.41] & \textbf{met} \\
+\midrule
+B1 & identity(K) in \fmtOpt{} and \fmtLetter{} positive, CI excluding 0, in at least 4 of 5 models & 5/5 models & \textbf{met} \\
+B2 & identity(K)(\fmtOpt{}) $-$ identity(K)(\fmtNone{}) $> 0$, CI excluding 0, in at least 4 of 5 models & 5/5 models & \textbf{met} \\
+B3 & Exploratory, no directional claim: how the \fmtOpt{} key share ($l_0 = 0$ and $l_0 = 0.0625\,L$) varies with size within Qwen2.5 & Rises steadily with size: 1.5B 0.37 [0.36, 0.39]; 3B 0.69 [0.68, 0.71]; 7B 0.82 [0.81, 0.83]; 14B 0.91 [0.90, 0.91]. The depth-matched $l_0$ gives identical values. Recorded later, with the outcome of C: non-monotonic beyond 14B. & -- \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\begin{minipage}{0.94\textwidth}
+\footnotesize
+\emph{Notes recorded with outcome A.} \fmtBefore{} and \fmtPost{} are slightly but reliably negative. They sit inside the margin but are not exactly zero. The seed-0 \fmtLetter{} interaction ($+2.0$ [0.3, 3.7]) did not replicate: seed 1 gives $+0.6$ [$-1.0$, 2.2]. This confirms the post hoc option-listing claim in the same model on new data; generalisation across models is preregistration B.
+
+\emph{Unpredicted observations recorded with outcome B} (reported, not reinterpreted). \fmtPost{} carries large key identity in the larger models (Qwen2.5-7B $+5.5$, Qwen2.5-14B $+12.1$, Qwen3-8B $+8.8$, Mistral-7B $+7.9$, OLMo-2-7B $+2.0$ nats) but about 0 at Qwen2.5-1.5B/3B ($-0.47$ and $-0.04$). So the post hoc ``listed answer options only'' refinement from 1.5B does not generalise. \fmtBefore{} is at or below 0 in every model ($-0.45$ to $+0.01$). \fmtNone{} carries small positive identity(K) in larger models ($+1.0$ to $+1.25$ nats at 7--14B), outside the CPU-era $\pm 1$ margin, though under 5\% of \fmtOpt{}.
+\end{minipage}
+\end{table}
+
+\begin{table}[!ht]
+\centering
+\footnotesize
+\caption{\textbf{Preregistration C}: GPU stage 2, the released bases of \citet{anonymous2026fitted} at Mistral-Small-24B and Qwen2.5-72B across formats, and the natural factorial at 24--72B. Predictions and the scoring script \texttt{analysis/stage2\_score.py} committed before any stage-2 run (\texttt{prereg-C}); code at \texttt{stage2-run}. C4 is scored by \texttt{analysis/stage1\_prereg.py} (committed at \texttt{stage1-score}). Primary population: native story cores with B, S and T distinct; fits averaged within core; 95\% core bootstrap. $\kappa_V$ was estimated before the run from the fixed-value data released with \citet{anonymous2026fitted}. Here $\psi$ is our $\psi_K$.}
+\label{tab:prereg-c}
+\begin{tabular}{p{0.30\textwidth}p{0.31\textwidth}p{0.31\textwidth}}
+\toprule
+Prediction & Mistral-Small-24B & Qwen2.5-72B \\
+\midrule
+Gate: in \fmtOpt{}, the argmax of M and of P agrees with the outputs released with \citet{anonymous2026fitted} on $\geq 0.95$ of (core, fit) items & M 0.994, P 1.000 ($n = 360$ each): \textbf{passed} & M 1.000, P 1.000: \textbf{passed} \\
+C1, transfer law: $\varphi_{\text{\fmtNone{}}}(\text{M})$ within $\pm 0.15$ of $\kappa_V$ & 0.708 [0.681, 0.734] vs $0.53 \pm 0.15$: \textbf{not met} & 0.861 [0.837, 0.884] vs $0.73 \pm 0.15$: \textbf{met} (at the edge) \\
+C2: $\varphi_{\text{\fmtOpt{}}}(\text{M}) - \varphi_{\text{\fmtNone{}}}(\text{M}) > 0$, paired CI excluding 0 & $-0.003$ [$-0.019$, $+0.013$]: \textbf{not met} & $+0.034$ [$+0.018$, $+0.049$]: \textbf{met} (small) \\
+C3: $\psi_{\text{\fmtNone{}}} < 0.5 \cdot \psi_{\text{\fmtOpt{}}}$ & 0.069 vs 0.528: \textbf{met} & 0.052 vs 0.633: \textbf{met} \\
+\bottomrule
+\end{tabular}
+
+\medskip
+\begin{tabular}{p{0.30\textwidth}p{0.64\textwidth}}
+\toprule
+Prediction (natural factorial) & Outcome \\
+\midrule
+C4: \fmtOpt{} key share $\geq 0.80$ at Mistral-Small-24B, Qwen2.5-32B and Qwen2.5-72B & \textbf{not met} overall: Mistral-24B 0.78 [0.77, 0.79] no; Qwen2.5-32B 0.86 [0.84, 0.87] yes; Qwen2.5-72B 0.76 [0.75, 0.77] no. \\
+C4: \fmtBefore{} identity(K) $\leq 0.5$ nats in all three & \textbf{met} in all three: $-0.53$, $-0.42$, $-1.99$. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!ht]
+\centering
+\footnotesize
+\caption{\textbf{Preregistrations D and E.} D: GPU stage 3; predictions and the scoring script \texttt{analysis/stage3\_score.py} committed before any stage-3 run (\texttt{prereg-D}); run at \texttt{stage3-run}. New tasks: $n = 150$ per format in Qwen2.5-7B, Qwen2.5-14B, Qwen3-8B, Mistral-7B-v0.3 and OLMo-2-7B; localisation: belief task, $n = 60$, in Qwen2.5-7B, Qwen2.5-14B and Mistral-7B, the order of the three D3 values. E: GPU stage 3b; predictions and the scoring script \texttt{analysis/stage3b\_score.py} committed before any stage-3b run, which ran at that commit (\texttt{stage3b-run}). E1 and E2 use Qwen2.5-7B, Qwen2.5-14B, Mistral-7B and OLMo-2-7B; E4 uses Mistral-Small-24B and Qwen2.5-72B.}
+\label{tab:prereg-de}
+\begin{tabular}{p{0.06\textwidth}p{0.40\textwidth}p{0.36\textwidth}p{0.08\textwidth}}
+\toprule
+ & Prediction & Result & Verdict \\
+\midrule
+D1 & Paint: per model, \fmtOpt{} ID$_K > 0$ and \fmtOpt{} $-$ \fmtNone{} $> 0$ (CIs excluding 0); met if $\geq 4$ of 5 models count & 5/5 models (\fmtOpt{} ID$_K$ $+6.5$ to $+42.7$ nats) & \textbf{met} \\
+D1 & Schedule: same & 5/5 models (\fmtOpt{} ID$_K$ $+4.5$ to $+28.5$ nats) & \textbf{met} \\
+D2 & \fmtBefore{} ID$_K \leq 0.5$ nats in $\geq 9$ of the 10 task $\times$ model cells & 10/10 task $\times$ model cells (max $+0.32$) & \textbf{met} \\
+D3 & \fmtOpt{}: choice-word rows recover $\geq 0.70$ of the full key effect; question rows and the remaining tail rows each $\leq 0.15$; in all 3 models & 3/3 models: choice words 0.92 / 0.94 / 0.98; question 0.00; tail $\leq 0.01$ & \textbf{met} \\
+D3 & \fmtPost{}, where the full key effect is positive: re-mention-word rows recover $\geq 0.50$ in $\geq 2$ of 3 models & 3/3 models: 0.67 / 0.72 / 0.73 & \textbf{met} \\
+\midrule
+E1a & Instruction-matched $2{\times}2$, every arm ``Answer with one word'': ID$_K$(\fmtListA{}) $> 0$, CI excluding 0, in 4/4 models & $+8.7$ to $+35.8$ nats, 4/4 & \textbf{met} \\
+E1b & ID$_K$(\fmtBefore{}) $\leq 0.5$ and ID$_K$(\fmtSentB{}) $\leq 0.5$, each in $\geq 3/4$ models & 4/4 and 4/4 (max $+0.01$) & \textbf{met} \\
+E1c & Paired \fmtListA{} $-$ \fmtBefore{} $> 0$ in 4/4 models; paired \fmtPost{} $-$ \fmtSentB{} $> 0$ in $\geq 3/4$; each CI excluding 0 & 4/4; 4/4 & \textbf{met} \\
+E2 & Role control: for the direct question in \fmtOpt{} and \fmtNone{}, $\lvert f_K \rvert \leq 0.15$ and $\lvert f_V \rvert \leq 0.15$ in $\geq 3/4$ models (Qwen2.5-72B exploratory) & 4/4 and 4/4 (all fractions $\leq 0.02$; also $\leq 0.01$ at Qwen2.5-72B) & \textbf{met} \\
+E3 & Environment: each re-run within 0.03 of the original \fmtOpt{} key share (Qwen2.5-14B under transformers 5.9.0 on 2 GPUs, original 0.91; Qwen2.5-32B under transformers 5.18.0 on 1 GPU, original 0.86) & Qwen2.5-14B: 0.91 (original 0.91); Qwen2.5-32B: 0.86 (original 0.86) & \textbf{met} \\
+E4 & Value-only exchange in the frames of \citet{anonymous2026fitted}: $\psi_V(\text{\fmtNone{}}) \geq 0.5$ and $\psi_V(\text{\fmtNone{}}) > \psi_K(\text{\fmtNone{}})$ in both models & Mistral-24B 0.80 vs 0.07; Qwen-72B 0.90 vs 0.05 & \textbf{met} \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\begin{minipage}{0.94\textwidth}
+\footnotesize
+\emph{Exploratory parts of D and E}, with no prediction: key shares on the new tasks; \fmtLetter{} and \fmtPost{} identity on the new tasks; layer-window and KV-group localisation at 7--14B; $\psi_V$ and $\chi_V$ in the other formats; the role control in \fmtLetter{} and at Qwen2.5-72B. Before preregistration E, an exploratory CPU pilot of the role control was run at Qwen2.5-1.5B ($n = 40$; recorded in the log with E).
+\end{minipage}
+\end{table}
+
+\begin{table}[!ht]
+\centering
+\footnotesize
+\caption{\textbf{Preregistration F.} GPU stage 4: the remap of \citet{anonymous2026fitted} refit at Mistral-Small-24B with their released training code, under \fmtNone{} (fit\_none) and under their own format (fit\_opt, same-code control). Predictions, gates and the scoring script \texttt{analysis/stage4\_score.py} committed before the run, which ran at that commit (\texttt{stage4-run}). Thresholds refer to point estimates except F3; every statistic is per run, with the three seeds averaged within core; 96 cores, 95\% core bootstrap.}
+\label{tab:prereg-f}
+\begin{tabular}{p{0.06\textwidth}p{0.40\textwidth}p{0.36\textwidth}p{0.08\textwidth}}
+\toprule
+ & Prediction or gate & Result & Verdict \\
+\midrule
+G1 & Each refit P spans the released P of the same seed: mean squared principal cosine $\geq 0.99$ & \refGOneMin{} for all six (one P for all seeds) & \textbf{met} \\
+G2 & $\varphi \geq 0.5$ under each run's fitting prompt & fit\_none \phiNoneRefNone{}; fit\_opt \phiOptRefOpt{} & \textbf{met} \\
+G3 & fit\_opt reproduces the released crossover: $\psi_K(\text{\fmtLetter{}}) \geq 0.5$, $\psi_V(\text{\fmtNone{}}) \geq 0.5$ & \psiLetterRefOpt{}, \psiVNoneRefOpt{} & \textbf{met} \\
+\midrule
+F1 & fit\_none: $\psi_K(\text{\fmtLetter{}}) \geq 0.5$ and $\psi_V(\text{\fmtNone{}}) \geq 0.5$ & \psiLetterRefNone{}, \psiVNoneRefNone{} & \textbf{met} \\
+F2 & fit\_none: $\varphi(\text{\fmtLetter{}}) \geq 0.5$ & \phiLetterRefNone{} & \textbf{met} \\
+F3 & $D = [\psi_K(\text{\fmtLetter{}}) - \psi_K(\text{\fmtNone{}})]_{\text{fit\_none}} - [\cdot]_{\text{fit\_opt}}$, paired over cores: CI within $[-0.25, +0.25]$ & $\refD{}$ [$\refDLo{}$, $\refDHi{}$] & \textbf{met} \\
+F4 & For each run, $\psi_K/(\psi_K+\psi_V)$ over the five formats correlates with the natural $s_{\mathrm{ID}}$ of Mistral-Small-24B at $r \geq 0.9$ & fit\_none \refRNone{}; fit\_opt \refROpt{} & \textbf{met} \\
+\bottomrule
+\end{tabular}
+
+\smallskip
+\begin{minipage}{0.94\textwidth}
+\footnotesize
+\emph{Stated alternative.} If the fitting format decided which channel carries the remap, F1 and F2 would fail with $\psi_V(\text{\fmtLetter{}}) \geq 0.5$ for fit\_none and $D \leq -0.4$. This all-or-none pattern, which needs an edit that values can read and keys cannot, was not observed; the graded post hoc shift in \fmtOpt{} and \fmtPost{} (\cref{app:refit}) is the more sensitive comparison. \emph{Exploratory parts of F}, with no prediction: evaluation without the ``Answer:'' prefill; $\chi_K$ and $\chi_V$; principal cosines between the remaps; loss curves; the identity-objective fits that the training code makes alongside the remap.
+\end{minipage}
+\end{table}
+
+\begin{table}[p]
+\centering
+\footnotesize
+\caption{\textbf{Preregistration G.} GPU stage 5, scored by \texttt{analysis/stage5\_score.py}. Predictions, scoring script and code were finalised together before any stage-5 GPU run; a first attempt stopped in the unit tests before any model was loaded, and the entry was re-finalised with test-only changes at \texttt{stage5-run}, the commit the run used. Parts (a)--(d): the 150 seed-0 story cores of stages 1 and 3b (the row splice and the form probe on the first 60); part (e): 200 fresh IOI cores. Triples are Qwen2.5-7B / Qwen2.5-14B / Mistral-7B (Instruct) unless the row says otherwise; G2 and G3 concern Qwen2.5-1.5B and 3B; part (d) adds OLMo-2-7B and is met if at least three evaluable models meet it. A prediction with sub-verdicts is not met unless every sub-verdict is met (the scorer's rule); the Observed column gives the sub-verdicts. 95\% core-bootstrap CIs. In all, \GcountMet{} met and \GcountNotMet{} not met; none was not evaluable. Details in \cref{app:stage5}.}
+\label{tab:prereg-g}
+{\scriptsize\input{tables/tab_prereg_g.tex}}
+\end{table}
+
+\paragraph{Preregistration G: status of the preregistered alternatives.} (a)~$H_{\mathrm{track}}$, context-selective heads at small scale: not declared ($H_{\mathrm{diss}}$ holds and G4b is met). (b)~$H_{\mathrm{replaced}}$: not met; neither it nor $H_{\mathrm{redundant}}$ holds, so the preregistered outcome is a partial takeover. (c)~Graded list-likeness: not supported overall (the arms that name B with two other candidates fall below \fmtNone{} in both families, and lists read fully with two named candidates), but two features match it in part: in sentences at Qwen2.5-7B, $r_2$ is close to $2/6$, and in S2 the rows after the question carry \GtwelveRestStwoQwenSeven{} / \GtwelveRestStwoQwenFourteen{} / \GtwelveRestStwoMistralSeven{} of the splice effect. (d)~Concept-level lookup: not established; the concept pattern holds on $a_v$ in two models and for one variant (FRMIX at the two Qwen models), not in the three the decision table needs. (e)~An inhibitory key read or an additive mixture at 7B: neither at Qwen2.5-7B; Mistral-7B not evaluable. The GPT-2 small parts of G18, G21c and G22 replicate a disclosed CPU pilot on fresh cores and are not counted as confirmatory. For G16 the scorer prints the label ``near-token-level''; the entry says only ``graded'', the label does not describe FRMIX at the Qwen models, and we do not adopt it.
+
+
+\begin{table}[p]
+\centering
+\footnotesize
+\caption{\textbf{Preregistration H.} GPU stage 6, scored by \texttt{analysis/stage6\_score.py}. Predictions, gates, scoring script and code were finalised at \texttt{stage6-run}, before any stage-6 run and before any output of G was inspected; the run used that commit. Part (a), gates a1--a3 and H1--H6: Qwen2.5-7B / Mistral-7B (Instruct), \fmtOpt{} unless stated, BF16, eager attention, 60 ranking and 60 held-out evaluation stories, $k^*$ = 5\% of heads; a prediction over both models is met only if it is met in both. Part (b), gates b0--b3 and H7--H12: Qwen2.5-14B-Instruct on the material of \citet{prakash2025lookbacks}, $n = \PkN{}$ pairs, BF16; triples are \fmtNone{} / \textsc{qnames} / \fmtOpt{}; $\ell^* = \PkLstar{}$, $\ell^*_{\mathrm{ID}} = \PkLstarId{}$. met$^*$: met except in the cell named in the Observed column. 95\% bootstrap CIs (10{,}000 resamples). In all, \HcountMet{} met (H1--H5, H11), \HcountNotMet{} not met (H7--H10), \HcountNotEval{} not evaluable (H6) and \HcountNotRun{} not run (H12). Details in \cref{app:heads,app:prakash}.}
+\label{tab:prereg-h}
+\input{tables/tab_prereg_h.tex}
+
+\smallskip
+\begin{minipage}{0.94\textwidth}
+\footnotesize
+\emph{Status of the preregistered alternatives.} Part (a): a read distributed beyond 5\% of heads (H1, H2 fail), task-tuned lookup heads instead of generic duplicate-token heads (H4 (i) fails), a three-hop route through the instruction and template rows (H5 fails with $r_{\mathrm{all}} \geq 0.8$) and no head-level trade-off between the key and value routes (H3 (d) fails, as in the 0.5B pilot): none is supported, although the H4 margin at Mistral-7B depends on the size of the head set (\cref{app:heads}). Part (b): H10, the rival, is not met, and Gate b3 failed, so the reading ``keys carry identity, values carry binding'' is not available in either direction (``not evaluable as a dissociation at this depth''). The flat-high pattern, $\kappa \geq 0.75$ in every evaluable format, reported beside H10 without a verdict, does not hold either (\fmtNone{}: \PkKappaBindNone{}). No evaluable cell is interaction-carried. H5's \fmtPost{} line, reported against $r_{\mathrm{ans}}(KV) \geq 0.35$ and $r_{\mathrm{all}} \geq 0.5$ and not scored, holds at both models but is not evaluable at Qwen2.5-7B (Gate a2), and so not evaluable overall.
+\end{minipage}
+\end{table}
+
+\begin{table}[p]
+\centering
+\footnotesize
+\caption{\textbf{Preregistration I.} GPU stage 7, scored by \texttt{analysis/stage7\_score.py}. Predictions, gates, scoring script and code were finalised at \texttt{stage7-run}, before any stage-7 run; the run used that commit (a first attempt stopped before the unit tests; disclosures below). Mistral-Small-24B-Instruct-2501 at the pinned revision, BF16; the released remap M and PCA control P of \citet{anonymous2026fitted} on the 96 cores of \cref{tab:frames}, three fits averaged within each core; $H^*$: the top \Ikstar{} of the 1120 eligible heads (5\% of 1280) by $a_3$ on 60 separate ranking stories, per format, with the key clamped from block~6. $G$: the option rows. Blinding: chosen heads at $G$ see P's key at the writing token instead of M's; $g_K$: the share of M's key-only effect removed by blinding every head at $G$; $\mathrm{KO}_x(S)$: the share of that direct read removed by blinding only the set $S$. A, A$^+$, N: mean-ablation of the heads' outputs at $G$, the same with the 32 heads of block 5, and a knockout of their attention from $G$ to the writing token (\cref{app:stage7}). $t = D^{\mathrm{A}}/D^\emptyset$; $c_\kappa = (\kappa^\emptyset - \kappa^{\mathrm{A}})/(\kappa^\emptyset - \kappa^\emptyset_{\text{\fmtNone{}}})$ and $\tilde c_K$ the same for $\tilde\psi_K$ against $\psi_K$; $\Delta_V = V^{\mathrm{A}} - V^\emptyset$, with floor $F_V = 0.25\,[V^\emptyset(\text{\fmtNone{}}) - V^\emptyset]$. The $\kappa$ rule: $\kappa$ is defined when $\psi_K + \psi_V \geq 0.3$, both are $\geq -0.1$ and $D \geq 3$ nats. I1--I4 and I7 are scored under \fmtOpt{} and \fmtLetter{} (met only if met in both), I5 and I6 under \fmtOpt{} alone; \fmtPost{} is reported against the same thresholds without a verdict (\cref{app:stage7}). 95\% core-bootstrap CIs (10{,}000 resamples). In all, \IcountMet{} met and \IcountNotMet{} not met (I6); none was not evaluable. I-G4 only licenses reading I5 and I6 as a value takeover and is not a verdict gate.}
+\label{tab:prereg-i}
+\input{tables/tab_prereg_i.tex}
+
+\smallskip
+\begin{minipage}{0.94\textwidth}
+\footnotesize
+\emph{Status of the preregistered alternatives.} Not established: $H_{\mathrm{link}}$ with redundant writing (I1--I7 met), because I6 failed; I-G4 was not met either. The applicable outcome is ``I1--I4 and I7 met; I5 met, I6 not met'', which the entry reads as a partial takeover: without its readers the value channel carries more of M's effect, but not enough to keep it. Not supported: other heads reading M's key at the option words ($H_{\mathrm{other}}$; I2 met), a key read outside the option rows ($H_{\mathrm{not\_rows}}$; I1 met), backup readers (I4 met) and a non-specific disruption (I3, I7 met).
+\end{minipage}
+\end{table}
+
+\begin{table}[p]
+\centering
+\footnotesize
+\caption{\textbf{The \GHIcountFailed{} failed predictions of preregistrations G, H and I, by kind} (\cref{sec:failed}). Values as in \cref{tab:prereg-g,tab:prereg-h,tab:prereg-i}; Qwen2.5-7B unless stated.}
+\label{tab:failures}
+\begin{tabular}{@{}l p{0.28\textwidth} p{0.40\textwidth} p{0.17\textwidth}@{}}
+\toprule
+& Predicted & Observed & Kind \\
+\midrule
+G20 & On IOI, the lookup replaces the copy (2/2 of the 7B pair) & every clause met except the \textsc{question} baseline, $f_V$ = \GeFVQuestionQwenSeven{} against $\geq 0.75$; Mistral-7B not evaluable & direction kept, threshold missed \\
+H9 & $\kappa(\text{\fmtOpt{}}) - \kappa(\text{\fmtNone{}}) \geq 0.4$ on the binding swap, $\kappa(\textsc{qnames})$ between & $+\HnineDiff{}$ [\HnineDiffLo{}, \HnineDiffHi{}]; $\kappa(\textsc{qnames})$ = \PkKappaBindQnames{} is not between & direction kept, threshold missed \\
+\midrule
+G7 & With the lookup cut, the copy takes over and the answer stays (3/3) & copy returns 3/3; answer kept 1/3 (Qwen2.5-7B $\mathrm{acc}_B$ = \GsevenAccBAfterQwenSeven{}); preregistered ``partial takeover'' & met in part \\
+G10 & The dose effect is more than proportional, per family & lists 3/3; sentences 2/3 ($r_2$ = \GtenSRtwoQwenSeven{}) & met in part \\
+G12 & The named words carry $\geq 0.5$ of the read in S2, S3, L2, L3 & \GtwelveCells{} cells; S2 fails (\GtwelveStwoQwenFourteen{}--\GtwelveStwoQwenSeven{}) & met in part \\
+G13 & Wrappers keep the read (\textsc{the}, \textsc{modif}) & \textsc{the} \GthirteenTheMin{}--\GthirteenTheMax{}; \textsc{modif} \GthirteenModifMin{}--\GthirteenModifMax{} & met in part \\
+G14 & An exact repeat reads most (six variants) & four of six; case variants read nearly fully ($r_K$ \GfourteenCaseMin{}--\GfourteenCaseMax{}) & met in part \\
+G21 & IOI controls: list before, question wrapper, GPT-2 inline-before & question and GPT-2 met; list before gives $\mathrm{ID}_K$ = $\GeIDKBeforeQwenSeven{}$, not about 0; Mistral-7B not evaluable & met in part \\
+\midrule
+G19 & On IOI, a later list opens a positive key read (2/2) & met at Qwen2.5-7B ($+\GeIDKAfterQwenSeven{}$ nats); Mistral-7B failed the competence gate (two-way \GeTwowayAfterMistralSeven{}) & competence gate \\
+H10 & Rival: values carry the binding swap ($\kappa \leq 0.25$) & $\kappa$ = \PkKappaBindNone{}, \PkKappaBindQnames{}, \PkKappaBindOpt{} & rival rejected \\
+\midrule
+G11 & Without the readers in the list, the copy carries the identity again ($R_V \geq 0.5$) & $R_V \leq \GelevenRVQwenSeven{}$ in every model & falsified \\
+G16 & A token pattern on both measures for synonyms and translations & graded, none of the three preregistered outcomes; the French-mixed variant shows the concept pattern at Qwen2.5-7B and 14B & falsified \\
+H7 & $\kappa \approx s_{\mathrm{ID}}$ on the binding swap, depth-matched ($\leq 0.25$) & gaps \HsevenGapMin{}--\HsevenGapMax{} & falsified \\
+H8 & Without a later mention values carry the swap ($\psi_V \geq 0.5$, $\psi_K \leq 0.25$) & $\psi_V$ = \HeightPsiV{}, $\psi_K$ = \HeightPsiK{} & falsified \\
+I6 & With the 64 reader heads mean-ablated at the option words (Mistral-Small-24B, \fmtOpt{}), M's effect is kept ($t \geq 0.75$) & $t$ = \IsixT{} [\IsixTLo{}, \IsixTHi{}]; its values carry $+$\IfiveDV{} nats more (I5, met), the outcome the entry called a partial takeover (I-G4 not met) & falsified \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Disclosures for preregistration G.}
+\begin{itemize}\setlength\itemsep{1pt}
+  \item \emph{Re-finalisation.} The first GPU attempt stopped in a unit test before any model was loaded: one check compared batch rows with equal inputs at a tolerance of $10^{-5}$, which batched matrix products on a many-core CPU can exceed. The entry was re-finalised with test-only changes (that check uses the $10^{-4}$ of the other batched checks, and the tests run on at most 16 CPU threads). No experiment, stimulus, scorer or threshold changed.
+  \item \emph{Disclosed pilots.} Before the draft, two CPU pilots of part (a) at Qwen2.5-0.5B already showed the $H_{\mathrm{diss}}$ pattern, so G2 is a confirmatory replication in sibling models. After the draft, a full GPT-2 small IOI run on CPU was scored while the code was built; the IOI run of the stage therefore uses fresh cores, and its GPT-2 small parts are replications.
+  \item \emph{Points the entry left open (no verdict depends on them).} In part (a), the emitted casing is the one with the larger clean-B candidate mass (it matters only at Qwen2.5-1.5B under \fmtPost{}, where both casings pass the gate), and $F$ is computed on the evaluation half while the key effects use all 150 cores. In part (b), the behaviour clause of $H_{\mathrm{replaced}}$ is applied per model in both list formats, the $q_V$ thresholds are applied to point estimates, and G6's value criterion uses cell means, which equal the paired means.
+  \item \emph{Eager against sdpa attention.} The key effects of Gate a come from the eager run of part (a). At Qwen2.5-7B they are lower than the sdpa values on the same cores, both on the lowercase answer ids ($\mathrm{ID}_K$ \GaIDKLowPostQwenSeven{} against \GaSdpaIDKPostQwenSeven{} under \fmtPost{}, \GaIDKLowOptQwenSeven{} against \GaSdpaIDKOptQwenSeven{} under \fmtOpt{}; under \fmtPost{} the casing the model emits gives \GaIDKCapPostQwenSeven{}, as in \cref{tab:attention}); the other models agree closely. The main text quotes sdpa values; the gate is far from its bound.
+  \item \emph{IOI at the 7B pair rests on one model.} Mistral-7B failed the competence gate in AFTER, BEFORE and INLINE\_BEFORE, and its not-evaluable cells count as not met, so the not-met verdicts of G19--G21 reflect Qwen2.5-7B-Instruct together with that gate failure.
+  \item \emph{GPT-2 attention probe.} The exploratory GPT-2 small name-mover and duplicate-head probe failed on the GPU (a device mismatch) and was re-run afterwards on CPU with the same arguments, model revision, cores and code, in FP32 with eager attention, under a different torch and Python version. No gate or prediction uses it.
+  \item \emph{Combined lines.} The scorer prints a prediction as met only when every sub-verdict is met; the counts above use these combined lines. The sub-verdicts are: G10 lists met, sentences not met; G13 THE met, MODIF not met; G14 PLURAL, SYN, FRMIX and DEMIX met, TITLE and UPPER not met.
+  \item \emph{Checks.} The reproduction gate checks determinism: the reproduced cells are bitwise identical to stage 3b (exploratory, recomputed). Five recomputations from the raw files, none importing the scorer, reproduce every gate value, point estimate and verdict.
+\end{itemize}
+
+\paragraph{Disclosures for preregistration H.}
+\begin{itemize}\setlength\itemsep{1pt}
+  \item \emph{Timeline.} H was finalised before any output of G was inspected (item~10 below). Between the finalising commit and the commit of the results, no scorer, experiment, test or library file changed, and the text of entry H is byte-identical.
+  \item \emph{Gate a2 and the BF16 batch-shape offset.} Gate a2 compares rows of a batched pass with single passes. Its failure at Qwen2.5-7B under \fmtPost{} ($\lvert$none$-$clean$\rvert$ = \HatwoNoneCleanPostQwenSeven{} against \HatwoBoundPostQwenSeven{}) is a batch-shape offset, not a splice error (exploratory, recomputed): rows with equal inputs agree within each batch, the reference rows of batches of different sizes differ under \fmtPost{} but coincide under \fmtOpt{}, and the hop exactness row is \HatwoHopPostQwenSeven{} in every story. Every scored quantity is a difference against an in-batch reference row; at Mistral-7B the gate values stay at or below \HatwoAllFullPostMistralSeven{}. The rule still ties H5's \fmtPost{} line and H6 to the gate, and both stay not evaluable.
+  \item \emph{Narrow pass.} Qwen2.5-7B passes Gate a2 under \fmtOpt{} only narrowly: $\lvert$all$_T-$full$\rvert$ = \HatwoAllFullOptQwenSeven{} against a bound of \HatwoBoundOptQwenSeven{}, which exceeds the 0.5-nat floor only because it scales with $\bar d_{\mathrm{full}}$ (\HathreeDfullOptQwenSeven{} nats). Its bootstrap interval, [\HatwoAllFullOptQwenSevenLo{}, \HatwoAllFullOptQwenSevenHi{}] (exploratory, recomputed with the scorer's resampling; the log reports an interval from an independent resampling), crosses the bound. The verdict uses the point estimate, as the entry specifies.
+  \item \emph{Null probabilities.} The entry quotes hypergeometric probabilities at the thresholds (overlap $\geq 3$ of the top 10 for H4: $1.7 \times 10^{-4}$ and $7.8 \times 10^{-5}$; overlap $\geq 10$ of the top 20 for H6: $1.3 \times 10^{-12}$ and $9.3 \times 10^{-14}$). The scorer prints the probability of the observed overlap or more: $\HfourPQwenSeven$ and $\HfourPMistralSeven$ (H4; observed \HfourOverlapQwenSeven{} and \HfourOverlapMistralSeven{} of the top 10), $\HsixPQwenSeven$ and $\HsixPMistralSeven$ (H6). Both are correct; they differ in conditioning.
+  \item \emph{Floors and pooling.} The H3 (d) floors of \HthreeFloorQwenSeven{} and \HthreeFloorMistralSeven{} nats are rounded from the stage-1 summaries, far below the observed rises. H4 (ii) pools $T_{\mathrm{dup}}$ over (story, word) pairs as a ratio of means, within the entry's wording; per-story averaging gives \HfourTstoryQwenSeven{} and \HfourTstoryMistralSeven{} against \HfourTQwenSeven{} and \HfourTMistralSeven{} (exploratory, recomputed). H5's paired condition is checked as the lower bound of the paired difference.
+  \item \emph{No BOS token at Qwen2.5-7B.} The duplicate-score sequences of Qwen2.5-7B have no BOS token, so position 0 is both the attention sink and the first repeated query's earlier copy. This can raise a head's $D$ by at most $1/30$, which cannot move the median below 0.2. Mistral-7B's sequences have a BOS token.
+  \item \emph{Evaluability from the \textup{\fmtNone{}} sweep.} As the entry specifies, a format is evaluable in part (b) if the edit reproduces on the \fmtNone{} sweep. BIND@28 and ID@28 are therefore evaluable under \textsc{qnames} and \fmtOpt{}, although neither flips an answer there; those cells decompose a shift of the logit margin (\cref{app:prakash}).
+  \item \emph{Statistics, onsets and pairs.} $\kappa$ (one-sided) and $s_{\mathrm{ID}}$ (symmetric) are different statistics by design; $\ell^*_{\mathrm{ID}} = \PkLstarId{}$ comes from the tie rule on a flat sweep; $\ell^* = \PkLstar{}$ rests on one pair; and the overlap of \PkOverlap{} of 80 pairs with the validation split of \citet{prakash2025lookbacks} is approximate, because it is computed with our filter, not theirs. \Cref{app:prakash} gives the details and the depth confound of the identity-against-binding contrast (Gate b3).
+  \item \emph{FP32 re-check.} The command of the exploratory FP32 re-check passes the dtype option twice (BF16, then FP32); the last value applies, and both output files record FP32. The scorer skips these files by design, so their values are recomputed.
+  \item \emph{Disclosed pilots.} At Qwen2.5-0.5B (FP32), the top heads by $a_3$ were duplicate-token heads, consistent with H4 at 7B. The same pilot showed no head-level trade-off and a weak answer-only hop on two stories; at 7B, H3 (d) and H5 are met, unlike the pilot. The release of \citet{prakash2025lookbacks} gives per-layer IIA at Qwen2.5-14B that predicted $\ell^*$ = 27--28, and $\ell^* = \PkLstar{}$, so the replication table compares against material seen before the entry was finalised: it is a reproduction check, not an independent prediction.
+  \item \emph{H12 not run.} By a rule agreed before the run, for reasons of budget, the optional Llama-3-70B run was to be made only if Qwen2.5-14B failed to reproduce the edit (Gate b1). Gate b1 passed (IIA \PkGatebOneBind{}), and the run was not made. It can still be scored against the fixed 14B verdicts; with none of H7, H9 and H10 met, it would test only Gate b1, H8 and H11 Part 1.
+  \item \emph{Cosmetic.} For the one cell that fails the $\kappa$ rule (ID@28 \fmtLetter{}), the scorer does not print the fraction of dropped resamples, \PkDropIdTwentyeightLetter{}\% (exploratory, recomputed); the cell enters no verdict.
+  \item \emph{Checks.} Four recomputations from the raw files, none importing the scorer, reproduce every gate value, point estimate and verdict, and the committed scorer reproduces the score file byte for byte.
+\end{itemize}
+
+\paragraph{Disclosures for preregistration I.}
+\begin{itemize}\setlength\itemsep{1pt}
+  \item \emph{Timeline.} The entry was written after preregistrations A--H were scored and finalised at \texttt{stage7-run} with its scorer, code and GPU script. Before that only unit tests, plumbing runs at Qwen2.5-0.5B with random bases and checks on a tiny random-weight Mistral had run; no head-level output of any model at 24B had been seen. Between \texttt{stage7-run} and the results commit only result files changed.
+  \item \emph{First attempt.} At \texttt{stage7-run} the script first stopped about a minute in, before the unit tests and before any model, because the release of \citet{anonymous2026fitted} could not be downloaded on that host. The run, a second session on the same machine, used a copy of the same release that passed the run's checks against the hashes pinned in stage 4 before any test or model.
+  \item \emph{The curve point $k = 128$ was not measured.} The code built every head curve from the stored $H^*$, which has 64 heads, so its ``top 128'' rows repeat $H^*$. No gate or verdict uses $k = 128$ ($k^* = 64$, and 80\% is reached by 64 heads or fewer), and we report no value for it.
+  \item \emph{Exact reproduction.} Gate I-G1 found the family run equal to stage 3b (largest difference \IgoneaMaxDiff{}; every candidate row equal, exploratory, recomputed), although stage 3b ran on transformers 5.9.0 over two GPUs and stage 7 on 5.18.0 on one A100 80GB PCIe (stages 1--6 used SXM4 boards).
+  \item \emph{The expected key route outside the option rows is absent.} The entry expected about 0.14 and 0.10 of M's key-only effect (\fmtOpt{}, \fmtLetter{}) to be read outside the option rows, as under \fmtNone{}; with every head at the option rows blinded, almost none remains, so ratios measured against \fmtNone{} exceed 1 in places (for example under N($H^*$), where M's key share falls below its \fmtNone{} level; \cref{tab:link,tab:prereg-i}). I4's lower bounds are unaffected.
+  \item \emph{I-G4 not met.} Under A$^+$, which also ablates the 32 heads of block 5 at the option rows, $t$ = \IgfourT{} (against 0.6), against \IsixT{} under A. So I5 and I6 are not read as a value takeover (the scorer prints ``readable as value takeover: no''); the gate's stated rule, for I5 and I6 both met, does not arise. Block 5 alone changes nothing (\cref{tab:link}).
+  \item \emph{The power check.} Its no-takeover scenario gave $t \approx 0.57$ with no value gain; the run gave the same $t$ with a value gain of \IfiveDV{} nats, because the key lost more than simulated (0.90 of its key-only effect, against 0.81) and the non-additive part of M's effect, which the simulation held fixed, fell from \InonAddU{} to \InonAddA{} nats (exploratory, recomputed). With that part held fixed, the observed key loss and value gain give $t$ = 0.698 (exploratory, recomputed), still below the preregistered 0.75.
+  \item \emph{Argmax rates} are over the 288 (core, fit) items for M and P and over the 96 cores for the natural rows.
+  \item \emph{The knockout floor is met trivially.} The null knockout's second pass reuses the unblocked mask and reproduces the unblocked rows bit for bit, so I-G1 (c) does not measure any numeric cost of the changed-mask path; it gates only the reported N lines.
+  \item \emph{Checks.} Four recomputations from the raw files, none importing the scorer, reproduce every gate value, point estimate and verdict, and the committed scorer reproduces the score file off the machine.
+\end{itemize}
+
+\paragraph{History of the claim, including post hoc steps.}
+The account of when keys carry the value was revised twice after seeing data, and its intervention half was narrowed after a preregistered failure (item~10) and qualified at the head level after another (item~11). We list every step.
+\begin{enumerate}\setlength\itemsep{1pt}
+  \item \emph{Starting hypothesis.} Before the first format factorial, our hypothesis was that any re-mention of the candidates after the writing token opens the key channel.
+  \item \emph{Post hoc narrowing at 1.5B.} In the first run at Qwen2.5-1.5B (seed 0, $n = 40$), \fmtPost{} showed no key effect. We therefore narrowed the claim to ``listed answer options after the writing token open the key channel''. This narrowing was made after seeing the data, and an internal go/no-go gate written before that run was not met as written.
+  \item \emph{Preregistration A} tested the narrowed claim on fresh story cores in the same model, and all three predictions were met. This confirms the narrowed claim in one model on new data, not across models.
+  \item \emph{Preregistration B} tested held-out models. Both directional predictions were met in 5/5 models, but from 7B up \fmtPost{} carries an intermediate amount of key identity, so the ``listed options only'' account does not generalise. The account given after stage 1, that from 7B up a later mention of the candidates opens the key channel, whether a list or a neutral sentence (a list most strongly), while at 1.5B and 3B only a list does, was revised again, post hoc, after stage 1. It is closer to the starting hypothesis. The residual \fmtNone{} identity in the Qwen models from 7B to 32B (up to \noneMax{} nats) extends just beyond the $\pm 1$-nat margin that A set at 1.5B; in the other models it stays inside. We report it as unpredicted, not as a confirmation.
+  \item \emph{Preregistration C} added a transfer law derived from the fixed-value data of \citet{anonymous2026fitted}. It failed at Mistral-Small-24B (C1 and C2 not met) and held only marginally at Qwen2.5-72B. C3 was met in both models. The key-share threshold of C4 was met only at Qwen2.5-32B; its \fmtBefore{} control was met in all three models. The reading that the intervention is written into both channels, and that the format decides which one appears to carry it, was formed after seeing these data.
+  \item \emph{Preregistration D} retested the options-list part of the account on two new tasks (D1, D2) and localised the readers at 7--14B (D3). It contains no test of whether \fmtPost{} opens the key channel; \fmtPost{} on the new tasks was exploratory.
+  \item \emph{Preregistration E} was written in response to two internal reviews of a draft. It tested the revised account with an instruction-matched $2{\times}2$ (E1), including the first confirmatory test that a sentence after the story opens the key channel (E1c, \fmtPost{} $-$ \fmtSentB{}). It also tested the value half of the post hoc reading of C (E4), the role control (E2) and the software environment (E3). All its predictions were met.
+  \item \emph{Preregistration F} tested the other half of that reading: whether the format in which a remap is read, rather than the one in which it was fit, decides which channel appears to carry it, by refitting the remap without later mentions at Mistral-Small-24B. All gates and predictions were met; a smaller shift of the key share in the two mixed formats, in the direction the alternative predicts, was found post hoc.
+  \item \emph{Preregistration G} was written in response to an external critique that expected the objection ``duplicate-token attention in a new setting''. It conceded the first hop: the re-mentions attend to the writing token with a key-matched duplicate-token pattern at every scale, including 1.5B and 3B, whose key identity under \fmtPost{} is about zero (G1--G3; with option lists it is positive), so on the lower-case score the match is present where no key read was seen (the final round qualifies this: the flag is written in sentences at 1.5B and 3B, and at 1.5B the injected flag is read by key; \cref{app:scale}). The candidate words' attention to the writing token proved necessary for the key read, and the answer's own attention to it unnecessary (G5, G6, G8). A lead we had planned before the run, that the lookup largely replaces the value copy, was not supported (G7 a partial takeover; G11 and G20 not met) and was dropped. Three claims were narrowed: the readers to lists and to sentences naming at least three candidates (G12), the matched form to the word largely up to case (G13, G14), and the tasks to our three templated ones, since IOI did not confirm a later list's key read (G19--G21).
+  \item \emph{Preregistration H} identified the reader heads and the second hop at two 7B models (H1--H5 met) and applied the exchange to an intervention from another lab. On the binding swap of \citet{prakash2025lookbacks}, the law that predicts an edit's key share from the natural identity key share (H7), the shared value prediction (H8), the crossover (H9) and the rival (H10) all failed. The identity-edit control was met (H11), but at $\ell^*_{\mathrm{ID}} = \PkLstarId{}$ it nearly restates the natural clamp, so the law for identity edits out of sample is untested; the in-sample relation for the released remaps and the refits (F4) is unchanged. H was finalised (commit \texttt{stage6-run}, 01:16 UTC) before any output of G was inspected: the stage-5 run had started at 21:25 UTC the day before, its results were first committed at 08:41 UTC, after H, and the stage-6 run started at 10:57 UTC on \texttt{stage6-run}, unchanged. The reading that at block 28 the binding swap is key-dominant while the identity edit is value-carried (\cref{app:prakash}) was formed after these data and is post hoc.
+  \item \emph{Preregistration I} was written in response to an external reading that the two halves of the paper were linked only by inference. At Mistral-Small-24B the reader heads replicated as a gate in three formats (I-G2); the released remap's key effect is read at the option words and through these heads, not through random or active sets (I1--I3); ablating them moved its key share under \fmtOpt{} near the \fmtNone{} level (I4, a consistency check; under \fmtLetter{} only to \IfourKappaALetter{}) and raised what its values carry (I5), but kept only part of its effect on the margin (I6, not met), the outcome the entry called a partial takeover; I-G4 was not met. The prediction that the copy keeps the remap's effect without its readers is therefore not supported; the format-level crossover stands. Qwen2.5-72B was not run. Preregistration~I was finalised (\texttt{stage7-run}) before any stage-7 run.
+  \item \emph{Preregistration J} was written in response to an external reading of the previous version, which raised six objections: the stories were templated, the free-form formats were scored on lower-case tokens that carry little of the probability, the novelty against QK/OV and duplicate-token heads was unclear, the intervention lesson rested on one remap, most models were from one family, and the paper relied on an anonymous submission. Its four parts, each finalised with its scorer before any stage-8 run, tested the account on fresh stories in four new families with emitted-form scoring and generated answers (B), on counterfactual reading-comprehension passages (A), on what the reader heads write and what sets the sign of the read (D), and as a channel-ratio law for identity edits obtained independently of the natural clamp (C). The later-mention account held on fresh stories in all eight models and in generated answers, and on passages for a later options list; behaviour on passages followed the key only with lettered options; the reader heads' write is sufficient and read by key but neither specific nor necessary as one direction; the channel-ratio law failed (outcome (e)). Of the risky account lines, \JxRiskyMetABCD{} of \JxRiskyVerdABCD{} held against \JxRiskyExpABCD{} expected (\cref{app:prereg-j}); every failure is in \cref{tab:failures-j}, and the decisions taken after the data are in \cref{app:decisions}.
+\end{enumerate}
+
+\subsection{Pre-written texts used and decisions taken after the data}\label{app:decisions}
+
+The entry pre-wrote the paper's text for each outcome of each primary line. The main text uses these texts verbatim apart from filled placeholders. Where no pre-written text fitted the outcome, or two rules of the entry conflicted, we took a decision after the data; each is listed here, with the outcome record's wording. In both conflicts between the common part and a part's own text (items 1 and 12) we followed the part's text, and both choices favour our account (the broader title is kept; a not-met line becomes not evaluable); the alternative is stated in each item and, for the tally, in \cref{tab:status}.
+
+\paragraph{1. The title, and a conflict between two rules of the entry.} The common part (G4) says that only the natural-text lines named in Part A can change the title (``A1 and A3 in the design'') and that if these are not met or not evaluable the title becomes the templates-only fallback (``\ldots{} on Templated Stories''). Part A's table names the row J-A1 (with J-A2; J-A3 derived) and, for J-A1 met, says ``Title kept'', with conditions on J-A3 only in its not-met column. J-A1 is met; J-A3, a derived line that is not counted, is not evaluable (met in both models where it is evaluable). Read literally, the common part's ``or NOT EVALUABLE'' would give the fallback through J-A3, while Part A's table keeps the title. We keep the title under Part A's table and state the conflict here, as the outcome record requires. % verbatim: outcome J part A
+
+\paragraph{2. The scope of the passage clause.} J-A1's pre-written clause says ``in four model families including two not used before''. This overstates the evaluable set and is not used; the main text names the evaluable models (key read with options after in Gemma-2-9B, Qwen2.5-7B and Mistral-7B, one family new to the paper; value copy in free form in Llama-3.1-8B, Gemma-2-9B and Qwen2.5-7B). Because J-A5 was not met, the main text says ``a later options list'' for natural text where the pre-written clause said ``later mentions''. % verbatim: outcome J part A
+
+\paragraph{3. Hybrids on passages.} The behavioural row's clause about hybrids applies only if J-A6c alone fails. J-A6a also failed, so the hybrids are reported as an observation, not under that clause; the behavioural sentence is dropped from the abstract, and the cue-conflict panel is reported as a boundary with the decision-token rates.
+
+\paragraph{4. Planned figure panels.} The passage figure planned panels for the quantization drops and for the continuation decomposition and ghost markers for the templated values; these are given as \cref{tab:kivi} and in the text of \cref{app:natural} (the quantization result is exploratory and makes no claim). The flag figure's planned inset for the hop-2 route (J-D4) is given in the text (\cref{app:flag}).
+
+\paragraph{5. The split of the generated-sentence line.} J-B5b was met in the new families and not in the discovery-sample models (OLMo-2-7B). The entry has no text for a split. The main text uses the outcome record's two sentences: the sentence read changes generated answers in seven of the eight models (flip rate \JbFivebFlipPostMetMin{}--\JbFivebFlipPostMetMax{} after the sentence, \JbRangeFlipPreEightMax{} before it), and at OLMo-2-7B it ``is visible in log-probabilities but not in generated answers (flip rate 1.0\,\% after, 0\,\% before)''. The main text adds that the flip rate is a small share in most models and that Phi-4's component passes Holm only narrowly (\cref{app:prereg-j}). % verbatim: outcome J part B
+
+\paragraph{6. The scoring-invariance template.} J-B6b's pre-written replacement (``the key share moves by more than 0.05 under emitted forms in \{cells\}'') names the wrong statistic: every $s_{\mathrm{ID}}$ difference stayed inside $\pm 0.05$, and what moved was the sentence read relative to the list read. It is replaced, as a disclosed correction of the template, by the record's sentence given in \cref{app:measure}. % verbatim: outcome J part B
+
+\paragraph{7. ``Re-scored'' for ``published''.} J-B6c's pre-written sentence says that ``every published verdict on the original stories is unchanged''. The five verdicts concerned are those of this paper's discovery sample that the check re-scores, so the main text says ``every re-scored verdict''.
+
+\paragraph{8. The null sentence at Llama-3.1-8B.} J-B-NULL-N4 is met in three of the four new families. For a failing family the entry pre-wrote a replacement that withdraws, in that family, the reading that a re-mention opens the key; the record shows that the replacement does not describe Llama-3.1-8B, whose null-sentence ratio equals its no-mention baseline (\cref{app:fresh}). That replacement is not applied, and the record's reading is reported, labelled post hoc.
+
+\paragraph{9. The sign of the read in IOI.} J-D-SIGN-IOI is met and J-D8-IOI is not evaluable; the entry has text for both met and both not met only. The joint abstract clause (that the frozen belief reader heads also carry an opposite-sign key read in IOI) is not used. The body reports the sign dissociation as confirmed and the frozen heads' IOI read as met at Qwen2.5-7B and not evaluable at Mistral-7B. The novelty statement (D-13) is reduced accordingly: its item (i), the flag whose mean direction names no candidate (J-D1, J-D-ADDR), is stated with J-D2's failed specificity beside it; item (ii) is reduced to the sign dissociation, which the main text presents as consistent with S-inhibition, not as a novelty; item (iii), the scale-dependent route at 1.5B, is dropped. The main text's novelty paragraph adds two points the entry's statement did not name: that the answer reads the flagged row by key (J-D4, met) and that the same reader heads carry the read under both questions (J-D8-Q, met), with the sign applied after them (D9, exploratory).
+
+\paragraph{10. Mediation across scale.} J-D6 and J-D6-ROUTE are not met, and the decision table gives outcome (d), ``Mixed.'', which the paper reports. The post hoc reading of the natural ratio (\cref{app:scale}) is reported as exploratory, and the paper draws no conclusion about mediation from it in either direction.
+
+\paragraph{11. The lexical boundary.} J-C-BOUND's pre-written sentence for not met is contradicted by the numbers (every E5 $\bar\lambda$ lies below E2's at the same cells) and has one slot for six sub-family values. The paper reports the line as not met with the per-sub-family values and states that the boundary was not isolated, because the effective non-lexical edits also write far from the natural state; it claims neither that the token-form account holds for edits nor that it is contradicted. % verbatim: outcome J part C
+
+\paragraph{12. J-C-READb.} Under the part's own text the line is not evaluable; under the common part's evaluability rule it would be not met, and the risky tally would read \JxRiskyMetABCDAlt{} of \JxRiskyVerdABCDAlt{} (expected \JxRiskyExpABCDAlt{}). The official verdict is used, as the part's own table was for Part A's title rule, and the conflict is stated here and in \cref{tab:status}.
+
+\paragraph{13. The interventions' texts.} The main text opens its section with the pre-committed outcome (e) text and gives J-C1's numbers with the second clause of J-C1's pre-written sentence; the full sentence is in \cref{tab:table1-rows}. The screen's pre-committed text ends ``H7--H10 stand''; the main text says this in words (the four earlier predictions on the swap, which failed, stand), and \cref{app:binding-j} quotes it with the codes. J-C4's size depends on depth, so the main text quotes $\psi_K$ and $\psi_V$ in one clause beside the pre-written $\bar\lambda$ sentence, as the record's sensitivity note asks; the per-depth values are in \cref{app:lawresults}. After the R1 sentence the main text adds that the shortfall is relative to the model's own ratio, with the remap's key shares (reported in the record, exploratory), so that ``mainly through the value'' is not read as an absolute share. The screen's sentence names the two screened models.
+
+\paragraph{14. Table numbering.} The common part's ``Table 3'' (the calibration summary) is the main text's \cref{tab:status}. The pre-written ``Table 1 rows'' are in \cref{tab:table1-rows}, because the main text's \cref{tab:qkov} is the question-by-question table that the rewrite rule of the entry asked for; each row keeps its verdict.
+
+\paragraph{15. The abstract.} The pre-written abstract clauses appear without their numbers, because the abstract keeps to four numbers; the numbers are in the body.
+
+\paragraph{16. ``In at most 0\,\% when they are not''.} J-B5's pre-written sentence is kept with this wording, and the record's definition of ``not'' is added: no mention, a list before or a sentence before the story, the arms the line tests (after a sentence the key moves some answers; \cref{app:generated}).
+
+\paragraph{17. Status marks.} The main text marks risky predictions with a superscript \rsk{} and says in words where a prediction did not hold or could not be evaluated; earlier drafts printed ``(risky; held)'' and similar tags. The marks do not change any verdict; \cref{tab:crosswalk} lists them.
+
+\paragraph{18. The flag's injection.} J-D1's pre-written sentence says that the flag is ``injected'' into the row of an absent option. The line's statistic moves it: it adds the flag at that row and subtracts it at B's row, as the natural key clamp does (\cref{app:flag}). The main text keeps the sentence and adds this, with the effect of adding the flag alone (the record's reported dose).
+
+\paragraph{Deviations from the reporting plan.} (i)~The common part (G4) promised script-computed post hoc risk labels for the predictions of entries A--I; we did not compute them, so the discovery sample's failures are listed (\cref{app:prereg-ai}) but not classed by risk. (ii)~The tail probabilities of the class tallies and the resolution of the not-evaluable risky lines (\cref{app:prereg-j}) were not in the plan; they are post hoc and do not replace the official tallies.
+
+\subsection{Crosswalk: main-text claims, predictions and verdicts}\label{app:crosswalk}
+
+\Cref{tab:crosswalk} maps each claim of the main text to the predictions it rests on, their class and verdict, and the status mark and words the main text uses. Unmarked main-text claims were preregistered in the final round and held.
+
+\begin{table*}[p]
+\centering
+\scriptsize
+\renewcommand{\arraystretch}{0.92}
+\caption{\textbf{Crosswalk.} Each main-text claim, the lines it rests on (class, verdict), the status mark (\rsk: a risky prediction) and words the main text prints, and where. Classes: L replication, M extrapolation, R risky; V measurement validity. Discovery-sample codes are those of \cref{app:prereg-ai}.}
+\label{tab:crosswalk}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}p{0.29\textwidth}p{0.33\textwidth}p{0.19\textwidth}p{0.13\textwidth}@{}}
+\toprule
+Main-text claim & Lines (class, verdict) & Status mark and words & Where \\
+\midrule
+List after: the key carries most of the identity, eight models & J-B1-P4f (L, met), J-B1-N4 (M, met 4/4) & none & \cref{sec:fresh}, \cref{tab:qkov}, \cref{fig:schematic}b \\
+No mention: copied & J-B4-P4f (L), J-B4-N4 (M), met & none & \cref{sec:fresh} \\
+Before: no key read; a list before lowers the read below no mention in the new families & J-B2-P4f (L), J-B2-N4 (M), met; J-B-LB-N4 (R, met) & \rsk{} for the second & \cref{sec:fresh}, \cref{tab:qkov} \\
+Sentence after: intermediate read & J-B3-P4f (M, met), J-B3-N4 (R, met) & \rsk & \cref{sec:fresh}, \cref{tab:qkov} \\
+Null sentence: no read & J-B-NULL-P4f (M, met), J-B-NULL-N4 (R, met 3/4; Llama reading post hoc, with the outcome record's $+0.005$ [0.0001, 0.011]) & \rsk{} ``in the new families''; ``post hoc reading'' & \cref{sec:fresh} \\
+Sentence read at 2B & J-B-SMALL (R, not evaluable; would not have been met, post hoc) & ``not evaluable''; ``post hoc'' & \cref{sec:fresh} \\
+Generated answers follow the channel & J-B5-P4f, J-B5-N4 (M, met) & none & \cref{sec:fresh}, \cref{fig:schematic}c \\
+Sentence read in generated answers & J-B5b-N4 (R, met), J-B5b-P4f (R, not met: OLMo-2) & \rsk; ``held in the new families''; ``did not hold'' in the discovery-sample models & \cref{sec:fresh} \\
+Scoring invariance; the sentence ratio understated & J-B6a, J-B6c (R, V, met); J-B6b (R, V, not met); J-B7, J-B8 (R, V, met; ``two further validity checks'') & \rsk; ``did not hold'' for $r$ & \cref{sec:fresh} \\
+Passages: options after $\to$ keys; free form $\to$ values & J-A1 (M, 3/3), J-A2 (M, 3/3), J-A1b (R, met), J-A1c (M, 4/4) & \rsk{} for J-A1b; continuation ``exploratory'' & \cref{sec:natural}, \cref{fig:natural}a \\
+Passages: options before & J-A4 (L, met) & none & \cref{sec:natural} \\
+Passages: a sentence after gives only a small read & J-A5 (R, not met); J-A5B (not evaluable) & \rsk; ``did not hold''; listing sentence & \cref{sec:natural} \\
+Passages: the derived within-model contrast; Llama-3.1-8B's cue-conflict cell & J-A3 (derived, n.e.; met in both evaluable models); J-A6a's Llama cell (n.e.) & ``derived''; ``not evaluable'' & \cref{sec:natural} \\
+Passages: cue conflict & J-A6b (R, met; narrowly under Holm), J-A6e (R, met), J-A6a (R, not met), J-A6c (R, not met), J-A6d (not evaluable) & \rsk; ``did not hold'' for J-A6a and J-A6c & \cref{sec:natural}, \cref{fig:natural}b \\
+Passages: quantization, hybrids, continuation, heads & J-A7, J-A7b, J-A8d (R, not met); J-A8 (M, n.e.); J-A-HA1--HA3b (R, n.e.); J-A6d (R, n.e.); the gate resolutions (outcome record, post hoc) & listing sentence; \rsk; ``post hoc'' & \cref{sec:natural} \\
+Scope: tasks, role, the $2{\times}2$ & discovery D1, D2, E1, E2 (met) & ``in the discovery sample'' & \cref{sec:scope} \\
+Two hops; a set enriched for duplicate-token heads; ablation leaves a copy route & discovery G, H1--H5 (met); the core's numbers and the hop-2 key split not scored & ``in the discovery sample''; ``exploratory'' & \cref{sec:claim2} \\
+The flag is sufficient; its mean direction names no candidate (each story's write also carries its word) & J-D1 (R, met), J-D-ADDR (M, met); the dose and the per-story identity share (reported) & \rsk; dose ``exploratory'' & \cref{sec:claim2} \\
+Not specific & J-D2 (R, not met) & \rsk; ``failed'' & \cref{sec:claim2} \\
+Read by key & J-D4 (M, met) & none & \cref{sec:claim2} \\
+Not necessary as one direction & J-D3 (R, not met) & \rsk; ``failed'' & \cref{sec:claim2} \\
+The question sets the sign; the same readers & J-D7, J-D-SIGN-Q, J-D8-Q (M, met) & none & \cref{sec:claim2} \\
+The sign is applied after the first hop & D9: the list-fitted flag injected under the second question (reported, no verdict) & ``exploratory'' & \cref{sec:claim2}, \cref{tab:qkov} \\
+IOI: key negative, value positive & J-D-SIGN-IOI (L, met) & none & \cref{sec:claim2} \\
+The IOI read is applied at the names' keys & J-D-ROUTE-IOI (R, met) & \rsk & \cref{sec:claim2} \\
+Not by the same hop-2 heads & J-D-HOP2 (R, not met) & \rsk; ``failed'' & \cref{sec:claim2} \\
+The belief readers carry the IOI read & J-D8-IOI (R, n.e.; met at Qwen) & \rsk; ``not evaluable at Mistral-7B'' & \cref{sec:claim2} \\
+The flag is written in sentences at every scale & J-D6a (L, met) & none & \cref{sec:claim2} \\
+Mediation across scale; the route at 1.5B; binding; a key naming no candidate & J-D6, J-D6-ROUTE (R, not met; outcome (d), ``Mixed.''); J-D5, J-D-KN (R, not met) & \rsk; ``did not hold'' & \cref{sec:claim2} \\
+The released remap's crossover; the lead's second sentence (the prompt and the edit) & discovery C3, E4, F (met); 72B letters exploratory; $\kappa$ against $\sigma$ (reported); J-C1, J-C4 & ``discovery sample, exploratory at this model; preregistered for a refit''; ``exploratory here'' & \cref{sec:claim3} \\
+Outcome (e), the section's lead; how J-C1 fails (none wholly outside the margin; one statistic at Llama-3.1-8B) & J-C1 (M, not met), J-C2 (M, not met); headline (e); counts over the printed statistics & ``did not hold'' & \cref{sec:claim3}, \cref{fig:law}a \\
+Equivalence at the shallowest depth; pooled under-read; small channels; the under-read at block 7 & reported context; recomputed & ``exploratory'', ``post hoc'' & \cref{sec:claim3} \\
+A remap trained at the writing token is read through the value & J-C4 (R, not met, R1); its depth dependence (recomputed); $\kappa$ against $\sigma$ (reported) & \rsk; ``did not hold''; ``exploratory'', ``post hoc'' & \cref{sec:claim3} \\
+Autoencoder features & J-C3 (R, n.e.; not met under either post hoc gate) & ``not evaluable''; ``post hoc'' & \cref{sec:claim3} \\
+Orthogonal and non-lexical components; lexical boundary & J-C5, J-C-BOUND (R, not met) & \rsk; ``did not hold'' & \cref{sec:claim3} \\
+The reader heads read the steering vectors & J-C-READa (M, not met); J-C-READb (R, n.e.) & ``failed''; ``post hoc reading''; ``not evaluable'' & \cref{sec:claim3} \\
+Distance from the natural write; a thresholded key route (a hypothesis) & none & ``post hoc''; ``a hypothesis for a future test'' & \cref{sec:claim3} \\
+An identity edit at block 28 is copy-read & J-C6 (M, met) & none & \cref{sec:claim3} \\
+No overlap window & J-C-SCREEN (R, met); J-C-WIN (R, n.e.) & \rsk; ``not evaluable'' & \cref{sec:claim3} \\
+Calibration; tails (lines treated as independent); the not-evaluable risky lines & G4 tallies; tail probabilities and resolutions post hoc & ``post hoc'' & \cref{tab:status}, \cref{sec:discussion} \\
+Recommendation (iii): only the shallowest depth kept the ratio; the remap read through the value; report the distance & reported context (equivalence at block 3, recomputed); J-C4 (R, not met); the distance pattern & ``exploratory''; ``post hoc'' & \cref{sec:discussion} \\
+Limitations: the layer window at 1.5B; the base model in IOI & discovery D (exploratory window splice); G part (e) (exploratory) & ``exploratory'' & \cref{sec:limitations} \\
+\bottomrule
+\end{tabular}
+\end{table*}

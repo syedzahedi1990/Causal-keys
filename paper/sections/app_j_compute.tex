@@ -1,0 +1,50 @@
+% Appendix J: models, compute and licences. Input by sections/appendix.tex.
+\section{Models, compute and licences}\label{app:compute}
+
+\begin{table}[!ht]
+\centering
+\footnotesize
+\caption{\textbf{Models of the final round and the tests that use them.} Instruction-tuned models, BF16; revisions are the official repositories' commits on the date of the final entry, each file verified against the official hash before the model loaded (\cref{app:impl-j}); the three gated models were assembled from byte-identical public copies. Attention: sdpa, except eager for Gemma-2 and for the passes that read attention weights. Fresh: the fresh stories (\cref{app:fresh}); passages: \cref{app:natural}; mechanism: \cref{app:claim2}; interventions: \cref{app:claim3}; the frames: the released remap at 24B under the emitted-form score (\cref{app:measure}). The discovery sample's models are listed in \cref{app:compute-discovery}.}
+\label{tab:models-j}
+\setlength{\tabcolsep}{3pt}
+\resizebox{\textwidth}{!}{\begin{tabular}{@{}llll@{}}
+\toprule
+Model & Revision & Attention & Tests \\
+\midrule
+Qwen2.5-7B-Instruct & \texttt{\scriptsize a09a35458c702b33eeacc393d103063234e8bc28} & sdpa & fresh, passages, mechanism, interventions \\
+Qwen2.5-14B-Instruct & \texttt{\scriptsize cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8} & sdpa & fresh; binding swap at block 28 \\
+Qwen2.5-1.5B-Instruct & \texttt{\scriptsize 989aa7980e4cf806f80c7fef2b1adb7bc71aa306} & sdpa & mechanism (scale); fresh (exploratory) \\
+Qwen2.5-3B-Instruct & \texttt{\scriptsize aa8e72537993ba99e69dfaafa59ed015b17504d1} & sdpa & mechanism (scale); fresh (exploratory) \\
+Mistral-7B-Instruct-v0.3 & \texttt{\scriptsize c170c708c41dac9275d15a8fff4eca08d52bab71} & sdpa & fresh, passages, mechanism, interventions \\
+OLMo-2-1124-7B-Instruct & \texttt{\scriptsize 470b1fba1ae01581f270116362ee4aa1b97f4c84} & sdpa & fresh \\
+Llama-3.1-8B-Instruct & \texttt{\scriptsize 0e9e39f249a16976918f6564b8830bc894c89659} & sdpa & fresh, passages, interventions \\
+Gemma-2-9B-it & \texttt{\scriptsize 11c9b309abf73637e4b6f9a3fa1e92e615547819} & eager & fresh, passages \\
+Gemma-2-2B-it & \texttt{\scriptsize 299a8560bedf22ed1c72a8a11e7dce4a7f9f51f8} & eager & fresh (the 2B sentence test) \\
+Phi-4 & \texttt{\scriptsize 2db69c1c3e91a05d2c64a3185acfbaf36f744e25} & sdpa & fresh \\
+Falcon3-7B-Instruct & \texttt{\scriptsize 1e57a0ecd176c7c139f289c60a74e57f887c3dfb} & sdpa & fresh \\
+Mistral-Small-24B-Instruct-2501 & \texttt{\scriptsize 9527884be6e5616bdd54de542f9ae13384489724} & sdpa & the frames under emitted forms \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\paragraph{Compute of the final round.} Every part ran on one NVIDIA A100 80GB (PCIe for the passages, SXM4 for the other three parts) in BF16, with Python 3.12.14, torch 2.11.0 (CUDA 12.8), transformers 5.18.0 and numpy 2.5.3, from a clean checkout of the finalising commit, in one session each: the passages from 13:13 to 15:44 UTC, the mechanism from 09:17 to 10:33 UTC, the fresh stories from 11:25 to 13:51 UTC and the interventions from 14:40 to 17:33 UTC, on two consecutive days, each well before its preregistered deadline. No step failed, was skipped or was cut by a deadline in any part. The only training is the rank-16 remap fit at the writing token (losses and held-out flip rates in \cref{app:edits}); the steering vectors are means and the dictionaries are used as released. Pilots ran only on the CPU in FP32, with models of at most 1.5B parameters, and are listed with their numbers in the entry; no output of a final-round population was seen before its run. % verbatim: outcomes J, parts A--D; entry J (G7)
+
+\paragraph{Third-party material and licences.} SQuAD v1.1 \citep{rajpurkar2016squad} is used under CC BY-SA 4.0, and the counterfactual passages are derived from it. The sparse-autoencoder dictionaries are those of \citet{andyrdt2025saes} for Qwen2.5-7B-Instruct (BatchTopK, $k = 64$, 131{,}072 latents; \citealt{bussmann2024batchtopk}) at layers 3, 7, 11 and 15, at a pinned revision, each file checked against its sha256 at download. The release of \citet{prakash2025lookbacks} is fetched at run time at its pinned commit and checked against stored file hashes; none of it is copied into our code. The released bases and training code of \citet{anonymous2026fitted} are checked against the hashes pinned in stage 4 before any model is loaded. Each model is used under the licence on its model card.
+
+\subsection{The discovery sample}\label{app:compute-discovery}
+
+\paragraph{Compute of the discovery sample.} All experiments except the stage-4 refits are forward passes; the refits train only rank-16 bases (\cref{app:refit}), and no model weights are ever trained. Pilots with models of at most 1.7B parameters, the first format factorials, preregistration A, the 1.5B row-restricted splices, the early attention probe and the FP32 unit tests ran on CPU in FP32; the preregistration-A output records transformers 5.18.0 and Python 3.11.15. All GPU runs used NVIDIA A100 80GB GPUs (SXM4 in stages 1--6, PCIe in stage 7) in BF16, torch 2.11.0 with CUDA 12.8 and Python 3.12.14, as recorded in each stage's \texttt{ENV.txt} and output files:
+\begin{itemize}\setlength\itemsep{1pt}
+  \item stage 1 (preregistration B; Qwen2.5-1.5B to 14B, Qwen3-8B, Mistral-7B, OLMo-2-7B): one GPU, transformers 5.18.0, commit \texttt{stage1-run};
+  \item stage 2 (preregistration C; frames at 24B and 72B, natural factorial at 24--72B): two GPUs with \texttt{device\_map="auto"}, transformers 5.9.0, pinned by the stage-2 script for the reproduction gate, commit \texttt{stage2-run};
+  \item stage 3 (preregistration D; new tasks and localisation at 7--14B): one GPU, transformers 5.18.0, commit \texttt{stage3-run};
+  \item stage 3b (preregistration E): two GPUs, commit \texttt{stage3b-run}; the $2{\times}2$, the role control at 7--14B and the Qwen2.5-32B environment re-run under transformers 5.18.0 (the re-run on one GPU), and the Qwen2.5-14B environment re-run, the value-only frames and the role control at 72B under transformers 5.9.0;
+  \item stage 4 (preregistration F): two GPUs, one per refit (55 minutes each), then the frames on both, transformers 5.9.0, commit \texttt{stage4-run};
+  \item stage 5 (preregistration G): one GPU, transformers 5.18.0, commit \texttt{stage5-run}; eager attention for the re-mention attention and form probes, sdpa elsewhere; GPT-2 small and GPT-2 XL in FP32 with exactness asserted; the GPT-2 attention probe re-run on CPU (\cref{app:prereg});
+  \item stage 6 (preregistration H): one GPU, transformers 5.18.0, commit \texttt{stage6-run}; eager attention for part (a), sdpa for part (b), and the exploratory re-check sweeps of part (b) in FP32. The release of \citet{prakash2025lookbacks} is fetched at run time at its commit \texttt{0579347} and checked against stored file hashes; none of it is copied into our repository;
+  \item stage 7 (preregistration I; Mistral-Small-24B at the pinned revision): one GPU, transformers 5.18.0, commit \texttt{stage7-run}; eager attention for the head ranking and the exploratory remap ranking, sdpa elsewhere; about 2.4 hours from the unit tests to the score. The release of \citet{anonymous2026fitted} was checked against the hashes recorded in stage 4 before any model was loaded.
+\end{itemize}
+
+\paragraph{Model revisions of the discovery sample.} For the two models of \citet{anonymous2026fitted} we pin the revisions used for the reproduction: Mistral-Small-24B-Instruct-2501 at \texttt{9527884be6e5616bdd54de542f9ae13384489724} and Qwen2.5-72B-Instruct at \texttt{495f39366efef23836d0cfae4fbe635880d2be31}. The pins apply to the frames, the stage-4 refits, every stage-7 run and the stage-2 natural factorial at those sizes. All other runs, including Qwen2.5-32B and the role control at Qwen2.5-72B, load the default revision available at run time.
+
+\paragraph{Released code.} The code release contains the story generator, encoder, tasks and hook primitives (\texttt{ckeys/}); one script per experiment (\texttt{experiments/}); the preregistered scoring scripts (\texttt{analysis/stage1\_prereg.py}, \texttt{stage2\_score.py}, \texttt{stage3\_score.py}, \texttt{stage3b\_score.py}, \texttt{stage4\_score.py}, \texttt{stage5\_score.py}, \texttt{stage6\_score.py}, \texttt{stage7\_score.py}, and for the final round \texttt{stage8a\_score.py} to \texttt{stage8d\_score.py} with their shared Holm helper); the refit wrapper (\texttt{experiments/refit\_remap.py}); a port of the story generator and counterfactuals of \citet{prakash2025lookbacks} that reads their release at run time (\texttt{ckeys/causaltom.py}); one shell script per GPU stage, which pins the library version and records the commit and environment (\texttt{scripts/}); the exactness tests (\texttt{tests/}); and \texttt{paper/make\_figures.py}, which generates every result figure, every table in \cref{app:refit,app:additional,app:stage5,app:stage6,app:stage7}, the tables of preregistrations G, H, I and J, and every result macro in the text from the saved results and score files (the schematic in \cref{fig:schematic} is drawn by \texttt{paper/make\_schematic.py}).

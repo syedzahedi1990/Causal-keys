@@ -241,3 +241,41 @@ The first line checks out the commit that finalises preregistration P-2026-10-10
 To re-score an archive off the box: `PYTHONPATH=. python analysis/stage8<part>_score.py --results results/gpu_stage8<part>`.
 
 **CPU plumbing test.** `TEST_MODE=1 bash scripts/gpu_stage8<part>.sh` runs without the guards and without pip. It runs the pytest step, then every step of the part at Qwen2.5-0.5B-Instruct in FP32 on the CPU, with n = 2–3 items, wherever the part names a model. It writes to `results/gpu_stage8<part>_test/` and `gpu_stage8<part>_test_results.tgz`, and every output carries the tag `TEST_`. Its verdict lines are plumbing checks, not results. It takes about 65 min (A), 80 min (B, with an 18-minute pytest), 60 min (C) and 25 min (D) on a 4-core box.
+
+## Stage 9: the listed candidates set the edit window (dated prediction note, docs/STAGE9_PREDICTIONS.md)
+
+Stage 9 is one script, `scripts/gpu_stage9.sh`. Its predictions are in `docs/STAGE9_PREDICTIONS.md` and what it computes is in `docs/stage9/SPEC.md`. Both were frozen, with the code, in the commit titled `Freeze stage-9 predictions`. Stage 9 is not a preregistration entry: there is no class, prior or Holm family per line.
+
+| Arm | What it tests | Population | Formats |
+|---|---|---|---|
+| Stories | the late and early K/V windows at the writing token, by format and depth; l_b is fixed on C first | 150 new fresh cores (N9) and the 30 stage-8b calibration cores (C, for l_b only) | NONE, BEFORE, POST-NULL, POST, AFTER, LETTER |
+| Edits and dose | single-site E1, all-position CAA, the stored E4b remap, the dose rows and r_K | 80 new canonical-lexicon cores (E9) | NONE, AFTER, LETTER, POST |
+| Passages | the same windows on counterfactual SQuAD passages | the 185 stage-8a E items (decisive) and the 71 R items (held out) | NOM, OPTB, OPTA (LETA if time remains) |
+
+Models: Mistral-7B-Instruct-v0.3, Llama-3.1-8B-Instruct and Qwen2.5-7B-Instruct, in that order (keys `mistral7`, `llama8`, `qwen7` of `scripts/stage8_models.json`). The files are fetched and checked exactly as in stage 8 (see Model files above). There is no fallback model: a model whose files are refused is listed in `FETCH_FAILED.txt`, and its predictions are NOT EVALUABLE. A token is optional; without one, Llama comes from the manifest's verified mirrors.
+
+**What to rent.** 1× 80GB GPU (A100 or H100), host RAM ≥ 64 GB, disk ≥ 50 GB (one model at a time plus a prefetch). The box needs outbound network to huggingface.co and github.com. Runtime: about 40–65 min per model, about 3–4 h in all with the pytest step and the score (`DEADLINE_H` default 4.5). Cost: about $6–9.
+
+**Run it** in the instance's Jupyter terminal, after the same `git clone` and `cd` as above:
+```bash
+F=$(git log --format=%H -1 --grep='^Freeze stage-9 predictions$') && [ -n "$F" ] && git checkout "$F"
+bash scripts/gpu_stage9.sh
+```
+The script refuses to start (exit 1, archive of the logs written) if any of these holds:
+- tracked files have local changes, or the code directories (`ckeys experiments analysis scripts tests data`) hold untracked files that git does not ignore (code a run would import that is not in the freeze commit);
+- the history of HEAD has no commit with the subject `Freeze stage-9 predictions`;
+- `docs/STAGE9_PREDICTIONS.md` or `docs/stage9/SPEC.md` is absent at HEAD, or differs from its text at that commit;
+- the code at HEAD (`ckeys experiments analysis scripts tests data`) differs from that commit;
+- results under `OUT` are tracked by git, or results files already in `OUT` were written at another commit than HEAD (see Second session below);
+- transformers is not 5.18.0 after the pinned install, or the first GPU has less than 75 GiB (`MINGIB=<GiB>` lowers the floor).
+The guard writes the freeze commit and the sha256 of the note and the spec into `COMMIT.txt`, and every results file records them. The scorer checks that they agree.
+
+**What the script does.** It runs the FP32 tests of every stage-9 builder and of the shared modules they call before it loads a model (`logs/pytest.log`); a failure stops it. Then, per model: three tokenizer checks (`chk_st_`, `chk_ed_`, `chk_ps_<key>`), l_b on C (`cal_<key>` → `lb/<key>.json`), the stories (`st_<key>` → `stories/<key>.json`), the edits (`ed_<key>` → `edits/<key>.json`), the passages (`ps_<key>` → `passages/<key>.json`) and, if at least 10 minutes remain beyond the reserve of the later models, the exploratory LETA step (`leta_<key>`). An arm whose check failed is not run for that model. Each step has a reserve of minutes for the steps and models after it, and stops before work that would end inside it (exit 3: listed in `SKIPPED.txt`; a rerun goes on from where it stopped). Finally it scores with `analysis/stage9_score.py` into `STAGE9_SCORE.txt`, `stage9_summary.json` and `fig_window.csv`, `fig_edits.csv`, `fig_dose.csv`, prints the CHECKS, PREDICTIONS, FALSIFIERS and SUMMARY sections, and writes `MANIFEST.sha256` and `gpu_stage9_results.tgz` in the repository root (no weights).
+
+**What to upload.** `gpu_stage9_results.tgz`, to the Google Drive folder `causal-keys-results`. Then destroy the instance.
+
+**Reading the result.** As in stage 8: a line `FAILED <step>` marks a failed step (also in `FAILED.txt`; the script then exits 1, and the archive is still written). A scorer exit status 2 means a check printed MISMATCH (a population or provenance check, a row grid other than the spec's, the freeze record, l_b, `T_check` or the FP32 gate); the score step is then FAILED, the score file is still written and names it. A step stopped by the deadline (exit 3, `SKIPPED.txt`) is not a failure in any arm: the formats (stories, passages) or the whole edits arm of that model that it did not finish are NOT EVALUABLE, the CHECKS section lists the arm as PARTIAL, and the scorer still exits 0. NOT SUPPORTED and NOT EVALUABLE are results. The options (`TEST_MODE`, `DEADLINE_H`, `FORCE`, `FORCE_STEPS`, `KEEP_CACHE`, `TESTS=0`, `MINGIB`, `OUT`, `S8_MODELS`, `PY`) and reruns work as in stage 8; `SQUAD=<file>` points at another copy of the SQuAD v1.1 dev file (its sha256 is checked). `FORCE_STEPS=cal_<key>` (l_b recomputed) also redoes `st_<key>` by itself: a stories file that read another lb file than the current one is never kept. To re-score an archive off the box: `PYTHONPATH=. python analysis/stage9_score.py --results results/gpu_stage9`.
+
+**Second session.** To finish what a deadline left (`SKIPPED.txt`), run the script again on the same checkout at the same HEAD, with the earlier results in `OUT` (on a new box: clone, `git checkout` the HEAD recorded in `COMMIT.txt`, then `tar xzf gpu_stage9_results.tgz` so that `results/gpu_stage9` holds them). Leave the results untracked and commit nothing in between, not even a paper edit: the scorer wants one commit and a clean tree across all results files, so a second commit or a committed results file would make every verdict NOT EVALUABLE. The guard refuses such a session before it loads a model.
+
+**CPU plumbing test.** `TEST_MODE=1 bash scripts/gpu_stage9.sh` runs without the guard and without pip: the pytest step, then every step at Qwen2.5-0.5B-Instruct in FP32 on the CPU for the keys `qwen7` and `llama8` (`TEST_ALL=1`: all three), with 2 items per population. It writes `results/gpu_stage9_test/` and `gpu_stage9_test_results.tgz`; every output is tagged `TEST_`, and its verdicts are plumbing checks, not results. It is slow on a CPU: on a 4-core box the stories steps alone take about 400 s per format for 2 items (six formats in `cal`, six in `st`, per key), and the passages tests in the pytest step took 12-45 min, so a complete run takes several hours. The default `DEADLINE_H=4.5` then cuts it (exit 3, partial arms). For a complete plumbing run, which is the check to make before the freeze, run `TEST_MODE=1 DEADLINE_H=12 bash scripts/gpu_stage9.sh` on an idle box and check that it ends with no `FAILED.txt`, that the score step exits 0, and that `STAGE9_SCORE.txt` lists every arm of both keys with no PARTIAL. No complete run has been timed yet.

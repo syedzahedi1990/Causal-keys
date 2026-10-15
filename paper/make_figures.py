@@ -5161,6 +5161,384 @@ print("v5 round 1:", {n: macros[n] for n in ("JxRiskyTailP", "JcClassMTailP", "J
       "JxRiskyTailPA", "JxRiskyTailPB", "JxRiskyTailPC", "JxRiskyTailPD")})
 
 
+# ================================================================ stage 9, zero-GPU pre-analyses (group S9P; docs/stage9/SPEC.md section 15)
+# Post hoc re-analyses of committed stage-5 to stage-8 results, computed before the stage-9 GPU run by the pure functions of
+# analysis/stage9_pre.py (items 1-8 of the design review's section 7). Every value is recomputed from the raw results files
+# and registered with rmac ("[recomputed; label exploratory/post hoc]"), except the printed score-file strings taken with
+# smac (passage fractions, kappa and sigma, the stage-6 sweep IIAs and l*; each checked against its line by check (1) below)
+# and ranges that select registered strings (labelled by what they select: recomputed values or printed strings). Names:
+# Np + statistic + format + block or onset word + the K8 model tag; an estimate with a 95 % interval also has ...Lo and
+# ...Hi. Formats: stage-8b arms After, Post, PostNull, None, Pre, Before; stage-8c formats Opt (P1), Letter, Post, None;
+# passages Nom, Opta. Blocks: Three, Seven, Eleven, Fifteen (the natural patch from block l + 1). A value that rounds to
+# zero is printed unsigned. The figure fig_window_pre.pdf is drawn from the registered values only.
+import time as _time9  # noqa: E402
+
+import stage9_pre as S9P  # noqa: E402
+
+PRE9 = dict(macros)   # every macro defined before stage 9 (asserted unchanged at the end of the block)
+N_PRE9 = len(REG)
+G9P = "S9P"
+SH9 = dict(SH8)
+
+
+def rmac9(name, value, desc, src, fmt="{:.2f}"):
+    """rmac in group S9P; a value that rounds to zero is printed unsigned (as rmac does for the stage-8 groups)."""
+    if not isinstance(value, str) and fmt.format(value).lstrip("-").strip("0.") == "":
+        value = abs(value)
+    rmac(name, value, desc, src, G9P, fmt)
+
+
+def rmac93(name, e3, desc, src, fmt="{:.2f}"):
+    for suf, v, d in (("", e3[0], ""), ("Lo", e3[1], " (lower 95 % bound)"), ("Hi", e3[2], " (upper 95 % bound)")):
+        rmac9(name + suf, v, desc + d, src, fmt)
+
+
+def zl9(z):
+    return {"nat": "the natural patch", "T": "T (the target's own residual written as an edit: the pipeline check)"}.get(z) or zlab8(z)
+
+
+def rng9(name, names, desc, src):
+    """the smallest and the largest of registered S9P values (by value) -> nameMin, nameMax, each the registered string. The
+    label follows what is selected: recomputed values, or printed score-file strings (smac; never a mix of the two)."""
+    printed = {n in SRCLINE for n in names}
+    assert len(printed) == 1, (name, sorted(n for n in names if n in SRCLINE))
+    lab = "[selects a printed string; label exploratory/post hoc]" if printed.pop() else "[recomputed; label exploratory/post hoc]"
+    v = sorted(names, key=lambda n: fl(macros[n]))
+    nm(name + "Min", macros[v[0]], desc + f" (smallest; = \\{v[0]}) {lab}", src, G9P)
+    nm(name + "Max", macros[v[-1]], desc + f" (largest; = \\{v[-1]}) {lab}", src, G9P)
+
+
+_t9 = _time9.time()
+MC9 = S9P.MODELS_C                                   # qwen7, mistral7, llama8
+A9 = S9P.FRESH8                                      # the 8 fresh-story models of stage 8b
+_fg9 = S9P.format_gap(ROOT)
+_oc9 = S9P.onset_curves(ROOT, {k: C8M[k] for k in MC9})
+_po9 = S9P.passage_onsets(ROOT)
+_et9 = S9P.edit_transfer(ROOT)
+_bs9 = S9P.binding_swap(ROOT)
+_do9 = S9P.dose(ROOT, {k: C8M[k] for k in MC9})
+_lw9 = S9P.law_diagnostics({k: C8M[k] for k in MC9})
+_ko9 = S9P.knockout(ROOT)
+_cp9 = S9P.one_token_copy(ROOT)
+
+# ---- item 1: the behavioural format gap, 8 fresh-story models (stage 8b, F; E-scored argmax at the KV patch from round(0.3 L))
+for k in A9:
+    t, S, r = K8[k], SH9[k], _fg9[k]
+    src = f"results/gpu_stage8b/eval/{k}_F.json (analysis/stage9_pre.py format_gap)"
+    rmac9(f"NpFreshLayers{t}", r["L"], f"blocks L, {S}", src, "{:d}")
+    rmac9(f"NpFreshOnset{t}", r["l0"], f"onset l0 = round(0.3 L) of the late KV patch of stage 8b (its third onset), {S}", src, "{:d}")
+    rmac9(f"NpFreshN{t}", r["n"], f"fresh stories (F) valid in every arm, {S}", src, "{:d}")
+    rmac93(f"NpStaleAfter{t}", r["arms"]["AFTER"]["stale"], f"list after (AFTER): share of answers left at B by the exact K/V patch of S at the writing token from block l0 = round(0.3 L) "
+           f"(E-scored argmax over the six candidates, not generation; two-stage cluster bootstrap, seed 20261013), {S}", src)
+    for arm, aw in AB8.items():
+        rmac93(f"NpFlip{aw}{t}", r["arms"][arm]["flip"], f"{ALAB8[arm]} ({arm}): share of answers moved to S by the K/V patch from l0 = round(0.3 L) (E-scored argmax), {S}", src)
+        rmac9(f"NpFullFlip{aw}{t}", r["arms"][arm]["flip0"][0], f"{ALAB8[arm]} ({arm}): share moved to S by the full K/V patch KV_S@0 (E-scored argmax), {S}", src)
+    a = r["after"]
+    rmac9(f"NpNonflipB{t}", a["nonflip_b"], f"AFTER, patch from l0: share B among the answers not moved to S (E-scored argmax), {S}", src, "{:.3f}")
+    rmac9(f"NpNonflipN{t}", a["n_nonflip"], f"AFTER, patch from l0: answers not moved to S, {S}", src, "{:d}")
+    rmac9(f"NpStaleN{t}", a["n_stale"], f"AFTER, patch from l0: answers left at B, {S}", src, "{:d}")
+    rmac9(f"NpStalePabs{t}", a["med_abs_pb"], f"AFTER, patch from l0: median absolute p(B) = exp(E_B) of the answers left at B (not renormalised), {S}", src, "{:.3f}")
+    rmac9(f"NpStalePsix{t}", a["med_six_pb"], f"AFTER, patch from l0: median six-way p(B) = softmax(E)_B of the answers left at B, {S}", src, "{:.3f}")
+    rmac93(f"NpGenVzeroAfter{t}", a["gen_v0"], f"AFTER: share of generated answers moved to S by the value-only patch V_S@0 (all layers), {S}", src)
+    _free = [f"NpFlip{AB8[x]}{t}" for x in S9P.FREE_ARMS]
+    _m = min(_free, key=lambda n: fl(macros[n]))
+    nm(f"NpFlipFreeMin{t}", macros[_m], f"smallest flip from l0 over no mention, list before, null sentence after and sentence before (= \\{_m}), {S} [recomputed; label exploratory/post hoc]", src, G9P)
+_src1 = "results/gpu_stage8b/eval/*_F.json (analysis/stage9_pre.py format_gap)"
+rng9("NpFlipFree", [f"NpFlip{AB8[x]}{K8[k]}" for k in A9 for x in S9P.FREE_ARMS], "flip from l0 under NONE, BEFORE, POST-NULL and PRE over the 8 models", _src1)
+rng9("NpFullFlip", [f"NpFullFlip{aw}{K8[k]}" for k in A9 for aw in AB8.values()], "flip of the full patch KV_S@0 over the six arms and the 8 models", _src1)
+rng9("NpFlipPostOther", [f"NpFlipPost{K8[k]}" for k in A9 if k != "mistral7"], "flip from l0 under POST over the 7 models other than Mistral-7B", _src1)
+rng9("NpGenVzeroAfter", [f"NpGenVzeroAfter{K8[k]}" for k in A9], "AFTER generated flip of the value-only patch V_S@0 over the 8 models", _src1)
+rng9("NpStalePabs", [f"NpStalePabs{K8[k]}" for k in A9], "median absolute p(B) of the answers left at B over the 8 models", _src1)
+rng9("NpStaleAfter", [f"NpStaleAfter{K8[k]}" for k in A9], "AFTER share left at B by the patch from l0 over the 8 models", _src1)
+
+# ---- item 2: onset curves by format (stage 8c eval, 80 E stories; E-scored argmax of the natural rows, over stories and t)
+CH9 = {"KV": "Joint", "K": "Key", "V": "Value"}
+for k in MC9:
+    t, S, r = K8[k], SH9[k], _oc9[k]
+    src = f"results/gpu_stage8c/eval/{k}.json (analysis/stage9_pre.py onset_curves)"
+    rmac9(f"NpEditLayers{t}", r["L"], f"blocks L, {S}", src, "{:d}")
+    for C, cw in CH9.items():
+        for f, fw in FWC8.items():
+            for j, l in enumerate(r["depths"]):
+                d = f"natural {C} patch of S (or X) at the writing token from block {l + 1} (written at the output of block {l}), {f}: share of answers moved to the target (E-scored argmax; over stories and t in S, X), {S}"
+                if C == "KV":
+                    rmac93(f"NpOnset{cw}{fw}{DW8[l]}{t}", r["flips"][C][f][j], d + "; two-stage (base, source) bootstrap, seed 20261012", src)
+                else:
+                    rmac9(f"NpOnset{cw}{fw}{DW8[l]}{t}", r["flips"][C][f][j][0], d, src)
+    for f, fw in FWC8.items():
+        b = r["lc"][f]
+        cen = " (censored: no onset below 0.5; the upper end is L)" if b["censored"] else ""
+        rmac9(f"NpLcLo{fw}{t}", b["lo"], f"l_c bracket of the natural KV patch, {f}: the last onset (block l + 1) with flip >= 0.5 before the first below 0.5 (0 if the first onset is already below){cen}, {S}", src, "{:d}")
+        rmac9(f"NpLcHi{fw}{t}", b["hi"], f"l_c bracket of the natural KV patch, {f}: the first onset with flip < 0.5{cen}, {S}", src, "{:d}")
+        rmac9(f"NpLcLoFrac{fw}{t}", b["lo"] / r["L"], f"l_c bracket lower end as a fraction of the depth L, {f}{cen}, {S}", src, "{:.3f}")
+        rmac9(f"NpLcHiFrac{fw}{t}", b["hi"] / r["L"], f"l_c bracket upper end as a fraction of the depth L, {f}{cen}, {S}", src, "{:.3f}")
+    rmac9(f"NpEoneGap{t}", r["eone_gap"]["max"], f"largest |flip(E1) - flip(nat)| of the KV rows over the format x block cells (E-scored argmax; at {r['eone_gap']['cell'][0]}, block {r['eone_gap']['cell'][1]}), {S}", src)
+    if "tau_e4b_3" in r:
+        ta = r["tau_e4b_3"]
+        rmac9(f"NpTauEfourbThree{t}", ta["tau"], f"E4b (DAS remap, seed 102) at block 3: transfer tau = flip(P1) / flip(NONE) of its KV rows (E-scored argmax), {S}", src)
+        rmac9(f"NpEfourbFlipOptThree{t}", ta["P1"], f"E4b at block 3: flip under P1 (E-scored argmax), {S}", src)
+        rmac9(f"NpEfourbFlipNoneThree{t}", ta["NONE"], f"E4b at block 3: flip under NONE (E-scored argmax), {S}", src)
+_src2 = "results/gpu_stage8c/eval/*.json (analysis/stage9_pre.py onset_curves)"
+rng9("NpOnsetValueNone", [f"NpOnsetValueNone{DW8[l]}{K8[k]}" for k in MC9 for l in DW8], "value-only natural patch under NONE over the three models and four onsets", _src2)
+rng9("NpOnsetValueOpt", [f"NpOnsetValueOpt{DW8[l]}{K8[k]}" for k in MC9 for l in DW8], "value-only natural patch under P1 over the three models and four onsets", _src2)
+rng9("NpOnsetJointNone", [f"NpOnsetJointNone{DW8[l]}{K8[k]}" for k in MC9 for l in DW8], "natural KV patch under NONE over the three models and four onsets", _src2)
+rng9("NpEoneGap", [f"NpEoneGap{K8[k]}" for k in MC9], "largest |flip(E1) - flip(nat)| per model, over the three models", _src2)
+
+# ---- item 3: natural passages (stage 8a explore, onset_piece; 185 E items; argmax over the five decision tokens)
+S8A9 = SCORE["S8A"]
+for k in S9P.MODELS_A:
+    t, S, r = K8[k], SH9[k], _po9[k]
+    src = f"results/gpu_stage8a/explore/{k}.json (analysis/stage9_pre.py passage_onsets)"
+    rmac9(f"NpPsgOnset{t}", r["onset"], f"passage onset round(0.3 L), {S}", src, "{:d}")
+    rmac9(f"NpPsgN{t}", r["n"]["OPTA"], f"E passages in the onset rows, {S}", src, "{:d}")
+    for (f, row), w in ((("NOM", "V_S"), "NomValueZero"), (("NOM", "V_S@on"), "NomValueOn"), (("OPTA", "K_S"), "OptaKeyZero"), (("OPTA", "K_S@on"), "OptaKeyOn")):
+        frm = "from layer 0" if "@on" not in row else f"from round(0.3 L) = {r['onset']}"
+        rmac93(f"NpPsg{w}{t}", r["share"][f][row], f"{f}: {'value' if row.startswith('V') else 'key'}-only patch of S over the answer span {frm}; share of passages whose argmax over the five decision tokens (B, S, X, Z, D) is S; article bootstrap, seed 20261010, {S}", src)
+    i0 = find(S8A9, f"  [{k}] explore parts")
+    for f, w, ch in (("NOM", "Nom", "V"), ("OPTA", "Opta", "K")):
+        i = find(S8A9, f"E1/E2 {f} (", start=i0, end=i0 + 16)
+        s_ = grab(S8A9, i, rf"fractions {ch}_S@on ([+-]\d\.\d+)")[0]
+        assert f"{r['ratio'][f][0]:+.3f}" == s_, (k, f, r["ratio"][f], s_)   # the recomputation reproduces the printed fraction
+        smac(f"NpPsg{w}Ratio{t}", "S8A", i, s_, f"{f}: mean margin shift d = m({ch}_S@on) - m(ID) from round(0.3 L) as a fraction of the shift from layer 0 (m = lp_S - lp_B; the part-A scorer's printed fraction), {S}", G9P)
+        rmac9(f"NpPsg{w}Ratio{t}Lo", r["ratio"][f][1], f"{f}: the fraction of the margin shift kept from round(0.3 L), lower 95 % bound (article bootstrap), {S}", src, "{:.3f}")
+        rmac9(f"NpPsg{w}Ratio{t}Hi", r["ratio"][f][2], f"{f}: the fraction of the margin shift kept from round(0.3 L), upper 95 % bound (article bootstrap), {S}", src, "{:.3f}")
+_src3 = "results/gpu_stage8a/explore/*.json (analysis/stage9_pre.py passage_onsets)"
+rng9("NpPsgNomRatio", [f"NpPsgNomRatio{K8[k]}" for k in S9P.MODELS_A], "NOM fraction of the value margin shift kept from round(0.3 L), over the four models", SRCA + " EXPLORATORY")
+rng9("NpPsgOptaKeyOn", [f"NpPsgOptaKeyOn{K8[k]}" for k in S9P.MODELS_A], "OPTA share moved by the key-only patch from round(0.3 L), over the four models", _src3)
+
+# ---- item 4: edit transfer in generation (stage 8c explore: block 7, the first 40 E stories; NONE and P1)
+for k in MC9:
+    t, S, r = K8[k], SH9[k], _et9["models"][k]
+    src = f"results/gpu_stage8c/explore/{k}.json (analysis/stage9_pre.py edit_transfer)"
+    rmac9(f"NpEditStories{t}", r["n"], f"stories of the generation rows of stage 8c (block {r['layer']}), {S}", src, "{:d}")
+    for z in r["insts"]:
+        for f, fw in (("NONE", "None"), ("P1", "Opt")):
+            rmac93(f"NpEditFlip{zw8(z)}{fw}{t}", r["flip"][z][f], f"{zl9(z)} written at the output of block {r['layer']}, {f}: generated answers that name the target "
+                   f"(mean over stories of the mean over t in S, X); two-stage (base, source) bootstrap of the 40 stories, seed 20261012, {S}", src)
+        fb, nf = r["fail_b"][z]
+        if nf:
+            rmac9(f"NpEditFailB{zw8(z)}{t}", fb, f"{zl9(z)}, P1 at block {r['layer']}: share answering B among the (story, t) units whose answer is not t, {S}", src)
+        rmac9(f"NpEditFailN{zw8(z)}{t}", nf, f"{zl9(z)}, P1 at block {r['layer']}: (story, t) units whose answer is not t, {S}", src, "{:d}")
+    if "kappa_line" in r:
+        i, sig, kap = r["kappa_line"]
+        smac(f"NpEditSigma{t}", "S8C", i, sig, f"sigma = kappa of the natural patch at P1, block 7 (printed), {S}", G9P)
+        for z in S9P.KAPPA_INSTS:
+            if z in kap:
+                smac(f"NpEditKappa{zw8(z)}{t}", "S8C", i, kap[z], f"kappa (key share of the identity contrast) of {zlab8(z)} at P1, block 7 (printed), {S}", G9P)
+for p in _et9["pairs"]:
+    t, S = K8[p["k"]], SH9[p["k"]]
+    src = f"{SRCC} (P1@7 kappa line) and results/gpu_stage8c/explore/{p['k']}.json"
+    amac(f"NpEditRel{zw8(p['z'])}{t}", p["rel"], f"kappa/sigma of {zlab8(p['z'])} at P1, block 7, {S}", src, G9P)
+    rmac9(f"NpEditTransfer{zw8(p['z'])}{t}", p["transfer"], f"transfer ratio (flip(P1) / flip_nat(P1)) / flip(NONE) of {zlab8(p['z'])} in generation, block 7, {S}", src)
+rmac9("NpEditPairs", len(_et9["pairs"]), "(model, edit) pairs of Qwen2.5-7B and Mistral-7B with a printed kappa and NONE flip >= 0.5 at block 7", SRCC, "{:d}")
+rmac9("NpEditRho", _et9["rho"], "Spearman correlation of kappa/sigma with the transfer ratio over those pairs", SRCC + " and results/gpu_stage8c/explore", "{:.2f}")
+rng9("NpEditFailBMistral", [f"NpEditFailB{zw8(z)}MistralSeven" for z in ("nat", "E1", "E4b")], "Mistral-7B, P1 at block 7: share B among the failures of the natural patch, E1 and E4b", "results/gpu_stage8c/explore/mistral7.json")
+
+# ---- item 5: Prakash et al.'s binding swap by format (Qwen2.5-14B; printed sweep lines of STAGE6_SCORE.txt)
+_bn = max(_bs9["named"].items(), key=lambda x: fl(x[1][1]))
+assert f"{_bn[1][2]}:{_bn[1][1]}/" in SCORE["S6"][_bn[1][0]]
+smac("NpBindNamedMax", "S6", _bn[1][0], _bn[1][1], f"largest BIND IIA over blocks {_bs9['blocks'][0]}-{_bs9['blocks'][1]} under QNAMES, OPTIONS-AFTER and LETTERS-AFTER (reached under {_bn[0]} at block {_bn[1][2]}; printed)", G9P)
+_bz = SCORE["S6"][_bs9["none"][0]]
+# the anchor is the IIA at the preregistered l* of stage 6 (SPEC 15.2 item 5; its 3-decimal value is \JcGsevenIIA), not a best block
+_bl = _bs9["none_lstar"]
+assert _bl[0] == _bs9["none"][0] and f" {_bl[2]}:{_bl[1]}/" in _bz and f"l* = {_bl[2]} (lstar.json {_bl[2]})" in SCORE["S6"][_bl[3]]
+smac("NpBindLstar", "S6", _bl[3], str(_bl[2]), "the preregistered BIND layer l* of stage 6 (lstar.json, re-derived from the sweep files; printed)", G9P)
+smac("NpBindNoneLstar", "S6", _bl[0], _bl[1], f"BIND IIA under NO-MENTION at the preregistered l* = {_bl[2]} (printed sweep value, 2 decimals; the 3-decimal value of the J-C-G7 anchor is \\JcGsevenIIA): "
+     "the anchor against the named formats' maximum", G9P)
+assert f" {_bs9['none'][2]}:{_bs9['none'][1]}/" in _bz
+smac("NpBindNoneMax", "S6", _bs9["none"][0], _bs9["none"][1], f"secondary, a post hoc best-block pick: largest BIND IIA over all blocks under NO-MENTION (first reached at block {_bs9['none'][2]}; "
+     f"printed); cite \\NpBindNoneLstar (the preregistered l* = {_bl[2]}) as the anchor", G9P)
+rmac9("NpBindBlockFirst", _bs9["blocks"][0], "first block of the named-format BIND sweeps", "results/gpu_stage6/STAGE6_SCORE.txt", "{:d}")
+rmac9("NpBindBlockLast", _bs9["blocks"][1], "last block of the named-format BIND sweeps", "results/gpu_stage6/STAGE6_SCORE.txt", "{:d}")
+rmac9("NpIdNoneOneTo", _bs9["id_none_one_to"][1], "ID span patch under NO-MENTION: last block of the run of IIA 1.00 from block 0", f"results/gpu_stage6/STAGE6_SCORE.txt:{_bs9['id_none_one_to'][0] + 1}", "{:d}")
+rmac9("NpIdOptZeroFrom", _bs9["id_opt_zero_from"][1], "ID span patch under OPTIONS-AFTER: first block from which the IIA is 0.00 at every later block", f"results/gpu_stage6/STAGE6_SCORE.txt:{_bs9['id_opt_zero_from'][0] + 1}", "{:d}")
+
+# ---- item 6: dose curves (stage 8c eval: SK50/SK80, SV50/SV80 at blocks 3 and 7) and the post hoc lambda law
+AW9 = {50: "Fifty", 80: "Eighty"}
+ZD9 = {"SK50": "Kfifty", "SK80": "Keighty", "SV50": "Vfifty", "SV80": "Veighty"}
+for k in MC9:
+    t, S, r = K8[k], SH9[k], _do9[k]
+    src = f"results/gpu_stage8c/eval/{k}.json (analysis/stage9_pre.py dose)"
+    for l in S9P.DOSE_BLOCKS:
+        for f, fw in FWC8.items():
+            for C in ("K", "V"):
+                if not r["used"][f, l, C]:
+                    continue
+                for a, aw in AW9.items():
+                    rmac93(f"NpPsi{C}{fw}{DW8[l]}{aw}{t}", r["psi"][C, f, l, a], f"psi_{C}({a / 100:g}) = mean ID_{C} of the S{C}{a} rows (the {C} table interpolated {a / 100:g} of the way from B to the target) / mean ID_{C} of the natural rows, {f}, block {l} (law.Model.psi; two-stage (base, source) bootstrap), {S}", src)
+            for Z, zw in ZD9.items():
+                rmac93(f"NpDoseFlip{zw}{fw}{DW8[l]}{t}", r["flip"][Z, f, l], f"{Z} KV rows ({'key interpolated, value of the target' if Z.startswith('SK') else 'value interpolated, key of the target'}), {f}, block {l}: share of answers moved to the target (E-scored argmax, over stories and t), {S}", src)
+    if "story" in r:
+        s_ = r["story"]
+        rmac9(f"NpDoseStoryN{t}", s_["n"], f"P1, block 3: stories with natural ID_K > 2 nats, {S}", src, "{:d}")
+        for q, qw in (("p10", "Pten"), ("p50", "Pfifty"), ("p90", "Pninety")):
+            rmac9(f"NpDoseStory{qw}{t}", s_[q], f"P1, block 3: {q[1:]}th percentile over those stories of the per-story ratio ID_K(SK50) / ID_K(nat), {S}", src)
+        rmac9(f"NpDoseStoryEightyMed{t}", s_["med80"], f"P1, block 3: median over those stories of the per-story ratio ID_K(SK80) / ID_K(nat), {S}", src)
+        rmac9(f"NpDoseStoryAboveHalf{t}", s_["above_half"], f"P1, block 3: share of those stories whose SK50 ratio exceeds 0.5, {S}", src)
+_srcl = "results/gpu_stage8c/eval/*.json (analysis/stage9_pre.py law_diagnostics)"
+L9 = _lw9
+rmac9("NpLawNStat", L9["n_stats"], "post hoc lambda law: statistics (model, instance, depth, code) with phi(NONE) >= 0.3 and both natural channels used", _srcl, "{:d}")
+rmac9("NpLawNUnit", L9["n_units"], "post hoc lambda law: units (model, instance, depth)", _srcl, "{:d}")
+rmac9("NpLawRhoCurve", L9["rho_curve"], "post hoc lambda law: Spearman of lambda with the calibrated-curve predictor Lg(curve_K(p_k)) - Lg(curve_V(p_v))", _srcl, "{:.3f}")
+rmac9("NpLawRhoLogpk", L9["rho_logpk"], "post hoc lambda law: Spearman of lambda with log proj_k alone (the baseline)", _srcl, "{:.3f}")
+rmac9("NpLawRhoDiff", L9["diff"], "post hoc lambda law: Spearman(curve) - Spearman(log proj_k), unrounded difference", _srcl, "{:.3f}")
+rmac9("NpLawRhoDiffLo", L9["diff_lo"], "post hoc lambda law: Spearman(curve) - Spearman(log proj_k), lower 95 % bound over 2,000 resamples of the units (numpy.random.default_rng(1))", _srcl, "{:.3f}")
+rmac9("NpLawRhoDiffHi", L9["diff_hi"], "post hoc lambda law: Spearman(curve) - Spearman(log proj_k), upper 95 % bound over 2,000 resamples of the units", _srcl, "{:.3f}")
+rmac9("NpLawRhoDiffMean", L9["diff_mean"], "post hoc lambda law: Spearman(curve) - Spearman(log proj_k), mean over the 2,000 unit resamples", _srcl, "{:.3f}")
+rmac9("NpLawMaeCurve", L9["mae_curve"], "post hoc lambda law: mean |lambda - curve predictor|", _srcl, "{:.3f}")
+rmac9("NpLawMaeOone", L9["mae_o1"], "post hoc lambda law: mean |lambda - O1|, O1 = Lg(p_k) - Lg(p_v)", _srcl, "{:.3f}")
+rmac9("NpLawPartial", L9["partial"], "post hoc lambda law: partial rank correlation of the curve predictor with lambda given log proj_k (ranks residualised on [1, rank(log p_k)])", _srcl)
+rmac9("NpLawRhoPkPv", L9["rho_pk_pv"], "post hoc lambda law: Spearman of proj_k with proj_v over the statistics", _srcl)
+for C, f in (("K", "Opt"), ("V", "None")):
+    rng9(f"NpPsi{C}{f}ThreeFifty", [f"NpPsi{C}{f}ThreeFifty{K8[k]}" for k in MC9], f"psi_{C}(0.5), {f}, block 3, over the three models", "results/gpu_stage8c/eval/*.json (analysis/stage9_pre.py dose)")
+rng9("NpDoseFlipKfiftyOptThree", [f"NpDoseFlipKfiftyOptThree{K8[k]}" for k in MC9], "SK50 (half key, full value) flip under P1 at block 3, over the three models", "results/gpu_stage8c/eval/*.json (analysis/stage9_pre.py dose)")
+rng9("NpDoseFlipVfiftyNoneThree", [f"NpDoseFlipVfiftyNoneThree{K8[k]}" for k in MC9], "SV50 (half value, full key) flip under NONE at block 3, over the three models", "results/gpu_stage8c/eval/*.json (analysis/stage9_pre.py dose)")
+
+# ---- item 7: knockout (stage 5; Qwen2.5-7B, Mistral-7B, Qwen2.5-14B; 150 cores per format)
+KOM9 = {"M0": "Mzero", "M3": "Mthree", "M7": "Mseven"}
+for k in S9P.KO_FILES:
+    t, S, r = K8[k], SH9[k], _ko9[k]
+    src = f"results/gpu_stage5/knockout/{S9P.KO_FILES[k]}_s0.json (analysis/stage9_pre.py knockout)"
+    for f, fw in (("AFTER", "After"), ("P1", "Opt")):
+        for mk, mw in KOM9.items():
+            rmac93(f"NpKoKeepB{fw}{mw}{t}", r["keep_b"][f, mk], f"{f}, mask {mk} ({'none' if mk == 'M0' else 'the answer cannot attend to the writing token' if mk == 'M3' else 'no non-candidate later row can attend to it'}): share of answers (argmax over the candidates) kept at B; item bootstrap, seed 20261015, {S}", src)
+    rmac93(f"NpKoInitNoneMthree{t}", r["init"], f"NONE, mask M3: share of answers sent to the initial or the distractor location; item bootstrap, seed 20261015, {S}", src)
+    rmac9(f"NpKoKeepBNoneMthree{t}", r["keep_b"]["NONE", "M3"][0], f"NONE, mask M3: share of answers kept at B, {S}", src)
+    rmac9(f"NpKoN{t}", r["n"]["AFTER", "M3"], f"cores per format and mask, {S}", src, "{:d}")
+_srck = "results/gpu_stage5/knockout/*_s0.json (analysis/stage9_pre.py knockout)"
+rng9("NpKoKeepBMthree", [f"NpKoKeepB{fw}Mthree{K8[k]}" for k in S9P.KO_FILES for fw in ("After", "Opt")], "AFTER and P1 under M3: share kept at B over the three models", _srck)
+rng9("NpKoKeepBMseven", [f"NpKoKeepB{fw}Mseven{K8[k]}" for k in S9P.KO_FILES for fw in ("After", "Opt")], "AFTER and P1 under M7: share kept at B over the three models", _srck)
+rng9("NpKoInitNoneMthree", [f"NpKoInitNoneMthree{K8[k]}" for k in S9P.KO_FILES], "NONE under M3: share sent to the initial or the distractor location over the three models", _srck)
+
+# ---- item 8: one-token copy (stage 8a factorial, NOM, multi-token PERSON and PLACE answers)
+for k in S9P.MODELS_A:
+    t, S, r = K8[k], SH9[k], _cp9[k]
+    src = f"results/gpu_stage8a/factorial/{k}.json (analysis/stage9_pre.py one_token_copy)"
+    for row, w in (("V_S", "Value"), ("KV_S", "Joint")):
+        rmac93(f"NpCopy{w}{t}", r[row]["est"], f"NOM, {'value-only' if row == 'V_S' else 'joint K/V'} patch of S ({row}): among the PERSON and PLACE items with a multi-token S whose generated first entity token is S's, "
+               f"the share completing the whole S (article bootstrap, seed 20261010), {S}", src)
+        rmac9(f"NpCopy{w}N{t}", r[row]["n"], f"NOM, {row}: items whose generated first entity token is S's (the denominator), {S}", src, "{:d}")
+for w in ("Value", "Joint"):
+    rng9(f"NpCopy{w}", [f"NpCopy{w}{K8[k]}" for k in MC9], f"NOM {'value-only' if w == 'Value' else 'joint'} patch: completion after S's first token, over Qwen2.5-7B, Mistral-7B and Llama-3.1-8B", "results/gpu_stage8a/factorial/*.json (analysis/stage9_pre.py one_token_copy)")
+
+
+# ---- figure fig_window_pre.pdf (one row of four panels, the text width); every plotted value is a registered S9P macro
+CAPTION_WINDOW_PRE = (   # draft caption for the paper (the sections are written by the lead); printed below
+    "The format window in data in hand. (a) Share of answers left at B by the exact K/V patch of S at the writing token from "
+    "0.3 L with the candidates listed after the story (dark, 95 % interval), and the smallest flip of the same patch with no "
+    "list after it (brown: no mention, list before, null sentence after, sentence before); 8 models, E-scored argmax. (b) "
+    "Answers moved by the natural K/V patch from each onset block: options after (solid, filled) and letters after (solid, "
+    "hollow) against no mention (dashed) and sentence after (dotted). (c) Natural passages: share moved to S by the key-only "
+    "patch with options after (dark) and by the value-only patch in free form (brown), from layer 0 and from 0.3 L. (d) "
+    "psi_K(alpha) with options after (solid) and psi_V(alpha) with no mention (dashed) at block 3; identity dotted. "
+    "Post hoc: rows of stages 5-8 re-analysed before the stage-9 run.")
+LIST9, FREE9 = INK, BROWN
+COL9 = {"qwen7": AQUA, "mistral7": PURPLE, "llama8": BLUE, "gemma9": ORANGE}
+MK9 = {"qwen7": "o", "mistral7": "s", "llama8": "^", "gemma9": "D"}
+SHT9 = {"mistral7": "Mistral", "llama8": "Llama", "phi4": "Phi-4", "olmo7": "OLMo", "falcon7": "Falcon", "gemma9": "Gemma",
+        "qwen7": "Qwen-7B", "qwen14": "Qwen-14B"}
+
+
+def _m9(name):
+    assert name in macros and any(r[1] == name and r[0] == G9P for r in REG[N_PRE9:]), name
+    return mf8(name)
+
+
+def window_pre_figure():
+    """fig_window_pre.pdf: (a) item 1, (b) item 2, (c) item 3, (d) item 6 (SPEC 15.3). Encoding shared by the panels: dark
+    ink = candidates listed after, brown = free form or no list after; in (b) and (d) colour and marker = model, solid =
+    options after (letters after: hollow markers), dashed = no mention, dotted = sentence after."""
+    fig = plt.figure(figsize=(6.75, 2.05))
+    gs = fig.add_gridspec(1, 4, width_ratios=[1.25, 1.0, 1.1, 0.9], wspace=0.4, left=0.052, right=0.995, bottom=0.235, top=0.845)
+    ax = [fig.add_subplot(gs[0, j]) for j in range(4)]
+    # (a) the behavioural format gap, ordered by the stale share
+    ordm = sorted(A9, key=lambda k: -_m9(f"NpStaleAfter{K8[k]}"))
+    for j, k in enumerate(ordm):
+        y, lo, hi = (_m9(f"NpStaleAfter{K8[k]}{s_}") for s_ in ("", "Lo", "Hi"))
+        ax[0].plot([j - 0.12, j - 0.12], [lo, hi], color=LIST9, lw=0.9, solid_capstyle="butt", zorder=2)
+        ax[0].plot(j - 0.12, y, "o", ms=3.4, color=LIST9, zorder=3, label="list after: kept B" if j == 0 else None)
+        ax[0].plot(j + 0.12, _m9(f"NpFlipFreeMin{K8[k]}"), "s", ms=3.2, color=FREE9, mfc="white", mew=0.8, zorder=3,
+                   label="no list after: min flip" if j == 0 else None)
+    ax[0].set_xticks(range(len(ordm)))
+    ax[0].set_xticklabels([SHT9[k] for k in ordm], rotation=55, ha="right", fontsize=6, rotation_mode="anchor")
+    ax[0].tick_params(axis="x", length=0, pad=2)
+    ax[0].set_ylabel("share of answers", fontsize=7, labelpad=1)
+    ax[0].set_xlim(-0.6, len(ordm) - 0.4)
+    ax[0].legend(frameon=False, fontsize=5.6, loc="lower left", bbox_to_anchor=(-0.02, 0.0), handletextpad=0.1, borderaxespad=0.0, labelspacing=0.25)
+    # (b) onset curves of the natural K/V patch
+    ons = [l + 1 for l in DW8]
+    LS9 = {"P1": "-", "LETTER": "-", "NONE": (0, (3.5, 1.5)), "POST": (0, (1, 1.2))}
+    for k in MC9:
+        c, mk = COL9[k], MK9[k]
+        for f, fw in (("NONE", "None"), ("POST", "Post"), ("LETTER", "Letter"), ("P1", "Opt")):
+            ys = [_m9(f"NpOnsetJoint{fw}{DW8[l]}{K8[k]}") for l in DW8]
+            listed = f in ("P1", "LETTER")
+            ax[1].plot(ons, ys, ls=LS9[f], color=c, lw=1.0 if listed else 0.8, marker=mk if listed else None, ms=3.0,
+                       mfc=c if f == "P1" else "white", mew=0.7, zorder=3 if listed else 2)
+    ax[1].set_xticks(ons)
+    ax[1].set_xlim(3.4, 16.6)
+    ax[1].set_xlabel("onset block of the late patch", fontsize=6.5, labelpad=1)
+    ax[1].set_ylabel("answers moved (E-argmax)", fontsize=7, labelpad=1)
+    # (c) natural passages
+    PSG9 = ((-0.27, "OptaKeyZero", LIST9, LIST9, "o"), (-0.09, "OptaKeyOn", LIST9, "white", "o"),
+            (0.09, "NomValueZero", FREE9, FREE9, "s"), (0.27, "NomValueOn", FREE9, "white", "s"))
+    for j, k in enumerate(S9P.MODELS_A):
+        for dx, w, col, mfc, mk in PSG9:
+            y, lo, hi = (_m9(f"NpPsg{w}{K8[k]}{s_}") for s_ in ("", "Lo", "Hi"))
+            ax[2].plot([j + dx, j + dx], [lo, hi], color=col, lw=0.8, solid_capstyle="butt", zorder=2)
+            ax[2].plot(j + dx, y, mk, ms=3.0, color=col, mfc=mfc, mew=0.7, zorder=3)
+    ax[2].set_xticks(range(len(S9P.MODELS_A)))
+    ax[2].set_xticklabels([{"qwen7": "Qwen", "mistral7": "Mistral", "llama8": "Llama", "gemma9": "Gemma"}[k] for k in S9P.MODELS_A], fontsize=6)
+    ax[2].tick_params(axis="x", length=0, pad=2)
+    ax[2].set_xlim(-0.5, len(S9P.MODELS_A) - 0.5)
+    ax[2].set_ylabel("passages moved to S", fontsize=7, labelpad=1)
+    hs = [matplotlib.lines.Line2D([], [], ls="none", marker=mk, ms=3.0, color=col, mfc=mfc, mew=0.7) for _, _, col, mfc, mk in PSG9]
+    ax[2].set_xlabel("dark: options after; brown: free form", fontsize=6, labelpad=1)
+    ax[2].legend(hs, ["key, from 0", "key, from 0.3 L", "value, from 0", "value, from 0.3 L"], frameon=False, fontsize=5.6, ncol=2,
+                 loc="upper center", bbox_to_anchor=(0.5, -0.2), handletextpad=0.15, borderaxespad=0.0, columnspacing=0.8, labelspacing=0.15)
+    # (d) dose curves at block 3: psi_K under options after (solid), psi_V without a mention (dashed)
+    al = [0, 0.5, 0.8, 1.0]
+    ax[3].plot([0, 1], [0, 1], color=INK2, lw=0.6, ls=(0, (1, 1.5)), zorder=1)
+    for k in MC9:
+        c, mk = COL9[k], MK9[k]
+        yk = [0.0, _m9(f"NpPsiKOptThreeFifty{K8[k]}"), _m9(f"NpPsiKOptThreeEighty{K8[k]}"), 1.0]
+        yv = [0.0, _m9(f"NpPsiVNoneThreeFifty{K8[k]}"), _m9(f"NpPsiVNoneThreeEighty{K8[k]}"), 1.0]
+        ax[3].plot(al, yk, color=c, lw=1.0, marker=mk, ms=3.0, mew=0.7, zorder=3)
+        ax[3].plot(al, yv, color=c, lw=0.8, ls=LS9["NONE"], marker=mk, ms=2.4, mew=0.6, zorder=2)
+    ax[3].set_xticks(al)
+    ax[3].set_xticklabels(["0", "0.5", "0.8", "1"])
+    ax[3].set_xlabel(r"$\alpha$ (share of natural $\Delta$)", fontsize=6, labelpad=1)
+    ax[3].set_ylabel(r"$\psi_K$ (solid), $\psi_V$ (dashed)", fontsize=7, labelpad=1)
+    ax[3].text(0.97, 0.05, "block 3", transform=ax[3].transAxes, fontsize=5.8, color=INK2, ha="right", va="bottom")
+    for j, a_ in enumerate(ax):
+        a_.set_ylim(-0.04, 1.06)
+        a_.set_yticks([0, 0.5, 1])
+        a_.set_yticklabels(["0", "0.5", "1"])
+        a_.tick_params(labelsize=6, pad=1.5)
+        a_.grid(axis="y", color=GRID, lw=0.6, zorder=0)
+        a_.text(-0.03, 1.02, "(" + "abcd"[j] + ")", transform=a_.transAxes, fontsize=8, fontweight="bold", color=INK, ha="right", va="bottom")
+    # one key for (b) and (d), above them: the models, then the formats
+    hs = [matplotlib.lines.Line2D([], [], color=COL9[k], marker=MK9[k], ms=3.0, lw=1.0) for k in MC9]
+    hs += [matplotlib.lines.Line2D([], [], color=INK2, lw=1.0, marker="o", ms=2.6), matplotlib.lines.Line2D([], [], color=INK2, lw=1.0, marker="o", ms=2.6, mfc="white", mew=0.7),
+           matplotlib.lines.Line2D([], [], color=INK2, lw=0.8, ls=LS9["NONE"]), matplotlib.lines.Line2D([], [], color=INK2, lw=0.8, ls=LS9["POST"])]
+    kw = dict(frameon=False, fontsize=6, handletextpad=0.3, columnspacing=0.8, handlelength=1.8, borderaxespad=0.1)
+    fig.legend(hs[:3], [SH9[k] for k in MC9], ncol=3, loc="upper right", bbox_to_anchor=(0.515, 1.0), **kw)
+    fig.legend(hs[3:], ["options after", "letters after", "no mention", "sentence after"], ncol=4, loc="upper right", bbox_to_anchor=(0.998, 1.0), **kw)
+    fig.savefig(FIG / "fig_window_pre.pdf", metadata=MD8META)
+    plt.close(fig)
+
+
+window_pre_figure()
+# the S9P block's own checks: every new macro is in group S9P, every earlier macro keeps its value
+assert all(r[0] == G9P for r in REG[N_PRE9:]), sorted({r[0] for r in REG[N_PRE9:]})
+assert all(macros[n] == v for n, v in PRE9.items()), [n for n, v in PRE9.items() if macros[n] != v][:5]
+assert all(re.fullmatch(r"Np[A-Za-z]+", r[1]) for r in REG[N_PRE9:])
+print(f"stage 9 (pre): {len(REG) - N_PRE9} new S9P macros ({sum(1 for r in REG[N_PRE9:] if 'recomputed' in r[3])} recomputed, "
+      f"{sum(1 for r in REG[N_PRE9:] if r[1] in SRCLINE)} printed strings, {sum(1 for r in REG[N_PRE9:] if 'selects a printed string' in r[3])} ranges selecting printed strings, "
+      f"{sum(1 for r in REG[N_PRE9:] if 'arithmetic' in r[3])} arithmetic) "
+      f"in {_time9.time() - _t9:.0f} s; fig_window_pre.pdf, draft caption: {CAPTION_WINDOW_PRE}")
+
+
 # ---------------------------------------------------------------- checks
 # (1) every score-file macro still equals its line at the printed precision
 for name, (tag, idx, s) in SRCLINE.items():
@@ -5194,7 +5572,7 @@ print(f"v3: {len(REG)} new macros ({sum(1 for r in REG if 'recomputed' in r[3])}
 # (5) stage 8: every macro defined before stage 8 keeps its value (every stage-8 score-file macro equals its line: (1));
 # the new macros by group
 assert all(macros[n] == v for n, v in PRE8.items()), [n for n, v in PRE8.items() if macros[n] != v][:5]
-_s8 = REG[N_PRE8:]
+_s8 = REG[N_PRE8:N_PRE9]   # the stage-9 pre-analyses (group S9P) follow the stage-8 macros
 assert all(r[0] in (G8A, G8B, G8C, G8D, G8X) for r in _s8)
 _s8n = {r[1] for r in _s8}
 print(f"stage 8: {len(_s8)} new macros (" + ", ".join(f"{g} {sum(1 for r in _s8 if r[0] == g)}" for g in (G8A, G8B, G8C, G8D, G8X)) +
@@ -5215,7 +5593,7 @@ if os.environ.get("MACRO_INDEX"):
            f"{len(REG)} new macros. Group = section of docs/V3_PLAN.md. Value = as in numbers.tex. "
            "'[recomputed]' = not printed by a scorer: label exploratory or post hoc in the paper.", ""]
     if len(REG) > N_PRE8:
-        out += [f"Stage 8 (preregistration J; {len(REG) - N_PRE8} of the macros) has groups by part instead: S8A = part A (natural passages), "
+        out += [f"Stage 8 (preregistration J; {N_PRE9 - N_PRE8} of the macros) has groups by part instead: S8A = part A (natural passages), "
                 "S8B = part B (fresh samples, the emitted-form score), S8C = part C (independently obtained identity edits, the channel-ratio "
                 "law), S8D = part D (the flag), S8X = counts across parts (...ABD: parts A, B and D, as registered before part C; ...ABCD: the "
                 "entry in total). Names: J + part (Ja, Jb, Jc, Jd, Jx) + statistic + format or arm + model tag; "
@@ -5224,6 +5602,12 @@ if os.environ.get("MACRO_INDEX"):
                 "Negative values are in math mode. '[arithmetic on printed values]' = a count or sum of printed values; a name ending "
                 "in Min or Max selects a printed string. A value of -0.000 (or -0.0) is the scorer's printed string, kept verbatim; it is "
                 "marked NEGATIVE ZERO below: in running text quote its interval or range instead.", ""]
+    if len(REG) > N_PRE9:
+        out += [f"Stage 9, zero-GPU pre-analyses (group S9P; {len(REG) - N_PRE9} of the macros; docs/stage9/SPEC.md section 15): post hoc "
+                "re-analyses of committed stage-5 to stage-8 results by analysis/stage9_pre.py, made before the stage-9 GPU run; label every "
+                "one post hoc. Names: Np + statistic + format + block or onset word + model tag; ...Lo and ...Hi are 95 % bounds. A name "
+                "ending in Min or Max selects a registered value (its description names which). Values that round to zero are unsigned; "
+                "the few negative values (lower bounds) are in math mode.", ""]
     if only:
         out += [f"Generated with MACRO_INDEX_GROUPS={','.join(only)}: groups {', '.join(only)} are listed in full; the others are only counted "
                 "(unset MACRO_INDEX_GROUPS to list every group).", ""]

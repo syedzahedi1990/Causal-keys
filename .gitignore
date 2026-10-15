@@ -11,3 +11,6 @@ gpu_stage8*_results.tgz
 gpu_stage8*_test_results.tgz
 paper/main.log
 paper/main.blg
+results/gpu_stage9_test/
+gpu_stage9_results.tgz
+gpu_stage9_test_results.tgz

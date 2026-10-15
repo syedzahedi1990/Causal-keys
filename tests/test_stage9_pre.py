@@ -4,18 +4,19 @@ printed precision, and so are the in-hand analogues of section 2 that the same r
 asserted to occur in the note (or, for the extra values that SPEC 15.2 lists, in the spec), so a later edit of either file
 is caught. The pure helpers (the l_c bracket, the dose curve, the printed-line parsers) are tested on hand cases.
 
-This file is one of the FP32 gates of scripts/gpu_stage9.sh and is frozen with the note, so the few note values that a
-correction of the note may legitimately change are matched by value, not by string (``printed``: the printed number
-reproduces the statistic at its own precision, either way at an exact tie): row 4's E4b flips at Mistral (39/40 and 1/40)
-and P2's brackets (4/32 and 12/32), and the two numbers the note computed from already-rounded values, which are accepted
-in that form or as recomputed (section 1 row 5's Spearman difference: 0.862 - 0.855 = 0.007 of the printed values, 0.0076
-unrounded, printed 0.008; and section 2's one non-reproducing analogue, P5b's tau(3) at Mistral: 0.56 / 0.99 = 0.57 of the
-printed values, 0.563 unrounded, printed 0.56). The recomputed values themselves are pinned exactly. paper/numbers.tex is
-checked by tests/test_paper_s9p.py (not a gate: the paper's macros may be regenerated after the freeze). No model is
+This file is one of the FP32 gates of scripts/gpu_stage9.sh and is frozen with the note. The note rounds every number
+half up from the recomputed value (its section 1 says so once), so the values at an exact tie are matched by that rule
+(``printed``: the printed number is the value rounded half up at the printed precision): row 4's E4b flips at Mistral
+(39/40 and 1/40: 0.98 and 0.03) and P2's brackets (4/32 and 12/32: 0.13 and 0.38). The two numbers that differ from a
+difference or ratio of other printed values are the recomputed ones (section 1 row 5's Spearman difference: 0.0076
+unrounded, printed 0.008, while 0.862 - 0.855 = 0.007; section 2's P5b tau(3) at Mistral: 0.563 unrounded, printed 0.56,
+while 0.56 / 0.99 = 0.57). The recomputed values themselves are pinned exactly. paper/numbers.tex is checked by
+tests/test_paper_s9p.py (not a gate: the paper's macros may be regenerated after the freeze; they format the binary float,
+which differs from half up only at an exact tie: \\NpEditFlipEfourbNoneMistralSeven prints 0.97 for 39/40). No model is
 loaded; the module fixture reads the results once (about 30 s)."""
 import re
 import sys
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
 import numpy as np
@@ -60,10 +61,16 @@ def num(s):
     return Decimal(s.replace("\u2212", "-"))
 
 
+def half_up(x, d):
+    """x rounded half up to d decimals (the note's rule); x is first rounded to 12 decimals, so a value at an exact tie
+    that the binary float holds just below it (39/40 = 0.97499...) counts as the tie."""
+    return str(Decimal(f"{x:.12f}").quantize(Decimal(1).scaleb(-d), rounding=ROUND_HALF_UP))
+
+
 def printed(s, x):
-    """the printed number s reproduces x at its own precision (either rounding convention at an exact tie)."""
+    """the printed number s is x rounded half up at the precision s is printed with."""
     d = -num(s).as_tuple().exponent
-    return abs(float(num(s)) - x) <= 0.5 * 10 ** -d + 1e-9
+    return num(s) == Decimal(half_up(x, d))
 
 
 def grab(pattern, where):
@@ -197,13 +204,12 @@ def test_row4_edit_transfer(A):
     in_note("E1 flips NONE 1.00 vs P1 0.35 (Mistral), 0.95 (Qwen), 0.65 (Llama)", r4)
     assert all(f2(m[k]["flip"]["E1"]["NONE"][0]) == "1.00" for k in m)
     assert tuple(f2(m[k]["flip"]["E1"]["P1"][0]) for k in ("mistral7", "qwen7", "llama8")) == ("0.35", "0.95", "0.65")
-    # the Mistral pair are exact ties at 2 decimals (39/40 and 1/40): matched by value, so 0.97 / 0.03, 0.98 / 0.03 and
-    # 0.975 / 0.025 all pass
+    # the Mistral pair are exact ties at 2 decimals (39/40 and 1/40): half up, 0.98 / 0.03
     g = grab(r"E4b (\d\.\d+) vs (\d\.\d+) \(Mistral\), (\d\.\d+) vs (\d\.\d+) \(Qwen\)", r4)
     e4b = [m[k]["flip"]["E4b"][f][0] for k in ("mistral7", "qwen7") for f in ("NONE", "P1")]
     assert all(printed(s, x) for s, x in zip(g, e4b)), (g, e4b)
     assert e4b == pytest.approx([39 / 40, 1 / 40, 79 / 80, 1 / 4], abs=1e-12)
-    assert (f2(e4b[2]), f2(e4b[3])) == ("0.99", "0.25")
+    assert g == ("0.98", "0.03", "0.99", "0.25")
     assert all(m[k]["n"] == 40 and m[k]["layer"] == 7 for k in m)
     in_note("At Mistral 99-100 % of the P1 failures are B", r4)
     fb = [m["mistral7"]["fail_b"][z][0] for z in ("nat", "E1", "E4b")]
@@ -246,11 +252,11 @@ def test_row5_lambda_law(A):
     L, r5 = A["law"], row(5)
     in_note("λ ranks: calibrated curve Spearman 0.862, log proj_k alone 0.855 (difference ", r5)
     assert (f3(L["rho_curve"]), f3(L["rho_logpk"])) == ("0.862", "0.855")
-    # the unrounded difference is 0.0076 (printed 0.008, = \NpLawRhoDiff); the note may print it so or as the difference of
-    # the two printed values, 0.862 - 0.855 = 0.007
+    # the unrounded difference is 0.0076 (printed 0.008, = \NpLawRhoDiff), not the difference of the two printed values
+    # (0.862 - 0.855 = 0.007)
     assert f3(L["diff"]) == "0.008" and f3(round(L["rho_curve"], 3) - round(L["rho_logpk"], 3)) == "0.007"
     d, lo, hi = grab(r"\(difference\D*?(\d\.\d+)[^,\[]*, 95 % \[([−-]?\d\.\d+), ([−-]?\d\.\d+)\]\)", r5)
-    assert printed(d, L["diff"]) or d == f3(round(L["rho_curve"], 3) - round(L["rho_logpk"], 3)), d
+    assert printed(d, L["diff"]) and d == "0.008", d
     assert printed(lo, L["diff_lo"]) and printed(hi, L["diff_hi"]), (lo, hi)
     assert (f3(L["diff_lo"]), f3(L["diff_hi"])) == ("-0.060", "0.090")
     s152 = " ".join(S152.split())
@@ -308,8 +314,7 @@ def test_item8_one_token_copy(A):
 def test_section2_analogues(A):
     oc, fg = A["onset_curves"], A["format_gap"]
     pr = " ".join(PRED.split())
-    # the brackets are exact fractions of L (4/32 = 0.125 and 12/32 = 0.375 are ties at 2 decimals): matched by value, so
-    # (0.13, 0.25] and (0.125, 0.25] both pass
+    # the brackets are exact fractions of L (4/32 = 0.125 and 12/32 = 0.375 are ties at 2 decimals): half up, 0.13 and 0.38
     g = grab(r"P1 brackets \(2\): Mistral \((\d\.\d+), (\d\.\d+)\] L, Llama \((\d\.\d+), (\d\.\d+)\] L, Qwen \((\d\.\d+), (\d\.\d+)\] L", pr)
     fr = [oc[k]["lc"]["P1"][e] / oc[k]["L"] for k in ("mistral7", "llama8", "qwen7") for e in ("lo", "hi")]
     assert all(printed(s, x) for s, x in zip(g, fr)), (g, fr)
@@ -330,18 +335,17 @@ def test_section2_analogues(A):
 
 
 def test_section2_tau_pinned(A):
-    """The one section-2 analogue that the note computed from rounded values: P5b's tau(3) of E4b at Mistral is 0.563
-    (P1 0.556, NONE 0.988; printed 0.56 = \\NpTauEfourbThreeMistralSeven), while the ratio of the printed flips 0.56 / 0.99 is
-    0.57. The note may print either; the recomputed values are pinned (Qwen's 0.59 reproduces). The other number computed
-    from rounded values, section 1 row 5's Spearman difference, is pinned in test_row5_lambda_law."""
+    """P5b's tau(3) of E4b at Mistral is 0.563 (P1 0.556, NONE 0.988; printed 0.56 = \\NpTauEfourbThreeMistralSeven), not
+    the ratio of the rounded flips (0.56 / 0.99 = 0.57); the recomputed values are pinned (Qwen's 0.59 reproduces). The
+    other number that differs from a computation on printed values, section 1 row 5's Spearman difference, is pinned in
+    test_row5_lambda_law."""
     pr = " ".join(PRED.split())
     tq, tm = grab(r"P1: τ\(3\) (\d\.\d+) / (\d\.\d+) \(E-argmax\)", pr)
     oc = A["onset_curves"]
     q, m = oc["qwen7"]["tau_e4b_3"], oc["mistral7"]["tau_e4b_3"]
     assert (q["P1"], q["NONE"], m["P1"], m["NONE"]) == pytest.approx((19 / 32, 1.0, 89 / 160, 79 / 80), abs=1e-12)
     assert (f2(q["tau"]), f2(m["tau"])) == ("0.59", "0.56") and f2(round(m["P1"], 2) / round(m["NONE"], 2)) == "0.57"
-    assert printed(tq, q["tau"]), tq
-    assert printed(tm, m["tau"]) or tm == f2(round(m["P1"], 2) / round(m["NONE"], 2)), tm
+    assert printed(tq, q["tau"]) and printed(tm, m["tau"]) and (tq, tm) == ("0.59", "0.56"), (tq, tm)
     assert "tau_e4b_3" not in oc["llama8"]   # no stored DAS basis at Llama
 
 
@@ -381,9 +385,11 @@ def test_parsers_on_hand_lines():
 
 
 def test_printed_helper():
-    """the note-matching helper: a printed number reproduces a value at its own precision, either way at an exact tie."""
-    assert printed("0.97", 39 / 40) and printed("0.98", 39 / 40) and printed("0.975", 39 / 40) and printed("0.03", 1 / 40)
-    assert printed("0.13", 4 / 32) and printed("0.12", 4 / 32) and printed("0.125", 4 / 32)
+    """the note-matching helper: a printed number is the value rounded half up at its own precision (exact ties up, also
+    when the binary float sits just below the tie)."""
+    assert printed("0.98", 39 / 40) and not printed("0.97", 39 / 40) and printed("0.975", 39 / 40) and printed("0.03", 1 / 40)
+    assert printed("0.13", 4 / 32) and not printed("0.12", 4 / 32) and printed("0.125", 4 / 32) and printed("0.38", 12 / 32)
     assert not printed("0.57", 0.5633) and printed("0.56", 0.5633) and not printed("0.007", 0.0076) and printed("0.008", 0.0076)
     assert printed("−0.060", -0.0601) and not printed("0.060", -0.0601) and not printed("0.974", 39 / 40)
+    assert printed("0.11", 0.11249999999999993) and printed("0.113", 0.11249999999999993) and half_up(0.975, 2) == "0.98"
 

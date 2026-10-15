@@ -1,7 +1,9 @@
 """Stage 9, passages arm (docs/stage9/SPEC.md 13.2): FP32 exactness of the window rows of experiments/stage9_passages.py
 at Qwen2.5-0.5B-Instruct on the CPU (1e-4 in log-probabilities, 1e-5 in K/V tables), the 48-token generation against the
-cache-free stepwise reference, the two answer classes on hand cases, the valid E and R sets with the cached study
-tokenizers, and a TEST_MODE subprocess run of check and eval (the keys of SPEC 11.3 and 11.6, resume, the deadline).
+cache-free stepwise reference, the stored clean B run (clean_B, the reference of the BF16 floor) against a plain forward
+of the B prompt, the two answer classes and the containment normaliser (possessives and Unicode punctuation, SPEC 9.3) on
+hand cases, the valid E and R sets with the cached study tokenizers, and a TEST_MODE subprocess run of check and eval
+(the keys of SPEC 11.3 and 11.6, resume, the deadline).
 
 Items: two E items (IDS) with windowed passages (experiments.natural_factorial.window, as in TEST_MODE) from the
 committed SQuAD file; the subprocess run takes the first valid E and R item. Every reference is computed independently
@@ -256,6 +258,13 @@ def test_generation_equals_the_stepwise_reference(qwen, items, fmt):
     ref = greedy_reference(model, tok, torch.tensor([d["ids"]["S"]]), max_new=sp.MAX_NEW, stop=stop)[0]
     assert rec["S_run"]["ids"] == cut(ref, ends)
     assert rec["rows"]["KV@0"]["ids"] == rec["S_run"]["ids"] and rec["rows"]["none"]["ids"] == rec["rows"]["none2"]["ids"]
+    # clean_B (the reference of the BF16 floor): the B prompt's own decision log-probabilities from the capture batch,
+    # equal to a plain forward of the B prompt and, in FP32, to the none row of the scoring batch (1e-4)
+    c, j, T = d["c"]["S"], d["j"], d["T"]
+    l0 = lsm(model, d["ids"]["B"] + c, T - 1 + j)[0]
+    assert set(rec["clean_B"]) == {"lp"} and set(rec["clean_B"]["lp"]) == set(d["dec"])
+    assert close(rec["clean_B"]["lp"], {Y: float(l0[t]) for Y, t in d["dec"].items()}), fmt
+    assert close(rec["clean_B"]["lp"], rec["rows"]["none"]["lp"]), fmt
     if fmt == "LETA":
         st = decided_stop(tok, it, fmt)
         fired = [n for n in rows if rec["rows"][n]["ids"] and st(0, rec["rows"][n]["ids"])]
@@ -294,10 +303,39 @@ IT = {"answer": "Bing Crosby", "S": "Darren Fletcher", "X": "Peyton Manning", "Z
     (" Darrenfletcher", "other", "other"),
     ("", "other", "other"),
     (" none of them", "other", "other"),
+    # SPEC 9.3's normaliser: a possessive and Unicode punctuation never hide a contained answer (strict: the stage-8a rule)
+    (" Bing Crosby's band", "other", "B"),
+    (" Bing Crosby\u2019s band", "other", "B"),
+    (" Darren Fletcher\u2019s", "other", "S"),
+    (" \u201cDarren Fletcher\u201d", "other", "S"),
+    (" \u00abPeyton Manning\u00bb", "other", "X"),
+    (" Peyton Manning\u2014the quarterback", "other", "X"),
+    (" Peyton Manning\u2013Ed McCaffrey", "other", "X"),
+    (" Ed McCaffrey/Bing Crosby", "other", "D"),
+    (" Bing Crosby\u2026", "other", "B"),
+    (" Bing Crosby\u3002", "other", "B"),
+    (" (Ed McCaffrey)", "D", "D"),
+    (" Crosby's", "other", "other"),
+    (" Bing Crosbys", "other", "other"),
 ])
 def test_who_contain_and_who_strict(text, strict, contain):
     assert sp.answers(text, IT, "NOM") == {"who_strict": strict, "who_contain": contain}
     assert sp.who_contain(text, IT, "OPTA") == contain
+
+
+def test_norm9():
+    """The containment normaliser (SPEC 9.3): the stage-8a norm on ASCII text without a possessive, dash or slash; a
+    possessive 's / \u2019s dropped; Unicode punctuation removed; dashes and the slash split words; the same rule for
+    entities, so an entity with a possessive or punctuation of its own still matches its own spelling."""
+    for s in (" The answer is Darren Fletcher.", "**Bing Crosby**", "U.S. Army, 1,000 men", "(an) Ed McCaffrey!", "$5 million",
+              "Joneses' house", "C'est la vie", ""):
+        assert sp.norm9(s) == norm(s), s
+    assert sp.norm9("Bing Crosby's") == sp.norm9("Bing Crosby\u2019s") == sp.norm9("\u201cBing Crosby\u201d") == "bing crosby"
+    assert sp.norm9("Crosby\u2014the singer") == "crosby singer" and sp.norm9("Crosby/Hope") == "crosby hope"
+    assert sp.norm9("Jay-Z") == "jay z" and sp.norm9("1914\u20131918") == sp.norm9("1914-1918") == "1914 1918"
+    assert sp.norm9("Bing Crosbys") == "bing crosbys" and sp.norm9("St. John's Wood") == "st john wood"
+    it = dict(IT, answer="St. John's Wood")
+    assert sp.who_contain(" It is St John\u2019s Wood.", it, "NOM") == "B" == sp.who_contain(" St. John's Wood", it, "NOM")
 
 
 def test_who_contain_ties_and_subwords():
@@ -353,7 +391,8 @@ def test_valid_sets_cached_tokenizer(key, full_items):
 
 
 # --------------------------------------------------------------------------- the TEST_MODE subprocess run
-ITEM_KEYS = {"id", "art", "title", "sub", "D_in", "stratum", "split", "fmt", "nP", "P", "T", "j", "w", "dec", "rows", "S_run"}
+ITEM_KEYS = {"id", "art", "title", "sub", "D_in", "stratum", "split", "fmt", "nP", "P", "T", "j", "w", "dec", "rows", "S_run",
+             "clean_B"}
 ROW_KEYS = {"lp", "mass", "argmax", "text", "ids", "n_tok", "who_strict", "who_contain"}
 PROV_KEYS = {"git_commit", "git_dirty", "freeze_commit", "predictions_sha256", "spec_sha256", "started_utc", "finished_utc",
              "stage9", "arm", "stage", "model", "model_key", "revision", "verified", "dtype", "attn_implementation", "device",
@@ -406,6 +445,8 @@ def test_test_mode_check_eval_resume_and_deadline(tmp_path):
             assert all(set(x) == ROW_KEYS for x in r["rows"].values())
             assert set(r["S_run"]) == {"text", "ids", "n_tok", "who_strict", "who_contain"}
             assert set(r["dec"]) == {"B", "S", "X", "Z", "D"} and r["nP"] == len(r["P"])
+            assert set(r["clean_B"]) == {"lp"} and set(r["clean_B"]["lp"]) == set(r["dec"])
+            assert close(r["clean_B"]["lp"], r["rows"]["none"]["lp"])          # FP32: the floor is rounding only
 
     assert "load" in P["timings"] and P["kept"] == [] and P["carried"] == []
     pieces = [f"{s}/{f}" for s in ("E", "R") for f in ("NOM", "OPTB", "OPTA")]

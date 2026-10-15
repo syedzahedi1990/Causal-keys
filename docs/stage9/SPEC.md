@@ -257,7 +257,7 @@ it is S. `donor(row, l', ch)` for layer l' and channel ch in {k, v}:
 
 | Row | donor = S when | Purpose |
 |---|---|---|
-| `none`, `none2` | never | identity; two copies (first and last row of the batch): the BF16 floor |
+| `none`, `none2` | never | identity; two copies (first and last row of the batch): an in-batch determinism check (the same ids and tables in one forward come out bitwise equal, also in BF16). The BF16 floor is `none` against the clean B run of the same item in another batch shape (`clean_B`, 11.4 and 11.6; 14) |
 | `KV@0` | always | the full patch (= the S run exactly; control "listed answers are sticky") |
 | `late@l` | l' >= l | late window [l, L) |
 | `early@l` | l' < l | early window [0, l) |
@@ -280,8 +280,10 @@ rows by l, `K@0`, `V@0`, the Klate rows by l, the Vlate rows by l, `none2`. Row 
   duck-typed row object with `.donor(l, ch, i)` passed to `ckeys.natural_rows.tables` (passages; `i` the span index,
   ignored). Clamp with `ckeys.clamp.clamp_kv(model, positions, tables, range(L))`.
 - Complementarity (FP32-tested, 13.1): writing S on [0, l) and S on [l, L) by two nested `clamp_kv` contexts equals
-  `KV@0`; `late@0` equals `KV@0`; `early@L` equals `none` equals the clean B run; `early@l` equals the nesting of an S clamp
-  on [0, l) and a B clamp on [l, L). Mixed-depth states are therefore exact table assignments, not broken states.
+  `KV@0`; the window ends are `late@0` = `early@L` = `KV@0` = the clean S run and `early@0` = `late@L` = `none` = the clean
+  B run (by 7.1, `early@l` takes S on [0, l), so `early@L` is the full patch and `early@0` the identity); `early@l` equals
+  the nesting of an S clamp on [0, l) and a B clamp on [l, L). Mixed-depth states are therefore exact table assignments,
+  not broken states.
 
 ## 8. Edit and dose arm
 
@@ -363,7 +365,10 @@ Text: `ckeys.fresh.gen_text(tok, ids, gen)`. Answer:
 - word formats: `ckeys.fresh.parse(text, it.words)` (first candidate named, lower case, plurals allowed) or "other";
 - LETTER: `stage9.parse_letter(text, it)`: s as above; if `s[0] in "ABCDEF"` and (`len(s) == 1` or `not s[1].isalpha()`):
   the word `it.words[it.order["ABCDEF".index(s[0])]]`, how "letter"; else `fresh.parse` (how "word" if a candidate is
-  named, else "none", answer "other").
+  named, else "none", answer "other"). Every LETTER row (stories and edits) also stores `word` = `fresh.parse(text,
+  words)` (edits: LOCATIONS), so that a letter answer whose text names another candidate word ("A drawer", option A not
+  the drawer) can be counted: the scorer prints, per model and cell, the letter answers whose `word` is neither "other"
+  nor the letter's word (14, CONTROLS), a sensitivity count; the answer stays parse_letter's.
 
 ### 9.3 Passages: decision tokens and generation
 
@@ -376,10 +381,19 @@ Text: `ckeys.fresh.gen_text(tok, ids, gen)`. Answer:
 - Two answer classes per row (stored by builder b):
   - `who_strict` = `ckeys.natural_formats.answer_of(text, it, fmt)` (normalised first line equals the entity or starts
     with it followed by a space; LETA: `letter_of`);
-  - `who_contain` (entity formats): with g = `norm(first line)` and e_Y = `norm(entity Y)` for Y in (B, S, X, Z, D), the
-    entities whose e_Y occurs in g as a whole-word substring (`re.search(r"(?<!\S)" + re.escape(e_Y) + r"(?!\S)", g)`);
+  - `who_contain` (entity formats): with g = `norm9(first line)` and e_Y = `norm9(entity Y)` for Y in (B, S, X, Z, D),
+    the entities whose e_Y occurs in g as a whole-word substring (`re.search(r"(?<!\S)" + re.escape(e_Y) + r"(?!\S)", g)`);
     the one with the smallest start index; ties to the longer e_Y; none -> "other". LETA: equal to `who_strict`.
-  - **Primary is containment**; strict is the sensitivity analysis (both printed by the scorer).
+  - `norm9` (`experiments.stage9_passages.norm9`, the frozen containment normaliser) is `ckeys.natural_formats.norm`
+    extended so that punctuation never hides a contained answer: lower case; a possessive `'s`, `’s` or `ʼs` at the end
+    of a word dropped ("Crosby's" -> "crosby"; a contraction such as "it's" alike); dashes (Unicode category Pd) and the
+    slash replaced by a space ("Crosby—who"); every other punctuation character removed (Unicode category P*, e.g. curly
+    quotes, guillemets, the ellipsis, the ideographic full stop, and the ASCII symbols of `string.punctuation` that
+    `norm` removes); the articles a, an, the dropped; whitespace collapsed. It is applied to the generated text and to
+    every entity alike (B, S, X, Z, D), so it favours no answer class; on ASCII text without a possessive, dash or slash
+    it equals `norm`.
+  - **Primary is containment**; strict (`answer_of`, the stage-8a `norm` and prefix rule, unchanged) is the sensitivity
+    analysis (both printed by the scorer).
 
 ### 9.4 Competence (per item and format)
 
@@ -456,7 +470,7 @@ wrapper) | `stage9.run_meta()` | the following:
 |---|---|
 | `stage9` | `true` |
 | `arm`, `stage` | "stories" / "passages" / "edits"; "check" / "cal" / "eval" |
-| `git_dirty` | tracked files modified (`git status --porcelain --untracked-files=no` non-empty) |
+| `git_dirty` | tracked files modified in the code directories, the note or the spec (`git status --porcelain --untracked-files=no -- ckeys experiments analysis scripts tests data docs/STAGE9_PREDICTIONS.md docs/stage9/SPEC.md` non-empty; a modified `paper/` or `docs/stage9/S9P_MACROS.md` does not count) |
 | `freeze_commit` | `$STAGE9_FREEZE` (exported by the guard; `null` in TEST_MODE) |
 | `predictions_sha256`, `spec_sha256` | sha256 of `docs/STAGE9_PREDICTIONS.md`, `docs/stage9/SPEC.md` in the working tree |
 | `started_utc`, `finished_utc` | ISO times |
@@ -501,8 +515,10 @@ A failed check is exit 1 and the pipeline does not run that arm for the model. (
    "key": "N9007", "pop": "N9", "idx": 7, "core": {...}, "lex": 1, "order": [6 ints], "sent": int|null,
    "words": [6], "track": {"S", "B", "X", "init"}, "cluster": [lex, base, source],
    "fmt": "AFTER", "p": int, "T": int,
-   "rows": {"<row>": {"E": [6], "L": [6], "gen": str, "ans": word|"other", "how": "word"|"letter"|"none", "n_tok": int}},
-   "clean_S": {"E": [6], "L": [6], "gen": str, "ans": ..., "how": ..., "n_tok": int} } ] }
+   "rows": {"<row>": {"E": [6], "L": [6], "gen": str, "ans": word|"other", "how": "word"|"letter"|"none", "n_tok": int,
+                      "word": word|"other"  (LETTER only: fresh.parse of the same text, 9.2)}},
+   "clean_S": {"E": [6], "L": [6], "gen": str, "ans": ..., "how": ..., "n_tok": int, ["word"]},
+   "clean_B": {"E": [6], "L": [6]} } ] }    (the B prompt's own pass in the capture batch B, S, X: the BF16 floor's reference)
 ```
 Floats rounded to 5 decimals. The file is rewritten atomically after every format; a rerun keeps the formats already in
 an existing file with the same `git_commit`, `revision` and `lb_sha256` (resume by format) and exits 3 if the deadline
@@ -515,11 +531,14 @@ stops it before the last format.
  "cores": [ {"index": i, "core": {...}, "X": loc, "p": int, "iB", "iS", "iX", "iPiS", "iPiX": int, "cluster": [base, source],
    "T_check": {"<l>": max_abs_diff},
    "stats": {"<l>": {"<row>|<t>": {"proj_k", "proj_v", "cos_k", "cos_v", "ratio_k", "ratio_v", "nu", "cos_resid", "ratio_resid"}}},
-   "cells": {"<fmt>@<l>": {"<row>": {"E": [6], "L": [6], "gen": str, "ans": loc|"other", "how": str},
+   "cells": {"<fmt>@<l>": {"<row>": {"E": [6], "L": [6], "gen": str, "ans": loc|"other", "how": str, "n_tok": int,
+                                     "word": loc|"other" (LETTER only, 9.2)},
                            "caa": {"self": {...}, "CAA|S": {...}, "CAA|X": {...}}}} } ] }
 ```
 Row names as in 8.1 including the target suffix (`nat|S`, `J0.5|X`, ...); `self` and `self2` without one. E and L in
-LOCATIONS order (LETTER: letter i = location i). Resume by core (as stage 8c's eval), written every 5 cores; exit 3 at the
+LOCATIONS order (LETTER: letter i = location i). The CAA batch's `self` row is the clean B run of the cell (the B prompt
+unclamped, its CAA vector zero, in a batch of 3): the BF16 floor's reference for the table batch's `self` row (14);
+`self2` against `self` is the in-batch determinism check. Resume by core (as stage 8c's eval), written every 5 cores; exit 3 at the
 deadline.
 
 ### 11.6 `passages/<tag>.json` and `passages/<tag>_LETA.json`
@@ -530,7 +549,8 @@ deadline.
  item: {"id", "art", "title", "sub", "D_in", "stratum", "split", "fmt", "nP", "P", "T", "j", "w", "dec": {Y: id},
         "rows": {"<row>": {"lp": {Y: float}, "mass": float, "argmax": int, "text": str, "ids": [int], "n_tok": int,
                            "who_strict": Y|"other", "who_contain": Y|"other"}},
-        "S_run": {"text", "ids", "n_tok", "who_strict", "who_contain"}} }
+        "S_run": {"text", "ids", "n_tok", "who_strict", "who_contain"},
+        "clean_B": {"lp": {Y: float}}} }   (the B prompt's decision log-probabilities from the capture batch B, S, X, Z + w)
 ```
 Resume by format and split; exit 3 at the deadline.
 
@@ -552,15 +572,21 @@ number printed, keyed by `<arm>/<model>/<statistic>`, each with `pt`, `lo`, `hi`
 `scripts/stage9_common.sh`, whose `s9_init` replaces `s8_init` (which hard-codes parts a-d and the J guard) and sets the
 variables the helpers need (`OUT`, `TGZ`, `PY`, `DEV`, `DTYPE`, `S8_MODELS`, `S8_STATE`, `STAGE8_DEADLINE` exported,
 `KEEP_CACHE`, `FORCE`, `FORCE_STEPS`, `TESTS`, `PART=9`, `PART_UC=9`). `s9_guard` refuses (die, exit 1, logs archived):
-1. a tree with modified tracked files;
+0. results under `OUT` that git tracks (results are never committed between sessions);
+1. a tree with modified tracked files, or untracked (not ignored) files in the code directories (`ckeys experiments
+   analysis scripts tests data`: code a run would import that is not in F);
 2. no commit in the history of HEAD whose subject is exactly `Freeze stage-9 predictions` (the most recent one is F);
 3. `docs/STAGE9_PREDICTIONS.md` or `docs/stage9/SPEC.md` absent at HEAD, or different from their text at F;
 4. code (`ckeys experiments analysis scripts tests data`) that differs between F and HEAD;
-5. transformers other than 5.18.0 (pip install as `s8_init` does), or no CUDA device with >= MINGIB GiB (default 75).
+4b. results files already in `OUT` (an earlier session's: `check`, `lb`, `stories`, `edits`, `passages`) written at a commit
+   other than HEAD (`s9_other_commits`; a later session resumes on the same HEAD, or the scorer would see two commits);
+5. transformers other than 5.18.0 after the pinned install (pip runs only when the version or a needed package differs,
+   as `s8_init`), or no CUDA device with >= MINGIB GiB (default 75).
 It appends to `COMMIT.txt`: "stage-9 predictions frozen at F (commit date); note sha256 ...; spec sha256 ...; HEAD ...",
-and exports `STAGE9_FREEZE=F`, `STAGE9_NOTE_SHA256`, `STAGE9_SPEC_SHA256`. The git checks are a separate function so
-`tests/test_stage9_guard.py` can run them in a temporary clone without CUDA. `s9_finish` = `s8_finish` with the score
-file `STAGE9_SCORE.txt` (sections printed: CHECKS, PREDICTIONS, FALSIFIERS, SUMMARY).
+and exports `STAGE9_FREEZE=F`, `STAGE9_NOTE_SHA256`, `STAGE9_SPEC_SHA256`. The git checks 1-4 are a separate function
+(`s9_git_checks`) so `tests/test_stage9_guard.py` can run them in a temporary clone without CUDA (it also tests checks 0
+and 4b). `s9_finish` = `s8_finish` with the score file `STAGE9_SCORE.txt` (sections printed: CHECKS, PREDICTIONS,
+FALSIFIERS, SUMMARY).
 
 ### 12.2 Steps (`scripts/gpu_stage9.sh`)
 
@@ -589,11 +615,19 @@ Every step: `S8_OUTPUTS=<its file>`, `--model "$dir" --key "$key" --out "$OUT" -
 a model is fixed: the decisive stories first, then edits, then passages. A step exit 3 is "partial" (SKIPPED.txt) and is
 redone in the next session.
 
+The pytest step is the FP32 gate (the seven stage-9 test files above, the scorer's `STAGE9_TESTS`, and the shared-module
+tests). `tests/test_paper_s9p.py` is deliberately not in it: it checks `paper/numbers.tex`, which `paper/make_figures.py`
+may regenerate after the freeze, and a renamed or reformatted macro must not stop a GPU run. It is code under `tests/`,
+so it is frozen with the rest (an edit after the freeze waits until the GPU sessions are done, or the guard refuses the
+next session); `tests/test_stage9_pre.py` is the gate for the pre-analysis numbers (13.5).
+
 ### 12.3 Deadline
 
-`DEADLINE_H` default 4.5. `CORE_MIN` per model (stories + edits + passages, load included): mistral7 60, llama8 55, qwen7
-50; within a model a step's reserve is the minutes of its later steps (stories 12, edits 10, passages 30) plus the later
-models' CORE_MIN plus 10 (score). `LETA_MIN` = 10.
+`DEADLINE_H` default 6.0. `CORE_MIN` per model (fetch, loads, checks, cal, stories, edits and passages; the upper ends of
+section 16's per-step minutes): mistral7 88, llama8 83, qwen7 78; within a model a step's reserve is the minutes of its
+later steps (`ST_MIN` 25 for the stories eval, `ED_MIN` 25 for the edits, `PS_MIN` 30 for the passages) plus the later
+models' CORE_MIN plus 10 (score). `LETA_MIN` = 10. With the expected 4.3-5 h (16) the default leaves the reserves' upper
+ends inside the deadline.
 
 ### 12.4 Options
 
@@ -614,7 +648,11 @@ No guard, no pip; CPU, FP32, `Qwen/Qwen2.5-0.5B-Instruct` (24 blocks) for every 
   [16, hidden] with orthonormal rows; both recorded in provenance as TEST stand-ins (`calib_file`, `das_file`: "TEST");
 - the scorer with `--test` (population sizes and pins, the stage-8a E-set comparison, BF16, sdpa, the freeze and the
   pytest-log checks waived; verdicts are plumbing).
-Expected wall time on a 4-core CPU: under 1 h including the pytest run.
+Measured wall time on an idle 4-core CPU (2026-10-15, the keys qwen7 and llama8): 1 h 51 min in all, of which the pytest
+step 52 min (267 tests at the time) and the steps of the two keys 58 min (about 29 min per key: cal and st about 6 min each, ed about
+12 min, ps about 4 min, LETA about 1 min); the score under a minute. Allow 2-3 h on a slower or busy box; the default
+`DEADLINE_H` (6.0) holds it, and a complete run (no `FAILED.txt`, score exit 0, no PARTIAL in `STAGE9_SCORE.txt`) is the
+check to make before the freeze.
 
 ## 13. Exactness tests (FP32, CPU; Qwen2.5-0.5B-Instruct or tiny random models; 1e-4 log-prob, 1e-5 K/V)
 
@@ -627,13 +665,15 @@ Mistral-7B, the Llama-3.1-8B mirror) carry "cached_tokenizer" in their name and 
    pairs and 20 objects, 53 clusters, lexicon 75/75, sentence counts; E9 satisfies cond_E; N9, E9, C pairwise disjoint;
    N9 and E9 disjoint from U, from X9 and from every stage-8 population taken from the functions the stage-8 steps call
    (`fresh.population`, `edits.populations`, `stage8_flag.populations`, IOI and task lists by type); seeds 9101, 9102 not in
-   the stage-8 pilot seeds nor any stage-8 population seed; `story_onsets` and `passage_onsets` values for L = 24, 28, 32.
+   the stage-8 pilot seeds nor any stage-8 population seed; `story_onsets` and `passage_onsets` values for L = 24, 28, 32;
+   `run_meta`'s `git_dirty` in a temporary repository (true for a modified file in the code directories, the note or the
+   spec; false for a modified `paper/` file or an untracked file).
 2. E9 items: `fresh.raw_prompt(item, f, loc) == encoding.raw_prompt(f, story, query)` for every core, f in EDIT_FORMATS
    and P1, loc in B, S, X.
 3. Every row of `run_item9` (stories, one N9 item of each lexicon, formats NONE, BEFORE, AFTER, LETTER) equals
    `ckeys.surface.score_reference` under a separately built single-row clamp (E and L, 1e-4).
-4. `late@0` = `KV@0` = the clean S run, and `early@L` = `none` = the clean B run (scores 1e-4; the tables captured under
-   the clamp 1e-5); complementarity: S on [0, l) and S on [l, L) by two nested `clamp_kv` contexts equals `KV@0`, and
+4. `late@0` = `early@L` = `KV@0` = the clean S run, and `early@0` = `late@L` = `none` = the clean B run (scores 1e-4; the
+   tables captured under the clamp 1e-5); complementarity: S on [0, l) and S on [l, L) by two nested `clamp_kv` contexts equals `KV@0`, and
    S on [0, l) nested with B on [l, L) equals `early@l`, for l in (2, 12, 22).
 5. The generation batch equals `ckeys.generate.greedy_reference` of each row alone under its own clamp, with the word
    stop and with `letter_stop` (LETTER), 16 tokens.
@@ -646,12 +686,15 @@ Mistral-7B, the Llama-3.1-8B mirror) carry "cached_tokenizer" in their name and 
 ### 13.2 Builder (b): `tests/test_stage9_passages.py`
 
 1. Window rows on windowed passages (NOM, OPTB, OPTA, LETA): each row's teacher-forced decision log-probabilities equal a
-   reference forward under a separately built clamp (1e-4); `late@0` = `KV@0` = the S prompt's own; `early@L` = `none` =
-   the B prompt's own; the nested complementarity of 13.1.4 at span positions.
+   reference forward under a separately built clamp (1e-4); `late@0` = `early@L` = `KV@0` = the S prompt's own;
+   `early@0` = `late@L` = `none` = the B prompt's own; the nested complementarity of 13.1.4 at span positions.
 2. The 48-token generation of the batch equals `greedy_reference` of each row alone under its own clamp; no W + 2 cut in
    NOM (a row continues past W + 2 words); LETA stops at the letter rule.
 3. `who_contain` and `who_strict` on hand cases: entity first; entity after a preamble ("The answer is S."); two entities
-   (earliest wins; tie to the longer); entity as a sub-word (not counted); empty text; LETA letters.
+   (earliest wins; tie to the longer); entity as a sub-word (not counted); empty text; LETA letters; a possessive
+   ("Crosby's", "Crosby’s"), curly quotes, guillemets, a glued em or en dash, a slash, the ellipsis and the ideographic
+   full stop (contained; strict "other"); `norm9` equal to `norm` on ASCII text without a possessive, dash or slash.
+   The stored `clean_B` equals a plain forward of the B prompt and, in FP32, the `none` row (1e-4).
 4. With the cached Qwen2.5-7B tokenizer and SQuAD (skip when absent; name contains "cached_tokenizer"): the valid E set
    at frame " " has 185 items and `sha_ids` = stage 8a's `population_sha256`; the R set is computed and stable.
 
@@ -675,6 +718,9 @@ Mistral-7B, the Llama-3.1-8B mirror) carry "cached_tokenizer" in their name and 
 Synthetic results in the layouts of section 11 with known answers: every prediction's SUPPORTED, AT THE POINT, NOT
 SUPPORTED and NOT EVALUABLE paths; l_c with censoring; l_b recomputation and its mismatch; the "2 of 3" rule; falsifier
 triggers; AUC with ties and the evaluability floor; ψ in nats and in logits; containment primary with strict printed;
+deadline-partial stories, passages and calibration files listed as PARTIAL in CHECKS and SUMMARY with the parts that ran
+evaluable, and a partial edits file NOT EVALUABLE, neither a MISMATCH; the CONTROLS floor against the clean B run, the
+in-batch determinism and the LETTER letter/word conflict counts;
 competence filtering; the bootstrap (two-stage structure, determinism, paired across formats); provenance checks
 (MISMATCH exit 2: two commits, a TEST_ file outside TEST, a population hash, a frames/calib/das sha, a freeze commit or
 note sha differing from COMMIT.txt, an eval that read another lb file); the pytest-log gate (every stage-9 test file in
@@ -686,17 +732,31 @@ pass on a clean frozen clone.
 ### 13.5 Builder (e): `tests/test_stage9_pre.py`
 
 The functions of `analysis/stage9_pre.py` reproduce, at printed precision, every seen-before number in
-`docs/STAGE9_PREDICTIONS.md` section 1 (they read only committed results files).
+`docs/STAGE9_PREDICTIONS.md` section 1 and the in-hand analogues of its section 2 (they read only committed results
+files), rounded half up as the note states (an exact tie such as 39/40 prints 0.98). `tests/test_paper_s9p.py` checks
+that `paper/numbers.tex` carries the S9P values; it is not an FP32 gate (12.2). The S9P macros format the binary float
+(Python's `format`), which differs from half up only at an exact tie: `\NpEditFlipEfourbNoneMistralSeven` prints 0.97
+for 39/40 where the note prints 0.98.
 
 ## 14. The scorer (`analysis/stage9_score.py --results DIR [--test]`)
 
 - CHECKS: provenance (one commit across files; freeze commit and note/spec sha equal to COMMIT.txt's; BF16, sdpa, model
   revisions equal to the manifest's; no TEST_ files outside TEST), population pins and skipped counts (0 expected),
   stage-8 artefact sha256s, the passage E set against stage 8a, l_b recomputed and read in order, the `T_check` maxima,
-  the pytest-log gate. A failed check prints MISMATCH and the scorer exits 2 after writing every output.
+  the pytest-log gate. A failed check prints MISMATCH and the scorer exits 2 after writing every output. A
+  deadline-partial arm is listed as PARTIAL in CHECKS and SUMMARY (and in `stage9_summary.json`, `meta/run/checks`
+  `partial`), never as a MISMATCH: stories formats not run, a calibration left as `lb/<tag>.json.partial`, passage or LETA
+  (split, format) pieces not run (the parts that ran stay evaluable; every statistic that needs a missing part is NOT
+  EVALUABLE), or edits cores not run (the model's whole edits arm NOT EVALUABLE, `partial_whole_arm`).
 - CONTROLS (per model and format): competence share; flip(KV@0) on all items (the "listed answers are sticky" control);
-  the BF16 floor (mean |E(none) − E(none2)| and the answer disagreement rate); E-argmax/generation agreement; the
-  complementarity reminder (FP32-tested; no GPU check).
+  the BF16 floor: the `none` row (edits: `self`) against the clean B run of the same item in another batch shape
+  (stories: `clean_B` of the capture pass; passages: `clean_B` of the capture batch; edits: the CAA batch's `self`
+  row), as the mean |E(none) − E(clean B)| (passages: |lp|, over the decision tokens) and the share of items whose argmax
+  answer differs (E-argmax; passages: the decision-token argmax; edits also the generated answers); the in-batch
+  determinism `none` against `none2` (edits: `self` against `self2`; max |ΔE| and the generated-answer disagreement, 0
+  expected); per LETTER cell (stories: per model; edits: per block) the count of letter answers whose `word` names
+  another candidate (9.2), with the rows that carry them; E-argmax/generation agreement; the complementarity reminder
+  (FP32-tested; no GPU check).
 - PREDICTIONS P1-P5 and POST, DIRECTION B (B1-B3), FALSIFIERS (F1-F3, B-F1, B-F2): exactly as the note defines them,
   with per-model point, interval, verdict, the combined verdict, and the pre-written reading the outcome selects (note,
   section 6).
@@ -742,7 +802,7 @@ word + the model tag of make_figures' `K8` map (e.g. `NpStaleAfterMistralSeven`,
    ratio of mean margin shifts (m = lp_S − lp_B relative to ID) from 0.3 L to from 0: NOM V 0.987-1.000, OPTA K
    0.516/0.014/0.273/0.116; article bootstrap (`analysis.stage8a_parts.common`, seed 20261010).
 4. Edit transfer in generation (`results/gpu_stage8c/explore/<k>.json`, block 7, first 40 E stories): flip per instance
-   under NONE and P1 (Mistral E1 1.00 -> 0.35, E4b 0.97 -> 0.03; Qwen E3 1.00 -> 0.50, E4b 0.99 -> 0.25), the share B
+   under NONE and P1 (Mistral E1 1.00 -> 0.35, E4b 0.98 -> 0.03; Qwen E3 1.00 -> 0.50, E4b 0.99 -> 0.25), the share B
    among P1 failures (Mistral 0.99-1.00 for nat, E1, E4b), and the Spearman correlation of κ/σ against the transfer ratio
    (0.92 over 9 edit x model pairs). Flips are means over the stories of the mean over t in (S, X) of 1[answer = t]. The
    pairs are the (model, instance) of qwen7 and mistral7 among E1, E2, E3, E4a, E4b, E5FR, E5DE, E5SYN, E5NL whose NONE
@@ -773,7 +833,7 @@ word + the model tag of make_figures' `K8` map (e.g. `NpStaleAfterMistralSeven`,
    - λ = Lg(ψ_K) − Lg(ψ_V). The curve predictor is Lg(curve_K(p_k)) − Lg(curve_V(p_v)), O1 = Lg(p_k) − Lg(p_v), and
      the baseline is Lg(p_k).
    The results: Spearman with λ 0.862 (curve) and 0.855 (log proj_k); MAE 0.369 (curve) against 0.868 (O1). The
-   difference in Spearman is 0.007; its 95 % interval from 2,000 unit resamples (units = (model, Z, depth),
+   difference in Spearman (of the unrounded values) is 0.008; its 95 % interval from 2,000 unit resamples (units = (model, Z, depth),
    `numpy.random.default_rng(1)`) is [−0.060, 0.090], with a resample mean of 0.012. The partial rank correlation of the
    curve with λ given log proj_k is 0.53 (ranks residualised on [1, rank(log p_k)]); Spearman(p_k, p_v) is 0.92.
 7. Knockout (`results/gpu_stage5/knockout/<model>_s0.json`, Qwen2.5-7B, Mistral-7B, Qwen2.5-14B): the share of
@@ -801,23 +861,27 @@ MACRO_INDEX_GROUPS=S9P`. Do not edit the paper's .tex sections.
 ## 16. Compute estimate (A100-80GB, BF16)
 
 From stage-8 timings (stage 8b: 40-60 s per 150-item arm with 24 rows; stage 8a: 180-225 s per 185-item format with
-16-token generation; stage 8c: 25-40 min per model for 494 rows per story-cell):
+16-token generation; stage 8c: 25-40 min per model for 494 rows per story-cell) and the builders' own estimates of the
+stage-9 batches (stories 13-21 min per model for N9 in six formats; edits about 25 min per model):
 
-| Step (per model) | Work | Minutes |
-|---|---|---|
-| fetch and verify (prefetched) | ~15 GB | 0-10 |
-| checks | tokenizer only | 1-2 |
-| `cal` (C) | 30 cores x 6 formats x ~45 rows (trie + generation) | 2-3 |
-| `st` (N9) | 150 x 6 x ~45 rows | 8-12 |
-| `ed` (E9) | 80 x 4 formats x ~120 rows (table rows and CAA batches) | 8-12 |
-| `ps` (E + R) | 256 items x 3 formats x 21 rows (48-token generation) | 20-30 |
-| `leta` (optional) | 185 x 21 rows | 6-9 |
-| model load | | 1-2 |
-| **per model** | | **40-65** |
+| Step (per model) | Work | Minutes | Upper end used (mistral7 / llama8 / qwen7) |
+|---|---|---|---|
+| fetch and verify | ~15 GB; the next model is prefetched during the current one's steps | 0-10 | 5 / 0 / 0 (mistral7 runs first: nothing prefetches it) |
+| checks | tokenizer only, three steps | < 1 | 1 / 1 / 1 |
+| model loads | one per GPU step (cal, st, ed, ps) | 1-2 | 2 / 2 / 2 |
+| `cal` (C) | 30 cores x 6 formats x 39-43 rows (trie + generation) | 3-4 | 4 / 4 / 3 |
+| `st` (N9) | 150 x 6 x 39-43 rows | 13-21 | 21 / 21 / 17 (28 blocks: 39 rows) |
+| `ed` (E9) | 80 x 4 formats x ~120 rows (table rows and CAA batches) | 20-25 | 25 / 25 / 25 |
+| `ps` (E + R) | 256 items x 3 formats x 21 rows (48-token generation) | 20-30 | 30 / 30 / 30 |
+| **CORE_MIN** (12.3) | | | **88 / 83 / 78** |
+| `leta` (optional) | 185 x 21 rows | 6-9 | `LETA_MIN` 10 |
 
-Three models: 2.0-3.3 GPU-hours, plus pytest (~10 min) and the scorer (~5 min): about **3-4 A100-hours**, within the
-target of about 4 (DEADLINE_H default 4.5). Memory: at most ~48 rows x ~560 tokens per trie forward (stories), ~21 rows x
-~830 tokens per passage forward: under 12 GB beyond the weights. Disk: >= 50 GB (one model at a time plus a prefetch).
+The step reserves of 12.3 are the upper ends (`ST_MIN` 25 >= 21, `ED_MIN` 25, `PS_MIN` 30). Expected wall time on one
+A100-80GB: about **4.3-5 h** (the pytest step 15-30 min on the box's CPU, 52 min on an idle 4-core CPU; about 70-80 min
+per model at the middle of the ranges; the three LETA steps about 25 min; the score 5-10 min). The upper ends sum to
+about 5.3 h, inside the 6.0 h default deadline (`DEADLINE_H`). Memory: at most ~48 rows x ~560 tokens per trie forward
+(stories), ~21 rows x ~830 tokens per passage forward: under 12 GB beyond the weights. Disk: >= 50 GB (one model at a
+time plus a prefetch).
 
 ## 17. Decisions fixed here, and what is not built
 
@@ -829,7 +893,8 @@ target of about 4 (DEADLINE_H default 4.5). Memory: at most ~48 rows x ~560 toke
    window is not left to recompute above l.
 5. Containment is the primary passage answer rule, strict the sensitivity (the 48-token generation is meant to catch
    verbose correct answers that the stage-8a W + 2 cut ended early; at the stage-8a cut, strict NOM competence was 45 of
-   185 items at Mistral).
+   185 items at Mistral). Its normaliser `norm9` (9.3) drops possessives and Unicode punctuation for every entity alike,
+   so a verbose answer ("Crosby's band", "“Crosby”", "Crosby—who") is not lost to "other"; strict keeps the stage-8a rule.
 6. Primary populations are the items competent in the format (section 9.4); all-items versions are exploratory.
 7. Dose rows only at blocks 3 and 7 (Direction B's GPU part); nat, E1, CAA and E4b at all four blocks.
 8. E4b = the stored seed-102 bases; no retraining; Llama has none.

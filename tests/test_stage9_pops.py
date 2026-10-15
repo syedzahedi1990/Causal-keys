@@ -191,3 +191,38 @@ def test_artefact_pins_on_disk():
     for p, h in stage9.ARTEFACT_SHA256.items():
         if (stage9.ROOT / p).exists():
             assert stage9.file_sha(stage9.ROOT / p) == h, p
+
+
+def test_run_meta_dirty_reads_only_the_code_note_and_spec(tmp_path, monkeypatch):
+    """run_meta's git_dirty (SPEC 11.1): tracked files modified in the code directories, the prediction note or the spec
+    directory make it true; a modified tracked file elsewhere (paper/) does not; untracked files never do. Run in a
+    temporary repository (stage9.ROOT pointed at it); TEST_MODE gives freeze_commit None."""
+    import os
+    import subprocess
+
+    def git(*args):
+        env = dict(os.environ, GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="none", GIT_COMMITTER_NAME="t",
+                   GIT_COMMITTER_EMAIL="none", GIT_CONFIG_GLOBAL="/dev/null", GIT_CONFIG_SYSTEM="/dev/null")
+        subprocess.run(["git", *args], cwd=tmp_path, check=True, capture_output=True, env=env)
+
+    files = ["ckeys/x.py", "experiments/x.py", "analysis/x.py", "scripts/x.sh", "tests/x.py", "data/x.json",
+             stage9.NOTE, stage9.SPEC, "docs/other.md", "paper/main.tex", "README.md"]
+    for f in files:
+        (tmp_path / f).parent.mkdir(parents=True, exist_ok=True)
+        (tmp_path / f).write_text("0\n")
+    git("init", "-q")
+    git("add", "-A")
+    git("commit", "-q", "-m", "init")
+    monkeypatch.setattr(stage9, "ROOT", tmp_path)
+    assert stage9.run_meta(True)["git_dirty"] is False
+    for f in ("paper/main.tex", "docs/other.md", "README.md"):
+        (tmp_path / f).write_text("1\n")
+    (tmp_path / "ckeys" / "new.py").write_text("untracked\n")
+    m = stage9.run_meta(True)
+    assert m["git_dirty"] is False and m["freeze_commit"] is None and len(m["git_commit"]) == 40
+    assert m["predictions_sha256"] == stage9.file_sha(tmp_path / stage9.NOTE)
+    for f in files[:8]:
+        (tmp_path / f).write_text("1\n")
+        assert stage9.run_meta(True)["git_dirty"] is True, f
+        git("checkout", "--", f)
+    assert stage9.run_meta(True)["git_dirty"] is False

@@ -5,8 +5,10 @@ the AUC with ties and its evaluability floor; psi in nats and in logits; contain
 competence filtering; the bootstrap (two-stage structure, determinism, paired across formats); the provenance checks
 (MISMATCH, exit 2: two commits, a TEST_ file outside TEST, a population hash, a frames / calib / das sha256, a freeze
 commit or note sha256 differing from COMMIT.txt, an eval that read another lb file, a row grid other than SPEC 7.1 / 8.1);
-a deadline-partial edits file (NOT EVALUABLE, no MISMATCH); the pytest-log gate; a missing model; the per-model P2 entry
-(the stories part; P2p counts 2 of 3); the main reading withheld when a falsifier part cannot be read.
+a deadline-partial edits file (NOT EVALUABLE, no MISMATCH) and deadline-partial stories, passages and calibration files
+(listed as PARTIAL, the parts that ran evaluable); the CONTROLS floor against the clean B run, the in-batch determinism
+and the LETTER letter/word conflict counts; the pytest-log gate; a missing model; the per-model P2 entry (the stories
+part; P2p counts 2 of 3); the main reading withheld when a falsifier part cannot be read.
 
 The generator writes, per model, item records whose generated answers are fixed by a scenario: for each (format, row) a
 share r of the competent items answers S (edits: the target t), a share o "other", the rest B, assigned by a fixed rank of
@@ -231,8 +233,10 @@ def story_file(key, pop_items, pop, scen_d, test, L, fmts=s9.STORY_FORMATS, comp
                 e = lp6(W, a, pB, iS, iB, iX)
                 rr[row] = {"E": e, "L": e, "gen": " " + word, "ans": word, "how": "word" if a != "other" else "none", "n_tok": 2}
             e = lp6(W, "S", 0.99, iS, iB, iX)
+            cb = [x + 0.001 for x in rr["none"]["E"]]          # the clean B run: the BF16 floor is 0.001 in every entry
             recs.append({**m, "pop": pop, "idx": i, "fmt": fmt, "p": 40, "T": 90, "rows": rr,
-                         "clean_S": {"E": e, "L": e, "gen": " " + tr["S"], "ans": tr["S"], "how": "word", "n_tok": 2}})
+                         "clean_S": {"E": e, "L": e, "gen": " " + tr["S"], "ans": tr["S"], "how": "word", "n_tok": 2},
+                         "clean_B": {"E": cb, "L": cb}})
     return recs, rows
 
 
@@ -348,7 +352,8 @@ def passage_file(key, scen, n_e, n_r):
                              "stratum": "x", "split": split, "fmt": fmt, "nP": 2, "P": [50, 51], "T": 300, "j": 1, "w": [3],
                              "dec": {y: 1 for y in ("B", "S", "X", "Z", "D")}, "rows": rr,
                              "S_run": {"text": "S", "ids": [1], "n_tok": 1, "who_strict": "other" if scen.strict_other else "S",
-                                       "who_contain": "S"}})
+                                       "who_contain": "S"},
+                             "clean_B": {"lp": {y: v + 0.002 for y, v in rr["none"]["lp"].items()}}})
             fm[fmt] = recs
         splits[split] = fm
     return {"rows": rows, "frame": " ", "splits": splits}
@@ -856,6 +861,97 @@ def test_run_level_mismatch_makes_every_verdict_not_evaluable(full_run, tmp_path
     assert all(verdict(J, c) == ST.NE for c in ALL_LINES)
 
 
+def test_partial_stories_passages_and_cal_are_listed(full_run, tmp_path):
+    """A deadline-partial stories file (formats not run), passages file (pieces not run) and calibration (only
+    lb/<tag>.json.partial) are listed as PARTIAL in CHECKS, in SUMMARY and in meta/run/checks "partial", are not a
+    MISMATCH (exit 0), and leave the parts that ran evaluable: only the statistics that need a missing part are NOT
+    EVALUABLE."""
+    def apply(r):
+        def drop_post(J):
+            J["items"] = [x for x in J["items"] if x["fmt"] != "POST"]
+            J["provenance"].update(formats_not_run=["POST"], formats_done=[f for f in s9.STORY_FORMATS if f != "POST"])
+        edit_json(r / "stories" / "llama8.json", drop_post)
+
+        def drop_r_opta(J):
+            del J["splits"]["R"]["OPTA"]
+            J["provenance"].update(formats_not_run=["R/OPTA"], complete=False)
+        edit_json(r / "passages" / "qwen7.json", drop_r_opta)
+        lb = json.loads((r / "lb" / "mistral7.json").read_text())
+        lb["provenance"]["formats_done"] = ["NONE", "BEFORE"]
+        (r / "lb" / "mistral7.json.partial").write_text(json.dumps(lb))
+        (r / "lb" / "mistral7.json").unlink()
+        (r / "stories" / "mistral7.json").unlink()                 # the eval waits for the lb file
+    root = mutate(full_run, tmp_path / "r", apply)
+    rc, text, J = score(root, test=False)
+    assert rc == 0 and "checks: OK" in text and J["meta/run/checks"]["mismatch"] is False, text[-3000:]
+    assert J["meta/run/checks"]["partial"] == ["llama8/stories", "mistral7/stories", "qwen7/passages"]
+    assert J["meta/run/checks"]["partial_whole_arm"] == []
+    checks = text[text.index("#### CHECKS"):text.index("#### CONTROLS")]
+    summ = text[text.index("#### SUMMARY"):]
+    assert "PARTIAL llama8 stories: stories/llama8.json: incomplete at the deadline: formats ['POST'] not run" in checks
+    assert "PARTIAL qwen7 passages: passages/qwen7.json: incomplete at the deadline: pieces ['R/OPTA'] not run" in checks
+    assert "PARTIAL mistral7 stories: lb/mistral7.json.partial: the calibration (cal) is incomplete" in checks
+    assert "the statistics that need the parts not run are NOT EVALUABLE (not a MISMATCH)" in checks
+    assert "Partial at the deadline" in summ and "llama8 stories (the parts not run NOT EVALUABLE)" in summ
+    assert "qwen7 passages (the parts not run NOT EVALUABLE)" in summ and "mistral7 stories" in summ
+    assert verdict(J, "POST", "llama8") == ST.NE and verdict(J, "POST") == ST.NE
+    for c in ("P1s", "P2s", "P3s", "P4"):                           # the formats that ran stay evaluable
+        assert verdict(J, c, "llama8") == ST.SUP, c
+    assert verdict(J, "P1p", "qwen7") == ST.SUP and verdict(J, "P2p") == ST.SUP and verdict(J, "P3p", "qwen7") == ST.SUP
+    lines = text.splitlines()
+    i = next(i for i, x in enumerate(lines) if x.startswith("  P2p [R, containment]"))
+    assert "qwen7: NOT EVALUABLE" in lines[i + 1] and "R/OPTA not run" in lines[i + 1], lines[i:i + 2]
+    assert verdict(J, "P1s", "mistral7") == ST.NE and "no stories results" in J["verdict/mistral7/P1s"]["why"]
+    assert verdict(J, "P5a") == ST.SUP and verdict(J, "B1") == ST.SUP          # other arms untouched
+
+
+def test_controls_floor_and_letter_conflicts(tmp_path):
+    """CONTROLS: the BF16 floor against the clean B run (stories 0.001 and passages 0.002 by construction; edits: self
+    against the CAA batch's self, 0), the in-batch determinism (none against none2: 0), and the LETTER letter/word
+    conflicts (stories: 3 of 5 letter answers; edits: 1 of 2) in the text and in stage9_summary.json."""
+    root = make_run(tmp_path / "r", keys=("llama8",), n_st=10, n_c=10, n_e=10, n_r=6, n_ed=6)
+
+    def letters(J):
+        k = 0
+        for r in J["items"]:
+            if r["fmt"] != "LETTER":
+                continue
+            for name, d in list(r["rows"].items()) + [("clean_S", r["clean_S"])]:
+                d["word"] = "other"
+            if k < 5:
+                d = r["rows"]["late@2"]
+                d.update(how="letter", ans=r["track"]["S"], word=r["track"]["B"] if k < 3 else "other")
+            k += 1
+    edit_json(root / "stories" / "TEST_llama8.json", letters)
+
+    def eletters(J):
+        for c in J["cores"]:
+            cell = c["cells"]["LETTER@3"]
+            for d in [v for n, v in cell.items() if n != "caa"] + list(cell["caa"].values()):
+                d["word"] = "other"
+        c = J["cores"][0]["cells"]["LETTER@3"]
+        c["nat|S"] = dict(c["nat|S"], how="letter", word=J["cores"][0]["core"]["base"])
+        c["E1|S"] = dict(c["E1|S"], how="letter", word=c["E1|S"]["ans"])
+    edit_json(root / "edits" / "TEST_llama8.json", eletters)
+    rc, text, J = score(root)
+    ctl = text[text.index("#### CONTROLS"):text.index("#### PREDICTIONS")]
+    assert "BF16 floor mean|E(none) - E(clean B)| 0.0010, E-argmax differs 0.000 (n=10)" in ctl
+    assert "in-batch determinism max|E(none) - E(none2)| 0.0e+00, answers differ 0.000" in ctl
+    assert "BF16 floor mean|lp(none) - lp(clean B)| 0.0020, decision argmax differs 0.000 (n=10)" in ctl
+    assert "floor mean|E(self) - E(clean B)| 0.0000 (E-argmax differs 0.000, answers differ 0.000)" in ctl
+    assert "stories LETTER    letter/word conflicts: 0.600 (3/5) of the letter answers name another candidate word" in ctl
+    assert "by row: late@2 3" in ctl
+    assert "edits LETTER@3 letter/word conflicts: 0.500 (1/2) of the letter answers" in ctl and "by row: nat 1" in ctl
+    assert J["stories/llama8/NONE:bf16_floor_mean_abs_E"]["pt"] == pytest.approx(0.001)
+    assert J["stories/llama8/NONE:bf16_floor_mean_abs_E"]["argmax_differs"] == 0.0
+    assert J["passages/llama8/E:NOM:bf16_floor_mean_abs_lp"]["pt"] == pytest.approx(0.002)
+    assert J["edits/llama8/NONE@3:bf16_floor_mean_abs_E"]["pt"] == 0.0
+    assert J["stories/llama8/LETTER:letter_word_conflicts"]["count"] == 3 and J["stories/llama8/LETTER:letter_word_conflicts"]["n"] == 5
+    assert J["edits/llama8/LETTER@3:letter_word_conflicts"]["count"] == 1
+    S = DA.StoryRun(json.loads((root / "stories" / "TEST_llama8.json").read_text()))
+    assert S.e_floor("AFTER")[0] == pytest.approx(0.001) and S.determinism("AFTER")[:2] == (0.0, 0.0)
+
+
 def test_partial_edits_is_not_evaluable_without_a_mismatch(full_run, tmp_path):
     """A deadline-partial edits file (cores_not_run) makes that model's edits lines NOT EVALUABLE (scoring a subset of
     the cores would change the population) but, like a partial stories or passages file, is not a MISMATCH: exit 0."""
@@ -864,6 +960,7 @@ def test_partial_edits_is_not_evaluable_without_a_mismatch(full_run, tmp_path):
     assert rc == 0 and "checks: OK" in text and J["meta/run/checks"]["mismatch"] is False
     assert "PARTIAL llama8 edits: edits/llama8.json: incomplete at the deadline: 1 cores not run" in text
     assert J["meta/run/checks"]["partial"] == ["llama8/edits"] and "Partial at the deadline" in text
+    assert J["meta/run/checks"]["partial_whole_arm"] == ["llama8/edits"] and "llama8 edits (the whole arm NOT EVALUABLE)" in text
     for c in ("P5a", "B1", "B2", "B3"):
         assert verdict(J, c, "llama8") == ST.NE and "partial at the deadline" in J[f"verdict/llama8/{c}"]["why"], c
         assert verdict(J, c) == ST.NE and verdict(J, c, "qwen7") == ST.SUP, c
@@ -984,6 +1081,8 @@ def test_pipeline_runs_every_stage9_test_and_scores_with_this_scorer():
                           "tests/test_clamp.py", "tests/test_natural_clamp.py", "tests/test_stage8_edits.py",
                           "tests/test_stage8_populations.py"}
     assert all((ROOT / f).exists() for f in files if "stage9_pre" not in f)
+    # tests/test_paper_s9p.py checks paper/numbers.tex, which may be regenerated after the freeze: not a gate (SPEC 12.2)
+    assert "tests/test_paper_s9p.py" not in files and "tests/test_paper_s9p.py" not in CK.STAGE9_TESTS
     assert "s9_finish analysis/stage9_score.py" in sh
     for f in ("gpu_stage9.sh", "stage9_common.sh"):
         assert subprocess.run(["bash", "-n", str(ROOT / "scripts" / f)]).returncode == 0

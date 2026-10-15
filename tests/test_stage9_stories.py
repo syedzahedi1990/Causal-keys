@@ -11,9 +11,8 @@ and Qwen2.5-0.5B-Instruct for the identities, the complementarity and the genera
    stored clean S and clean B runs (clean_B: the reference of the BF16 floor) equal plain passes of the S and B prompts.
 4. late@0 = early@L = KV@0 = the clean S run and early@0 = late@L = none = none2 = the clean B run (scores 1e-4; the K/V
    at every position >= p under the clamp 1e-5); S on [0, l) and S on [l, L) by two nested clamp_kv contexts equals KV@0,
-   and S on [0, l) nested with B on [l, L) equals early@l, l in (2, 12, 22). (SPEC 7.2 and 13.1.4 write "early@L = none";
-   by SPEC 7.1's definition early@l takes S on [0, l), so early@L is the full patch and early@0 the identity, as 7.1's
-   "KV@0 = late@0 and none = early@0" says.)
+   and S on [0, l) nested with B on [l, L) equals early@l, l in (2, 12, 22). (SPEC 7.1: early@l takes S on [0, l), so
+   early@L is the full patch and early@0 the identity, SPEC 7.2 and 13.1.4.)
 5. The generation batch equals ckeys.generate.greedy_reference of each row alone under its own clamp (16 tokens; the word
    stop under AFTER, stage9.letter_stop under LETTER; the clean S run unclamped); the stored answer fields equal the
    parsers' on the reference text (LETTER: also the word parse "word").

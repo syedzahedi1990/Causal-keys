@@ -38,6 +38,9 @@ ROOT = Path(__file__).resolve().parents[1]
 NOTE = "docs/STAGE9_PREDICTIONS.md"
 SPEC = "docs/stage9/SPEC.md"
 FREEZE_SUBJECT = "Freeze stage-9 predictions"
+# run_meta's git_dirty reads only these paths: the code directories the guard freezes (scripts/stage9_common.sh
+# S9_CODE_DIRS), the prediction note and the spec directory
+DIRTY_PATHS = ("ckeys", "experiments", "analysis", "scripts", "tests", "data", NOTE, "docs/stage9/SPEC.md")
 
 SEEDS = {"N9": 9101, "E9": 9102}
 N_POP = {"N9": 150, "E9": 80}
@@ -226,12 +229,13 @@ def _utc(t: datetime.datetime) -> str:
 
 
 def run_meta(test: bool | None = None) -> dict:
-    """SPEC 11.1's run fields: git_commit, git_dirty (tracked files modified), freeze_commit ($STAGE9_FREEZE, exported by
-    the guard; None in TEST_MODE), the sha256 of the prediction note and of the spec in the working tree (None if absent),
-    started_utc (when this module was imported, i.e. the process start) and finished_utc (now: call it when the file is
-    written). ``test`` None reads TEST_MODE from the environment."""
+    """SPEC 11.1's run fields: git_commit, git_dirty (tracked files modified in DIRTY_PATHS: the code directories, the
+    prediction note and the spec; a modified paper/ or other file outside them does not count), freeze_commit
+    ($STAGE9_FREEZE, exported by the guard; None in TEST_MODE), the sha256 of the prediction note and of the spec in the
+    working tree (None if absent), started_utc (when this module was imported, i.e. the process start) and finished_utc
+    (now: call it when the file is written). ``test`` None reads TEST_MODE from the environment."""
     test = bool(os.environ.get("TEST_MODE")) if test is None else test
-    st = _git("status", "--porcelain", "--untracked-files=no")
+    st = _git("status", "--porcelain", "--untracked-files=no", "--", *DIRTY_PATHS)
     sha = {k: (file_sha(ROOT / p) if (ROOT / p).exists() else None) for k, p in (("predictions_sha256", NOTE),
                                                                                ("spec_sha256", SPEC))}
     return {"git_commit": _git("rev-parse", "HEAD"), "git_dirty": None if st is None else bool(st),

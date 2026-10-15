@@ -7,7 +7,7 @@
 #   s9_finish analysis/stage9_score.py
 #
 # s9_init replaces s8_init (which hard-codes the stage-8 parts and the guard of preregistration J). It checks the switches
-# (TEST_MODE, KEEP_CACHE, FORCE, TESTS, TEST_ALL: 0 or 1; DEADLINE_H a positive number of hours, default 4.5; FORCE_STEPS
+# (TEST_MODE, KEEP_CACHE, FORCE, TESTS, TEST_ALL: 0 or 1; DEADLINE_H a positive number of hours, default 6.0; FORCE_STEPS
 # step names or shell globs) and sets PART=9, PART_UC=9, OUT (results/gpu_stage9; TEST_MODE results/gpu_stage9_test), TGZ
 # (gpu_stage9_results.tgz / gpu_stage9_test_results.tgz), PY (default python), DEV and DTYPE (cuda bfloat16; TEST_MODE cpu
 # float32), S8_MODELS (default $HOME/stage8_models), S8_STATE, STAGE8_DEADLINE (epoch s from the start, exported: the
@@ -145,7 +145,7 @@ s9_init() {
   PART=9; PART_UC=9
   local v s f
   for v in TEST_MODE KEEP_CACHE FORCE TESTS TEST_ALL; do case ${!v:-} in ""|0|1) ;; *) echo "bad $v='${!v}' (0 or 1)"; exit 2;; esac; done
-  DEADLINE_H=${DEADLINE_H:-4.5}
+  DEADLINE_H=${DEADLINE_H:-6.0}
   [[ "$DEADLINE_H" =~ ^[0-9]+([.][0-9]+)?$ ]] && awk -v h="$DEADLINE_H" 'BEGIN{exit !(h > 0)}' \
     || { echo "bad DEADLINE_H='$DEADLINE_H' (a positive number of hours)"; exit 2; }
   FORCE_STEPS=${FORCE_STEPS:-}

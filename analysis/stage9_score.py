@@ -14,9 +14,9 @@ falsifiers "falsifier/<model or ALL>/<id>"), fig_window.csv, fig_edits.csv, fig_
 --test (TEST_MODE; also when every results file is tagged TEST_): the population sizes and pins, the stage-8a E-set
 comparison, BF16, sdpa, the freeze record and the pytest-log gate are waived; the verdicts are plumbing, not results.
 Exit status 1 if a part of the scorer raised (traceback in the report); 2 if, outside TEST, a check printed MISMATCH (every
-output is still written); else 0. A deadline-partial arm (stories or passages formats not run, edits cores not run) is
-not a MISMATCH: its missing parts (edits: the whole arm of that model) are NOT EVALUABLE and the CHECKS section lists it
-as PARTIAL.
+output is still written); else 0. A deadline-partial arm (stories formats not run, a calibration left partial, passage
+pieces not run, edits cores not run) is not a MISMATCH: its missing parts (edits: the whole arm of that model) are NOT
+EVALUABLE, and the CHECKS and SUMMARY sections and stage9_summary.json (meta/run/checks "partial") list it as PARTIAL.
 """
 from __future__ import annotations
 
@@ -123,8 +123,9 @@ def summary(ctx, out, log, gate, test):
     out(f"  Checks: {'MISMATCH' if log.any() else 'OK'}" + (" (TEST: not a result)" if test else "")
         + f"; FP32 gate: {gate}" + ("" if gate is True else " (TEST: waived)" if test else " -> every verdict NOT EVALUABLE"))
     if log.part:
-        out("  Partial at the deadline (NOT EVALUABLE, not a MISMATCH; a later session resumes it): "
-            + ", ".join(f"{k} {arm}" for k, arm in sorted(log.part)))
+        out("  Partial at the deadline (not a MISMATCH; a later session resumes it): "
+            + ", ".join(f"{k} {arm} (" + ("the whole arm NOT EVALUABLE" if (k, arm) in log.whole else
+                                         "the parts not run NOT EVALUABLE") + ")" for k, arm in sorted(log.part)))
     if test:
         out("  TEST MODE: the verdicts above are plumbing checks, not results.")
 
@@ -175,6 +176,7 @@ def main(argv=None):
         log.run.append("FP32 tests not passed" + (": no outcome" if gate is None else ""))
     pre = "TEST_" if test else ""
     try:
+        CK.partial_cal(root, test, log, out)
         for k, m in models.items():
             m.l_b = CK.lb_checks(root, k, pre + k, m.lb, m.st, test, log, out)
             CK.t_check(m.ed, k, test, log, out)
@@ -195,7 +197,10 @@ def main(argv=None):
     for w in log.warn:
         out(f"  MISMATCH: {w}")
     for (k, arm), why in sorted(log.part.items()):
-        out(f"  PARTIAL {k} {arm}: " + "; ".join(why) + " -> its predictions are NOT EVALUABLE (not a MISMATCH)")
+        out(f"  PARTIAL {k} {arm}: " + "; ".join(why) + (" -> its predictions are NOT EVALUABLE (not a MISMATCH)"
+                                                        if (k, arm) in log.whole else
+                                                        " -> the statistics that need the parts not run are NOT EVALUABLE "
+                                                        "(not a MISMATCH)"))
     out(f"  checks: {'MISMATCH' if log.any() else 'OK'}" + (" (TEST: the scorer does not exit 2)" if test and log.any() else ""))
     ff = (root / "FETCH_FAILED.txt").read_text(errors="replace") if (root / "FETCH_FAILED.txt").exists() else ""
     ctx = PR.Ctx(models, log, gate, test, ff)
@@ -247,6 +252,7 @@ def main(argv=None):
         nums[f"verdict/{k}/P5c"] = {"transfers": t, "text": txt}
     nums["meta/run/checks"] = {"mismatch": log.any(), "test": test, "fp32_gate": gate, "errors": errors,
                                "partial": [f"{k}/{arm}" for k, arm in sorted(log.part)],
+                               "partial_whole_arm": [f"{k}/{arm}" for k, arm in sorted(log.whole)],
                                "readings": PR.readings(ctx) if ctx.res else []}
     text = "\n".join(lines) + "\n"
     print(text, end="")

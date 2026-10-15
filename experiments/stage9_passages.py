@@ -13,7 +13,8 @@ step. Each format captures its own B and S tables (OPTB changes the prefix).
 
 Rows (SPEC 7.1; every row is on the B prompt and writes K and V at every position of the answer span P in EVERY layer:
 in layer l' and channel ch the captured table of the donor run, B's own where the donor is B and S's where it is S):
-  none, none2      never S (the identity; first and last row of the batch: the BF16 floor)
+  none, none2      never S (the identity; first and last row of the batch: an in-batch determinism check; the
+                   BF16 floor is none against clean_B, below)
   KV@0             always S (the full patch, the S run exactly)
   late@l, early@l  S on [l, L) / on [0, l), for l in ckeys.stage9.passage_onsets(L) = round(x L), x in 0.15, 0.3, 0.45, 0.6
   K@0, V@0         S in the key / value channel only, every layer
@@ -26,9 +27,17 @@ log-probabilities lp of B, S, X, Z, D (LETA: the letters of B, S, X, D) after th
 full-vocabulary argmax) and the generation batch (ckeys.natural_rows.generate_rows: greedy, 48 new tokens, the rows plus
 the unclamped S run; entity formats without the stage-8a W + 2 word cut: a row ends at EOS or an end-of-turn token, at a
 newline or at 48 tokens; LETA keeps decided_stop's two-character letter rule; the text is read up to the first special
-token). Two answer classes per row: who_strict (ckeys.natural_formats.answer_of) and who_contain (SPEC 9.3: the entity
-whose normalised text occurs earliest in the normalised first line as a whole-word substring, ties to the longer; LETA:
-who_strict). Containment is primary; strict is the sensitivity analysis.
+token). Two answer classes per row: who_strict (ckeys.natural_formats.answer_of, the stage-8a rule) and who_contain (SPEC
+9.3: the entity whose normalised text occurs earliest in the normalised first line as a whole-word substring, ties to the
+longer; LETA: who_strict). The containment normaliser (norm9) is the stage-8a norm extended so that punctuation never
+hides a contained answer: a possessive 's (straight or curly apostrophe) at the end of a word is dropped, every Unicode
+punctuation character (category P*, and the ASCII symbols the stage-8a norm drops) is removed, except dashes (category
+Pd) and the slash, which separate words and become spaces; articles are dropped and whitespace collapsed. The same
+normaliser is applied to the generated text and to every entity (B, S, X, Z, D alike). Containment is primary; strict is
+the sensitivity analysis. Each record also stores "clean_B": the decision-token log-probabilities of the B prompt's own
+pass in the capture batch (B, S, X, Z + w; another batch shape than the 21-row scoring batch), against which the scorer
+reads the BF16 floor of the none row (the none2 row is an in-batch determinism check: the same ids and tables in one
+forward come out bitwise equal, also in BF16).
 
 Stages (each a separate process; BF16, sdpa, use_cache=False in every scoring pass; scripts/gpu_stage9.sh):
   check  tokenizer only, no weights: the frame file's pinned sha256, the items' sha256, the SQuAD file and the items'
@@ -57,8 +66,10 @@ import argparse
 import json
 import os
 import re
+import string
 import sys
 import time
+import unicodedata
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -68,7 +79,7 @@ from transformers import AutoConfig, AutoTokenizer
 from ckeys import stage9 as s9
 from ckeys.encoding import WRAPPER_USED
 from ckeys.interventions import blocks
-from ckeys.natural_formats import FORMATS, LETTER_FORMATS, answer_of, norm
+from ckeys.natural_formats import FORMATS, LETTER_FORMATS, answer_of
 from ckeys.natural_rows import Invalid, capture, generate_rows, prep, score_rows, valid_all
 from ckeys.squad_items import SQUAD_DEV_SHA256
 from experiments.format_factorial import provenance as ff_provenance
@@ -144,16 +155,37 @@ def window_rows(nL: int) -> dict:
 
 
 # --------------------------------------------------------------------------- answers
+_ASCII_PUNCT = frozenset(string.punctuation)          # what ckeys.natural_formats.norm drops (some are symbols, not P*)
+_SEPARATORS = frozenset("/")                           # with every dash (category Pd): becomes a space
+_POSSESSIVE = re.compile(r"(?<=\w)['\u2019\u02bc]s(?!\w)")
+
+
+def _punct(c: str) -> bool:
+    return c in _ASCII_PUNCT or unicodedata.category(c).startswith("P")
+
+
+def norm9(s: str) -> str:
+    """The containment normaliser (SPEC 9.3): lower case; a possessive 's / \u2019s / \u02bcs at the end of a word
+    dropped; dashes (Unicode category Pd) and the slash replaced by a space; every other punctuation character (Unicode
+    category P*, and the ASCII symbols of string.punctuation that ckeys.natural_formats.norm drops) removed; the
+    articles a, an, the dropped; whitespace collapsed. On ASCII text without a possessive, dash or slash it equals
+    ckeys.natural_formats.norm."""
+    s = _POSSESSIVE.sub("", s.lower())
+    s = "".join(" " if (c in _SEPARATORS or unicodedata.category(c) == "Pd") else "" if _punct(c) else c for c in s)
+    s = re.sub(r"\b(a|an|the)\b", " ", s)
+    return " ".join(s.split())
+
+
 def who_contain(text: str, it, fmt: str) -> str:
-    """SPEC 9.3: with g = norm(first line) and e_Y = norm(entity Y), Y in B, S, X, Z, D, the entity whose e_Y occurs in
+    """SPEC 9.3: with g = norm9(first line) and e_Y = norm9(entity Y), Y in B, S, X, Z, D, the entity whose e_Y occurs in
     g as a whole-word substring at the smallest start index (ties: the longer e_Y; then the order B, S, X, Z, D), or
     "other". Letter formats: who_strict."""
     if fmt in LETTER_FORMATS:
         return answer_of(text, it, fmt)
-    g = norm(text.split("\n")[0])
+    g = norm9(text.split("\n")[0])
     best = None
     for k, (Y, key) in enumerate(ENTS):
-        e = norm(it[key])
+        e = norm9(it[key])
         if not e:
             continue
         m = re.search(r"(?<!\S)" + re.escape(e) + r"(?!\S)", g)
@@ -203,9 +235,10 @@ def stage8a_population(a):
 # --------------------------------------------------------------------------- one item in one format
 @torch.no_grad()
 def run_item(model, tok, it, fmt, frame, rows, nL, dev, name, max_new=MAX_NEW):
-    """The capture, scoring and generation batches of one item in one format (record of SPEC 11.6)."""
+    """The capture, scoring and generation batches of one item in one format (record of SPEC 11.6); "clean_B" is the B
+    prompt's decision-token log-probabilities from the capture batch (the reference of the BF16 floor)."""
     d = prep(tok, it, fmt, frame)
-    kv, _ = capture(model, d, range(nL), dev)
+    kv, runs = capture(model, d, range(nL), dev)
     sc = score_rows(model, d, kv, rows, nL, dev, "S")
     gens = generate_rows(model, tok, it, d, kv, rows, nL, max_new, extra={"S_run": "S"}, stop=fmt in LETTER_FORMATS)
     out = {}
@@ -217,7 +250,8 @@ def run_item(model, tok, it, fmt, frame, rows, nL, dev, name, max_new=MAX_NEW):
     g = gens["S_run"]
     return dict(id=it["id"], art=it["art"], title=it["title"], sub=it["sub"], D_in=it["D_in"], stratum=it["stratum"],
                 split=name, fmt=fmt, nP=len(d["P"]), P=d["P"], T=d["T"], j=d["j"], w=d["w"], dec=d["dec"], rows=out,
-                S_run={"text": g["text"], "ids": g["ids"], "n_tok": len(g["ids"])} | answers(g["text"], it, fmt))
+                S_run={"text": g["text"], "ids": g["ids"], "n_tok": len(g["ids"])} | answers(g["text"], it, fmt),
+                clean_B={"lp": {Y: r5(v) for Y, v in runs["B"].items()}})
 
 
 # --------------------------------------------------------------------------- provenance

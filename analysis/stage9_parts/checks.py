@@ -2,9 +2,11 @@
 artefact pins, the row grids (SPEC 7.1 and 8.1, rebuilt here independently of the builders), l_b, T_check and the
 pytest-log gate. Each failure is recorded against the model and arm it concerns (its predictions are then NOT
 EVALUABLE) or against the run; every failure prints MISMATCH and makes the scorer exit 2 outside TEST. A deadline-partial
-edits file (cores_not_run non-empty) is recorded apart, as PARTIAL: its predictions are NOT EVALUABLE (a subset of the
-cores would change the population) but, like a deadline-partial stories or passages file (whose missing formats are NOT
-EVALUABLE), it is not a MISMATCH and does not make the scorer exit 2.
+arm is recorded apart, as PARTIAL (listed in CHECKS and SUMMARY and in stage9_summary.json's meta/run/checks "partial"),
+never as a MISMATCH, and does not make the scorer exit 2: an edits file with cores_not_run makes the model's edits
+predictions NOT EVALUABLE (a subset of the cores would change the population); a stories file with formats not run, a
+passages or LETA file with (split, format) pieces not run, and a calibration left as lb/<tag>.json.partial leave the
+parts that were run evaluable, and every statistic that needs a missing part is NOT EVALUABLE.
 """
 from __future__ import annotations
 
@@ -14,7 +16,7 @@ import json
 import re
 from pathlib import Path
 
-from .data import lb_of, late_flips_all, passage_onsets, story_onsets
+from .data import PASSAGE_FORMATS, STORY_FORMATS, lb_of, late_flips_all, passage_onsets, story_onsets
 
 KEYS = ("mistral7", "llama8", "qwen7")
 E4B_KEYS = ("qwen7", "mistral7")
@@ -74,19 +76,26 @@ class Log:
         self.bad: dict = {}    # (model, arm) -> reasons: that arm's predictions in that model are NOT EVALUABLE
         self.run: list = []    # reasons that make every verdict NOT EVALUABLE (one commit, the freeze record, ...)
         self.warn: list = []   # MISMATCH lines that make the scorer exit 2 without touching a verdict (T_check)
-        self.part: dict = {}   # (model, arm) -> reasons: deadline-partial; NOT EVALUABLE, but no MISMATCH (no exit 2)
+        self.part: dict = {}   # (model, arm) -> reasons: deadline-partial, listed as PARTIAL; no MISMATCH (no exit 2)
+        self.whole: set = set()  # the (model, arm) of part whose whole arm is NOT EVALUABLE (edits: cores not run)
 
     def flag(self, key, arm, why):
         self.bad.setdefault((key, arm), []).append(why)
 
-    def partial(self, key, arm, why):
+    def partial(self, key, arm, why, whole: bool = False):
+        """A deadline-partial arm. ``whole``: every prediction of the arm in that model is NOT EVALUABLE (edits); else only
+        the statistics that need the parts not run are (stories formats, passage pieces), which they are by themselves."""
         self.part.setdefault((key, arm), []).append(why)
+        if whole:
+            self.whole.add((key, arm))
 
     def why(self, key, arm) -> list:
         return self.bad.get((key, arm), [])
 
     def why_partial(self, key, arm) -> list:
-        return self.part.get((key, arm), [])
+        """The reasons that make the whole arm NOT EVALUABLE (an arm whose missing parts are NOT EVALUABLE by themselves
+        gives none)."""
+        return self.part.get((key, arm), []) if (key, arm) in self.whole else []
 
     def any(self) -> bool:
         return bool(self.run) or bool(self.warn) or any(self.bad.values())
@@ -180,7 +189,7 @@ def provenance(root: Path, repo: Path, F: dict, test: bool, log: Log, out, pins:
             if Path(rel).name.startswith("TEST_") or p.get("test_mode"):
                 flag.append("a TEST_MODE file outside TEST")
             if p.get("git_dirty"):
-                flag.append("written from a tree with modified tracked files")
+                flag.append("written from a tree with modified tracked files (code, note or spec; SPEC 11.1)")
             if fr.unique and fr.recs:
                 if p.get("freeze_commit") != fr.F:
                     flag.append(f"freeze_commit {p.get('freeze_commit')} != COMMIT.txt's {fr.F}")
@@ -259,6 +268,14 @@ def population(F: dict, test: bool, log: Log, out, pop_pins: dict, stage8a: dict
             sk = p.get("skipped_items") or []
             info.append(f"population {p.get('population')}, {p.get('n_items')} items, formats done {p.get('formats_done')}, "
                         f"not run {p.get('formats_not_run') or 'none'}, skipped {len(sk)}")
+            nr = [f for f in (p.get("formats_not_run") or [])]
+            have = {r.get("fmt") for r in J.get("items") or []}
+            absent = [f for f in STORY_FORMATS if f not in have and f not in nr]
+            if nr:
+                part.append(f"incomplete at the deadline: formats {nr} not run (exit 3; the next session resumes it); "
+                            "their statistics are NOT EVALUABLE")
+            if absent:
+                part.append(f"formats {absent} absent from the file (not run); their statistics are NOT EVALUABLE")
             if not test and (p.get("population") != pop or p.get("population_sha256") != pop_pins.get(pop)):
                 flag.append(f"population {p.get('population')} sha256 {str(p.get('population_sha256'))[:12]} != the pin of {pop}")
             if not test and p.get("n_items") != N_POP[pop]:
@@ -288,6 +305,15 @@ def population(F: dict, test: bool, log: Log, out, pop_pins: dict, stage8a: dict
             s8 = stage8a.get(key)
             info.append(f"valid E {ni.get('E')} (sha256 {str(vs.get('E'))[:12]}), R {ni.get('R')} (sha256 {str(vs.get('R'))[:12]}); "
                         f"stage 8a E {str(s8)[:12]}; pieces not run {p.get('formats_not_run') or 'none'}")
+            nr = [x for x in (p.get("formats_not_run") or [])]
+            want = ([("E", "LETA")] if arm == "leta" else [(s, f) for s in ("E", "R") for f in PASSAGE_FORMATS])
+            got = {(s, f) for s, fm in (J.get("splits") or {}).items() for f in fm}
+            absent = [f"{s}/{f}" for s, f in want if (s, f) not in got and f"{s}/{f}" not in nr]
+            if nr:
+                part.append(f"incomplete at the deadline: pieces {nr} not run (exit 3; the next session resumes it); "
+                            "their statistics are NOT EVALUABLE")
+            if absent:
+                part.append(f"pieces {absent} absent from the file (not run); their statistics are NOT EVALUABLE")
             if not test:
                 if vs.get("E") != s8 or p.get("stage8a_population_sha256") != s8:
                     flag.append("the valid E set differs from stage 8a's population (MISMATCH)")
@@ -302,10 +328,29 @@ def population(F: dict, test: bool, log: Log, out, pop_pins: dict, stage8a: dict
         for x in flag:
             log.flag(key, arm, f"{rel}: {x}")
         for x in part:
-            log.partial(key, arm, f"{rel}: {x}")
+            log.partial(key, arm, f"{rel}: {x}", whole=(d == "edits"))
         ok_all &= not flag
         out(f"  {rel}: " + "; ".join(info) + "".join(f"  MISMATCH: {x}" for x in flag) + "".join(f"  PARTIAL: {x}" for x in part))
     return ok_all
+
+
+def partial_cal(root: Path, test: bool, log: Log, out):
+    """A calibration step stopped at the deadline leaves lb/<tag>.json.partial and no lb file (its formats are resumed by
+    the next session): PARTIAL stories (l_b and the stories eval are then missing, so their statistics are NOT
+    EVALUABLE by themselves)."""
+    d = root / "lb"
+    for f in sorted(d.glob("*.json.partial")) if d.is_dir() else []:
+        tag = f.name[: -len(".json.partial")]
+        if test != tag.startswith("TEST_") or (d / f"{tag}.json").exists():
+            continue
+        try:
+            done = json.loads(f.read_text())["provenance"].get("formats_done")
+        except Exception:  # noqa: BLE001
+            done = "unreadable"
+        key = tag[5:] if tag.startswith("TEST_") else tag
+        why = f"lb/{f.name}: the calibration (cal) is incomplete at the deadline (formats done {done}); no lb file yet"
+        log.partial(key, "stories", why)
+        out(f"  {why}  PARTIAL")
 
 
 # --------------------------------------------------------------------------- the row grids (SPEC 7.1, 8.1)

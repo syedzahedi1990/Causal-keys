@@ -36,31 +36,71 @@ def _models(ctx):
 
 
 # --------------------------------------------------------------------------- CONTROLS
+def _e(x) -> str:
+    return "nan" if x is None or (isinstance(x, float) and not math.isfinite(x)) else f"{x:.1e}"
+
+
+def _num(ctx, arm, key, stat, pt, n, **extra):
+    """A printed number without an interval into stage9_summary.json (lo and hi null)."""
+    f = lambda x: None if x is None or (isinstance(x, float) and not math.isfinite(x)) else round(float(x), 6)  # noqa: E731
+    ctx.nums[f"{arm}/{key}/{stat}"] = {"pt": f(pt), "lo": None, "hi": None, "n": int(n)} | extra
+
+
+def _conflicts(c, nl, nr, per) -> str:
+    if not nr:
+        return "no row stores the word parse"
+    top = ", ".join(f"{k} {v}" for k, v in sorted(per.items(), key=lambda kv: (-kv[1], kv[0]))[:8])
+    return (f"{_share(c, nl)} of the letter answers name another candidate word in the same text ({nr} LETTER rows in "
+            f"all)" + (f"; by row: {top}" + (" ..." if len(per) > 8 else "") if per else ""))
+
+
 def controls(ctx, out):
-    out("  The complementarity of the windows (early on [0, l) and late on [l, L) together = KV@0; late@0 = KV@0; early@L "
-        "= none = the clean B run) is FP32-tested (tests/test_stage9_stories.py, test_stage9_passages.py); no GPU check.")
+    out("  The window ends (late@0 = early@L = KV@0 = the clean S run; early@0 = late@L = none = the clean B run) and their "
+        "complementarity (early on [0, l) and late on [l, L) together = KV@0) are FP32-tested (tests/test_stage9_stories.py, "
+        "test_stage9_passages.py); no GPU check.")
+    out("  BF16 floor: the none row (edits: self) against the clean B run of the same item in another batch shape (stories: "
+        "clean_B of the capture pass; passages: clean_B of the capture batch; edits: the CAA batch's self row, unclamped): "
+        "the mean absolute difference of E (passages: of the decision log-probabilities lp) and the share of items whose "
+        "argmax answer differs (E-argmax; passages: the decision-token argmax; edits also the generated answers). In-batch "
+        "determinism: none against none2 (edits: self against self2), the same ids and tables in one forward (0 expected, "
+        "also in BF16). LETTER: the letter answers whose text names another candidate word (\"A drawer\" read as option "
+        "A), a sensitivity count; the answer stays SPEC 9.2's.")
     for k, m in _models(ctx):
         if m.st is not None:
             S = m.st
             for f in S.fmts:
                 pres, comp = S.present(f).sum(), S.comp(f).sum()
                 kv = ctx.sflip(m, f, "KV@0", sub="all")
-                fl, dis = S.e_floor(f)
+                fl, dis, nf = S.e_floor(f)
+                mx, gd, nd = S.determinism(f)
                 a, b = S.agreement(f)
+                _num(ctx, "stories", k, f"{f}:bf16_floor_mean_abs_E", fl, nf, argmax_differs=None if nf == 0 else round(dis, 6))
+                _num(ctx, "stories", k, f"{f}:in_batch_max_abs_E", mx, nd, answers_differ=None if nd == 0 else round(gd, 6))
                 out(f"  {k:8s} stories {f:9s} competent {_share(int(comp), int(pres))}; flip(KV@0) all items {kv.txt()}; "
-                    f"BF16 floor mean|E(none) - E(none2)| {_f(fl, 4)}, answers differ {_f(dis)}; E-argmax = generation "
-                    f"{_share(a, b)}")
+                    f"BF16 floor mean|E(none) - E(clean B)| {_f(fl, 4)}, E-argmax differs {_f(dis)} (n={nf}); in-batch "
+                    f"determinism max|E(none) - E(none2)| {_e(mx)}, answers differ {_f(gd)}; E-argmax = "
+                    f"generation {_share(a, b)}")
+            if S.has("LETTER"):
+                c, nl, nr, per = S.letter_conflicts("LETTER")
+                _num(ctx, "stories", k, "LETTER:letter_word_conflicts", c / nl if nl else None, nl, count=c, rows=nr)
+                out(f"  {k:8s} stories LETTER    letter/word conflicts: {_conflicts(c, nl, nr, per)}")
         if m.ps is not None:
             for name, sp in m.ps.splits.items():
                 for f in sp.fmts:
                     pres, comp = sp.present(f).sum(), sp.comp(f).sum()
                     kv = ctx.pflip(m, name, f, "KV@0", sub="all")
-                    fl, dis = sp.floor(f)
+                    fl, dis, nf = sp.floor(f)
+                    mx, gd, nd = sp.determinism(f)
                     a, b = sp.agreement(f)
+                    _num(ctx, "passages", k, f"{name}:{f}:bf16_floor_mean_abs_lp", fl, nf,
+                         argmax_differs=None if nf == 0 else round(dis, 6))
+                    _num(ctx, "passages", k, f"{name}:{f}:in_batch_max_abs_lp", mx, nd,
+                         answers_differ=None if nd == 0 else round(gd, 6))
                     out(f"  {k:8s} passages {name}/{f:5s} competent (containment) {_share(int(comp), int(pres))}, strict "
                         f"{_share(int(sp.comp(f, 'strict').sum()), int(pres))}; flip(KV@0) all items {kv.txt()}; BF16 floor "
-                        f"mean|lp(none) - lp(none2)| {_f(fl, 4)}, answers differ {_f(dis)}; lp-argmax = containment answer "
-                        f"{_share(a, b)}")
+                        f"mean|lp(none) - lp(clean B)| {_f(fl, 4)}, decision argmax differs {_f(dis)} (n={nf}); in-batch "
+                        f"determinism max|lp(none) - lp(none2)| {_e(mx)}, answers differ {_f(gd)}; lp-argmax = containment "
+                        f"answer {_share(a, b)}")
         if m.ed is not None:
             E = m.ed
             for f in EDIT_FORMATS:
@@ -69,16 +109,22 @@ def controls(ctx, out):
                     if not E.has_cell(f, l):
                         continue
                     sB = E.self_hit(f, l, "B")
-                    d, dis = [], []
-                    for i in range(E.n):
-                        c = E.cell(i, f, l)
-                        d.append(float(np.mean(np.abs(np.asarray(c["self"]["E"]) - np.asarray(c["self2"]["E"])))))
-                        dis.append(c["self"].get("ans") != c["self2"].get("ans"))
+                    fl, dis, gdis, nf = E.floor(f, l)
+                    mx, gd, nd = E.determinism(f, l)
                     a, b = E.agreement(f, l)
-                    parts.append(f"@{l} self = B {sB.mean():.3f}, floor {np.mean(d):.4f}, self/self2 differ {np.mean(dis):.3f}, "
-                                 f"E-argmax = generation {_share(a, b)}")
+                    _num(ctx, "edits", k, f"{f}@{l}:bf16_floor_mean_abs_E", fl, nf,
+                         argmax_differs=None if nf == 0 else round(dis, 6), answers_differ=None if nf == 0 else round(gdis, 6))
+                    _num(ctx, "edits", k, f"{f}@{l}:in_batch_max_abs_E", mx, nd, answers_differ=None if nd == 0 else round(gd, 6))
+                    parts.append(f"@{l} self = B {sB.mean():.3f}, floor mean|E(self) - E(clean B)| {_f(fl, 4)} (E-argmax differs "
+                                 f"{_f(dis)}, answers differ {_f(gdis)}), in-batch max|E(self) - E(self2)| {_e(mx)} (answers "
+                                 f"differ {_f(gd)}), E-argmax = generation {_share(a, b)}")
                 if parts:
                     out(f"  {k:8s} edits {f:6s} " + "; ".join(parts))
+            for l in E.blocks:
+                if E.has_cell("LETTER", l):
+                    c, nl, nr, per = E.letter_conflicts(l)
+                    _num(ctx, "edits", k, f"LETTER@{l}:letter_word_conflicts", c / nl if nl else None, nl, count=c, rows=nr)
+                    out(f"  {k:8s} edits LETTER@{l} letter/word conflicts: {_conflicts(c, nl, nr, per)}")
             if E.has_row("NONE", 3, "nat"):
                 out(f"  {k:8s} edits competence: nat|t at NONE@3 answers t: {ctx.eflip(m, 'NONE', 3, 'nat').txt()} (over (core, t); "
                     "the edit arm's flips use all cores)")

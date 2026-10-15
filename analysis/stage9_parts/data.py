@@ -7,8 +7,13 @@ answers S; flip(f, row) = the share of C9(f) whose generated answer is S, stale 
 argmax of the row's E six-vector (canonical word order) instead of the generated answer. One index set per file: every
 item of the file in item order (an item absent from a format is outside that format's subset).
 Passages (SPEC 9.3-9.4): per split, competent in f when who(none) = B and who(S_run) = S under the answer rule
-(containment primary, strict the sensitivity); flip = who(row) = S; the argmax version reads the argmax of the
-decision-token log-probabilities lp. Clusters: the article.
+(containment primary: the builder's who_contain, whose normaliser drops possessives and Unicode punctuation for every
+entity alike; strict, the stage-8a rule, the sensitivity); flip = who(row) = S; the argmax version reads the argmax of
+the decision-token log-probabilities lp. Clusters: the article.
+BF16 floor (SPEC 14, CONTROLS): the none row (edits: self) against the clean B run of the same item in another batch
+shape (stories: "clean_B" of the capture pass; passages: "clean_B" of the capture batch; edits: the CAA batch's self row,
+the B prompt unclamped); none against none2 (self against self2) is an in-batch determinism check (the same ids and
+tables in one forward: 0 expected, also in BF16).
 Edits (SPEC 9.7): per core and row Z, hit(Z) = the mean over t in (S, X) of 1[answer of Z|t = t] (stale: = B), so a
 rate over cores is the rate over (core, t) and both targets move together; ID(R) = 1/2 [(d_S(R|S) - d_S(R|X)) +
 (d_X(R|X) - d_X(R|S))] with d_w(row) = E_w(row) - E_w(self) (nats) or the logit margin m_w = L_w - L_B taken relative to
@@ -138,16 +143,53 @@ class StoryRun:
         return np.array(out, float)
 
     @functools.lru_cache(maxsize=None)
-    def e_floor(self, fmt) -> tuple[float, float]:
-        """(mean |E(none) - E(none2)| over items and the six entries, the share of items whose answers differ)."""
+    def e_floor(self, fmt) -> tuple[float, float, int]:
+        """The BF16 floor: (mean |E(none) - E(clean_B)| over the items and the six entries, the share of items whose
+        E-argmax words differ, the number of items). clean_B is the B prompt's own pass in the capture batch (B, S, X),
+        another batch shape than the scoring batch; it has no generated answer, so the answers compared are the
+        E-argmax words. (NaN, NaN, 0) when the file has no clean_B."""
+        d, a = [], []
+        for i in range(self.n):
+            r = self._rec(fmt, i)
+            x, y = (None, None) if r is None else (r["rows"].get("none"), r.get("clean_B"))
+            if x is None or y is None:
+                continue
+            d.append(float(np.mean(np.abs(np.asarray(x["E"]) - np.asarray(y["E"])))))
+            a.append(_argmax(x["E"]) != _argmax(y["E"]))
+        return (float(np.mean(d)) if d else NAN, float(np.mean(a)) if a else NAN, len(d))
+
+    @functools.lru_cache(maxsize=None)
+    def determinism(self, fmt) -> tuple[float, float, int]:
+        """In-batch determinism: (max |E(none) - E(none2)| over the items and entries, the share of items whose
+        generated answers differ, the number of items); 0 and 0 expected (the same ids and tables in one forward)."""
         d, a = [], []
         for i in range(self.n):
             x, y = self._run(fmt, i, "none"), self._run(fmt, i, "none2")
             if x is None or y is None:
                 continue
-            d.append(float(np.mean(np.abs(np.asarray(x["E"]) - np.asarray(y["E"])))))
+            d.append(float(np.max(np.abs(np.asarray(x["E"]) - np.asarray(y["E"])))))
             a.append(x.get("ans") != y.get("ans"))
-        return (float(np.mean(d)) if d else NAN, float(np.mean(a)) if a else NAN)
+        return (float(np.max(d)) if d else NAN, float(np.mean(a)) if a else NAN, len(d))
+
+    def letter_conflicts(self, fmt="LETTER") -> tuple[int, int, int, dict]:
+        """SPEC 9.2 / 14 (a sensitivity count): (rows whose answer is a parsed letter while the word parse of the same
+        text names another candidate word, i.e. ``word`` is neither "other" nor the letter's word; rows with a letter
+        answer; rows in all; {row: count} of the rows with a conflict), over every item's rows and clean S run of
+        ``fmt``. (0, 0, 0, {}) when no row stores ``word``."""
+        c = nl = nr = 0
+        per: dict = {}
+        for r in self.by.get(fmt, {}).values():
+            for name, d in list(r["rows"].items()) + [("clean_S", r["clean_S"])]:
+                if "word" not in d:
+                    continue
+                nr += 1
+                if d.get("how") != "letter":
+                    continue
+                nl += 1
+                if d["word"] not in ("other", d.get("ans")):
+                    c += 1
+                    per[name] = per.get(name, 0) + 1
+        return c, nl, nr, per
 
     def agreement(self, fmt) -> tuple[int, int]:
         """(rows whose generated answer equals the E-argmax word, rows whose generated answer names a candidate)."""
@@ -250,15 +292,32 @@ class PassageSplit:
     def mask(self, fmt, sub="comp", rule="contain") -> np.ndarray:
         return self.comp(fmt, rule) if sub == "comp" else self.present(fmt)
 
-    def floor(self, fmt) -> tuple[float, float]:
+    def floor(self, fmt) -> tuple[float, float, int]:
+        """The BF16 floor: (mean |lp(none) - lp(clean_B)| over the items and the decision tokens, the share of items
+        whose decision-token argmax differs, the number of items). clean_B is the B prompt's decision log-probabilities
+        from the capture batch (B, S, X, Z + w), another batch shape than the scoring batch. (NaN, NaN, 0) without it."""
+        d, a = [], []
+        for i in range(self.n):
+            r = self.by.get(fmt, {}).get(self.ids[i])
+            x, y = (None, None) if r is None else (r["rows"].get("none"), r.get("clean_B"))
+            if x is None or y is None or not x.get("lp"):
+                continue
+            lx, ly = x["lp"], y["lp"]
+            d.append(float(np.mean([abs(lx[Y] - ly[Y]) for Y in lx])))
+            a.append(max(lx, key=lx.get) != max(ly, key=ly.get))
+        return (float(np.mean(d)) if d else NAN, float(np.mean(a)) if a else NAN, len(d))
+
+    def determinism(self, fmt) -> tuple[float, float, int]:
+        """In-batch determinism: (max |lp(none) - lp(none2)|, the share of items whose containment answers differ, the
+        number of items); 0 and 0 expected."""
         d, a = [], []
         for i in range(self.n):
             x, y = self._run(fmt, i, "none"), self._run(fmt, i, "none2")
             if x is None or y is None:
                 continue
-            d.append(float(np.mean([abs(x["lp"][Y] - y["lp"][Y]) for Y in x["lp"]])))
+            d.append(float(max(abs(x["lp"][Y] - y["lp"][Y]) for Y in x["lp"])) if x.get("lp") else 0.0)
             a.append(x.get("who_contain") != y.get("who_contain"))
-        return (float(np.mean(d)) if d else NAN, float(np.mean(a)) if a else NAN)
+        return (float(np.max(d)) if d else NAN, float(np.mean(a)) if a else NAN, len(d))
 
     def agreement(self, fmt) -> tuple[int, int]:
         num = den = 0
@@ -368,6 +427,57 @@ class EditRun:
     @functools.lru_cache(maxsize=None)
     def self_hit(self, fmt, l, who="B") -> np.ndarray:
         return np.array([float(self._self(i, fmt, l, "nat").get("ans", "") == self.word[who][i]) for i in range(self.n)])
+
+    def floor(self, fmt, l) -> tuple[float, float, float, int]:
+        """The BF16 floor of a cell: (mean |E(self) - E(clean B)| over the cores and six entries, the share of cores
+        whose E-argmax differs, the share whose generated answers differ, the number of cores). The clean B run is the
+        CAA batch's self row: the B prompt unclamped (its CAA vector is zero) in a batch of 3, against the table batch's
+        self row (B's own tables at p from the natural pass)."""
+        d, a, g = [], [], []
+        for i in range(self.n):
+            c = self.cell(i, fmt, l)
+            if c is None or "self" not in c or "self" not in (c.get("caa") or {}):
+                continue
+            x, y = c["self"], c["caa"]["self"]
+            d.append(float(np.mean(np.abs(np.asarray(x["E"]) - np.asarray(y["E"])))))
+            a.append(_argmax(x["E"]) != _argmax(y["E"]))
+            g.append(x.get("ans") != y.get("ans"))
+        f = lambda v: float(np.mean(v)) if v else NAN  # noqa: E731
+        return f(d), f(a), f(g), len(d)
+
+    def determinism(self, fmt, l) -> tuple[float, float, int]:
+        """In-batch determinism of a cell: (max |E(self) - E(self2)|, the share of cores whose generated answers differ,
+        the number of cores); 0 and 0 expected."""
+        d, a = [], []
+        for i in range(self.n):
+            c = self.cell(i, fmt, l)
+            if c is None or "self" not in c or "self2" not in c:
+                continue
+            d.append(float(np.max(np.abs(np.asarray(c["self"]["E"]) - np.asarray(c["self2"]["E"])))))
+            a.append(c["self"].get("ans") != c["self2"].get("ans"))
+        return (float(np.max(d)) if d else NAN, float(np.mean(a)) if a else NAN, len(d))
+
+    def letter_conflicts(self, l, fmt="LETTER") -> tuple[int, int, int, dict]:
+        """As StoryRun.letter_conflicts, over every core's table rows and CAA rows of the cell ``fmt``@``l``; {kind: count}
+        with the row names' kinds (the target dropped)."""
+        c = nl = nr = 0
+        per: dict = {}
+        for i in range(self.n):
+            cell = self.cell(i, fmt, l)
+            if cell is None:
+                continue
+            for name, d in [(k, v) for k, v in cell.items() if k != "caa"] + list((cell.get("caa") or {}).items()):
+                if "word" not in d:
+                    continue
+                nr += 1
+                if d.get("how") != "letter":
+                    continue
+                nl += 1
+                if d["word"] not in ("other", d.get("ans")):
+                    c += 1
+                    k = name.split("|")[0]
+                    per[k] = per.get(k, 0) + 1
+        return c, nl, nr, per
 
     def agreement(self, fmt, l) -> tuple[int, int]:
         """(rows whose generated answer equals the E-argmax location, rows whose answer names a location) in a cell."""

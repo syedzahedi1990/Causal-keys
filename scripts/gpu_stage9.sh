@@ -29,18 +29,20 @@
 #                   the reserve)                                                          -> passages/<tag>_LETA.json
 #   score           analysis/stage9_score.py -> $OUT/STAGE9_SCORE.txt, stage9_summary.json, fig_*.csv; MANIFEST.sha256;
 #                   the archive gpu_stage9_results.tgz
-# Deadline (DEADLINE_H, default 4.5 h; STAGE8_DEADLINE): every step gets --reserve-min = the minutes of the later steps of
-# its model (stories 12, edits 10, passages 30) plus the CORE_MIN of the later models (mistral7 60, llama8 55, qwen7 50)
-# plus 10 for the score; it stops before work that would end inside the reserve (exit 3: partial, redone next session).
-# The next model's weights are prefetched in the background.
-# Compute (SPEC section 16, A100-80GB, BF16): 40-65 min per model, about 3-4 GPU-hours with the pytest and the score.
+# Deadline (DEADLINE_H, default 6.0 h; STAGE8_DEADLINE): every step gets --reserve-min = the minutes of the later steps of
+# its model (stories ST_MIN 25, edits ED_MIN 25, passages PS_MIN 30) plus the CORE_MIN of the later models (mistral7 88,
+# llama8 83, qwen7 78: the upper ends of SPEC 16's per-step minutes) plus 10 for the score; it stops before work that
+# would end inside the reserve (exit 3: partial, redone next session). The next model's weights are prefetched in the
+# background.
+# Compute (SPEC section 16, A100-80GB, BF16): about 70-90 min per model; expected wall time about 4.3-5 h with the pytest,
+# the LETA steps and the score (the 6.0 h default deadline holds the reserves' upper ends).
 # Disk: >= 50 GB (one model at a time plus a prefetch).
 # Usage:
 #   F=$(git log --format=%H -1 --grep='^Freeze stage-9 predictions$') && [ -n "$F" ] && git checkout "$F"
 #   bash scripts/gpu_stage9.sh                  # HF_TOKEN optional
-#   TEST_MODE=1 DEADLINE_H=12 bash scripts/gpu_stage9.sh   # CPU plumbing run at Qwen2.5-0.5B-Instruct (FP32, n = 2 per
-#                          # population, outputs TEST_<key>) for qwen7 and llama8 (TEST_ALL=1: all three keys); several
-#                          # hours on a 4-core CPU, so the default 4.5 h deadline leaves it partial
+#   TEST_MODE=1 bash scripts/gpu_stage9.sh   # CPU plumbing run at Qwen2.5-0.5B-Instruct (FP32, n = 2 per population,
+#                          # outputs TEST_<key>) for qwen7 and llama8 (TEST_ALL=1: all three keys); measured 1 h 51 min on
+#                          # a 4-core CPU (pytest 52 min, the steps of the two keys 58 min), inside the 6.0 h default
 # Optional: OUT, SQUAD (default results/gpu_stage8a/squad/dev-v1.1.json), DEADLINE_H, FORCE, FORCE_STEPS, KEEP_CACHE,
 # TESTS=0, PY, S8_MODELS, MINGIB, TEST_ALL.
 cd "$(dirname "$0")/.." || exit 2
@@ -66,8 +68,10 @@ if on TEST_MODE && ! on TEST_ALL; then   # every key runs the same 0.5B model: t
   KEYS=(qwen7 llama8)
   echo "$(s8_utc) TEST_MODE: keys ${KEYS[*]} (TEST_ALL=1 runs mistral7 too)" | tee -a "$OUT/COMMIT.txt"
 fi
-declare -A CORE_MIN=([mistral7]=60 [llama8]=55 [qwen7]=50)   # fetch and load, checks, cal, stories, edits, passages
-ST_MIN=12; ED_MIN=10; PS_MIN=30; LETA_MIN=10; SCORE_MIN=10
+# CORE_MIN: fetch, loads, checks, cal, stories, edits, passages of a model (SPEC 16: the upper ends of the per-step
+# minutes; llama8 at L = 32 with a prefetched fetch, mistral7 + 5 for its own fetch, qwen7 - 5 for 28 blocks)
+declare -A CORE_MIN=([mistral7]=88 [llama8]=83 [qwen7]=78)
+ST_MIN=25; ED_MIN=25; PS_MIN=30; LETA_MIN=10; SCORE_MIN=10
 
 later_models() {  # later_models <index>: the CORE_MIN of the models after KEYS[index], plus the score
   local i s=$SCORE_MIN

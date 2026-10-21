@@ -43,14 +43,38 @@
 #   TEST_MODE=1 bash scripts/gpu_stage9.sh   # CPU plumbing run at Qwen2.5-0.5B-Instruct (FP32, n = 2 per population,
 #                          # outputs TEST_<key>) for qwen7 and llama8 (TEST_ALL=1: all three keys); measured 1 h 51 min on
 #                          # a 4-core CPU (pytest 52 min, the steps of the two keys 58 min), inside the 6.0 h default
-# Optional: OUT, SQUAD (default results/gpu_stage8a/squad/dev-v1.1.json), DEADLINE_H, FORCE, FORCE_STEPS, KEEP_CACHE,
-# TESTS=0, PY, S8_MODELS, MINGIB, TEST_ALL.
+# Optional: OUT, SQUAD (default results/gpu_stage8a/squad/dev-v1.1.json), PRAKASH_REPO (a checkout of Prakash et al.'s
+# release at ckeys.causaltom.RELEASE_SHA; default: fetched into ~/.cache/causal-keys), DEADLINE_H, FORCE, FORCE_STEPS,
+# KEEP_CACHE, TESTS=0, PY, S8_MODELS, MINGIB, TEST_ALL.
 cd "$(dirname "$0")/.." || exit 2
 # shellcheck source=scripts/stage8_common.sh
 source scripts/stage8_common.sh
 # shellcheck source=scripts/stage9_common.sh
 source scripts/stage9_common.sh
 s9_init
+
+# ---- Prakash et al.'s release at the pinned commit (sparse: the data and the two ported code files), hashes asserted.
+# No stage-9 step reads it; the gate test tests/test_stage8_edits.py::test_prakash_caa_with_natural_difference_equals_id
+# does, so it is fetched here, before the gates, exactly as scripts/gpu_stage8c.sh fetches it (the first stage-9 session,
+# on 2026-10-21, stopped at that test because the box had no checkout: docs/stage9/RUN_LOG.md).
+SHA=$(PYTHONPATH=. $PY -c "from ckeys.causaltom import RELEASE_SHA; print(RELEASE_SHA)") || die "ckeys.causaltom not importable"
+URL=$(PYTHONPATH=. $PY -c "from ckeys.causaltom import RELEASE_URL; print(RELEASE_URL)")
+DEFREL=$HOME/.cache/causal-keys/mind-$SHA
+REL=${PRAKASH_REPO:-}
+if [ -z "$REL" ]; then
+  if on TEST_MODE && [ -d /home/user/nix07/mind/.git ]; then REL=/home/user/nix07/mind; else REL=$DEFREL; fi
+fi
+if [ ! -d "$REL/.git" ]; then   # fetched only into the default cache path (an existing other directory is left untouched)
+  if [ -e "$REL" ]; then [ "$REL" = "$DEFREL" ] && rm -rf "$REL" || die "PRAKASH_REPO=$REL exists but is not a git checkout of $SHA"; fi
+  { mkdir -p "$REL" && git init -q "$REL" && git -C "$REL" remote add origin "$URL" \
+      && git -C "$REL" sparse-checkout set --no-cone /data/ /src/dataset.py /notebooks/causalToM_novis/utils.py \
+      && git -C "$REL" fetch -q --depth 1 --filter=blob:none origin "$SHA" && git -C "$REL" checkout -q FETCH_HEAD; } >> "$OUT/logs/release_fetch.log" 2>&1 \
+    || { rm -rf "$REL"; die "could not fetch $URL at $SHA into $REL (see $OUT/logs/release_fetch.log)"; }
+fi
+[ "$(git -C "$REL" rev-parse HEAD 2>/dev/null)" = "$SHA" ] || die "the release checkout $REL is not at $SHA"
+export PRAKASH_REPO=$REL
+echo "$(s8_utc) Prakash et al.'s release $URL at $SHA in $REL" >> "$OUT/COMMIT.txt"
+s8_run release $PY -m ckeys.causaltom || die "the release or pool hash check (see $OUT/logs/release.log)"
 
 # ---- FP32 gates before any model: every stage-9 test file and the tests of the shared modules stage 9 calls
 s8_pytest tests/test_stage9_pops.py tests/test_stage9_stories.py tests/test_stage9_passages.py tests/test_stage9_edits.py \

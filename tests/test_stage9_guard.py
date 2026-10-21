@@ -299,6 +299,55 @@ def test_s9_guard_refuses_results_at_another_commit_or_tracked(repo, tmp_path):
     assert r.returncode == 1 and "are tracked by git" in (res / "FAILED.txt").read_text()
 
 
+def test_s9_guard_refuses_an_out_that_records_another_freeze(repo, tmp_path):
+    """Check 4c: an earlier session that wrote no results file (e.g. one stopped at the gates) still left its freeze
+    record in COMMIT.txt. A session at a new freeze with that OUT would leave two records, and the scorer would make
+    every verdict NOT EVALUABLE; the guard refuses it before anything runs. A record of the same freeze (a second
+    session at the same commit) is accepted."""
+    import sys
+    sys.path.insert(0, str(ROOT / "analysis"))
+    from stage9_parts.checks import Freeze
+    F = commit(repo, SUBJECT)
+    note = hashlib.sha256((repo / "docs/STAGE9_PREDICTIONS.md").read_bytes()).hexdigest()
+    spec = hashlib.sha256((repo / "docs/stage9/SPEC.md").read_bytes()).hexdigest()
+    state = tmp_path / "state"
+    state.mkdir()
+    run = "source scripts/stage8_common.sh && source scripts/stage9_common.sh && s9_guard"
+
+    def session(name, records):
+        out = tmp_path / name
+        (out / "logs").mkdir(parents=True)
+        (out / "COMMIT.txt").write_text("==== 2026-10-21T09:17:02Z stage 9 TEST_MODE=0\n" + "".join(
+            f"stage-9 predictions frozen at {f} (2026-10-15T07:54:47+00:00); note sha256 {n}; spec sha256 {s}; HEAD {f}\n"
+            for f, n, s in records) + "2026-10-21T09:17:30Z Prakash et al.'s release https://github.com/Nix07/mind at "
+            + "0" * 40 + " in /root/.cache\n")
+        env = dict(os.environ, OUT=str(out), S8_STATE=str(state), PY=str(_stub_python(tmp_path)),
+                   TGZ=str(tmp_path / f"{name}.tgz"))
+        return out, sh(run, repo, env=env, check=False)
+
+    old = "a" * 40
+    for name, rec in (("other_F", (old, note, spec)), ("other_note", (F, "b" * 64, spec)), ("other_spec", (F, note, "c" * 64))):
+        out, r = session(name, [rec])
+        assert r.returncode == 1, (name, r.stdout + r.stderr)
+        failed = (out / "FAILED.txt").read_text()
+        assert "already records another freeze" in failed and f"{rec[0]} (note {rec[1][:12]}, spec {rec[2][:12]})" in failed, name
+        assert len(Freeze(out).recs) == 1                                   # nothing appended
+    out, r = session("same", [(F, note, spec)])
+    assert r.returncode == 0, r.stdout + r.stderr
+    fr = Freeze(out)
+    assert len(fr.recs) == 2 and fr.unique and fr.F == F
+    out, r = session("none", [])
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert Freeze(out).unique
+    torn = tmp_path / "torn"                                               # a NUL byte (a torn append) is not binary
+    (torn / "logs").mkdir(parents=True)
+    (torn / "COMMIT.txt").write_bytes(f"stage-9 predictions frozen at {old} (2026-10-15T07:54:47+00:00); note sha256 {note}; "
+                                      f"spec sha256 {spec}; HEAD {old}\n".encode() + b"\0\0\0\0\n")
+    r = sh(run, repo, env=dict(os.environ, OUT=str(torn), S8_STATE=str(state), PY=str(_stub_python(tmp_path)),
+                               TGZ=str(tmp_path / "torn.tgz")), check=False)
+    assert r.returncode == 1 and "already records another freeze" in (torn / "FAILED.txt").read_text()
+
+
 def test_s9_lb_stale_and_the_st_step(tmp_path):
     """s9_lb_stale: true when the stories file recorded another lb sha256 than the lb file has (cal reran), or cannot be
     read; false without a stories file or when they agree. gpu_stage9.sh redoes a done st step when it is true."""

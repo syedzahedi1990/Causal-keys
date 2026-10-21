@@ -28,6 +28,9 @@
 #   4. code (ckeys experiments analysis scripts tests data) that differs between F and HEAD;
 #   4b. results files already in OUT (an earlier session's) written at a commit other than HEAD (s9_other_commits): a
 #      later session resumes on the same HEAD, or the scorer would see two commits and score nothing;
+#   4c. a COMMIT.txt in OUT that already records another freeze (F, note or spec sha256; s9_other_freeze): the scorer wants
+#      one freeze record, so a session at a new freeze starts from a new OUT (an earlier session that wrote no results
+#      file, e.g. one stopped at the gates, still left its record);
 #   5. transformers other than 5.18.0 (pip install only when the version or a needed package differs, as s8_init), or no
 #      CUDA device with >= MINGIB GiB (default 75).
 # Checks 1-4 are s9_git_checks, which needs no CUDA (tests/test_stage9_guard.py runs it in temporary repositories). On
@@ -111,6 +114,17 @@ s9_other_commits() {  # s9_other_commits <head>: the results files in OUT writte
   $PY -c "$S9_PY_COMMITS" "$OUT" "$1"
 }
 
+s9_other_freeze() {  # s9_other_freeze <F> <note sha256> <spec sha256>: the freeze records in OUT/COMMIT.txt of another freeze
+  # (the scorer's FREEZE_RE, analysis/stage9_parts/checks.py: one (F, note, spec) across the records, else every verdict is
+  # NOT EVALUABLE); no python, so the guard's tests can stub PY; -a: a NUL byte (a torn append) must not turn the file binary;
+  # the "" concatenations make awk compare strings, never numbers
+  [ -f "$OUT/COMMIT.txt" ] || return 0
+  grep -aoE 'stage-9 predictions frozen at [0-9a-f]{7,40} \([^)]*\); note sha256 [0-9a-f]{64}; spec sha256 [0-9a-f]{64}' "$OUT/COMMIT.txt" \
+    | awk -v f="$1" -v n="$2" -v s="$3" '{F = $5; N = $9; S = $12; sub(/;$/, "", N)
+        if (F "" != f "" || N "" != n "" || S "" != s "") print F " (note " substr(N, 1, 12) ", spec " substr(S, 1, 12) ")"}' | sort -u
+  return 0
+}
+
 s9_lb_stale() {  # s9_lb_stale <tag>: see the header
   local st="$OUT/stories/$1.json" lb="$OUT/lb/$1.json" rec
   [ -f "$st" ] && [ -f "$lb" ] || return 1
@@ -128,6 +142,8 @@ s9_guard() {  # checks 0-5; records the freeze in COMMIT.txt and exports STAGE9_
   IFS=$'\t' read -r STAGE9_FREEZE fdate STAGE9_NOTE_SHA256 STAGE9_SPEC_SHA256 head <<< "$info"
   other=$(s9_other_commits "$head") || die "stage-9 guard: cannot read the results files in $OUT"
   [ -z "$other" ] || die "stage-9 guard: results files in $OUT were written at another commit than HEAD $head ($(echo "$other" | head -n 3 | tr '\n' ';')): the scorer wants one commit across the results files; check out that commit (code and note are frozen, so it passed this guard), or start a new OUT (docs/GPU_RUNBOOK.md, Stage 9)"
+  other=$(s9_other_freeze "$STAGE9_FREEZE" "$STAGE9_NOTE_SHA256" "$STAGE9_SPEC_SHA256")
+  [ -z "$other" ] || die "stage-9 guard: $OUT/COMMIT.txt already records another freeze ($(echo "$other" | head -n 3 | tr '\n' ';')): the scorer wants one freeze record, so a session at a new freeze starts from a new OUT (move $OUT aside or set OUT; never unpack an earlier freeze's archive into it) (docs/GPU_RUNBOOK.md, Stage 9)"
   export STAGE9_FREEZE STAGE9_NOTE_SHA256 STAGE9_SPEC_SHA256
   echo "stage-9 predictions frozen at $STAGE9_FREEZE ($fdate); note sha256 $STAGE9_NOTE_SHA256; spec sha256 $STAGE9_SPEC_SHA256; HEAD $head" \
     | tee -a "$OUT/COMMIT.txt"

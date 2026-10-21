@@ -9,12 +9,15 @@
 # Guard (scripts/stage9_common.sh, s9_guard): refuses a tree with modified tracked files or untracked files in the code
 # directories, a history without the commit "Freeze stage-9 predictions", a note, spec or code (ckeys experiments analysis
 # scripts tests data) that differs from that commit, results under OUT that git tracks or that an earlier session wrote at
-# another commit than HEAD, transformers other than 5.18.0 and a GPU under MINGIB GiB (default 75); it records the freeze
+# another commit than HEAD, an OUT whose COMMIT.txt already records another freeze (an earlier freeze's session, even one
+# that stopped at the gates), transformers other than 5.18.0 and a GPU under MINGIB GiB (default 75); it records the freeze
 # commit and the sha256 of the note and the spec in COMMIT.txt and exports them to the steps (every results file records
 # them).
 # Steps (scripts/stage8_common.sh: each kept once done, FORCE=1 / FORCE_STEPS=<names or globs> redo, logs in
 # $OUT/logs/<step>.log, a failed step goes to FAILED.txt and the pipeline goes on; exit 3 of a step = complete up to the
 # deadline, recorded in SKIPPED.txt and redone next session):
+#   release         Prakash et al.'s release at the pinned commit (one gate test reads it; no step does): fetched into
+#                   ~/.cache/causal-keys/mind-<sha> (or PRAKASH_REPO), hashes checked -> logs/release.log, release_fetch.log
 #   pytest          the FP32 exactness tests of every stage-9 builder and the shared modules they call, before any model
 #   per model key:
 #     chk_st_<key>  experiments/stage9_stories.py --stage check  (tokenizer only)        -> check/<tag>_stories.json
@@ -55,8 +58,10 @@ s9_init
 
 # ---- Prakash et al.'s release at the pinned commit (sparse: the data and the two ported code files), hashes asserted.
 # No stage-9 step reads it; the gate test tests/test_stage8_edits.py::test_prakash_caa_with_natural_difference_equals_id
-# does, so it is fetched here, before the gates, exactly as scripts/gpu_stage8c.sh fetches it (the first stage-9 session,
-# on 2026-10-21, stopped at that test because the box had no checkout: docs/stage9/RUN_LOG.md).
+# does, so it is fetched here, before the gates, as scripts/gpu_stage8c.sh fetches it (the first stage-9 session, on
+# 2026-10-21, stopped at that test because the box had no checkout: docs/stage9/RUN_LOG.md). A PRAKASH_REPO that does
+# not exist yet is fetched into; one that exists must be a checkout at the pinned commit. The default cache path is
+# disposable: a checkout there that is not at the pinned commit (an interrupted fetch) is removed and fetched again.
 SHA=$(PYTHONPATH=. $PY -c "from ckeys.causaltom import RELEASE_SHA; print(RELEASE_SHA)") || die "ckeys.causaltom not importable"
 URL=$(PYTHONPATH=. $PY -c "from ckeys.causaltom import RELEASE_URL; print(RELEASE_URL)")
 DEFREL=$HOME/.cache/causal-keys/mind-$SHA
@@ -64,14 +69,17 @@ REL=${PRAKASH_REPO:-}
 if [ -z "$REL" ]; then
   if on TEST_MODE && [ -d /home/user/nix07/mind/.git ]; then REL=/home/user/nix07/mind; else REL=$DEFREL; fi
 fi
-if [ ! -d "$REL/.git" ]; then   # fetched only into the default cache path (an existing other directory is left untouched)
-  if [ -e "$REL" ]; then [ "$REL" = "$DEFREL" ] && rm -rf "$REL" || die "PRAKASH_REPO=$REL exists but is not a git checkout of $SHA"; fi
+if [ ! -d "$REL/.git" ] || { [ "$REL" = "$DEFREL" ] && [ "$(git -C "$REL" rev-parse HEAD 2>/dev/null)" != "$SHA" ]; }; then
+  if [ -e "$REL" ]; then
+    if [ "$REL" = "$DEFREL" ]; then rm -rf "$REL" || die "cannot remove the stale release cache $REL"
+    else die "PRAKASH_REPO=$REL exists but is not a git checkout of $SHA"; fi
+  fi
   { mkdir -p "$REL" && git init -q "$REL" && git -C "$REL" remote add origin "$URL" \
       && git -C "$REL" sparse-checkout set --no-cone /data/ /src/dataset.py /notebooks/causalToM_novis/utils.py \
       && git -C "$REL" fetch -q --depth 1 --filter=blob:none origin "$SHA" && git -C "$REL" checkout -q FETCH_HEAD; } >> "$OUT/logs/release_fetch.log" 2>&1 \
     || { rm -rf "$REL"; die "could not fetch $URL at $SHA into $REL (see $OUT/logs/release_fetch.log)"; }
 fi
-[ "$(git -C "$REL" rev-parse HEAD 2>/dev/null)" = "$SHA" ] || die "the release checkout $REL is not at $SHA"
+[ "$(git -C "$REL" rev-parse HEAD 2>/dev/null)" = "$SHA" ] || die "the release checkout $REL is not at $SHA (PRAKASH_REPO: point it at a checkout of $SHA, or unset it to use the default cache path)"
 export PRAKASH_REPO=$REL
 echo "$(s8_utc) Prakash et al.'s release $URL at $SHA in $REL" >> "$OUT/COMMIT.txt"
 s8_run release $PY -m ckeys.causaltom || die "the release or pool hash check (see $OUT/logs/release.log)"

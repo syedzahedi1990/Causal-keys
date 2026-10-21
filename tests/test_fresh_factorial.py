@@ -8,7 +8,8 @@ runs on the GPU, each against an independently computed reference.
 4. The lower-case fields of run_item equal format_factorial.run_item on 2 S0 items; plain_item equals it too, and the
    JB-G3 statistics pass in FP32 and fail on a perturbed record.
 5. experiments/paper1_frames.py --score E: L equals the old lp_rows (every run of run_core, locations and letters); the
-   default path writes byte-identical output to the file before the flag was added.
+   default path writes the output of the file before the flag was added: byte-identical, or (two processes; MKL's FP32
+   CPU kernels are not bitwise reproducible across runs) the same structure, strings and ints, and floats to 1e-4.
 6. score_cached equals score_reference on tiny random Gemma-2 (eager, sliding layers) and Phi-3 (fused qkv) models.
 7. Frame admission rejects a frame that breaks the disjointness rule (in calibration, and per core under --score E).
 8. The tokenizer check (J-B-G0b) fails when the null sentence would not have the after-sentence's length.
@@ -227,7 +228,44 @@ def test_paper1_frames_default_path_byte_identical(tmp_path):
         f = out / "TEST_Qwen2.5-0.5B-Instruct.json"
         outs.append(f.read_bytes())
         f.unlink()
-    assert outs[0] == outs[1]
+    if outs[0] != outs[1]:   # two processes: MKL's FP32 CPU kernels are not bitwise reproducible across runs (the first
+        # stage-9 clean-room run saw a clean-B log-prob differ by a few float32 ulps, 2026-10-21); the structure, every
+        # string, int and bool must still match exactly, and every float to 1e-4 (as test_row_restricted_regression)
+        _same_up_to_float_rounding(json.loads(outs[0]), json.loads(outs[1]))
+
+
+def test_same_up_to_float_rounding_is_strict_except_floats():
+    a = {"provenance": {"n": 1, "ok": True}, "runs": {"B": {"cand": [-6.547798156738281, -11.96], "argmax": "drawer"}}}
+    _same_up_to_float_rounding(a, json.loads(json.dumps(a)))
+    b = json.loads(json.dumps(a))
+    b["runs"]["B"]["cand"][0] = -6.547800064086914                       # a few float32 ulps: accepted
+    _same_up_to_float_rounding(a, b)
+    for change in (lambda d: d["runs"]["B"]["cand"].__setitem__(0, -6.5479),    # 1e-4: refused
+                   lambda d: d["runs"]["B"].__setitem__("argmax", "shelf"),
+                   lambda d: d["provenance"].__setitem__("ok", 1),
+                   lambda d: d["provenance"].__setitem__("n", 2),
+                   lambda d: d["runs"]["B"]["cand"].append(0.0),
+                   lambda d: d["runs"]["B"].__setitem__("extra", 0)):
+        c = json.loads(json.dumps(a))
+        change(c)
+        with pytest.raises(AssertionError):
+            _same_up_to_float_rounding(a, c)
+
+
+def _same_up_to_float_rounding(a, b, path="$"):
+    assert type(a) is type(b) or {type(a), type(b)} <= {int, float}, (path, a, b)
+    if isinstance(a, dict):
+        assert list(a) == list(b), (path, list(a), list(b))
+        for k in a:
+            _same_up_to_float_rounding(a[k], b[k], f"{path}.{k}")
+    elif isinstance(a, list):
+        assert len(a) == len(b), (path, len(a), len(b))
+        for i, (x, y) in enumerate(zip(a, b)):
+            _same_up_to_float_rounding(x, y, f"{path}[{i}]")
+    elif isinstance(a, float) or isinstance(b, float):
+        assert abs(a - b) < 1e-4, (path, a, b)
+    else:
+        assert a == b, (path, a, b)
 
 
 @pytest.mark.parametrize("cfg", [

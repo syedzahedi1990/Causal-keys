@@ -5539,6 +5539,888 @@ print(f"stage 9 (pre): {len(REG) - N_PRE9} new S9P macros ({sum(1 for r in REG[N
       f"in {_time9.time() - _t9:.0f} s; fig_window_pre.pdf, draft caption: {CAPTION_WINDOW_PRE}")
 
 
+# ================================================================ stage 9 (paper v6): the edit window, from the GPU run (group S9)
+# Every value comes from the frozen scorer's machine-readable outputs in results/gpu_stage9: its summary stage9_summary.json
+# (an estimate with its 95 % two-stage cluster-bootstrap interval and n), its figure tables fig_window.csv and fig_edits.csv,
+# and lb/<tag>.json for l_b. Each value is formatted at the precision STAGE9_SCORE.txt prints it and asserted, with its
+# printed context (estimate, interval and n), on the score-file line that prints it; that line is registered as its source,
+# so check (1) below re-asserts every one. Precision: the PREDICTIONS, FALSIFIERS and DIRECTION B lines print 3 decimals;
+# the REPORTED curves, edit tables and psi lines print 2 (their l_c / L and silent-failure lines print 3); the CONTROLS
+# print 3 (the BF16 floor 4). Integers (L, l_b, l_c, onsets, n, counts) as printed. Where a quantity is printed at both
+# precisions (a verdict cell and the same cell of a reported curve), both are registered under different names. A range
+# over models or cells (...Min, ...Max) selects registered strings; counts of printed verdicts are registered with amac.
+# Names: Nq + statistic + format + block or onset word + model tag (MistralSeven, LlamaEight, QwenSeven); ...Lo and ...Hi
+# are the 95 % bounds. Formats: stories None, Before, PostNull, Post, After, Letter (AFTER = the list after the story,
+# \fmtListA; POST-NULL = \fmtNull); passages Nom, Optb, Opta; edit rows Nat, Eone (E1), Efourb (E4b), Caa (all-position
+# steering); blocks Three, Seven, Eleven, Fifteen. The figure fig_window.pdf is drawn from fig_window.csv and fig_edits.csv,
+# whose every plotted value is asserted equal to the summary (and so to the registered macros at their precision).
+import csv as _csv9  # noqa: E402
+
+_t9q = _time9.time()
+PRE9Q = dict(macros)   # every macro defined before the stage-9 results (asserted unchanged at the end of the block)
+N_PRE9Q = len(REG)
+G9 = "S9"
+S9F = "results/gpu_stage9/STAGE9_SCORE.txt"
+SCORE["S9"] = (ROOT / S9F).read_text().splitlines()
+SNAME["S9"] = S9F
+S9L = SCORE["S9"]
+R9 = ROOT / "results/gpu_stage9"
+SJ9 = "results/gpu_stage9/stage9_summary.json"
+J9 = json.load(open(R9 / "stage9_summary.json"))
+W9 = list(_csv9.DictReader(open(R9 / "fig_window.csv")))
+E9C = list(_csv9.DictReader(open(R9 / "fig_edits.csv")))
+M9 = ["mistral7", "llama8", "qwen7"]                 # the paper's order
+FW9 = {"NONE": "None", "BEFORE": "Before", "POST-NULL": "PostNull", "POST": "Post", "AFTER": "After", "LETTER": "Letter"}
+PW9 = {"NOM": "Nom", "OPTB": "Optb", "OPTA": "Opta"}
+RW9 = {"nat": "Nat", "E1": "Eone", "E4b": "Efourb", "CAA": "Caa"}
+EF9 = ["NONE", "AFTER", "LETTER", "POST"]            # the edit arm's formats
+AW9Q = {"0.25": "Twentyfive", "0.5": "Fifty", "0.65": "Sixtyfive", "0.8": "Eighty", "0.9": "Ninety", "1.25": "Hundredtwentyfive"}
+CW9 = {"0.5": "Fifty", "0.75": "Seventyfive", "1.5": "Hundredfifty"}
+XW9 = ("Fifteen", "Thirty", "Fortyfive", "Sixty")     # passage onsets round(x L), x = 0.15, 0.3, 0.45, 0.6
+FTX9 = {"NONE": r"\fmtNone{}", "BEFORE": r"\fmtBefore{}", "POST-NULL": r"\fmtNull{}", "POST": r"\fmtPost{}", "AFTER": r"\fmtListA{}",
+        "LETTER": r"\fmtLetter{}"}
+FLB9 = {"NONE": "no mention", "BEFORE": "list before", "POST-NULL": "null sentence after", "POST": "sentence after",
+        "AFTER": "list after", "LETTER": "letters after", "NOM": "free form (NOM)", "OPTB": "options before (OPTB)",
+        "OPTA": "options after (OPTA)"}
+RL9 = {"nat": "the natural patch (K/V of the target written at the writing token from block l + 1)",
+       "E1": "E1 (single-site steering vector at the writing token)", "E4b": "E4b (the trained DAS remap, seed 102)",
+       "CAA": "CAA (the E1 vector added at every position from the writing token on: all-position steering)"}
+TOP9 = {}          # macro -> topic (docs/stage9/S9_MACROS.md)
+_tp9 = ["?"]
+
+
+def topic9(t):
+    _tp9[0] = t
+
+
+def f9(x, fmt):
+    """a summary value as the scorer prints it; a value that rounds to zero is unsigned."""
+    s = fmt.format(x)
+    return s.lstrip("-") if s.lstrip("-").strip("0.") == "" else s
+
+
+def hd9(prefix, a=0, b=None):
+    """the one line in [a, b) of the score file that starts with prefix."""
+    hits = [i for i in range(a, len(S9L) if b is None else b) if S9L[i].startswith(prefix)]
+    assert len(hits) == 1, (prefix, a, b, hits[:5])
+    return hits[0]
+
+
+def end9(i):
+    """the end (exclusive) of the block opened by line i: the following lines indented deeper than it."""
+    ind = len(S9L[i]) - len(S9L[i].lstrip())
+    j = i + 1
+    while j < len(S9L) and S9L[j].strip() and len(S9L[j]) - len(S9L[j].lstrip()) > ind:
+        j += 1
+    return j
+
+
+def mb9(i, k):
+    """model k's sub-block (header line, end) within the prediction block opened by line i."""
+    m = hd9(f"      {k}:", i, end9(i))
+    return m, end9(m)
+
+
+def put9(name, s, idx, desc, src):
+    """register the printed string s (asserted on score-file line idx) as macro name in group S9."""
+    assert s in S9L[idx], (name, s, S9L[idx][:200])
+    nm(name, s, desc, f"{src}; printed at {S9F}:{idx + 1}", G9)
+    SRCLINE[name] = ("S9", idx, s)
+    TOP9[name] = _tp9[0]
+
+
+def v9(key, fmt="{:.3f}"):
+    e = J9[key]
+    return {"e": f9(e["pt"], fmt), "lo": None if e["lo"] is None else f9(e["lo"], fmt),
+            "hi": None if e["hi"] is None else f9(e["hi"], fmt), "n": str(e["n"])}
+
+
+def q9(name, key, idx, ctx, desc, fmt="{:.3f}", ci=True):
+    """the summary estimate J9[key] (and its 95 % bounds) formatted as the scorer prints it; ctx is its printed context with
+    {e}, {lo}, {hi}, {n} placeholders, asserted on line idx; the macros are name, nameLo and nameHi."""
+    v = v9(key, fmt)
+    c = ctx.format(**v)
+    assert c in S9L[idx], (name, c, S9L[idx][:220])
+    src = f"{SJ9} [{key}]"
+    put9(name, v["e"], idx, desc, src)
+    if ci:
+        put9(name + "Lo", v["lo"], idx, desc + " (lower 95 % bound)", src)
+        put9(name + "Hi", v["hi"], idx, desc + " (upper 95 % bound)", src)
+    return v
+
+
+def a9(name, value, desc, src, fmt="{:d}"):
+    """a count or ratio of printed values (amac), in group S9."""
+    amac(name, value, desc, src, G9, fmt)
+    TOP9[name] = _tp9[0]
+
+
+def sel9(name, src_name, desc, ci=False):
+    """name (and nameLo, nameHi) = the registered strings of src_name: a selection, re-asserted on src_name's line."""
+    for suf in ("Lo", "Hi") if ci else ():
+        assert src_name + suf in macros, src_name
+    for suf in ("",) + (("Lo", "Hi") if ci else ()):
+        nm(name + suf, macros[src_name + suf], desc + ("" if not suf else f" ({'lower' if suf == 'Lo' else 'upper'} 95 % bound)") +
+           f" (= \\{src_name + suf}) [selects a printed string]", REG[[r[1] for r in REG].index(src_name + suf)][4], G9)
+        SRCLINE[name + suf] = SRCLINE[src_name + suf]
+        TOP9[name + suf] = _tp9[0]
+
+
+def rng9q(name, names, desc, tail=""):
+    """the smallest and the largest of registered S9 strings (by value) -> nameMin, nameMax (+ tail, e.g. a model tag)."""
+    assert names and all(n in SRCLINE for n in names), [n for n in names if n not in SRCLINE]
+    v = sorted(names, key=lambda n: fl(macros[n]))
+    sel9(name + "Min" + tail, v[0], desc + " (smallest)")
+    sel9(name + "Max" + tail, v[-1], desc + " (largest)")
+
+
+# score-file sections
+POP9Q, CHK9Q, CTL9Q, PRD9Q, FAL9Q, DIR9Q, REP9Q, EXP9Q, SUM9Q = (hd9(f"#### {s}") for s in (
+    "POPULATION", "CHECKS", "CONTROLS", "PREDICTIONS", "FALSIFIERS", "DIRECTION B", "REPORTED", "EXPLORATORY", "SUMMARY"))
+
+# depth L (from the figure table: onset / onset_frac), l_b (lb/<tag>.json), the passage onsets
+LQ9, LB9, PO9 = {}, {}, {}
+for k in M9:
+    _fr = {round(int(r["onset"]) / float(r["onset_frac"])) for r in W9 if r["model"] == k and r["arm"] == "stories" and float(r["onset_frac"]) > 0}
+    assert len(_fr) == 1, (k, _fr)
+    LQ9[k] = _fr.pop()
+    LB9[k] = json.load(open(R9 / f"lb/{k}.json"))["l_b"]
+    PO9[k] = sorted({int(r["onset"]) for r in W9 if r["model"] == k and r["arm"] == "passages" and r["split"] == "E" and r["format"] == "NOM" and r["window"] == "late" and int(r["onset"]) > 0})
+    assert len(PO9[k]) == 4 and PO9[k][1] == round(0.3 * LQ9[k]), (k, PO9[k])
+
+# ---- design and population
+topic9("Design, population and depth")
+_i = POP9Q
+_g = grab(S9L, _i, r"N9 (\d+), C (\d+), E9 (\d+) .*passages E (\d+)")
+for _n, _sq, _d in (("NqStories", _g[0], "N9: new fresh story cores (stories arm)"), ("NqCalib", _g[1], "C: stage-8b calibration cores, used for l_b only"),
+                   ("NqCores", _g[2], "E9: new canonical-lexicon cores (edit and dose arm)"), ("NqPassages", _g[3], "stage 8a's counterfactual SQuAD passages, set E (decisive)")):
+    put9(_n, _sq, _i, _d, S9F)
+_i = hd9("  passages/mistral7.json: valid E ", POP9Q, CHK9Q)
+put9("NqPassagesR", grab(S9L, _i, r", R (\d+) \(")[0], _i, "stage 8a's passages, set R (held-out check)", S9F)
+for k in M9:
+    t, S = K8[k], SH8[k]
+    put9(f"NqLayers{t}", str(LQ9[k]), hd9(f"  [{k} stories, N9, L = {LQ9[k]};", REP9Q, EXP9Q), f"depth L (decoder blocks), {S}", "results/gpu_stage9/fig_window.csv (onset / onset_frac)")
+    _i = hd9(f"  {k}: l_b = {LB9[k]} (recomputed from 30 C cores; late AFTER flips ", CHK9Q, CTL9Q)
+    put9(f"NqLb{t}", str(LB9[k]), _i, f"l_b: the first onset whose late AFTER flip is <= 0.2 over the 30 C cores (fixed before N9 was scored), {S}", f"results/gpu_stage9/lb/{k}.json")
+    _cal = json.load(open(R9 / f"lb/{k}.json"))["late_after_flip"][str(LB9[k])]
+    put9(f"NqLbCal{t}", f9(_cal, "{:.3f}"), _i, f"the late AFTER flip at l_b on the 30 C cores (the calibration value that fixed l_b), {S}", f"results/gpu_stage9/lb/{k}.json")
+    assert f" {LB9[k]}: {f9(_cal, '{:.3f}')}," in S9L[_i]
+    a9(f"NqLbFrac{t}", LB9[k] / LQ9[k], f"l_b / L, {S}", f"\\NqLb{t} / \\NqLayers{t}", "{:.3f}")
+    _i = hd9(f"  [{k} passages E, L = {LQ9[k]};", REP9Q, EXP9Q) + 1
+    assert S9L[_i].startswith("    NOM   late  ")
+    for _o, _w in zip(PO9[k], XW9):
+        put9(f"NqPsgOnset{_w}{t}", str(_o), _i, f"passage onset round({dict(zip(XW9, ('0.15', '0.3', '0.45', '0.6')))[_w]} L), {S}", "results/gpu_stage9/fig_window.csv")
+        assert (f"late  {_o}: " if _o == PO9[k][0] else f"; {_o}: ") in S9L[_i]
+
+# ---- the late window: l_c per format (REPORTED, 3 decimals), the gaps (P2s, F2s), the flips at l_b (REPORTED curves, 2 decimals)
+for k in M9:
+    t, S, L, lb = K8[k], SH8[k], LQ9[k], LB9[k]
+    a, b = hd9(f"  [{k} stories, N9, L = {L};", REP9Q, EXP9Q), None
+    b = end9(a)
+    for f, fw in FW9.items():
+        topic9("The late window: l_c by format")
+        i = hd9(f"    {f:<9} l_c = ", a, b)
+        lcf = J9[f"stories/{k}/{f}:lc_frac"]
+        assert lcf["pt"] < 1, (k, f, "censored")
+        lc = round(lcf["pt"] * L)
+        assert abs(lc - lcf["pt"] * L) < 1e-3 and f"l_c = {lc}, l_c/L" in S9L[i]
+        put9(f"NqLc{fw}{t}", str(lc), i, f"l_c in {FLB9[f]} ({f}): the first onset l at which the late patch (S's K/V at the writing token in blocks l..L-1) flips fewer than half of the generated answers, {S}", f"{SJ9} [stories/{k}/{f}:lc_frac] x L")
+        q9(f"NqLcFrac{fw}{t}", f"stories/{k}/{f}:lc_frac", i, "l_c/L {e} [{lo}, {hi}] (n={n})", f"l_c / L in {FLB9[f]} ({f}), {S}")
+        put9(f"NqN{fw}{t}", str(lcf["n"]), i, f"competent stories in {FLB9[f]} ({f}) of the 150 N9 cores (the denominator of its flips), {S}", f"{SJ9} [stories/{k}/{f}:lc_frac]")
+        topic9("Late and early flips at l_b (stories, REPORTED curves, 2 decimals)")
+        for w, ww in (("late", "Late"), ("early", "Early")):
+            i = hd9(f"    {f:<9} {w:<5} 2: ", a, b)
+            q9(f"Nq{ww}{fw}{t}", f"stories/{k}/{f}:{w}@{lb}:flip", i, f"; {lb}: " + "{e} [{lo}, {hi}] (n={n})",
+               f"{w} patch from l_b = {lb} ({'blocks l_b..L-1' if w == 'late' else 'blocks 0..l_b-1'}), {FLB9[f]} ({f}): share of generated answers changed to S, {S}", "{:.2f}")
+        topic9("Single-channel patches at every layer (stories, 2 decimals)")
+        i = hd9(f"    {f:<9} K@0 ", a, b)
+        q9(f"NqKzero{fw}{t}", f"stories/{k}/{f}:K@0:flip", i, "K@0 {e} [{lo}, {hi}] (n={n})", f"key-only patch K@0 (S's key at the writing token in every layer), {FLB9[f]} ({f}): share of answers changed to S, {S}", "{:.2f}")
+        q9(f"NqVzero{fw}{t}", f"stories/{k}/{f}:V@0:flip", i, "; V@0 {e} [{lo}, {hi}] (n={n})", f"value-only patch V@0, {FLB9[f]} ({f}): share of answers changed to S, {S}", "{:.2f}")
+    topic9("The late window: l_c by format")
+    i0, _ = mb9(hd9("  P2s stories:", PRD9Q, FAL9Q), k)
+    i = hd9("          [l_c(NONE) - l_c(AFTER)]/L ", i0, end9(i0))
+    q9(f"NqGapNoneAfter{t}", f"stories/{k}/NONE-AFTER:lc_gap_frac", i, f"[l_c(NONE) - l_c(AFTER)]/L (l_c(NONE) {macros['NqLcNone' + t]}) " + "{e} [{lo}, {hi}] (n={n})",
+       f"the window shrink [l_c(NONE) - l_c(AFTER)] / L (P2s, F3), {S}")
+    for f in ("AFTER", "LETTER"):   # P2s prints the same l_c / L as REPORTED
+        assert f"l_c({f})/L (l_c {macros['NqLc' + FW9[f] + t]}) {macros['NqLcFrac' + FW9[f] + t]} [{macros['NqLcFrac' + FW9[f] + t + 'Lo']}, {macros['NqLcFrac' + FW9[f] + t + 'Hi']}]" in S9L[hd9(f'          l_c({f})/L ', i0, end9(i0))]
+    i = hd9(f"      {k}: ", hd9("  F2s ", FAL9Q, DIR9Q), end9(hd9("  F2s ", FAL9Q, DIR9Q)))
+    q9(f"NqGapBeforeAfter{t}", f"stories/{k}/BEFORE-AFTER:lc_gap_frac", i, "[l_c(BEFORE) - l_c(AFTER)]/L {e} [{lo}, {hi}] (n={n})",
+       f"[l_c(BEFORE) - l_c(AFTER)] / L: the list before the story against the list after it (F2s), {S}")
+    # inconsistency at l_b (REPORTED, 2 decimals)
+    topic9("Silent failure and inconsistency at l_b")
+    i = hd9("    inconsistency (NONE late answer S while AFTER late answer B; items competent in both) ", a, b)
+    q9(f"NqIncons{t}", f"stories/{k}/inconsistency:late@{lb}", i, f"; {lb}: " + "{e} [{lo}, {hi}] (n={n})",
+       f"inconsistency at l_b: share of stories (competent in both) whose late-patched answer is S in no mention but the stale B in list after, {S}", "{:.2f}")
+    # silent failure at l_b (REPORTED: AFTER, LETTER and POST where evaluable; 3 decimals)
+    for f in ("AFTER", "LETTER", "POST"):
+        i = hd9(f"    silent failure {f:<9} late@{lb}: ", a, b)
+        if "NOT EVALUABLE" in S9L[i].split(";")[0]:
+            continue
+        fw = FW9[f]
+        q9(f"NqSilentShare{fw}{t}", f"stories/{k}/{f}:late@{lb}:silent_share", i, "share B among non-S {e} [{lo}, {hi}] (n={n})",
+           f"silent failure, late patch from l_b, {FLB9[f]}: share answering the stale B among the answers the patch did not change to S, {S}")
+        put9(f"NqSilentN{fw}{t}", v9(f"stories/{k}/{f}:late@{lb}:silent_share")["n"], i, f"silent failure, {FLB9[f]}: answers not changed to S by the late patch from l_b, {S}", f"{SJ9} [stories/{k}/{f}:late@{lb}:silent_share]")
+        q9(f"NqSilentPb{fw}{t}", f"stories/{k}/{f}:late@{lb}:median_abs_pB", i, "median absolute p(B) of B answers {e} [{lo}, {hi}] (n={n})",
+           f"silent failure, {FLB9[f]}: median absolute probability exp(E_B) of the stale answer B among the stale answers, {S}")
+    i0, _ = mb9(hd9("  P4 silent:", PRD9Q, FAL9Q), k)
+    assert f"AFTER late@{lb}: share B among the non-S answers {macros['NqSilentShareAfter' + t]} [{macros['NqSilentShareAfter' + t + 'Lo']}, {macros['NqSilentShareAfter' + t + 'Hi']}] (n={macros['NqSilentNAfter' + t]})" in S9L[hd9(f"          AFTER late@{lb}: share", i0, end9(i0))]
+    if k == "mistral7":
+        assert f"median absolute p(B) of the B answers {macros['NqSilentPbAfter' + t]} [{macros['NqSilentPbAfter' + t + 'Lo']}, {macros['NqSilentPbAfter' + t + 'Hi']}]" in S9L[hd9(f"          AFTER late@{lb}: median", i0, end9(i0))]
+
+# ---- prediction cells at 3 decimals: P1s (smallest cell), P3s, POST
+for k in M9:
+    t, S, L, lb = K8[k], SH8[k], LQ9[k], LB9[k]
+    topic9("Prediction cells: free form stays open (P1s) and the POST scope line")
+    i0, j0 = mb9(hd9("  P1s stories:", PRD9Q, FAL9Q), k)
+    cells = [(f, l) for f in ("NONE", "BEFORE", "POST-NULL") for l in range(2, L // 2 + 1, 2)]
+    assert j0 - i0 - 1 == len(cells)
+    f, l = min(cells, key=lambda c: J9[f"stories/{k}/{c[0]}:late@{c[1]}:flip"]["pt"])
+    q9(f"NqPoneMin{t}", f"stories/{k}/{f}:late@{l}:flip", hd9(f"          {f} late@{l} ", i0, j0), f"{f} late@{l} " + "{e} [{lo}, {hi}] (n={n})",
+       f"P1s: the smallest late flip over l <= 0.5 L in no mention, list before and null sentence after (at {f}, l = {l}; threshold 0.95), {S}")
+    i0, j0 = mb9(hd9("  POST scope:", PRD9Q, FAL9Q), k)
+    for l in range(2, L // 2 + 1, 2):
+        q9(f"NqPostLate{word(l)}{t}", f"stories/{k}/POST:late@{l}:flip", hd9(f"          POST late@{l} ", i0, j0), f"POST late@{l} " + "{e} [{lo}, {hi}] (n={n})",
+           f"POST scope line: late flip from block {l} in sentence after (threshold 0.8 at every l <= 0.5 L), {S}")
+    rng9q("NqPostLateFromLb", [f"NqPostLate{word(l)}{t}" for l in range(lb, L // 2 + 1, 2)], f"sentence after: late flip over the onsets from l_b to 0.5 L, {S}", t)
+    rng9q("NqPostLateAll", [f"NqPostLate{word(l)}{t}" for l in range(2, L // 2 + 1, 2)], f"sentence after: late flip over the onsets l <= 0.5 L, {S}", t)
+    topic9("Prediction cells: the crossover at l_b (P3s, 3 decimals)")
+    i0, j0 = mb9(hd9("  P3s stories, at l_b:", PRD9Q, FAL9Q), k)
+    for f in ("AFTER", "LETTER", "NONE", "BEFORE"):
+        q9(f"NqPthreeEarly{FW9[f]}{t}", f"stories/{k}/{f}:early@{lb}:flip", hd9(f"          {f} early@{lb} ", i0, j0), f"{f} early@{lb} " + "{e} [{lo}, {hi}] (n={n})",
+           f"P3s: early patch below l_b (blocks 0..l_b-1), {FLB9[f]}: share of answers changed to S (threshold: >= 0.7 listed after, <= 0.05 otherwise), {S}")
+
+# ---- passages (stage 8a's E set; containment answers; 3 decimals): P1p, P2p, P3p, F2p
+for k in M9:
+    t, S = K8[k], SH8[k]
+    o15, o30, o45, _ = PO9[k]
+    topic9("Passages (an evaluation warning only)")
+    i0, j0 = mb9(hd9("  P1p passages:", PRD9Q, FAL9Q), k)
+    for f in ("NOM", "OPTB"):
+        for o, w in ((o15, "Fifteen"), (o30, "Thirty"), (o45, "Fortyfive")):
+            q9(f"NqPsgLate{PW9[f]}{w}{t}", f"passages/{k}/E:{f}:late@{o}:flip", hd9(f"          E {f} late@{o} ", i0, j0), f"E {f} late@{o} " + "{e} [{lo}, {hi}] (n={n})",
+               f"P1p: passages, {FLB9[f]}: late patch over the answer span from block {o}: share of answers changed to S (threshold 0.8), {S}")
+    i0, j0 = mb9(hd9("  P2p passages:", PRD9Q, FAL9Q), k)
+    q9(f"NqPsgLateOptaThirty{t}", f"passages/{k}/E:OPTA:late@{o30}:flip", hd9(f"          E OPTA late@{o30} ", i0, j0), f"E OPTA late@{o30} " + "{e} [{lo}, {hi}] (n={n})",
+       f"P2p: passages, options after (OPTA): late patch from round(0.3 L) = {o30}: share changed to S (threshold <= 0.4), {S}")
+    i0, j0 = mb9(hd9("  P3p passages,", PRD9Q, FAL9Q), k)
+    for f in ("OPTA", "NOM", "OPTB"):
+        q9(f"NqPsgEarly{PW9[f]}Thirty{t}", f"passages/{k}/E:{f}:early@{o30}:flip", hd9(f"          E {f} early@{o30} ", i0, j0), f"E {f} early@{o30} " + "{e} [{lo}, {hi}] (n={n})",
+           f"P3p: passages, {FLB9[f]}: early patch below round(0.3 L) = {o30}: share changed to S (threshold: OPTA >= 0.5, NOM and OPTB <= 0.1), {S}")
+        put9(f"NqPsgN{PW9[f]}{t}", v9(f"passages/{k}/E:{f}:early@{o30}:flip")["n"], hd9(f"          E {f} early@{o30} ", i0, j0), f"passages competent in {FLB9[f]} (of the 185 E items), {S}", f"{SJ9} [passages/{k}/E:{f}:early@{o30}:flip]")
+    _f2 = hd9("  F2p passages:", FAL9Q, DIR9Q)
+    q9(f"NqPsgGap{t}", f"passages/{k}/E:OPTB-OPTA:late@{o30}:flip_diff", hd9(f"      {k}: ", _f2, end9(_f2)), f"OPTB - OPTA late@{o30} " + "{e} [{lo}, {hi}] (n={n})",
+       f"F2p: late flip from round(0.3 L), options before minus options after (F2 triggers below 0.1), {S}")
+
+# ---- edits (E9, 80 cores, (core, t) units; generated answers)
+for k in M9:
+    t, S = K8[k], SH8[k]
+    a = hd9(f"  [{k} edits, E9, 80 cores;", REP9Q, EXP9Q)
+    b = end9(a)
+    rows = ["nat", "E1", "CAA"] + (["E4b"] if any(r["model"] == k and r["row"] == "E4b" for r in E9C) else [])
+    assert ("E4b" in rows) == (k != "llama8")
+    topic9("Edits: flips by row, format and block (REPORTED table, 2 decimals)")
+    for l in DW8:
+        for row in rows:
+            i = hd9(f"    @{l} {row:<7} r_K ", a, b)
+            rk = {round(float(r["r_K"]), 6) for r in E9C if r["model"] == k and r["row"] == row and int(r["block"]) == l}
+            assert len(rk) == 1, (k, row, l, rk)
+            rk = rk.pop()
+            assert f"r_K {rk:.3f}  NONE " in S9L[i]
+            put9(f"NqEditRk{RW9[row]}{DW8[l]}{t}", f"{rk:.3f}", i, f"r_K = proj_k: the delivered fraction of the natural key displacement at block {l}, {RL9[row]}, {S}", f"results/gpu_stage9/fig_edits.csv (r_K)")
+            for f in EF9:
+                q9(f"NqEdit{RW9[row]}{FW9[f]}{DW8[l]}{t}", f"edits/{k}/{f}@{l}:{row}:flip", i, ("  " if f == "NONE" else "; ") + f"{f} " + "{e} [{lo}, {hi}] (n={n})",
+                   f"edit at block {l}, {RL9[row]}, {FLB9[f]}: share of (core, t) answers changed to the edit's target t, {S}", "{:.2f}")
+            q9(f"NqEditTau{RW9[row]}{DW8[l]}{t}", f"edits/{k}/{l}:{row}:tau", i, "; tau {e} [{lo}, {hi}] (n={n})",
+               f"transfer tau = flip(list after) / flip(no mention) at block {l}, {RL9[row]}, {S}", "{:.2f}")
+    topic9("Dose: joint interpolation and E1 multipliers at blocks 3 and 7 (REPORTED, 2 decimals)")
+    for l in (3, 7):
+        for al, aw in AW9Q.items():
+            i = hd9(f"    @{l} {'J' + al:<7} r_K ", a, b)
+            for f in ("NONE", "AFTER"):
+                q9(f"NqDoseJ{aw}{FW9[f]}{DW8[l]}{t}", f"edits/{k}/{f}@{l}:J{al}:flip", i, ("  " if f == "NONE" else "; ") + f"{f} " + "{e} [{lo}, {hi}] (n={n})",
+                   f"joint interpolation J{al} (the target's K/V displacement scaled by alpha = {al}) at block {l}, {FLB9[f]}: share of answers changed to t, {S}", "{:.2f}")
+        for c, cw in CW9.items():
+            i = hd9(f"    @{l} {'E1x' + c:<7} r_K ", a, b)
+            for f in ("NONE", "AFTER"):
+                q9(f"NqDoseEone{cw}{FW9[f]}{DW8[l]}{t}", f"edits/{k}/{f}@{l}:E1x{c}:flip", i, ("  " if f == "NONE" else "; ") + f"{f} " + "{e} [{lo}, {hi}] (n={n})",
+                   f"E1 scaled by {c} at block {l}, {FLB9[f]}: share of answers changed to t, {S}", "{:.2f}")
+        for f in ("NONE", "AFTER"):
+            i = hd9(f"    psi (nats) {f}@{l}: ", a, b)
+            for al, aw in AW9Q.items():
+                q9(f"NqPsiJ{aw}{FW9[f]}{DW8[l]}{t}", f"dose/{k}/{f}@{l}:psi_J({al}):nats", i, f"psi_J({al}) " + "{e} [{lo}, {hi}] (n={n})",
+                   f"psi_J({al}) = mean identity contrast of J{al} / that of the natural patch (E, nats) at block {l}, {FLB9[f]}, {S}", "{:.2f}")
+    # P5a: E1 against the natural patch, every format x block cell (3 decimals)
+    topic9("Edits: single-site E1 tracks the patch (P5a, 3 decimals)")
+    i0, j0 = mb9(hd9("  P5a single-site", PRD9Q, FAL9Q), k)
+    within, cells = 0, []
+    for f in EF9:
+        for l in DW8:
+            i = hd9(f"          {f}@{l} flip(E1) - flip(nat) ", i0, j0)
+            n_ = f"NqEoneDiff{FW9[f]}{DW8[l]}{t}"
+            q9(n_, f"edits/{k}/{f}@{l}:E1-nat:flip_diff", i, f"{f}@{l} flip(E1) - flip(nat) " + "{e} [{lo}, {hi}] (n={n})",
+               f"P5a: flip(E1) - flip(nat), {FLB9[f]}, block {l} (threshold |d| <= 0.1), {S}")
+            ok = not S9L[i].rstrip().endswith(": NOT SUPPORTED")
+            assert ok == (abs(J9[f"edits/{k}/{f}@{l}:E1-nat:flip_diff"]["pt"]) <= 0.1)
+            within += ok
+            cells.append(n_)
+    a9(f"NqEoneWithin{t}", within, f"P5a: format x block cells with |flip(E1) - flip(nat)| <= 0.1 at the point (of \\NqEoneCells{t}), {S}", S9F + " (P5a cell verdicts)")
+    a9(f"NqEoneCells{t}", len(cells), f"P5a: format x block cells, {S}", S9F)
+    sel9(f"NqEoneGap{t}", max(cells, key=lambda n: abs(fl(macros[n]))), f"P5a: the cell with the largest |flip(E1) - flip(nat)| (signed), {S}", ci=True)
+    # P5b and P5c (3 decimals)
+    if "E4b" in rows:
+        topic9("Edits: the trained remap E4b (P5b, 3 decimals)")
+        i0, j0 = mb9(hd9("  P5b E4b fails", PRD9Q, FAL9Q), k)
+        q9(f"NqTauNatThree{t}", f"edits/{k}/3:nat:tau", i0, "precondition tau_nat(3) {e} [{lo}, {hi}] (n={n})", f"P5b precondition: the natural patch's transfer tau at block 3 (>= 0.9 required), {S}")
+        for l in DW8:
+            i = hd9(f"          tau_E4b({l}) ", i0, j0)
+            put9(f"NqEfourbNone{DW8[l]}{t}", v9(f"edits/{k}/NONE@{l}:E4b:flip")["e"], i, f"P5b: E4b's flip in no mention at block {l} (the line reads tau where this is >= 0.5), {S}", f"{SJ9} [edits/{k}/NONE@{l}:E4b:flip]")
+            assert f"(E4b NONE flip {macros['NqEfourbNone' + DW8[l] + t]} >= 0.5)" in S9L[i]
+            q9(f"NqTauEfourb{DW8[l]}{t}", f"edits/{k}/{l}:E4b:tau", i, f"(E4b NONE flip {macros['NqEfourbNone' + DW8[l] + t]} >= 0.5) " + "{e} [{lo}, {hi}] (n={n})",
+               f"P5b: E4b's transfer tau = flip(list after) / flip(no mention) at block {l} (threshold <= 0.7), {S}")
+    topic9("Edits: all-position steering (P5c, 3 decimals)")
+    _p5 = hd9("  P5c all-position", PRD9Q, FAL9Q)
+    i = hd9(f"      {k}: TRANSFERS  ", _p5, end9(_p5))
+    for l in (11, 15):
+        nv = v9(f"edits/{k}/AFTER@{l}:nat:flip")
+        read = J9[f"edits/{k}/AFTER@{l}:nat:flip"]["pt"] <= 0.2
+        q9(f"NqPfivecNat{DW8[l]}{t}", f"edits/{k}/AFTER@{l}:nat:flip", i,
+           f"block {l}: nat AFTER " + "{e} [{lo}, {hi}] (n={n}) " + ("<= 0.2, CAA AFTER" if read else "> 0.2 (the window is open; not read)"),
+           f"P5c: the natural patch's flip in list after at block {l}" + ("" if read else " (above 0.2: the line does not read this block)") + f", {S}")
+        if read:
+            q9(f"NqPfivecCaa{DW8[l]}{t}", f"edits/{k}/AFTER@{l}:CAA:flip", i,
+               f"block {l}: nat AFTER {nv['e']} [{nv['lo']}, {nv['hi']}] (n={nv['n']}) <= 0.2, CAA AFTER " + "{e} [{lo}, {hi}] (n={n})",
+               f"P5c: all-position steering's flip in list after at block {l}, where the natural patch's is <= 0.2, {S}")
+    # Direction B: B1, B2 (3 decimals), B3, B-F2
+    topic9("Dose: the half-dose lines B1, B2 and the falsifier B-F2 (3 decimals)")
+    i0, j0 = mb9(hd9("  B1 block 3:", DIR9Q, REP9Q), k)
+    for f in ("NONE", "AFTER"):
+        q9(f"NqHalfJoint{FW9[f]}{t}", f"edits/{k}/{f}@3:J0.5:flip", hd9(f"          {f}@3 J0.5 ", i0, j0), f"{f}@3 J0.5 " + "{e} [{lo}, {hi}] (n={n})",
+           f"B1: joint interpolation at alpha = 0.5, block 3, {FLB9[f]}: share changed to t (thresholds: no mention >= 0.9, list after <= 0.35), {S}")
+    i0, j0 = mb9(hd9("  B2 block 3:", DIR9Q, REP9Q), k)
+    for f in ("NONE", "AFTER"):
+        q9(f"NqHalfEone{FW9[f]}{t}", f"edits/{k}/{f}@3:E1x0.5:flip", hd9(f"          {f}@3 E1x0.5 ", i0, j0), f"{f}@3 E1x0.5 " + "{e} [{lo}, {hi}] (n={n})",
+           f"B2: E1 at half dose, block 3, {FLB9[f]}: share changed to t (thresholds: no mention >= 0.9, list after <= 0.5), {S}")
+    _bf = hd9("  B-F2 ", FAL9Q, DIR9Q)
+    q9(f"NqBFtwo{t}", f"dose/{k}/B-F2:psiV(NONE,3,0.5)-psiK(AFTER,3,0.5)", hd9(f"      {k}: ", _bf, end9(_bf)), "psi_V(NONE, 3, 0.5) - psi_K(AFTER, 3, 0.5) {e} [{lo}, {hi}] (n={n})",
+       f"B-F2: psi_V(no mention, block 3, 0.5) - psi_K(list after, block 3, 0.5) (E, nats; triggered at <= 0.1), {S}")
+    topic9("The key share r_K predicts transfer (B3, 3 decimals)")
+    i0, j0 = mb9(hd9("  B3 r_K predicts", DIR9Q, REP9Q), k)
+    q9(f"NqAuc{t}", f"edits/{k}/B3:auc", hd9("          AUC of r_K ", i0, j0), "AUC of r_K {e} [{lo}, {hi}] (n={n})",
+       f"B3: AUC of r_K for transfer to list after (units (core, t, edit row) at the blocks where the natural patch transfers; threshold 0.8), {S}")
+    _g = grab(S9L, i0, r"cells \(blocks\) \[([\d, ]+)\]; (\d+) units, (\d+) positives, (\d+) negatives")
+    assert _g[1] == v9(f"edits/{k}/B3:auc")["n"]
+    put9(f"NqAucUnits{t}", _g[1], i0, f"B3: units (core, t, edit row) in the AUC, {S}", S9F)
+    put9(f"NqAucPos{t}", _g[2], i0, f"B3: units that transfer (answer t in list after), {S}", S9F)
+    put9(f"NqAucNeg{t}", _g[3], i0, f"B3: units that do not transfer, {S}", S9F)
+    q9(f"NqRuleAcc{t}", f"edits/{k}/B3:rule_accuracy", i0, "rule r_K >= 0.8 accuracy {e} [{lo}, {hi}] (n={n})", f"B3: accuracy of the fixed rule 'r_K >= 0.8 predicts transfer', {S}")
+
+# ---- controls (CONTROLS, CHECKS)
+topic9("Controls and checks")
+for k in M9:
+    t, S = K8[k], SH8[k]
+    for f, fw in FW9.items():
+        i = hd9(f"  {k:<8} stories {f:<9} competent ", CTL9Q, PRD9Q)
+        nn = J9[f"stories/{k}/{f}:lc_frac"]["n"]
+        s_ = f9(nn / int(macros["NqStories"]), "{:.3f}")
+        assert f"competent {s_} ({nn}/{macros['NqStories']})" in S9L[i]
+        put9(f"NqCompetent{fw}{t}", s_, i, f"share of the 150 N9 stories competent in {FLB9[f]} (the none row answers B, the clean S run answers S), {S}", f"{SJ9} [stories/{k}/{f}:lc_frac] n / 150")
+        q9(f"NqFull{fw}{t}", f"stories/{k}/{f}:KV@0:flip_all", i, "flip(KV@0) all items {e} [{lo}, {hi}] (n={n})", f"control: the full patch KV@0 (= the S run) on all 150 stories, {FLB9[f]}: share answering S, {S}")
+        q9(f"NqFloor{fw}{t}", f"stories/{k}/{f}:bf16_floor_mean_abs_E", i, "BF16 floor mean|E(none) - E(clean B)| {e}, ", f"BF16 floor: mean |E(none) - E(clean B)| (nats; the identity row against the clean run in another batch shape), {FLB9[f]}, {S}", "{:.4f}", ci=False)
+        _ad = f9(J9[f"stories/{k}/{f}:bf16_floor_mean_abs_E"]["argmax_differs"], "{:.3f}")
+        assert f"E-argmax differs {_ad} (n=" in S9L[i]
+        put9(f"NqFloorArg{fw}{t}", _ad, i, f"BF16 floor: share of stories whose E-argmax answer differs between the identity row and the clean run, {FLB9[f]}, {S}", f"{SJ9} [stories/{k}/{f}:bf16_floor_mean_abs_E argmax_differs]")
+        _eg = grab(S9L, i, r"E-argmax = generation (\d\.\d+) \(")[0]
+        put9(f"NqEargGen{fw}{t}", _eg, i, f"agreement of the E-argmax answer with the generated answer over all rows, {FLB9[f]}, {S}", S9F)
+    i = hd9(f"  {k}: T_check max ", CHK9Q, CTL9Q)
+    _tc = re.findall(r"'\d+': (\d+\.\d+)", S9L[i])
+    assert len(_tc) == 4 and all(float(x) == 0 for x in _tc)
+    put9(f"NqTcheck{t}", max(_tc, key=float), i, f"T_check: the largest |table of T - natural table of S| over the edit blocks (the residual written as an edit reproduces the patch; 0 expected), {S}", S9F)
+_i = hd9("  FP32 gate: ", CHK9Q, CTL9Q)
+_tests = re.findall(r"(\d+) passed, (\d+) failed or error, (\d+) skipped", S9L[_i])
+a9("NqTestsPassed", sum(int(x[0]) for x in _tests), f"FP32 exactness tests passed in the gate session ({len(_tests)} files)", f"{S9F}:{_i + 1}")
+a9("NqTestsFailed", sum(int(x[1]) for x in _tests), "FP32 exactness tests failed or in error in the gate session", f"{S9F}:{_i + 1}")
+a9("NqTestsSkipped", sum(int(x[2]) for x in _tests), "FP32 exactness tests skipped in the gate session", f"{S9F}:{_i + 1}")
+a9("NqTestFiles", len(_tests), "test files of the FP32 gate", f"{S9F}:{_i + 1}")
+
+# ---- verdicts and totals (SUMMARY; the per-model verdicts of the summary JSON)
+topic9("Verdicts and totals")
+VC9 = {"P1": "Pone", "P1s": "Pones", "P1p": "Ponep", "P2": "Ptwo", "P2s": "Ptwos", "P2p": "Ptwop", "P3": "Pthree", "P3s": "Pthrees",
+       "P3p": "Pthreep", "P4": "Pfour", "P5a": "Pfivea", "P5b": "Pfiveb", "POST": "Post", "B1": "Bone", "B2": "Btwo", "B3": "Bthree"}
+FC9 = {"F1": "Fone", "F2s": "Ftwos", "F2p": "Ftwop", "F2": "Ftwo", "F3": "Fthree", "B-F1": "BFone", "B-F2": "BFtwo"}
+_s0 = hd9("  Predictions (combined over the models", SUM9Q)
+for c, cw in VC9.items():
+    i = hd9(f"    {c:<5} ", _s0, len(S9L))
+    m_ = re.match(r"    \S+\s+(NOT SUPPORTED|SUPPORTED AT THE POINT|SUPPORTED|NOT EVALUABLE)\s{2,}(.*)$", S9L[i])
+    assert m_ and m_.group(1) == J9[f"verdict/ALL/{c}"]["verdict"], (c, S9L[i])
+    put9(f"NqVerdict{cw}", m_.group(1), i, f"stage-9 verdict of line {c}, combined over the three models", f"{SJ9} [verdict/ALL/{c}]")
+    per = dict(re.findall(r"(mistral7|llama8|qwen7) (NOT SUPPORTED|SUPPORTED AT THE POINT|SUPPORTED|NOT EVALUABLE)(?:,|$)", m_.group(2)))
+    for k in M9:
+        if f"verdict/{k}/{c}" not in J9:
+            assert k not in per
+            continue
+        assert per[k] == J9[f"verdict/{k}/{c}"]["verdict"], (c, k)
+        put9(f"NqVerdict{cw}{K8[k]}", per[k], i, f"stage-9 verdict of line {c}, {SH8[k]}", f"{SJ9} [verdict/{k}/{c}]")
+i = hd9("    P5c   ", _s0, len(S9L))
+for k in M9:
+    assert J9[f"verdict/{k}/P5c"]["transfers"] and f"{k} TRANSFERS" in S9L[i]
+    put9(f"NqVerdictPfivec{K8[k]}", "TRANSFERS", i, f"P5c (reported either way): all-position steering transfers to list after, {SH8[k]}", f"{SJ9} [verdict/{k}/P5c]")
+_f0 = hd9("  Falsifiers (at the point, any model):", SUM9Q)
+for c, cw in FC9.items():
+    i = hd9(f"    {c:<5} ", _f0, len(S9L))
+    v = "TRIGGERED" if J9[f"falsifier/ALL/{c}"]["triggered"] else "not triggered"
+    assert S9L[i].startswith(f"    {c:<5} {v}"), (c, S9L[i])
+    put9(f"NqFalsifier{cw}", v, i, f"stage-9 falsifier {c}, any model", f"{SJ9} [falsifier/ALL/{c}]")
+    for k in M9:
+        if f"falsifier/{k}/{c}" in J9:
+            vk = "TRIGGERED" if J9[f"falsifier/{k}/{c}"]["triggered"] else "not triggered"
+            assert re.search(rf"{k} {vk}(,|$)", S9L[i]), (c, k)
+            put9(f"NqFalsifier{cw}{K8[k]}", vk, i, f"stage-9 falsifier {c}, {SH8[k]}", f"{SJ9} [falsifier/{k}/{c}]")
+i = hd9("  Totals over P1-P4, P5a, P5b, POST, B1-B3: ", SUM9Q)
+_g = grab(S9L, i, r": (\d+) SUPPORTED, (\d+) SUPPORTED AT THE POINT, (\d+) NOT SUPPORTED, (\d+) NOT EVALUABLE")
+_lines10 = ["P1", "P2", "P3", "P4", "P5a", "P5b", "POST", "B1", "B2", "B3"]
+for _n, _sq, _v in (("NqTotSupported", _g[0], "SUPPORTED"), ("NqTotAtPoint", _g[1], "SUPPORTED AT THE POINT"), ("NqTotNotSupported", _g[2], "NOT SUPPORTED"), ("NqTotNotEvaluable", _g[3], "NOT EVALUABLE")):
+    assert int(_sq) == sum(J9[f"verdict/ALL/{c}"]["verdict"] == _v for c in _lines10), _n
+    put9(_n, _sq, i, f"stage-9 lines (P1-P4, P5a, P5b, POST, B1-B3) with the combined verdict {_v}", SJ9 + " [verdict/ALL/*]")
+a9("NqTotLines", sum(int(x) for x in _g), "stage-9 lines with a combined verdict (P1-P4, P5a, P5b, POST, B1-B3)", f"{S9F}:{i + 1}")
+i = hd9("  P2p passages: ", PRD9Q, FAL9Q)
+put9("NqPtwopCount", grab(S9L, i, r"\[(\d) of 3 at the point\]")[0], i, "P2p: models in which options after close the late passage window at the point (2 of 3 needed)", S9F)
+
+# ---- ranges over models (and cells) that the text cites
+topic9("Ranges over models")
+_t9s = [K8[k] for k in M9]
+for f, fw in FW9.items():
+    rng9q(f"NqLcFrac{fw}", [f"NqLcFrac{fw}{t}" for t in _t9s], f"l_c / L in {FLB9[f]} ({f}) over the three models")
+rng9q("NqLcFracListed", [f"NqLcFrac{fw}{t}" for fw in ("After", "Letter") for t in _t9s], "l_c / L in list after and letters after over the three models")
+rng9q("NqLcFracFree", [f"NqLcFrac{fw}{t}" for fw in ("None", "Before", "PostNull") for t in _t9s], "l_c / L in no mention, list before and null sentence after over the three models")
+rng9q("NqGapNoneAfter", [f"NqGapNoneAfter{t}" for t in _t9s], "[l_c(NONE) - l_c(AFTER)] / L over the three models")
+rng9q("NqGapBeforeAfter", [f"NqGapBeforeAfter{t}" for t in _t9s], "[l_c(BEFORE) - l_c(AFTER)] / L over the three models")
+rng9q("NqEarlyListed", [f"NqEarly{fw}{t}" for fw in ("After", "Letter") for t in _t9s], "early flip at l_b (2 decimals) in list after and letters after over the three models")
+rng9q("NqEarlyFree", [f"NqEarly{fw}{t}" for fw in ("None", "Before", "PostNull") for t in _t9s], "early flip at l_b (2 decimals) in no mention, list before and null sentence after over the three models")
+rng9q("NqLateListed", [f"NqLate{fw}{t}" for fw in ("After", "Letter") for t in _t9s], "late flip from l_b (2 decimals) in list after and letters after over the three models")
+rng9q("NqLateFree", [f"NqLate{fw}{t}" for fw in ("None", "Before", "PostNull") for t in _t9s], "late flip from l_b (2 decimals) in no mention, list before and null sentence after over the three models")
+rng9q("NqPthreeEarlyListed", [f"NqPthreeEarly{fw}{t}" for fw in ("After", "Letter") for t in _t9s], "P3s: early flip at l_b (3 decimals) in list after and letters after over the three models")
+rng9q("NqPthreeEarlyFree", [f"NqPthreeEarly{fw}{t}" for fw in ("None", "Before") for t in _t9s], "P3s: early flip at l_b (3 decimals) in no mention and list before over the three models")
+rng9q("NqPoneMin", [f"NqPoneMin{t}" for t in _t9s], "P1s: the smallest late flip at l <= 0.5 L in the free formats, over the three models")
+rng9q("NqSilentShareAfter", [f"NqSilentShareAfter{t}" for t in _t9s], "silent failure in list after: share stale among the unchanged answers, over the three models")
+rng9q("NqSilentPbAfter", [f"NqSilentPbAfter{t}" for t in _t9s], "silent failure in list after: median absolute p(B) of the stale answers, over the three models")
+rng9q("NqIncons", [f"NqIncons{t}" for t in _t9s], "inconsistency at l_b over the three models")
+rng9q("NqKzeroListed", [f"NqKzero{fw}{t}" for fw in ("After", "Letter") for t in _t9s], "key-only patch K@0 in list after and letters after over the three models")
+rng9q("NqVzeroListed", [f"NqVzero{fw}{t}" for fw in ("After", "Letter") for t in _t9s], "value-only patch V@0 in list after and letters after over the three models")
+rng9q("NqKzeroFree", [f"NqKzero{fw}{t}" for fw in ("None", "Before") for t in _t9s], "key-only patch K@0 in no mention and list before over the three models")
+rng9q("NqVzeroFree", [f"NqVzero{fw}{t}" for fw in ("None", "Before") for t in _t9s], "value-only patch V@0 in no mention and list before over the three models")
+rng9q("NqPsgEarlyClosed", [f"NqPsgEarly{fw}Thirty{t}" for fw in ("Nom", "Optb") for t in _t9s], "passages: early flip below round(0.3 L) in free form and options before over the three models")
+rng9q("NqPsgLateOpen", [f"NqPsgLate{fw}{w}{t}" for fw in ("Nom", "Optb") for w in ("Fifteen", "Thirty", "Fortyfive") for t in _t9s], "passages: late flip in free form and options before at 0.15, 0.3 and 0.45 L over the three models")
+rng9q("NqEfourbNone", [f"NqEfourbNone{DW8[l]}{K8[k]}" for k in ("mistral7", "qwen7") for l in DW8], "E4b's flip in no mention over blocks 3-15 at Mistral-7B and Qwen2.5-7B")
+rng9q("NqTauEfourbThree", [f"NqTauEfourbThree{K8[k]}" for k in ("mistral7", "qwen7")], "E4b's transfer tau at block 3 at Mistral-7B and Qwen2.5-7B")
+rng9q("NqTauEfourbSeven", [f"NqTauEfourbSeven{K8[k]}" for k in ("mistral7", "qwen7")], "E4b's transfer tau at block 7 at Mistral-7B and Qwen2.5-7B")
+rng9q("NqTauEfourbLate", [f"NqTauEfourb{w}{K8[k]}" for k in ("mistral7", "qwen7") for w in ("Eleven", "Fifteen")], "E4b's transfer tau at blocks 11 and 15 at Mistral-7B and Qwen2.5-7B")
+rng9q("NqTauEfourbBeyond", [f"NqTauEfourb{w}{K8[k]}" for k in ("mistral7", "qwen7") for w in ("Seven", "Eleven", "Fifteen")], "E4b's transfer tau beyond block 3 (blocks 7, 11, 15) at Mistral-7B and Qwen2.5-7B")
+rng9q("NqPfivecCaa", [n for n in macros if re.fullmatch(r"NqPfivecCaa(Eleven|Fifteen)(MistralSeven|LlamaEight|QwenSeven)", n)], "P5c: all-position steering's list-after flip at blocks 11 and 15 where the natural patch's is <= 0.2 (the cells the line reads)")
+rng9q("NqPfivecNatRead", [f"NqPfivecNat{w}{t}" for w in ("Eleven", "Fifteen") for t in _t9s if f"NqPfivecCaa{w}{t}" in macros], "P5c: the natural patch's list-after flip in the cells the line reads")
+rng9q("NqAuc", [f"NqAuc{t}" for t in _t9s], "B3: AUC of r_K over the three models")
+rng9q("NqRuleAcc", [f"NqRuleAcc{t}" for t in _t9s], "B3: accuracy of the rule r_K >= 0.8 over the three models")
+rng9q("NqHalfNone", [f"NqHalf{w}None{t}" for w in ("Joint", "Eone") for t in _t9s], "B1 and B2: half-dose flip in no mention at block 3 (J0.5 and E1 x 0.5) over the three models")
+rng9q("NqHalfAfter", [f"NqHalf{w}After{t}" for w in ("Joint", "Eone") for t in _t9s], "B1 and B2: half-dose flip in list after at block 3 (J0.5 and E1 x 0.5) over the three models")
+rng9q("NqBFtwo", [f"NqBFtwo{t}" for t in _t9s], "B-F2 statistic over the three models")
+rng9q("NqFloor", [f"NqFloor{fw}{t}" for fw in FW9.values() for t in _t9s], "BF16 floor mean |E(none) - E(clean B)| over the six story formats and three models")
+rng9q("NqFloorArg", [f"NqFloorArg{fw}{t}" for fw in FW9.values() for t in _t9s], "BF16 floor: share of E-argmax answers that differ, over the six story formats and three models")
+rng9q("NqEargGen", [f"NqEargGen{fw}{t}" for fw in FW9.values() for t in _t9s], "E-argmax = generated answer agreement over the six story formats and three models")
+rng9q("NqCompetent", [f"NqCompetent{fw}{t}" for fw in FW9.values() for t in _t9s], "share of N9 stories competent over the six formats and three models")
+rng9q("NqFull", [f"NqFull{fw}{t}" for fw in FW9.values() for t in _t9s], "the full patch KV@0 on all stories over the six formats and three models")
+for _n in ("NqLbFrac",):   # l_b / L is arithmetic (not a printed string): its range is registered the same way, as arithmetic
+    _v = sorted((f"{_n}{t}" for t in _t9s), key=lambda n: fl(macros[n]))
+    a9(_n + "Min", fl(macros[_v[0]]), f"l_b / L, smallest over the three models (= \\{_v[0]})", "arithmetic", "{:.3f}")
+    a9(_n + "Max", fl(macros[_v[-1]]), f"l_b / L, largest over the three models (= \\{_v[-1]})", "arithmetic", "{:.3f}")
+a9("NqEoneWithinAll", sum(int(macros[f"NqEoneWithin{t}"]) for t in _t9s), "P5a: cells with |flip(E1) - flip(nat)| <= 0.1 at the point, over the three models (of \\NqEoneCellsAll)", "sum of \\NqEoneWithin*")
+a9("NqEoneCellsAll", sum(int(macros[f"NqEoneCells{t}"]) for t in _t9s), "P5a: format x block cells over the three models", "sum of \\NqEoneCells*")
+
+# ---- check: an independent parse of STAGE9_SCORE.txt (regexes on the printed text, not the summary) for a sample of the
+# headline macros; each must equal the macro's registered string
+def chk9(name, path, pat):
+    """path: line prefixes, each searched (startswith) after the previous hit; pat: a regex whose group 1 is the printed value."""
+    i = 0
+    for p_ in path:
+        i = next(j for j in range(i, len(S9L)) if S9L[j].startswith(p_))
+    m_ = re.search(pat, S9L[i])
+    assert m_ and m_.group(1) == macros[name], (name, m_ and m_.group(1), macros[name], S9L[i][:160])
+    return name
+
+
+_chk9 = []
+for k in M9:
+    t, lb = K8[k], LB9[k]
+    for f in ("NONE", "AFTER", "LETTER", "BEFORE"):
+        _chk9.append(chk9(f"NqLcFrac{FW9[f]}{t}", [f"  [{k} stories", f"    {f:<9} l_c = "], r"l_c/L (\d\.\d+) \["))
+    _chk9.append(chk9(f"NqLb{t}", [f"  [{k} stories", "    l_b = "], r"l_b = (\d+)$"))
+    _chk9.append(chk9(f"NqGapNoneAfter{t}", ["  F3 ", f"      {k}: "], r"/L (\d\.\d+) \["))
+    _chk9.append(chk9(f"NqGapBeforeAfter{t}", ["  F2s ", f"      {k}: "], r"/L (\d\.\d+) \["))
+    for f in ("AFTER", "LETTER", "NONE"):
+        _chk9.append(chk9(f"NqPthreeEarly{FW9[f]}{t}", ["  P3s stories", f"      {k}:", f"          {f} early@"], r"early@\d+ (\d\.\d+) \["))
+    _chk9.append(chk9(f"NqEarlyAfter{t}", [f"  [{k} stories", "    AFTER     early "], rf"; {lb}: (\d\.\d+) \["))
+    _chk9.append(chk9(f"NqLateAfter{t}", [f"  [{k} stories", "    AFTER     late  "], rf"; {lb}: (\d\.\d+) \["))
+    _chk9.append(chk9(f"NqSilentShareAfter{t}", ["  P4 silent", f"      {k}:", "          AFTER late@"], r"answers (\d\.\d+) \["))
+    _chk9.append(chk9(f"NqPsgLateOptaThirty{t}", ["  P2p passages", f"      {k}:", "          E OPTA late@"], r"late@\d+ (\d\.\d+) \["))
+    _chk9.append(chk9(f"NqPsgEarlyOptaThirty{t}", ["  P3p passages", f"      {k}:", "          E OPTA early@"], r"early@\d+ (\d\.\d+) \["))
+    _chk9.append(chk9(f"NqPsgGap{t}", ["  F2p passages", f"      {k}: "], r"late@\d+ (\d\.\d+) \["))
+    _chk9.append(chk9(f"NqAuc{t}", ["  B3 r_K", f"      {k}:", "          AUC of r_K"], r"r_K (\d\.\d+) \["))
+    _chk9.append(chk9(f"NqRuleAcc{t}", ["  B3 r_K", f"      {k}:"], r"accuracy (\d\.\d+) \["))
+    _chk9.append(chk9(f"NqAucUnits{t}", ["  B3 r_K", f"      {k}:"], r"; (\d+) units"))
+    _chk9.append(chk9(f"NqHalfJointNone{t}", ["  B1 block 3", f"      {k}:", "          NONE@3 J0.5"], r"J0\.5 (\d\.\d+) \["))
+    _chk9.append(chk9(f"NqHalfEoneNone{t}", ["  B2 block 3", f"      {k}:", "          NONE@3 E1x0.5"], r"E1x0\.5 (\d\.\d+) \["))
+    _chk9.append(chk9(f"NqBFtwo{t}", ["  B-F2 ", f"      {k}: "], r"0\.5\) (\d\.\d+) \["))
+    _chk9.append(chk9(f"NqEditCaaAfterFifteen{t}", [f"  [{k} edits", "    @15 CAA "], r"; AFTER (\d\.\d+) \["))
+    _chk9.append(chk9(f"NqEditNatAfterSeven{t}", [f"  [{k} edits", "    @7 nat "], r"; AFTER (\d\.\d+) \["))
+    _chk9.append(chk9(f"NqPfivecNatFifteen{t}", ["  P5c all-position", f"      {k}: "], r"block 15: nat AFTER (\d\.\d+) \["))
+    _chk9.append(chk9(f"NqVerdictPthrees{t}", ["  P3s stories", f"      {k}: "], r": (NOT SUPPORTED|SUPPORTED AT THE POINT|SUPPORTED)$"))
+for k in ("mistral7", "qwen7"):
+    for l in DW8:
+        _chk9.append(chk9(f"NqTauEfourb{DW8[l]}{K8[k]}", ["  P5b E4b", f"      {k}:", f"          tau_E4b({l})"], r"\) (\d\.\d+) \["))
+_chk9.append(chk9("NqEoneDiffAfterElevenQwenSeven", ["  P5a single-site", "      qwen7:", "          AFTER@11 "], r"flip\(nat\) (-\d\.\d+) \["))
+_chk9.append(chk9("NqPsgLateOptbFortyfiveLlamaEight", ["  P1p passages", "      llama8:", "          E OPTB late@14 "], r"late@14 (\d\.\d+) \["))
+_chk9.append(chk9("NqPostLateTwelveMistralSeven", ["  POST scope", "      mistral7:", "          POST late@12 "], r"late@12 (\d\.\d+) \["))
+_chk9.append(chk9("NqSilentPbAfterMistralSeven", ["  P4 silent", "      mistral7:", "          AFTER late@8: median"], r"answers (\d\.\d+) \["))
+_chk9.append(chk9("NqTotSupported", ["#### SUMMARY", "  Totals over"], r": (\d+) SUPPORTED,"))
+_chk9.append(chk9("NqTotNotSupported", ["#### SUMMARY", "  Totals over"], r"(\d+) NOT SUPPORTED,"))
+_chk9.append(chk9("NqTotNotEvaluable", ["#### SUMMARY", "  Totals over"], r"(\d+) NOT EVALUABLE$"))
+_chk9.append(chk9("NqVerdictPone", ["#### SUMMARY", "    P1    "], r"^    P1\s+(NOT SUPPORTED|SUPPORTED AT THE POINT|SUPPORTED)\s{2,}"))
+_chk9.append(chk9("NqVerdictBthree", ["#### SUMMARY", "    B3    "], r"^    B3\s+(NOT SUPPORTED|SUPPORTED AT THE POINT|SUPPORTED)\s{2,}"))
+_chk9.append(chk9("NqFalsifierFtwo", ["#### SUMMARY", "    F2    "], r"^    F2\s+(TRIGGERED|not triggered)"))
+assert len(_chk9) == len(set(_chk9)) >= 30, len(_chk9)
+# every S9 macro that is not an arithmetic value is a printed string on its cited line (check (1) below repeats this)
+_s9 = REG[N_PRE9Q:]
+assert all(r[0] == G9 for r in _s9) and all(re.fullmatch(r"Nq[A-Za-z]+", r[1]) for r in _s9)
+assert all(r[1] in SRCLINE or "arithmetic" in r[3] for r in _s9), [r[1] for r in _s9 if r[1] not in SRCLINE and "arithmetic" not in r[3]][:5]
+_ok9 = sum(1 for r in _s9 if r[1] in SRCLINE and SRCLINE[r[1]][0] == "S9" and SRCLINE[r[1]][2] in S9L[SRCLINE[r[1]][1]] and macros[r[1]] == SRCLINE[r[1]][2])
+assert _ok9 == sum(1 for r in _s9 if r[1] in SRCLINE)
+assert all(macros[n] == v for n, v in PRE9Q.items()), [n for n, v in PRE9Q.items() if macros[n] != v][:5]
+
+
+# ---- figure fig_window.pdf (the text width, one row of four panels)
+CAPTION_WINDOW = (   # draft caption (the sections are written by the lead)
+    "Whether a patch at the writing token still changes the answer depends on the depth and the format. (a-c) Share of generated "
+    "answers changed to S by the late patch (S's key and value at the writing token in blocks l..L-1; solid) and by the early "
+    "patch (blocks 0..l-1; dashed), against the onset l as a fraction of the depth L, for no mention, list before, sentence after, "
+    "list after and letters after (N9, 150 stories; 95 % intervals as bands; dotted line: l_b). (d) Transfer to list after of edits "
+    "written at blocks 3-15: the natural patch, single-site steering E1, the trained remap E4b (not run at Llama) and all-position "
+    "steering (CAA); within a block, Mistral-7B, Llama-3.1-8B and Qwen2.5-7B from left to right; dotted: each model's l_b "
+    "(M, L, Q) in blocks (E9, 80 cores).")
+ST9 = {"NONE": (INK2, "s"), "BEFORE": (AQUA, "^"), "POST": (ORANGE, "D"), "AFTER": (BLUE, "o"), "LETTER": (PURPLE, "v")}
+# v6 review: E1 is a filled diamond (a hollow marker means the early patch in panels a-c); no connecting lines in (d),
+# whose dotted lines mark each model's l_b in blocks (M, L, Q)
+ED9 = {"nat": (INK, "o", INK), "E1": (INK2, "D", INK2), "E4b": (INK2, "^", INK2), "CAA": (BROWN, "s", BROWN)}
+DX9 = {"mistral7": -0.85, "llama8": 0.0, "qwen7": 0.85}
+
+
+def _w9(k, f, w):
+    rows = sorted((r for r in W9 if r["model"] == k and r["arm"] == "stories" and r["format"] == f and r["window"] == w), key=lambda r: int(r["onset"]))
+    for r in rows:   # every plotted point is the summary's estimate (onset 0: the window ends, KV@0 for late and none for early)
+        o = int(r["onset"])
+        key = f"stories/{k}/{f}:{w}@{o}:flip" if o else f"stories/{k}/{f}:{'KV@0' if w == 'late' else 'none'}:flip"
+        e = J9[key]
+        assert all(abs(float(r[c]) - e[x]) < 1e-5 for c, x in (("flip", "pt"), ("flip_lo", "lo"), ("flip_hi", "hi"))) and int(r["n"]) == e["n"], (key, r)
+    return (np.array([float(r[c]) for r in rows]) for c in ("onset_frac", "flip", "flip_lo", "flip_hi"))
+
+
+def window_figure():
+    fig = plt.figure(figsize=(6.75, 2.0))   # v6 review: 2.2 -> 2.0 in for the 8-page limit; absolute margins kept
+    gs = fig.add_gridspec(1, 4, width_ratios=[1, 1, 1, 0.92], wspace=0.13, left=0.052, right=0.995, bottom=0.1815, top=0.78)
+    axs = []
+    for j, k in enumerate(M9):
+        ax = fig.add_subplot(gs[0, j], sharey=axs[0] if axs else None)
+        axs.append(ax)
+        xl = LB9[k] / LQ9[k]
+        ax.axvline(xl, color=INK2, lw=0.7, ls=(0, (1, 1.3)), zorder=1)
+        ax.text(xl + 0.012, 0.56, r"$l_b$", fontsize=6.5, color=INK2, ha="left", va="center", zorder=4,
+                bbox=dict(boxstyle="square,pad=0.05", fc="white", ec="none", alpha=0.85))
+        for f, (col, mk) in ST9.items():
+            for w, ls, mfc in (("late", "-", col), ("early", (0, (2.6, 1.4)), "white")):
+                x, y, lo, hi = _w9(k, f, w)
+                ax.fill_between(x, lo, hi, color=col, alpha=0.12, lw=0, zorder=2)
+                ax.plot(x, y, color=col, ls=ls, lw=1.0, marker=mk, ms=2.3, mfc=mfc, mew=0.55, zorder=3 if w == "late" else 2.5)
+        ax.set_xlim(-0.02, 1.0)
+        ax.set_xticks([0, 0.25, 0.5, 0.75, 1])
+        ax.set_xticklabels(["0", "0.25", "0.5", "0.75", "1"])
+        ax.set_xlabel(r"patch onset $l\,/\,L$", fontsize=7, labelpad=1)
+        ax.set_title(f"({'abc'[j]}) {SH8[k]}", fontsize=7.5, color=INK, loc="left", pad=2)
+        if j:
+            plt.setp(ax.get_yticklabels(), visible=False)
+    axs[0].set_ylabel("answers changed to S", fontsize=7, labelpad=1)
+    dx = fig.add_subplot(gs[0, 3], sharey=axs[0])
+    for k in M9:
+        for row, (col, mk, mfc) in ED9.items():
+            pts = []
+            for l in DW8:
+                rr = [r for r in E9C if r["model"] == k and r["row"] == row and r["format"] == "AFTER" and int(r["block"]) == l]
+                if not rr:
+                    continue
+                r = rr[0]
+                e = J9[f"edits/{k}/AFTER@{l}:{row}:flip"]
+                assert all(abs(float(r[c]) - e[x]) < 1e-5 for c, x in (("flip", "pt"), ("lo", "lo"), ("hi", "hi"))), (k, row, l)
+                pts.append((l + DX9[k], float(r["flip"]), float(r["lo"]), float(r["hi"])))
+            if not pts:
+                continue
+            p = np.array(pts)
+            dx.vlines(p[:, 0], p[:, 2], p[:, 3], color=col, lw=0.6, alpha=0.7, zorder=2)
+            dx.plot(p[:, 0], p[:, 1], ls="none", marker=mk, ms=2.8, color=col, mfc=mfc, mew=0.6, zorder=3)
+    for k in M9:   # each model's l_b, in blocks (dotted, as in panels a-c)
+        dx.axvline(LB9[k], color=INK2, lw=0.7, ls=(0, (1, 1.3)), zorder=1)
+        dx.text(LB9[k], 0.62, {"mistral7": "M", "llama8": "L", "qwen7": "Q"}[k], fontsize=6, color=INK2, ha="center",
+                va="center", zorder=4, bbox=dict(boxstyle="square,pad=0.08", fc="white", ec="none", alpha=0.9))
+    dx.set_xticks(list(DW8))
+    dx.set_xlim(1.4, 16.6)
+    dx.set_xlabel("edit block", fontsize=7, labelpad=1)
+    dx.set_title("(d) edits, list after", fontsize=7.5, color=INK, loc="left", pad=2)
+    plt.setp(dx.get_yticklabels(), visible=False)
+    for a_ in axs + [dx]:
+        a_.set_ylim(-0.04, 1.04)
+        a_.set_yticks([0, 0.25, 0.5, 0.75, 1])
+        a_.tick_params(labelsize=6.5, pad=1.5, length=2.5)
+        a_.grid(axis="y", color=GRID, lw=0.6, zorder=0)
+    axs[0].set_yticklabels(["0", "", "0.5", "", "1"])
+    kw = dict(frameon=False, fontsize=6.5, handletextpad=0.35, columnspacing=0.9, borderaxespad=0.1)
+    hs = [matplotlib.lines.Line2D([], [], color=c, marker=m, ms=2.8, lw=1.0) for c, m in ST9.values()]
+    hs += [matplotlib.lines.Line2D([], [], color=INK2, lw=1.0, marker="o", ms=2.8),
+           matplotlib.lines.Line2D([], [], color=INK2, lw=1.0, ls=(0, (2.6, 1.4)), marker="o", ms=2.8, mfc="white", mew=0.55)]
+    fig.legend(hs, [FLB9[f] for f in ST9] + ["late (blocks l..L-1)", "early (blocks 0..l-1)"], ncol=7, loc="upper left",
+               bbox_to_anchor=(0.045, 1.0), handlelength=1.9, **kw)
+    he = [matplotlib.lines.Line2D([], [], ls="none", color=c, marker=m, mfc=mf, ms=3.0, mew=0.6) for c, m, mf in ED9.values()]
+    dx.legend(he, ["patch", "E1", "E4b", "CAA"], ncol=1, loc="lower right", bbox_to_anchor=(1.02, 0.07), handlelength=0.8,
+              labelspacing=0.25, **kw)
+    fig.savefig(FIG / "fig_window.pdf", metadata=MD8META)
+    plt.close(fig)
+
+
+window_figure()
+
+
+# ---- tab_stage9.tex: the stage-9 verdict table (appendix; full text width, table*); caption and label live in the section
+VTX9 = {"SUPPORTED": "supported", "SUPPORTED AT THE POINT": "at the point", "NOT SUPPORTED": r"\textbf{not supported}",
+        "NOT EVALUABLE": "not evaluable", "TRANSFERS": "transfers", "TRIGGERED": r"\textbf{triggered}", "not triggered": "not triggered"}
+CELL9 = re.compile(r"^\s+(?P<lab>.+?) (?P<v>-?\d\.\d+) \[(?P<lo>-?\d\.\d+), (?P<hi>-?\d\.\d+)\] \(n=\d+\) (?P<cmp>>=|<=|in) "
+                   r"(?P<thr>\[-0\.1, 0\.1\]|\d\.\d+): (?P<vd>NOT SUPPORTED|SUPPORTED AT THE POINT|SUPPORTED)$")
+
+
+def lab9(lab):
+    """a printed cell label -> LaTeX."""
+    m_ = re.fullmatch(r"(NONE|BEFORE|POST-NULL|POST|AFTER|LETTER) (late|early)@(\d+)", lab)
+    if m_:
+        return f"{FTX9[m_.group(1)]}, {m_.group(2)}, $l={m_.group(3)}$"
+    m_ = re.fullmatch(r"E (NOM|OPTB|OPTA) (late|early)@(\d+)", lab)
+    if m_:
+        return f"{FLAB8[m_.group(1)]}, {m_.group(2)}, $l={m_.group(3)}$"
+    m_ = re.fullmatch(r"(\w+)@(\d+) flip\(E1\) - flip\(nat\)", lab)
+    if m_:
+        return f"{FTX9[m_.group(1)]}, block {m_.group(2)}"
+    m_ = re.fullmatch(r"tau_E4b\((\d+)\) .*", lab)
+    if m_:
+        return f"$\\tau$, block {m_.group(1)}"
+    m_ = re.fullmatch(r"(NONE|AFTER)@3 (J0\.5|E1x0\.5)", lab)
+    if m_:
+        return f"{FTX9[m_.group(1)]}"
+    m_ = re.fullmatch(r"AFTER late@\d+: (share B|median absolute p\(B\)).*", lab)
+    if m_:
+        return "stale share" if m_.group(1) == "share B" else "median $p(B)$"
+    return lab.replace("_", r"\_")
+
+
+def two9(a, b):
+    """a cell with a second, small line below it (left-aligned)."""
+    return f"{a}\\newline{{\\scriptsize {b}}}"
+
+
+def tv9(s):
+    """a printed number -> LaTeX (a math minus)."""
+    return f"$-${s[1:]}" if s.startswith("-") else s
+
+
+def worst9(i0, j0):
+    """the decisive cell of a model's block: the NOT SUPPORTED cell furthest past its threshold, else the SUPPORTED AT THE
+    POINT cell nearest to it; None if every cell is SUPPORTED."""
+    cs = []
+    for i in range(i0 + 1, j0):
+        m_ = CELL9.match(S9L[i])
+        assert m_, S9L[i][:150]
+        v = fl(m_.group("v"))
+        mg = (0.1 - abs(v)) if m_.group("cmp") == "in" else (v - fl(m_.group("thr")) if m_.group("cmp") == ">=" else fl(m_.group("thr")) - v)
+        cs.append((m_.group("vd"), mg, m_.group("lab"), m_.group("v")))
+    for vd in ("NOT SUPPORTED", "SUPPORTED AT THE POINT"):
+        c = [x for x in cs if x[0] == vd]
+        if c:
+            x = min(c, key=lambda x: x[1])
+            return f"{lab9(x[2])}: {tv9(x[3])}"
+    return None
+
+
+def mcell9(code, k):
+    """a model's cell: its verdict and, below it, the decisive cell (printed strings)."""
+    if f"verdict/{k}/{code}" not in J9:
+        return "--"
+    v = J9[f"verdict/{k}/{code}"]["verdict"]
+    hdr = {"P1s": "  P1s stories:", "P1p": "  P1p passages:", "P2s": "  P2s stories:", "P2p": "  P2p passages:", "P3s": "  P3s stories, at l_b:",
+           "P3p": "  P3p passages,", "P4": "  P4 silent:", "P5a": "  P5a single-site", "P5b": "  P5b E4b fails", "POST": "  POST scope:",
+           "B1": "  B1 block 3:", "B2": "  B2 block 3:", "B3": "  B3 r_K predicts"}.get(code)
+    if hdr is None or v == "SUPPORTED":
+        return VTX9[v]
+    i0, j0 = mb9(hd9(hdr, PRD9Q, REP9Q), k)
+    w = worst9(i0, j0)
+    return two9(VTX9[v], w) if w else VTX9[v]
+
+
+L9T = [   # (code, sub-line?, short prediction)
+    ("P1", False, "Free form keeps the late window open"),
+    ("P1s", True, r"stories: late flip $\ge 0.95$ at every $l \le 0.5L$ in \fmtNone, \fmtBefore, \fmtNull"),
+    ("P1p", True, r"passages: late flip $\ge 0.8$ in free form and options before at $0.15, 0.3, 0.45\,L$"),
+    ("P2", False, "Candidates listed after the story close the late window"),
+    ("P2s", True, r"stories: $l_c/L \le 0.35$ (Mistral, Llama), $\le 0.55$ (Qwen) in \fmtListA, \fmtLetter; the window shrinks by $\ge 0.15\,L$ from \fmtNone"),
+    ("P2p", True, r"passages: options after, late flip at $0.3L \le 0.4$ in 2 of 3 models"),
+    ("P3", False, "The crossover: with the list after, the early window opens"),
+    ("P3s", True, r"stories at $l_b$: early flip $\ge 0.7$ in \fmtListA, \fmtLetter; $\le 0.05$ in \fmtNone, \fmtBefore"),
+    ("P3p", True, r"passages, early to $0.3L$: options after $\ge 0.5$; free form, options before $\le 0.1$"),
+    ("P4", False, r"Failures are silent: at $l_b$ in \fmtListA, $\ge 0.8$ of unchanged answers are the stale B (Mistral: median $p(B) \ge 0.8$)"),
+    ("P5a", False, r"Single-site steering E1 tracks the patch: $|\Delta\,\text{flip}| \le 0.1$ in every format $\times$ block cell"),
+    ("P5b", False, r"The trained remap E4b fails with the list: $\tau \le 0.7$ wherever its \fmtNone{} flip is $\ge 0.5$ (Mistral, Qwen)"),
+    ("P5c", False, r"All-position steering (CAA), reported: transfers if its \fmtListA{} flip is $\ge 0.5$ where the patch's is $\le 0.2$"),
+    ("POST", False, r"A neutral sentence after keeps the window open: late flip $\ge 0.8$ at every $l \le 0.5L$ in \fmtPost"),
+    ("B1", False, r"Block 3, joint $\alpha = 0.5$: \fmtListA{} flip $\le 0.35$ and \fmtNone{} flip $\ge 0.9$"),
+    ("B2", False, r"Block 3, E1 at half dose: \fmtNone{} flip $\ge 0.9$ and \fmtListA{} flip $\le 0.5$"),
+    ("B3", False, r"The key share $r_K$ predicts transfer to \fmtListA: AUC $\ge 0.8$"),
+]
+F9T = [
+    ("F1", r"early flip at $l_b \ge 0.2$ in \fmtNone{} or \fmtBefore"),
+    ("F2", r"the list's position does not matter (F2s or F2p)"),
+    ("F2s", r"$[l_c(\text{\fmtBefore}) - l_c(\text{\fmtListA})]/L < 0.1$"),
+    ("F2p", r"passages: options before minus options after, late flip at $0.3L$, $< 0.1$"),
+    ("F3", r"$[l_c(\text{\fmtNone}) - l_c(\text{\fmtListA})]/L < 0.1$"),
+    ("B-F1", r"joint $\alpha = 0.5$, \fmtListA{} flip at block 3 $\ge 0.6$"),
+    ("B-F2", r"$\psi_V(\text{\fmtNone}, 0.5) - \psi_K(\text{\fmtListA}, 0.5) \le 0.1$ at block 3"),
+]
+_fd9 = {"F2p": ("  F2p passages:", r"OPTB - OPTA late@\d+ (\d\.\d+) \[")}
+lines9 = [r"% the stage-9 verdict table, generated by paper/make_figures.py from results/gpu_stage9 (stage9_summary.json; every value",
+          r"% a printed string of STAGE9_SCORE.txt). Set it in a table* float; caption and label live in the section file.",
+          r"\footnotesize", r"\setlength{\tabcolsep}{4pt}", r"\begin{tabular}{@{}l>{\raggedright\arraybackslash}p{0.29\textwidth}>{\raggedright\arraybackslash}p{0.105\textwidth}*{3}{>{\raggedright\arraybackslash}p{0.145\textwidth}}@{}}", r"\toprule",
+          r"Line & Prediction (frozen before the run) & Verdict & Mistral-7B & Llama-3.1-8B & Qwen2.5-7B \\", r"\midrule"]
+for code, sub, txt in L9T:
+    if code == "P5c":
+        vv = "\\emph{reported}"
+        cells = [VTX9["TRANSFERS"] if J9[f"verdict/{k}/P5c"]["transfers"] else "does not transfer" for k in M9]
+    else:
+        vv = VTX9[J9[f"verdict/ALL/{code}"]["verdict"]]
+        cells = [mcell9(code, k) for k in M9]
+    if code == "P2":   # per model, P2 is the stories part alone (the passages part is decided over the models)
+        cells = [VTX9[J9[f"verdict/{k}/P2"]["verdict"]] for k in M9]
+    _q = "\\quad " if sub else ""
+    _vb = vv if (sub or code == "P5c") else "\\textbf{" + J9[f"verdict/ALL/{code}"]["verdict"].lower().replace("supported at the point", "at the point") + "}"
+    lines9.append(f"{_q}{code} & {txt} & {_vb} & " + " & ".join(cells) + " \\\\")
+lines9 += [r"\midrule", r"\multicolumn{6}{@{}l}{\emph{Falsifiers} (at the point, any model)} \\"]
+for code, txt in F9T:
+    vv = VTX9["TRIGGERED" if J9[f"falsifier/ALL/{code}"]["triggered"] else "not triggered"]
+    cells = []
+    for k in M9:
+        if f"falsifier/{k}/{code}" not in J9:
+            cells.append("--")
+            continue
+        tr = J9[f"falsifier/{k}/{code}"]["triggered"]
+        c = VTX9["TRIGGERED" if tr else "not triggered"]
+        if tr and code in _fd9:
+            _h = hd9(_fd9[code][0], FAL9Q, DIR9Q)
+            _gvq = grab(S9L, hd9(f"      {k}: ", _h, end9(_h)), _fd9[code][1])[0]
+            c = two9(c, f"options before $-$ after: {tv9(_gvq)}")
+        cells.append(c)
+    _q = "\\quad " if code in ("F2s", "F2p") else ""
+    lines9.append(f"{_q}{code} & {txt} & {vv} & " + " & ".join(cells) + " \\\\")
+lines9 += [r"\bottomrule",
+           r"\multicolumn{6}{@{}p{\textwidth}@{}}{\footnotesize Totals over the ten lines P1--P4, P5a, P5b, POST and B1--B3: "
+           f"{macros['NqTotSupported']} supported, {macros['NqTotAtPoint']} supported at the point, {macros['NqTotNotSupported']} not supported, "
+           f"{macros['NqTotNotEvaluable']} not evaluable. A model's verdict is \\emph{{supported}} when the point estimate and its whole 95\\,\\% "
+           r"interval lie on the predicted side, \emph{at the point} when only the point does; a line combines its models (P2p: 2 of 3 at the point). "
+           r"Below a model's verdict: the decisive cell as printed by the scorer (the failing cell furthest past its threshold, else the "
+           r"cell nearest to it). Per model, P2 is the stories part P2s alone. P5b and E4b were not run at Llama. Generated answers; "
+           r"stories N9 (150), passages E (185), edits E9 (80 cores).} \\",
+           r"\end{tabular}"]
+wtab("tab_stage9.tex", lines9)
+
+# ---- the S9 block's summary and, with S9_MACRO_INDEX=<file>, the writers' index (docs/stage9/S9_MACROS.md)
+_s9 = REG[N_PRE9Q:]
+assert all(r[0] == G9 for r in _s9) and all(macros[n] == v for n, v in PRE9Q.items())
+_n9sel = sum(1 for r in _s9 if "selects a printed string" in r[3])
+_n9ar = sum(1 for r in _s9 if "arithmetic" in r[3])
+print(f"stage 9: {len(_s9)} new S9 macros ({len(_s9) - _n9sel - _n9ar} read from results/gpu_stage9 and asserted on their printed "
+      f"score-file context, {_n9sel} selections of those strings (ranges and decisive cells), {_n9ar} arithmetic); independent "
+      f"parse of STAGE9_SCORE.txt matches {len(_chk9)} sampled macros; fig_window.pdf, tab_stage9.tex in {_time9.time() - _t9q:.0f} s; "
+      f"draft caption: {CAPTION_WINDOW}")
+if os.environ.get("S9_MACRO_INDEX"):
+    def _mv9(n):
+        return f"`\\{n}` = `{macros[n]}`"
+    CHEAT9 = [   # the V6 plan's "Stage 9 in one paragraph", item by item, with the macros that carry each number
+        ("Design: stories, edit cores, passages", ["NqStories", "NqCores", "NqPassages", "NqCalib", "NqPassagesR"]),
+        ("Depth L and l_b per model (l_b / L)", [f"Nq{s_}{t}" for t in _t9s for s_ in ("Layers", "Lb", "LbFrac")]),
+        ("Free form: l_c(NONE) / L (= 22/32, 26/32, 26/28; use \\pct{} for percent)", [f"NqLcNone{t}" for t in _t9s] + [f"NqLcFracNone{t}" for t in _t9s] + ["NqLcFracNoneMin", "NqLcFracNoneMax"]),
+        ("Listed after (AFTER, LETTER): l_c / L", [f"NqLcFrac{w}{t}" for w in ("After", "Letter") for t in _t9s] + ["NqLcFracListedMin", "NqLcFracListedMax"]),
+        ("The window shrinks by [l_c(NONE) - l_c(AFTER)] / L (P2s)", [f"NqGapNoneAfter{t}" for t in _t9s] + ["NqGapNoneAfterMin", "NqGapNoneAfterMax"]),
+        ("Position, not presence: BEFORE stays open; [l_c(BEFORE) - l_c(AFTER)] / L (F2s not triggered)", [f"NqLcFracBefore{t}" for t in _t9s] + [f"NqGapBeforeAfter{t}" for t in _t9s] + ["NqGapBeforeAfterMin", "NqGapBeforeAfterMax", "NqFalsifierFtwos"]),
+        ("Silent failure (P4): stale share among unchanged answers at l_b in AFTER; Mistral's median p(B)", [f"NqSilentShareAfter{t}" for t in _t9s] + ["NqSilentShareAfterMin", "NqSilentShareAfterMax", "NqSilentPbAfterMistralSeven", "NqSilentNAfterMistralSeven"]),
+        ("The crossover at l_b, 3 decimals (P3s): early flip in AFTER / LETTER; NONE / BEFORE", [f"NqPthreeEarly{w}{t}" for w in ("After", "Letter") for t in _t9s] + ["NqPthreeEarlyListedMin", "NqPthreeEarlyListedMax", "NqPthreeEarlyFreeMax", "NqVerdictPthreesMistralSeven"]),
+        ("The crossover, 2-decimal curve values (as in the figure)", ["NqEarlyListedMin", "NqEarlyListedMax", "NqEarlyFreeMin", "NqEarlyFreeMax", "NqLateListedMin", "NqLateListedMax"]),
+        ("Passages: OPTA vs OPTB late flip at 0.3 L; OPTA early; F2p (Qwen)", [f"NqPsgLate{w}Thirty{t}" for w in ("Opta", "Optb") for t in _t9s] + [f"NqPsgEarlyOptaThirty{t}" for t in _t9s] + [f"NqPsgGap{t}" for t in _t9s] + ["NqPsgEarlyClosedMin", "NqPsgEarlyClosedMax", "NqFalsifierFtwopQwenSeven"]),
+        ("P1 fails at Llama's OPTB passages at 0.45 L (block 14)", ["NqPsgLateOptbFortyfiveLlamaEight", "NqPsgLateOptbFortyfiveLlamaEightLo", "NqPsgLateOptbFortyfiveLlamaEightHi", "NqPsgOnsetFortyfiveLlamaEight"]),
+        ("Single-site E1 tracks the patch (P5a): cells within 0.1; the one failing cell", ["NqEoneWithinAll", "NqEoneCellsAll", "NqEoneGapQwenSeven", "NqEoneGapQwenSevenLo", "NqEoneGapQwenSevenHi"]),
+        ("E4b (P5b): free-form flips; tau at block 3 (Mistral's near miss) and beyond", ["NqEfourbNoneMin", "NqEfourbNoneMax", "NqTauEfourbThreeMistralSeven", "NqTauEfourbThreeQwenSeven", "NqTauEfourbBeyondMin", "NqTauEfourbBeyondMax", "NqTauEfourbSevenMin", "NqTauEfourbSevenMax", "NqTauEfourbLateMin", "NqTauEfourbLateMax"]),
+        ("All-position steering (P5c): CAA's AFTER flip where the patch's is <= 0.2", ["NqPfivecCaaMin", "NqPfivecCaaMax", "NqPfivecNatReadMin", "NqPfivecNatReadMax"]),
+        ("The key share predicts transfer (B3): AUC, units, rule accuracy", [f"NqAuc{t}" for t in _t9s] + [f"NqAucUnits{t}" for t in _t9s] + ["NqAucMin", "NqAucMax", "NqRuleAccMin", "NqRuleAccMax"]),
+        ("Dose (B1, B2): half-dose NONE flips at block 3", [f"NqHalf{w}None{t}" for w in ("Joint", "Eone") for t in _t9s] + ["NqHalfNoneMin", "NqHalfNoneMax", "NqHalfAfterMin", "NqHalfAfterMax"]),
+        ("Totals", ["NqTotSupported", "NqTotAtPoint", "NqTotNotSupported", "NqTotNotEvaluable", "NqTotLines"]),
+        ("POST fails at Mistral: late flip from l_b (= 0.25 L) to 0.5 L", ["NqPostLateFromLbMinMistralSeven", "NqPostLateFromLbMaxMistralSeven", "NqVerdictPostMistralSeven", "NqPostLateFromLbMinLlamaEight", "NqVerdictPostLlamaEight"]),
+        ("Controls: BF16 floor, full patch, T_check, the FP32 gate", ["NqFloorMin", "NqFloorMax", "NqFloorArgMin", "NqFloorArgMax", "NqFullMin", "NqFullMax", "NqTcheckMistralSeven", "NqTestsPassed", "NqTestsSkipped", "NqTestsFailed"]),
+    ]
+    out = ["# Stage 9 macros (group S9) for paper v6", "",
+           "Generated by `paper/make_figures.py` (run with `S9_MACRO_INDEX=docs/stage9/S9_MACROS.md`); do not edit by hand. "
+           f"{len(_s9)} macros, all new (no earlier macro changed). Source: `results/gpu_stage9` (the frozen scorer's "
+           "`stage9_summary.json`, `fig_window.csv`, `fig_edits.csv` and `lb/<tag>.json`); every value is formatted as "
+           "`STAGE9_SCORE.txt` prints it and asserted, with its printed context, on the score-file line given as its source.", "",
+           "## Conventions", "",
+           "- Names: `Nq` + statistic + format + block or onset word + model tag (`MistralSeven`, `LlamaEight`, `QwenSeven`). "
+           "`...Lo` and `...Hi` are the 95 % two-stage cluster-bootstrap bounds. A name ending in `Min` or `Max` (or with `Min` / "
+           "`Max` before a model tag) selects the smallest or largest of the listed registered strings; its meaning names which.",
+           "- Formats: stories `None` (no mention, `\\fmtNone`), `Before` (`\\fmtBefore`), `PostNull` (`\\fmtNull`), `Post` "
+           "(`\\fmtPost`), `After` (the list after the story, `\\fmtListA`), `Letter` (`\\fmtLetter`); passages `Nom` (free form), "
+           "`Optb` (options before), `Opta` (options after); edit rows `Nat` (the natural patch), `Eone` (E1, single site), "
+           "`Efourb` (E4b, the trained DAS remap; not run at Llama), `Caa` (all-position steering); blocks `Three`, `Seven`, "
+           "`Eleven`, `Fifteen`; passage onsets `Fifteen`, `Thirty`, `Fortyfive`, `Sixty` = round(x L) for x = 0.15, 0.3, 0.45, 0.6.",
+           "- Two precisions, as the scorer prints them: the verdict cells (PREDICTIONS, FALSIFIERS, DIRECTION B) have 3 "
+           "decimals; the reported curves and edit tables have 2 (their l_c / L and silent-failure values have 3). Where one "
+           "quantity is printed at both precisions it has two names, e.g. `\\NqPthreeEarlyAfterMistralSeven` (P3s cell, 3 "
+           "decimals) and `\\NqEarlyAfterMistralSeven` (the curve in the figure, 2 decimals). Cite the 3-decimal name with a "
+           "verdict and the 2-decimal name when describing the curves; do not mix the two for one number.",
+           "- Negative values (`\\NqEoneDiff...`, `\\NqEoneGap...`) carry a plain minus: use them in math mode. Values that "
+           "round to zero are unsigned. Percentages: `\\pct{\\NqLcFracNoneMistralSeven}` (main.tex) prints 69 %.",
+           "- Verdict macros (`\\NqVerdict...`, `\\NqFalsifier...`) hold the scorer's words verbatim (e.g. `NOT SUPPORTED`, "
+           "`SUPPORTED AT THE POINT`, `TRIGGERED`, `not triggered`); in running text write the verdict in words and use the "
+           "macros only where a verbatim verdict is wanted.",
+           "- `[arithmetic on printed values]`: a count or ratio of printed values (l_b / L, cells within 0.1, totals); "
+           "`[selects a printed string]`: a range or a decisive cell; every other macro is a printed string.",
+           "- Readings the outcome selects (docs/stage9/OUTCOME.md): passages are an evaluation warning only (F2 triggered "
+           "at Qwen); the window claim is for single-site edits, patching and KV-cache edits (CAA transfers); the dose "
+           "convexity has no threshold claim; the failed stage-8 channel-ratio law stays reported as failed.", "",
+           "## Cheat sheet: the V6 plan's stage-9 paragraph, with its macros", "",
+           "| claim | macros (= value) |", "|---|---|"]
+    for c_, ns_ in CHEAT9:
+        out.append(f"| {c_} | " + "; ".join(_mv9(n) for n in ns_) + " |")
+    out += ["", "Figure `paper/figures/fig_window.pdf` (draft caption): " + CAPTION_WINDOW, "",
+            "Table `paper/tables/tab_stage9.tex`: the verdict table (set it in a `table*`; caption and label in the section file).", ""]
+    from collections import OrderedDict as _OD9
+    by9 = _OD9()
+    for g, n, v, d, s_ in _s9:
+        by9.setdefault(TOP9.get(n, "Other"), []).append((n, v, d, s_))
+    out += ["## Macros by topic", ""] + [f"- {tp} ({len(r_)} macros)" for tp, r_ in by9.items()] + [""]
+    for tp, rows_ in by9.items():
+        out += [f"### {tp}", "", "| macro | value | meaning | source |", "|---|---|---|---|"]
+        _p9 = "\\|"   # an escaped pipe inside a Markdown table cell
+        out += [f"| `\\{n}` | `{v}` | {d.replace('|', _p9)} | {s_.replace('|', _p9)} |" for n, v, d, s_ in rows_]
+        out.append("")
+    Path(os.environ["S9_MACRO_INDEX"]).write_text("\n".join(out) + "\n")
+    print("wrote the S9 macro index to", os.environ["S9_MACRO_INDEX"])
+
+
 # ---------------------------------------------------------------- checks
 # (1) every score-file macro still equals its line at the printed precision
 for name, (tag, idx, s) in SRCLINE.items():
@@ -5608,6 +6490,10 @@ if os.environ.get("MACRO_INDEX"):
                 "one post hoc. Names: Np + statistic + format + block or onset word + model tag; ...Lo and ...Hi are 95 % bounds. A name "
                 "ending in Min or Max selects a registered value (its description names which). Values that round to zero are unsigned; "
                 "the few negative values (lower bounds) are in math mode.", ""]
+    if len(REG) > N_PRE9Q:
+        out += [f"Stage 9, the GPU run (group S9; {len(REG) - N_PRE9Q} of the macros): results/gpu_stage9, each value asserted on its "
+                "printed STAGE9_SCORE.txt context; names Nq + statistic + format + block or onset word + model tag. The writers' index "
+                "grouped by topic is docs/stage9/S9_MACROS.md (S9_MACRO_INDEX=<file>).", ""]
     if only:
         out += [f"Generated with MACRO_INDEX_GROUPS={','.join(only)}: groups {', '.join(only)} are listed in full; the others are only counted "
                 "(unset MACRO_INDEX_GROUPS to list every group).", ""]

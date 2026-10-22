@@ -4,6 +4,7 @@
 \usepackage{microtype}
 \usepackage{graphicx}
 \usepackage{booktabs}
+\usepackage{array}                                 % >{...} column specs (tables/tab_stage9.tex)
 \usepackage{hyperref}
 \newcommand{\theHalgorithm}{\arabic{algorithm}}
 \usepackage{icml2026}          % anonymous submission mode
@@ -30,14 +31,14 @@
 \begin{document}
 
 \twocolumn[
-  \icmltitle{Looked Up or Copied? Later Mentions Decide Whether a Model Reads\texorpdfstring{\\}{ }an In-Context Value Through Its Key or Its Value}
+  \icmltitle{Looked Up or Copied? Where the Candidates Are Named Decides\texorpdfstring{\\}{ }How---and When---a Model Reads an In-Context Value}
   \icmlsetsymbol{equal}{*}
   \begin{icmlauthorlist}
     \icmlauthor{Anonymous Authors}{anon}
   \end{icmlauthorlist}
   \icmlaffiliation{anon}{Anonymous Institution}
   \icmlcorrespondingauthor{Anonymous Authors}{anon@example.com}
-  \icmlkeywords{mechanistic interpretability, attention, key-value cache, interventions, preregistration}
+  \icmlkeywords{mechanistic interpretability, attention, key-value cache, activation patching, interventions, preregistration}
   \vskip 0.3in
 ]
 \printAffiliationsAndNotice{}

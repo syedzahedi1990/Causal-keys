@@ -60,3 +60,21 @@
   L and M tallies. Three review rounds (six reviewers each: mechanistic interpretability, statistics, skeptic, area
   chair, practitioner, fact-check / format) with revisions; the final fact-check and format checks were clean. Own commit
   hashes in the appendix are replaced by neutral labels. The v4 sources are in `v4_sections/`.
+- **v6** (`paper2_v6.pdf`, built from `paper/` on this branch; `paper/main.pdf` is the same file). The paper is
+  rewritten around stage 9, the edit window (`docs/stage9/OUTCOME.md`; the prediction note was frozen before the run),
+  following `docs/V6_PLAN.md` and `docs/V6_SPACE.md`.
+  - **Title.** "Looked Up or Copied? Where the Candidates Are Named Decides How---and When---a Model Reads an
+    In-Context Value".
+  - **New claim 3** (Sec. 5, Fig. 3). Listing the candidates after the story moves the depth at which a patch of the
+    writing token's cache still changes the answer from 69-93 % of the depth to 19-50 % (Mistral-7B, Llama-3.1-8B,
+    Qwen2.5-7B). Later patches fail silently. Only the early layers then change listed answers.
+  - **Edits.** Single-site steering largely inherits the window. All-position steering escapes it with a named list
+    but only partly with letters. Inside the window, the delivered key share predicts transfer.
+  - **Reported as they came out.** Passages give only an evaluation warning (F2 at Qwen). The note's tally is 3 of 10
+    lines supported, with every failure named.
+  - **Moved to the appendix.** The failed channel-ratio law is cut to one paragraph, and its detail, the claim-2
+    mechanism detail and fig_law move to the appendix. A new stage-9 appendix gives the design, the frozen note,
+    the runs, the verdict table and per-model results.
+  - **Checks.** Independent checks of the numbers (S9 macros asserted against the score file), the claims, anonymity
+    and a reviewer's reading came before the final fix pass. The main text is 8.00 pages.
+

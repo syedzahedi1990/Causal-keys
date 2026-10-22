@@ -1,6 +1,8 @@
 % Appendix wrapper. main.tex issues \appendix and \onecolumn before \input'ing this file.
-% A: preregistrations and claim status; B: prompts and items; C: implementation; D--F: details of Claims 1--3;
-% G: the released remap; H: the binding swap; I: competing accounts and further related work; J: models and compute.
+% A: preregistrations and claim status; B: prompts and items; C: implementation; D, E: details of Claims 1 and 2;
+% F: stage 9, the edit window of Section 5 (sections/app_k_stage9.tex, label app:stage9);
+% G: the stage-8 channel-ratio law (app_f_claim3); H: the released remap; I: the binding swap; J: competing accounts
+% and further related work; K: models and compute. File names keep their historical letters.
 \section*{Reader's guide to the appendix}
 \addcontentsline{toc}{section}{Reader's guide to the appendix}
 The appendix is long because every preregistered line, gate and post hoc reading is reported. \Cref{tab:guide} gives, for each claim of the main text, the two or three places that carry its evidence; \cref{app:crosswalk} maps every main-text sentence to its prediction and verdict, and \cref{app:failures-j} lists every prediction that did not hold or could not be evaluated.
@@ -19,10 +21,12 @@ Claim 1, fresh stories and generated answers & \cref{app:fresh} (\cref{tab:fresh
 Claim 1, the measurement & \cref{app:measure} (\cref{tab:mass,tab:invariance}), \cref{app:emitted} \\
 Claim 1, reading-comprehension passages & \cref{app:natural} (\cref{tab:natural8,tab:cue}) \\
 Claim 1, the discovery sample & \cref{app:discovery} (\cref{tab:twobytwo,tab:natural}) \\
+Claim 2 in full (moved from the main text) & \cref{app:claim2-brief} \\
 Claim 2, reader heads and the second hop & \cref{app:heads} (\cref{tab:heads,tab:ablation}), \cref{app:readers} \\
-Claim 2, the flag, the sign and scale & \cref{app:flag} (\cref{tab:flag}), \cref{app:sign}, \cref{app:scale} (\cref{fig:flag-scale}) \\
-Claim 3, the law and its edits & \cref{app:law}, \cref{app:edits}, \cref{app:lawresults} (\cref{tab:law}), \cref{app:nu} (\cref{fig:nu}) \\
-Claim 3, the released remap and the binding swap & \cref{app:remap}, \cref{app:binding} \\
+Claim 2, the flag, the sign and scale & \cref{app:flag} (\cref{fig:flag,tab:flag}), \cref{app:sign}, \cref{app:scale} (\cref{fig:flag-scale}) \\
+\Cref{sec:claim3}, the edit window (stage 9): design, verdicts, controls & \cref{app:stage9} \\
+\Cref{sec:claim3}, the channel-ratio law (stage 8) & \cref{app:law-brief}, \cref{app:law}, \cref{app:edits}, \cref{app:lawresults} (\cref{fig:law,tab:law}), \cref{app:nu} (\cref{fig:nu}) \\
+The released remap and the binding swap & \cref{app:remap}, \cref{app:binding} \\
 Implementation, exactness, models and compute & \cref{app:impl}, \cref{app:compute} \\
 \bottomrule
 \end{tabular}
@@ -37,6 +41,8 @@ Implementation, exactness, models and compute & \cref{app:impl}, \cref{app:compu
 \input{sections/app_d_claim1}
 \clearpage
 \input{sections/app_e_claim2}
+\clearpage
+\input{sections/app_k_stage9}
 \clearpage
 \input{sections/app_f_claim3}
 \clearpage

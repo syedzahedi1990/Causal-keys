@@ -1,0 +1,8 @@
+==== 2026-10-21T16:05:17Z python experiments/stage9_passages.py --stage eval --formats NOM,OPTB,OPTA --splits E,R --squad results/gpu_stage8a/squad/dev-v1.1.json --model /root/stage8_models/mistral7 --key mistral7 --out results/gpu_stage9 --reserve-min 171
+[mistral7] E/NOM: 185 items (393s)
+[mistral7] E/OPTB: 185 items (373s)
+[mistral7] E/OPTA: 185 items (265s)
+[mistral7] R/NOM: 71 items (155s)
+[mistral7] R/OPTB: 71 items (150s)
+[mistral7] R/OPTA: 71 items (106s)
+wrote results/gpu_stage9/passages/mistral7.json (1461s)

@@ -1,0 +1,10 @@
+==== 2026-10-21T17:53:45Z python experiments/stage9_stories.py --stage eval --model /root/stage8_models/qwen7 --key qwen7 --out results/gpu_stage9 --reserve-min 65
+lb file results/gpu_stage9/lb/qwen7.json sha256 90f31e56db133d8acb82317ec7e08b9bcf7a8b781559e65f400b555e678000fb: l_b = 14
+frames file results/gpu_stage8b/frames/qwen7.json sha256 ae18b810014aed61658ed99b73c9cd429e144ca8a65a3135502fe213a96a3f4a: frames []; G3 results/gpu_stage8b/g3/qwen7.json -> scorer trie
+  NONE: 150 items (139s)
+  BEFORE: 150 items (146s)
+  POST-NULL: 150 items (154s)
+  POST: 150 items (154s)
+  AFTER: 150 items (146s)
+  LETTER: 150 items (138s)
+wrote results/gpu_stage9/stories/qwen7.json (formats not run [])

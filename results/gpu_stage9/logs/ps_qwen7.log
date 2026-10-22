@@ -1,0 +1,8 @@
+==== 2026-10-21T18:25:08Z python experiments/stage9_passages.py --stage eval --formats NOM,OPTB,OPTA --splits E,R --squad results/gpu_stage8a/squad/dev-v1.1.json --model /root/stage8_models/qwen7 --key qwen7 --out results/gpu_stage9 --reserve-min 10
+[qwen7] E/NOM: 185 items (307s)
+[qwen7] E/OPTB: 185 items (171s)
+[qwen7] E/OPTA: 185 items (169s)
+[qwen7] R/NOM: 71 items (125s)
+[qwen7] R/OPTB: 71 items (71s)
+[qwen7] R/OPTA: 71 items (72s)
+wrote results/gpu_stage9/passages/qwen7.json (935s)

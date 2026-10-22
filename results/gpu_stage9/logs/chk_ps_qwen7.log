@@ -1,0 +1,2 @@
+==== 2026-10-21T17:50:18Z python experiments/stage9_passages.py --stage check --squad results/gpu_stage8a/squad/dev-v1.1.json --model /root/stage8_models/qwen7 --key qwen7 --out results/gpu_stage9 --reserve-min 90
+[qwen7] passages check passed: valid E 185, R 71; E sha256 57fb5fa1556d (stage 8a 57fb5fa1556d); frame ' '; onsets [4, 8, 13, 17] -> results/gpu_stage9/check/qwen7_passages.json

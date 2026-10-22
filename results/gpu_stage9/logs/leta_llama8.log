@@ -1,0 +1,4 @@
+==== 2026-10-22T13:16:58Z python experiments/stage9_passages.py --stage eval --formats LETA --splits E --squad results/gpu_stage8a/squad/dev-v1.1.json --model /root/stage8_models/llama8 --key llama8 --out results/gpu_stage9 --reserve-min 88
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+[llama8] E/LETA: 185 items (186s)
+wrote results/gpu_stage9/passages/llama8_LETA.json (204s)

@@ -1,0 +1,10 @@
+==== 2026-10-21T16:30:42Z python experiments/stage9_stories.py --stage cal --model /root/stage8_models/llama8 --key llama8 --out results/gpu_stage9 --reserve-min 168
+frames file results/gpu_stage8b/frames/llama8.json sha256 da3daabc1b59219f4484fee43a2c81e19dbbc4419ad4bc622d3206fe94570486: frames []; G3 results/gpu_stage8b/g3/llama8.json -> scorer trie
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+  NONE: 30 items (36s)
+  BEFORE: 30 items (37s)
+  POST-NULL: 30 items (39s)
+  POST: 30 items (39s)
+  AFTER: 30 items (37s)
+  LETTER: 30 items (36s)
+l_b = 10 (late AFTER flips {'2': 0.96667, '4': 1.0, '6': 0.6, '8': 0.5, '10': 0.06667, '12': 0.0, '14': 0.0, '16': 0.0, '18': 0.0, '20': 0.0, '22': 0.0, '24': 0.0, '26': 0.0, '28': 0.0, '30': 0.0}); wrote results/gpu_stage9/lb/llama8.json sha256 6104c20b852bedd18c48748aa842d561bf9116a19f62318612e65269f0e356de

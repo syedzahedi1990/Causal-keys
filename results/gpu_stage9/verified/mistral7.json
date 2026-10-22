@@ -1,0 +1,248 @@
+{
+ "key": "mistral7",
+ "repo": "mistralai/Mistral-7B-Instruct-v0.3",
+ "revision": "c170c708c41dac9275d15a8fff4eca08d52bab71",
+ "attn": "sdpa",
+ "gated": false,
+ "token_used": false,
+ "manifest": "/workspace/Causal-keys/scripts/stage8_models.json",
+ "manifest_sha256": "b840b71ea644d3f01e634c67ef2c2b9bdb26cdf53d3fe6b45d34c5e78c0cb707",
+ "fetcher_sha256": "aba1e5a423fea2b079b5cc4936ab6fc95cb64818812f0178609cd118fcea8c8c",
+ "dest": "/root/stage8_models/mistral7",
+ "host": "373f866c6d04",
+ "time_utc": "2026-10-22T12:19:02Z",
+ "sources_used": [
+  "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71",
+  "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71 (local HF cache)"
+ ],
+ "files": {
+  "config.json": {
+   "kind": "git_blob",
+   "expected": "9f913dc05d66cfb23c16e3c93b3cc4899813dfa6",
+   "size": 601,
+   "attempts": [
+    {
+     "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71 (local HF cache)",
+     "ok": true,
+     "observed": {
+      "size": 601,
+      "git_blob": "9f913dc05d66cfb23c16e3c93b3cc4899813dfa6"
+     },
+     "link": "hard"
+    }
+   ],
+   "ok": true,
+   "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71 (local HF cache)",
+   "link": "hard",
+   "observed": "9f913dc05d66cfb23c16e3c93b3cc4899813dfa6"
+  },
+  "generation_config.json": {
+   "kind": "git_blob",
+   "expected": "b6bea2642bc3fe80f392111d52af91d1563a8de2",
+   "size": 116,
+   "attempts": [
+    {
+     "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71",
+     "ok": true,
+     "observed": {
+      "size": 116,
+      "git_blob": "b6bea2642bc3fe80f392111d52af91d1563a8de2"
+     }
+    }
+   ],
+   "ok": true,
+   "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71",
+   "observed": "b6bea2642bc3fe80f392111d52af91d1563a8de2"
+  },
+  "model-00001-of-00003.safetensors": {
+   "kind": "sha256",
+   "expected": "ce6fb6f6f4d0183f4813cbf4ece24109da629a08d4210da46f77e1d8b0bd5c19",
+   "size": 4949453792,
+   "attempts": [
+    {
+     "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71",
+     "ok": true,
+     "observed": {
+      "size": 4949453792,
+      "sha256": "ce6fb6f6f4d0183f4813cbf4ece24109da629a08d4210da46f77e1d8b0bd5c19"
+     }
+    }
+   ],
+   "ok": true,
+   "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71",
+   "observed": "ce6fb6f6f4d0183f4813cbf4ece24109da629a08d4210da46f77e1d8b0bd5c19"
+  },
+  "model-00002-of-00003.safetensors": {
+   "kind": "sha256",
+   "expected": "8c0e72f148366b6a3709e002a98706a33d31aec8515090c856c95b2044f92ae0",
+   "size": 4999819336,
+   "attempts": [
+    {
+     "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71",
+     "ok": true,
+     "observed": {
+      "size": 4999819336,
+      "sha256": "8c0e72f148366b6a3709e002a98706a33d31aec8515090c856c95b2044f92ae0"
+     }
+    }
+   ],
+   "ok": true,
+   "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71",
+   "observed": "8c0e72f148366b6a3709e002a98706a33d31aec8515090c856c95b2044f92ae0"
+  },
+  "model-00003-of-00003.safetensors": {
+   "kind": "sha256",
+   "expected": "905dd405363e43d95779c1c1155a2dbfd36155914ae95dbd934e12e490cfb4ca",
+   "size": 4546807800,
+   "attempts": [
+    {
+     "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71",
+     "ok": true,
+     "observed": {
+      "size": 4546807800,
+      "sha256": "905dd405363e43d95779c1c1155a2dbfd36155914ae95dbd934e12e490cfb4ca"
+     }
+    }
+   ],
+   "ok": true,
+   "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71",
+   "observed": "905dd405363e43d95779c1c1155a2dbfd36155914ae95dbd934e12e490cfb4ca"
+  },
+  "model.safetensors.index.json": {
+   "kind": "git_blob",
+   "expected": "050e5515d49376fc01e4837d031902c63af98111",
+   "size": 23950,
+   "attempts": [
+    {
+     "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71",
+     "ok": true,
+     "observed": {
+      "size": 23950,
+      "git_blob": "050e5515d49376fc01e4837d031902c63af98111"
+     }
+    }
+   ],
+   "ok": true,
+   "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71",
+   "observed": "050e5515d49376fc01e4837d031902c63af98111"
+  },
+  "params.json": {
+   "kind": "git_blob",
+   "expected": "00dc7d10b86d793afaf3d6733a45ee4d8c557194",
+   "size": 202,
+   "attempts": [
+    {
+     "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71",
+     "ok": true,
+     "observed": {
+      "size": 202,
+      "git_blob": "00dc7d10b86d793afaf3d6733a45ee4d8c557194"
+     }
+    }
+   ],
+   "ok": true,
+   "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71",
+   "observed": "00dc7d10b86d793afaf3d6733a45ee4d8c557194"
+  },
+  "special_tokens_map.json": {
+   "kind": "git_blob",
+   "expected": "451134b2ddc2e78555d1e857518c54b4bdc2e87d",
+   "size": 414,
+   "attempts": [
+    {
+     "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71 (local HF cache)",
+     "ok": true,
+     "observed": {
+      "size": 414,
+      "git_blob": "451134b2ddc2e78555d1e857518c54b4bdc2e87d"
+     },
+     "link": "hard"
+    }
+   ],
+   "ok": true,
+   "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71 (local HF cache)",
+   "link": "hard",
+   "observed": "451134b2ddc2e78555d1e857518c54b4bdc2e87d"
+  },
+  "tokenizer.json": {
+   "kind": "git_blob",
+   "expected": "8d7d23136b474a3df1182ed829db19984e295ee7",
+   "size": 1961548,
+   "attempts": [
+    {
+     "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71 (local HF cache)",
+     "ok": true,
+     "observed": {
+      "size": 1961548,
+      "git_blob": "8d7d23136b474a3df1182ed829db19984e295ee7"
+     },
+     "link": "hard"
+    }
+   ],
+   "ok": true,
+   "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71 (local HF cache)",
+   "link": "hard",
+   "observed": "8d7d23136b474a3df1182ed829db19984e295ee7"
+  },
+  "tokenizer.model": {
+   "kind": "sha256",
+   "expected": "37f00374dea48658ee8f5d0f21895b9bc55cb0103939607c8185bfd1c6ca1f89",
+   "size": 587404,
+   "attempts": [
+    {
+     "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71 (local HF cache)",
+     "ok": true,
+     "observed": {
+      "size": 587404,
+      "sha256": "37f00374dea48658ee8f5d0f21895b9bc55cb0103939607c8185bfd1c6ca1f89"
+     },
+     "link": "hard"
+    }
+   ],
+   "ok": true,
+   "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71 (local HF cache)",
+   "link": "hard",
+   "observed": "37f00374dea48658ee8f5d0f21895b9bc55cb0103939607c8185bfd1c6ca1f89"
+  },
+  "tokenizer.model.v3": {
+   "kind": "git_blob",
+   "expected": "d8233e5b061987d32b63dbfb38fe86d7d4fc8a18",
+   "size": 587404,
+   "attempts": [
+    {
+     "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71",
+     "ok": true,
+     "observed": {
+      "size": 587404,
+      "git_blob": "d8233e5b061987d32b63dbfb38fe86d7d4fc8a18"
+     }
+    }
+   ],
+   "ok": true,
+   "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71",
+   "observed": "d8233e5b061987d32b63dbfb38fe86d7d4fc8a18"
+  },
+  "tokenizer_config.json": {
+   "kind": "git_blob",
+   "expected": "940a9c375c745ccbf0bebc5bedcec924d71827aa",
+   "size": 140874,
+   "attempts": [
+    {
+     "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71 (local HF cache)",
+     "ok": true,
+     "observed": {
+      "size": 140874,
+      "git_blob": "940a9c375c745ccbf0bebc5bedcec924d71827aa"
+     },
+     "link": "hard"
+    }
+   ],
+   "ok": true,
+   "source": "mistralai/Mistral-7B-Instruct-v0.3@c170c708c41dac9275d15a8fff4eca08d52bab71 (local HF cache)",
+   "link": "hard",
+   "observed": "940a9c375c745ccbf0bebc5bedcec924d71827aa"
+  }
+ },
+ "failed": [],
+ "unexpected_files": []
+}

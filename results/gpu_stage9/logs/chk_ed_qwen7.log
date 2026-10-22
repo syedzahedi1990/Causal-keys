@@ -1,0 +1,2 @@
+==== 2026-10-21T17:50:07Z python experiments/stage9_edits.py --stage check --model /root/stage8_models/qwen7 --key qwen7 --out results/gpu_stage9 --reserve-min 90
+check PASS: 0 failures []; p [55]; trie nodes {'LETTER': [2, 2], 'NONE': [37, 37], 'AFTER': [37, 37], 'POST': [37, 37]}

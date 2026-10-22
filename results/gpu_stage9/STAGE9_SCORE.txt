@@ -1,0 +1,1007 @@
+Stage 9 scoring: the listed candidates set the edit window (docs/STAGE9_PREDICTIONS.md; docs/stage9/SPEC.md); results results/gpu_stage9
+
+#### PROVENANCE (COMMIT.txt and the other pipeline records; every results file)
+  COMMIT.txt:
+    ==== 2026-10-21T13:26:49Z stage 9 TEST_MODE=0 FORCE=0 FORCE_STEPS= DEADLINE_H=6.0 TESTS=1 KEEP_CACHE=0 TEST_ALL=0
+    69763e9978ddc036c124fccc642e52ec0df530eb
+    ?? results/gpu_stage9/
+    stage-9 predictions frozen at 69763e9978ddc036c124fccc642e52ec0df530eb (2026-10-21T13:20:09+00:00); note sha256 3e97d03198de057cc50ec6f9147487c19125d7cfbb05e601ee79cd4151a8f056; spec sha256 ca9efe813d81deb8102baa8cf2751474e1f22e96457e11cd77419d08867315b0; HEAD 69763e9978ddc036c124fccc642e52ec0df530eb
+    2026-10-21T13:27:12Z Prakash et al.'s release https://github.com/Nix07/mind at 0579347e3cf963d13d55edf041c7b595b0dcd88b in /root/.cache/causal-keys/mind-0579347e3cf963d13d55edf041c7b595b0dcd88b
+    ==== 2026-10-22T11:52:25Z stage 9 TEST_MODE=0 FORCE=0 FORCE_STEPS= DEADLINE_H=8 TESTS=1 KEEP_CACHE=0 TEST_ALL=0
+    69763e9978ddc036c124fccc642e52ec0df530eb
+    ?? results/gpu_stage9/
+    stage-9 predictions frozen at 69763e9978ddc036c124fccc642e52ec0df530eb (2026-10-21T13:20:09+00:00); note sha256 3e97d03198de057cc50ec6f9147487c19125d7cfbb05e601ee79cd4151a8f056; spec sha256 ca9efe813d81deb8102baa8cf2751474e1f22e96457e11cd77419d08867315b0; HEAD 69763e9978ddc036c124fccc642e52ec0df530eb
+    2026-10-22T11:52:46Z Prakash et al.'s release https://github.com/Nix07/mind at 0579347e3cf963d13d55edf041c7b595b0dcd88b in /root/.cache/causal-keys/mind-0579347e3cf963d13d55edf041c7b595b0dcd88b
+  ENV.txt:
+    ==== 2026-10-21T13:27:07Z stage 9 TEST_MODE=0 OUT=results/gpu_stage9 DEV=cuda DTYPE=bfloat16 deadline 2026-10-21T19:26:49Z (DEADLINE_H=6.0)
+    HEAD 69763e9978ddc036c124fccc642e52ec0df530eb freeze commit 69763e9978ddc036c124fccc642e52ec0df530eb
+    manifest scripts/stage8_models.json sha256 b840b71ea644d3f01e634c67ef2c2b9bdb26cdf53d3fe6b45d34c5e78c0cb707; model store /root/stage8_models; HF_TOKEN set: no (the token itself is never recorded)
+    disk at the model store: 273G free of 274G
+    python 3.12.15 torch 2.11.0+cu128 transformers 5.18.0 numpy 2.5.4 huggingface_hub 2.2.0 gpus 1 NVIDIA A100-SXM4-80GB
+    name, memory.total [MiB], driver_version
+    NVIDIA A100-SXM4-80GB, 81920 MiB, 595.91.07
+    2026-10-21T16:29:44Z mistral7 removed from /root/stage8_models/mistral7
+    2026-10-21T17:49:43Z llama8 removed from /root/stage8_models/llama8
+    2026-10-21T18:43:56Z qwen7 removed from /root/stage8_models/qwen7
+    ==== 2026-10-22T11:52:43Z stage 9 TEST_MODE=0 OUT=results/gpu_stage9 DEV=cuda DTYPE=bfloat16 deadline 2026-10-22T19:52:25Z (DEADLINE_H=8)
+    HEAD 69763e9978ddc036c124fccc642e52ec0df530eb freeze commit 69763e9978ddc036c124fccc642e52ec0df530eb
+    manifest scripts/stage8_models.json sha256 b840b71ea644d3f01e634c67ef2c2b9bdb26cdf53d3fe6b45d34c5e78c0cb707; model store /root/stage8_models; HF_TOKEN set: no (the token itself is never recorded)
+    disk at the model store: 199G free of 200G
+    python 3.12.15 torch 2.11.0+cu128 transformers 5.18.0 numpy 2.5.4 huggingface_hub 2.2.0 gpus 1 NVIDIA A100-SXM4-80GB
+    name, memory.total [MiB], driver_version
+    NVIDIA A100-SXM4-80GB, 81920 MiB, 595.71.05
+    2026-10-22T12:50:31Z mistral7 removed from /root/stage8_models/mistral7
+    2026-10-22T13:20:27Z llama8 removed from /root/stage8_models/llama8
+  REVISIONS.txt:
+    # <repo> <revision> key=<key> attn=<impl> token=<used> sources=<where the verified bytes came from>; pins: scripts/stage8_models.json sha256 b840b71ea644d3f01e634c67ef2c2b9bdb26cdf53d3fe6b45d34c5e78c0cb707
+    mistralai/Mistral-7B-Instruct-v0.3 c170c708c41dac9275d15a8fff4eca08d52bab71 key=mistral7 attn=sdpa token=no sources=mistralai/Mistral-7B-Instruct-v0.3@c170c708c4
+    meta-llama/Llama-3.1-8B-Instruct 0e9e39f249a16976918f6564b8830bc894c89659 key=llama8 attn=sdpa token=no sources=
+    Qwen/Qwen2.5-7B-Instruct a09a35458c702b33eeacc393d103063234e8bc28 key=qwen7 attn=sdpa token=no sources=
+  SKIPPED.txt: absent
+  FETCH_FAILED.txt: absent
+  FAILED.txt: absent
+  freeze record(s) in COMMIT.txt: 2; F 69763e9978ddc036c124fccc642e52ec0df530eb, note sha256 3e97d03198de057c, spec sha256 ca9efe813d81deb8, HEAD 69763e9978
+  check/llama8_edits.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/llama8 (key llama8), revision 0e9e39f249, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  check/llama8_passages.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/llama8 (key llama8), revision 0e9e39f249, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  check/llama8_stories.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/llama8 (key llama8), revision 0e9e39f249, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  check/mistral7_edits.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/mistral7 (key mistral7), revision c170c708c4, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  check/mistral7_passages.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/mistral7 (key mistral7), revision c170c708c4, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  check/mistral7_stories.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/mistral7 (key mistral7), revision c170c708c4, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  check/qwen7_edits.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/qwen7 (key qwen7), revision a09a35458c, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  check/qwen7_passages.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/qwen7 (key qwen7), revision a09a35458c, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  check/qwen7_stories.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/qwen7 (key qwen7), revision a09a35458c, dtype -, attn -, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  edits/llama8.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/llama8 (key llama8), revision 0e9e39f249, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  edits/mistral7.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/mistral7 (key mistral7), revision c170c708c4, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  edits/qwen7.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/qwen7 (key qwen7), revision a09a35458c, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  lb/llama8.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/llama8 (key llama8), revision 0e9e39f249, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  lb/mistral7.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/mistral7 (key mistral7), revision c170c708c4, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  lb/qwen7.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/qwen7 (key qwen7), revision a09a35458c, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  passages/llama8.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/llama8 (key llama8), revision 0e9e39f249, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  passages/llama8_LETA.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/llama8 (key llama8), revision 0e9e39f249, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  passages/mistral7.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/mistral7 (key mistral7), revision c170c708c4, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  passages/mistral7_LETA.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/mistral7 (key mistral7), revision c170c708c4, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  passages/qwen7.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/qwen7 (key qwen7), revision a09a35458c, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  passages/qwen7_LETA.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/qwen7 (key qwen7), revision a09a35458c, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  stories/llama8.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/llama8 (key llama8), revision 0e9e39f249, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  stories/mistral7.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/mistral7 (key mistral7), revision c170c708c4, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  stories/qwen7.json: commit 69763e9978, dirty False, freeze 69763e9978, model /root/stage8_models/qwen7 (key qwen7), revision a09a35458c, dtype torch.bfloat16, attn sdpa, device NVIDIA A100-SXM4-80GB, transformers 5.18.0, test_mode False
+  commits: ['69763e9978']
+
+#### POPULATION (N9 150, C 30, E9 80 (pins in ckeys/stage9.py); passages E 185 = stage 8a's set)
+  check/llama8_edits.json: pass True
+  check/llama8_passages.json: pass True
+  check/llama8_stories.json: pass True
+  check/mistral7_edits.json: pass True
+  check/mistral7_passages.json: pass True
+  check/mistral7_stories.json: pass True
+  check/qwen7_edits.json: pass True
+  check/qwen7_passages.json: pass True
+  check/qwen7_stories.json: pass True
+  edits/llama8.json: 80 of 80 cores, not run 0, skipped 0, blocks [3, 7, 11, 15], formats ['NONE', 'AFTER', 'LETTER', 'POST'], e4b False
+  edits/mistral7.json: 80 of 80 cores, not run 0, skipped 0, blocks [3, 7, 11, 15], formats ['NONE', 'AFTER', 'LETTER', 'POST'], e4b True
+  edits/qwen7.json: 80 of 80 cores, not run 0, skipped 0, blocks [3, 7, 11, 15], formats ['NONE', 'AFTER', 'LETTER', 'POST'], e4b True
+  lb/llama8.json: population C, 30 items, formats done ['NONE', 'BEFORE', 'POST-NULL', 'POST', 'AFTER', 'LETTER'], not run none, skipped 0
+  lb/mistral7.json: population C, 30 items, formats done ['NONE', 'BEFORE', 'POST-NULL', 'POST', 'AFTER', 'LETTER'], not run none, skipped 0
+  lb/qwen7.json: population C, 30 items, formats done ['NONE', 'BEFORE', 'POST-NULL', 'POST', 'AFTER', 'LETTER'], not run none, skipped 0
+  passages/llama8.json: valid E 185 (sha256 57fb5fa1556d), R 71 (sha256 ef23b97c9fa5); stage 8a E 57fb5fa1556d; pieces not run none
+  passages/llama8_LETA.json: valid E 185 (sha256 57fb5fa1556d), R 71 (sha256 ef23b97c9fa5); stage 8a E 57fb5fa1556d; pieces not run none
+  passages/mistral7.json: valid E 185 (sha256 57fb5fa1556d), R 71 (sha256 ef23b97c9fa5); stage 8a E 57fb5fa1556d; pieces not run none
+  passages/mistral7_LETA.json: valid E 185 (sha256 57fb5fa1556d), R 71 (sha256 ef23b97c9fa5); stage 8a E 57fb5fa1556d; pieces not run none
+  passages/qwen7.json: valid E 185 (sha256 57fb5fa1556d), R 71 (sha256 ef23b97c9fa5); stage 8a E 57fb5fa1556d; pieces not run none
+  passages/qwen7_LETA.json: valid E 185 (sha256 57fb5fa1556d), R 71 (sha256 ef23b97c9fa5); stage 8a E 57fb5fa1556d; pieces not run none
+  stories/llama8.json: population N9, 150 items, formats done ['NONE', 'BEFORE', 'POST-NULL', 'POST', 'AFTER', 'LETTER'], not run none, skipped 0
+  stories/mistral7.json: population N9, 150 items, formats done ['NONE', 'BEFORE', 'POST-NULL', 'POST', 'AFTER', 'LETTER'], not run none, skipped 0
+  stories/qwen7.json: population N9, 150 items, formats done ['NONE', 'BEFORE', 'POST-NULL', 'POST', 'AFTER', 'LETTER'], not run none, skipped 0
+
+#### CHECKS (the FP32 gate; l_b recomputed and read in order; T_check; every MISMATCH)
+  FP32 gate: pytest.log (its last session that ran them): tests/test_stage9_pops.py 11 passed, 0 failed or error, 0 skipped; tests/test_stage9_stories.py 23 passed, 0 failed or error, 0 skipped; tests/test_stage9_passages.py 22 passed, 0 failed or error, 3 skipped; tests/test_stage9_edits.py 26 passed, 0 failed or error, 0 skipped; tests/test_stage9_score.py 35 passed, 0 failed or error, 0 skipped; tests/test_stage9_guard.py 21 passed, 0 failed or error, 0 skipped; tests/test_stage9_pre.py 20 passed, 0 failed or error, 0 skipped -> PASSED
+  mistral7: l_b = 8 (recomputed from 30 C cores; late AFTER flips 2: 1.000, 4: 1.000, 6: 1.000, 8: 0.200, 10: 0.133, 12: 0.033, 14: 0.000, 16: 0.000, 18: 0.000, 20: 0.000, 22: 0.000, 24: 0.000, 26: 0.000, 28: 0.000, 30: 0.000); lb file 8; eval 8, lb sha256 33a483c9e284
+  mistral7: T_check max |T|S - nat S| per block {'3': 0.0, '7': 0.0, '11': 0.0, '15': 0.0} (0 expected: OK)
+  llama8: l_b = 10 (recomputed from 30 C cores; late AFTER flips 2: 0.967, 4: 1.000, 6: 0.600, 8: 0.500, 10: 0.067, 12: 0.000, 14: 0.000, 16: 0.000, 18: 0.000, 20: 0.000, 22: 0.000, 24: 0.000, 26: 0.000, 28: 0.000, 30: 0.000); lb file 10; eval 10, lb sha256 6104c20b852b
+  llama8: T_check max |T|S - nat S| per block {'3': 0.0, '7': 0.0, '11': 0.0, '15': 0.0} (0 expected: OK)
+  qwen7: l_b = 14 (recomputed from 30 C cores; late AFTER flips 2: 1.000, 4: 0.967, 6: 0.900, 8: 0.833, 10: 0.433, 12: 0.567, 14: 0.100, 16: 0.000, 18: 0.000, 20: 0.000, 22: 0.000, 24: 0.000, 26: 0.000); lb file 14; eval 14, lb sha256 90f31e56db13
+  qwen7: T_check max |T|S - nat S| per block {'3': 0.0, '7': 0.0, '11': 0.0, '15': 0.0} (0 expected: OK)
+  checks: OK
+
+#### CONTROLS (per model and format; no verdicts)
+  The window ends (late@0 = early@L = KV@0 = the clean S run; early@0 = late@L = none = the clean B run) and their complementarity (early on [0, l) and late on [l, L) together = KV@0) are FP32-tested (tests/test_stage9_stories.py, test_stage9_passages.py); no GPU check.
+  BF16 floor: the none row (edits: self) against the clean B run of the same item in another batch shape (stories: clean_B of the capture pass; passages: clean_B of the capture batch; edits: the CAA batch's self row, unclamped): the mean absolute difference of E (passages: of the decision log-probabilities lp) and the share of items whose argmax answer differs (E-argmax; passages: the decision-token argmax; edits also the generated answers). In-batch determinism: none against none2 (edits: self against self2), the same ids and tables in one forward (0 expected, also in BF16). LETTER: the letter answers whose text names another candidate word ("A drawer" read as option A), a sensitivity count; the answer stays SPEC 9.2's.
+  mistral7 stories NONE      competent 1.000 (150/150); flip(KV@0) all items 1.000 [1.000, 1.000] (n=150); BF16 floor mean|E(none) - E(clean B)| 0.0554, E-argmax differs 0.000 (n=150); in-batch determinism max|E(none) - E(none2)| 0.0e+00, answers differ 0.000; E-argmax = generation 0.997 (6577/6599)
+  mistral7 stories BEFORE    competent 0.993 (149/150); flip(KV@0) all items 0.993 [0.971, 1.000] (n=150); BF16 floor mean|E(none) - E(clean B)| 0.0345, E-argmax differs 0.000 (n=150); in-batch determinism max|E(none) - E(none2)| 0.0e+00, answers differ 0.000; E-argmax = generation 0.999 (6595/6600)
+  mistral7 stories POST-NULL competent 1.000 (150/150); flip(KV@0) all items 1.000 [1.000, 1.000] (n=150); BF16 floor mean|E(none) - E(clean B)| 0.0351, E-argmax differs 0.000 (n=150); in-batch determinism max|E(none) - E(none2)| 0.0e+00, answers differ 0.000; E-argmax = generation 0.997 (6577/6600)
+  mistral7 stories POST      competent 1.000 (150/150); flip(KV@0) all items 1.000 [1.000, 1.000] (n=150); BF16 floor mean|E(none) - E(clean B)| 0.0303, E-argmax differs 0.000 (n=150); in-batch determinism max|E(none) - E(none2)| 0.0e+00, answers differ 0.000; E-argmax = generation 0.996 (6576/6600)
+  mistral7 stories AFTER     competent 0.993 (149/150); flip(KV@0) all items 1.000 [1.000, 1.000] (n=150); BF16 floor mean|E(none) - E(clean B)| 0.0343, E-argmax differs 0.000 (n=150); in-batch determinism max|E(none) - E(none2)| 0.0e+00, answers differ 0.000; E-argmax = generation 0.999 (6591/6600)
+  mistral7 stories LETTER    competent 0.920 (138/150); flip(KV@0) all items 0.960 [0.911, 0.994] (n=150); BF16 floor mean|E(none) - E(clean B)| 0.0993, E-argmax differs 0.000 (n=150); in-batch determinism max|E(none) - E(none2)| 0.0e+00, answers differ 0.000; E-argmax = generation 0.996 (6575/6600)
+  mistral7 stories LETTER    letter/word conflicts: 0.000 (0/6600) of the letter answers name another candidate word in the same text (6600 LETTER rows in all)
+  mistral7 passages E/NOM   competent (containment) 0.903 (167/185), strict 0.238 (44/185); flip(KV@0) all items 0.897 [0.833, 0.952] (n=185); BF16 floor mean|lp(none) - lp(clean B)| 0.0479, decision argmax differs 0.000 (n=185); in-batch determinism max|lp(none) - lp(none2)| 0.0e+00, answers differ 0.000; lp-argmax = containment answer 0.937 (2946/3145)
+  mistral7 passages E/OPTB  competent (containment) 0.843 (156/185), strict 0.832 (154/185); flip(KV@0) all items 0.859 [0.771, 0.932] (n=185); BF16 floor mean|lp(none) - lp(clean B)| 0.0673, decision argmax differs 0.000 (n=185); in-batch determinism max|lp(none) - lp(none2)| 0.0e+00, answers differ 0.000; lp-argmax = containment answer 0.994 (3799/3823)
+  mistral7 passages E/OPTA  competent (containment) 0.876 (162/185), strict 0.876 (162/185); flip(KV@0) all items 0.897 [0.827, 0.957] (n=185); BF16 floor mean|lp(none) - lp(clean B)| 0.0614, decision argmax differs 0.000 (n=185); in-batch determinism max|lp(none) - lp(none2)| 0.0e+00, answers differ 0.000; lp-argmax = containment answer 0.991 (3688/3722)
+  mistral7 passages R/NOM   competent (containment) 0.887 (63/71), strict 0.225 (16/71); flip(KV@0) all items 0.930 [0.829, 1.000] (n=71); BF16 floor mean|lp(none) - lp(clean B)| 0.0454, decision argmax differs 0.000 (n=71); in-batch determinism max|lp(none) - lp(none2)| 0.0e+00, answers differ 0.000; lp-argmax = containment answer 0.965 (1119/1159)
+  mistral7 passages R/OPTB  competent (containment) 0.972 (69/71), strict 0.972 (69/71); flip(KV@0) all items 0.986 [0.937, 1.000] (n=71); BF16 floor mean|lp(none) - lp(clean B)| 0.0594, decision argmax differs 0.000 (n=71); in-batch determinism max|lp(none) - lp(none2)| 0.0e+00, answers differ 0.000; lp-argmax = containment answer 0.987 (1438/1457)
+  mistral7 passages R/OPTA  competent (containment) 0.930 (66/71), strict 0.930 (66/71); flip(KV@0) all items 0.944 [0.850, 1.000] (n=71); BF16 floor mean|lp(none) - lp(clean B)| 0.0637, decision argmax differs 0.000 (n=71); in-batch determinism max|lp(none) - lp(none2)| 0.0e+00, answers differ 0.000; lp-argmax = containment answer 0.981 (1415/1442)
+  mistral7 edits NONE   @3 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0575 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.997 (3905/3915); @7 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0555 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.996 (3904/3919); @11 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0567 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.993 (873/879); @15 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0555 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.991 (870/878)
+  mistral7 edits AFTER  @3 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0507 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.996 (3906/3920); @7 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0545 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.998 (3913/3920); @11 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0656 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.998 (878/880); @15 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0673 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.999 (879/880)
+  mistral7 edits LETTER @3 self = B 0.925, floor mean|E(self) - E(clean B)| 0.0951 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.982 (3851/3920); @7 self = B 0.925, floor mean|E(self) - E(clean B)| 0.0981 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.992 (3888/3920); @11 self = B 0.925, floor mean|E(self) - E(clean B)| 0.1090 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.965 (849/880); @15 self = B 0.925, floor mean|E(self) - E(clean B)| 0.1135 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.957 (841/879)
+  mistral7 edits POST   @3 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0551 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.997 (3899/3911); @7 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0490 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.996 (3901/3918); @11 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0563 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.991 (869/877); @15 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0634 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.989 (870/880)
+  mistral7 edits LETTER@3 letter/word conflicts: 0.000 (0/3876) of the letter answers name another candidate word in the same text (3920 LETTER rows in all)
+  mistral7 edits LETTER@7 letter/word conflicts: 0.000 (0/3899) of the letter answers name another candidate word in the same text (3920 LETTER rows in all)
+  mistral7 edits LETTER@11 letter/word conflicts: 0.000 (0/837) of the letter answers name another candidate word in the same text (880 LETTER rows in all)
+  mistral7 edits LETTER@15 letter/word conflicts: 0.000 (0/839) of the letter answers name another candidate word in the same text (880 LETTER rows in all)
+  mistral7 edits competence: nat|t at NONE@3 answers t: 1.000 [1.000, 1.000] (n=80) (over (core, t); the edit arm's flips use all cores)
+  llama8   stories NONE      competent 1.000 (150/150); flip(KV@0) all items 1.000 [1.000, 1.000] (n=150); BF16 floor mean|E(none) - E(clean B)| 0.0574, E-argmax differs 0.000 (n=150); in-batch determinism max|E(none) - E(none2)| 0.0e+00, answers differ 0.000; E-argmax = generation 0.989 (6525/6600)
+  llama8   stories BEFORE    competent 1.000 (150/150); flip(KV@0) all items 1.000 [1.000, 1.000] (n=150); BF16 floor mean|E(none) - E(clean B)| 0.0810, E-argmax differs 0.000 (n=150); in-batch determinism max|E(none) - E(none2)| 0.0e+00, answers differ 0.000; E-argmax = generation 0.998 (6586/6600)
+  llama8   stories POST-NULL competent 1.000 (150/150); flip(KV@0) all items 1.000 [1.000, 1.000] (n=150); BF16 floor mean|E(none) - E(clean B)| 0.0591, E-argmax differs 0.000 (n=150); in-batch determinism max|E(none) - E(none2)| 0.0e+00, answers differ 0.000; E-argmax = generation 0.988 (6497/6574)
+  llama8   stories POST      competent 1.000 (150/150); flip(KV@0) all items 1.000 [1.000, 1.000] (n=150); BF16 floor mean|E(none) - E(clean B)| 0.0772, E-argmax differs 0.000 (n=150); in-batch determinism max|E(none) - E(none2)| 0.0e+00, answers differ 0.000; E-argmax = generation 0.983 (6488/6600)
+  llama8   stories AFTER     competent 1.000 (150/150); flip(KV@0) all items 1.000 [1.000, 1.000] (n=150); BF16 floor mean|E(none) - E(clean B)| 0.0794, E-argmax differs 0.000 (n=150); in-batch determinism max|E(none) - E(none2)| 0.0e+00, answers differ 0.000; E-argmax = generation 0.997 (6580/6600)
+  llama8   stories LETTER    competent 1.000 (150/150); flip(KV@0) all items 1.000 [1.000, 1.000] (n=150); BF16 floor mean|E(none) - E(clean B)| 0.1020, E-argmax differs 0.000 (n=150); in-batch determinism max|E(none) - E(none2)| 0.0e+00, answers differ 0.000; E-argmax = generation 0.996 (6573/6600)
+  llama8   stories LETTER    letter/word conflicts: 0.000 (0/6600) of the letter answers name another candidate word in the same text (6600 LETTER rows in all)
+  llama8   passages E/NOM   competent (containment) 0.924 (171/185), strict 0.492 (91/185); flip(KV@0) all items 0.930 [0.874, 0.975] (n=185); BF16 floor mean|lp(none) - lp(clean B)| 0.0435, decision argmax differs 0.000 (n=185); in-batch determinism max|lp(none) - lp(none2)| 0.0e+00, answers differ 0.000; lp-argmax = containment answer 0.973 (2998/3082)
+  llama8   passages E/OPTB  competent (containment) 0.924 (171/185), strict 0.924 (171/185); flip(KV@0) all items 0.930 [0.874, 0.976] (n=185); BF16 floor mean|lp(none) - lp(clean B)| 0.0684, decision argmax differs 0.000 (n=185); in-batch determinism max|lp(none) - lp(none2)| 0.0e+00, answers differ 0.000; lp-argmax = containment answer 0.997 (3824/3834)
+  llama8   passages E/OPTA  competent (containment) 0.832 (154/185), strict 0.832 (154/185); flip(KV@0) all items 0.838 [0.749, 0.916] (n=185); BF16 floor mean|lp(none) - lp(clean B)| 0.0718, decision argmax differs 0.000 (n=185); in-batch determinism max|lp(none) - lp(none2)| 0.0e+00, answers differ 0.000; lp-argmax = containment answer 0.996 (3719/3735)
+  llama8   passages R/NOM   competent (containment) 0.930 (66/71), strict 0.437 (31/71); flip(KV@0) all items 0.944 [0.857, 1.000] (n=71); BF16 floor mean|lp(none) - lp(clean B)| 0.0450, decision argmax differs 0.000 (n=71); in-batch determinism max|lp(none) - lp(none2)| 0.0e+00, answers differ 0.000; lp-argmax = containment answer 0.960 (1085/1130)
+  llama8   passages R/OPTB  competent (containment) 0.944 (67/71), strict 0.944 (67/71); flip(KV@0) all items 0.958 [0.871, 1.000] (n=71); BF16 floor mean|lp(none) - lp(clean B)| 0.0721, decision argmax differs 0.000 (n=71); in-batch determinism max|lp(none) - lp(none2)| 0.0e+00, answers differ 0.000; lp-argmax = containment answer 0.999 (1456/1458)
+  llama8   passages R/OPTA  competent (containment) 0.845 (60/71), strict 0.845 (60/71); flip(KV@0) all items 0.859 [0.731, 0.956] (n=71); BF16 floor mean|lp(none) - lp(clean B)| 0.0613, decision argmax differs 0.000 (n=71); in-batch determinism max|lp(none) - lp(none2)| 0.0e+00, answers differ 0.000; lp-argmax = containment answer 0.988 (1388/1405)
+  llama8   edits NONE   @3 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0682 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.987 (3703/3752); @7 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0589 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.986 (3706/3758); @11 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0648 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.999 (719/720); @15 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0654 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 1.000 (720/720)
+  llama8   edits AFTER  @3 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0839 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.993 (3730/3755); @7 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0788 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.992 (3729/3760); @11 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0847 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 1.000 (720/720); @15 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0845 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 1.000 (720/720)
+  llama8   edits LETTER @3 self = B 1.000, floor mean|E(self) - E(clean B)| 0.1105 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.994 (3730/3754); @7 self = B 1.000, floor mean|E(self) - E(clean B)| 0.1028 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.994 (3737/3759); @11 self = B 1.000, floor mean|E(self) - E(clean B)| 0.1038 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.987 (705/714); @15 self = B 1.000, floor mean|E(self) - E(clean B)| 0.1123 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.997 (718/720)
+  llama8   edits POST   @3 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0676 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.994 (3737/3758); @7 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0635 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.991 (3728/3760); @11 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0656 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 1.000 (720/720); @15 self = B 1.000, floor mean|E(self) - E(clean B)| 0.0672 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.997 (718/720)
+  llama8   edits LETTER@3 letter/word conflicts: 0.000 (0/3740) of the letter answers name another candidate word in the same text (3760 LETTER rows in all)
+  llama8   edits LETTER@7 letter/word conflicts: 0.000 (0/3759) of the letter answers name another candidate word in the same text (3760 LETTER rows in all)
+  llama8   edits LETTER@11 letter/word conflicts: 0.000 (0/706) of the letter answers name another candidate word in the same text (720 LETTER rows in all)
+  llama8   edits LETTER@15 letter/word conflicts: 0.000 (0/719) of the letter answers name another candidate word in the same text (720 LETTER rows in all)
+  llama8   edits competence: nat|t at NONE@3 answers t: 1.000 [1.000, 1.000] (n=80) (over (core, t); the edit arm's flips use all cores)
+  qwen7    stories NONE      competent 1.000 (150/150); flip(KV@0) all items 1.000 [1.000, 1.000] (n=150); BF16 floor mean|E(none) - E(clean B)| 0.1048, E-argmax differs 0.000 (n=150); in-batch determinism max|E(none) - E(none2)| 0.0e+00, answers differ 0.000; E-argmax = generation 0.998 (5986/6000)
+  qwen7    stories BEFORE    competent 0.987 (148/150); flip(KV@0) all items 1.000 [1.000, 1.000] (n=150); BF16 floor mean|E(none) - E(clean B)| 0.1450, E-argmax differs 0.000 (n=150); in-batch determinism max|E(none) - E(none2)| 0.0e+00, answers differ 0.000; E-argmax = generation 0.998 (5987/6000)
+  qwen7    stories POST-NULL competent 1.000 (150/150); flip(KV@0) all items 1.000 [1.000, 1.000] (n=150); BF16 floor mean|E(none) - E(clean B)| 0.1579, E-argmax differs 0.007 (n=150); in-batch determinism max|E(none) - E(none2)| 0.0e+00, answers differ 0.000; E-argmax = generation 0.994 (5963/6000)
+  qwen7    stories POST      competent 1.000 (150/150); flip(KV@0) all items 1.000 [1.000, 1.000] (n=150); BF16 floor mean|E(none) - E(clean B)| 0.1641, E-argmax differs 0.000 (n=150); in-batch determinism max|E(none) - E(none2)| 0.0e+00, answers differ 0.000; E-argmax = generation 0.996 (5973/6000)
+  qwen7    stories AFTER     competent 0.987 (148/150); flip(KV@0) all items 0.993 [0.971, 1.000] (n=150); BF16 floor mean|E(none) - E(clean B)| 0.1275, E-argmax differs 0.007 (n=150); in-batch determinism max|E(none) - E(none2)| 0.0e+00, answers differ 0.000; E-argmax = generation 0.995 (5970/6000)
+  qwen7    stories LETTER    competent 0.913 (137/150); flip(KV@0) all items 0.960 [0.912, 0.994] (n=150); BF16 floor mean|E(none) - E(clean B)| 0.1521, E-argmax differs 0.007 (n=150); in-batch determinism max|E(none) - E(none2)| 0.0e+00, answers differ 0.000; E-argmax = generation 0.989 (5936/5999)
+  qwen7    stories LETTER    letter/word conflicts: 0.000 (0/5999) of the letter answers name another candidate word in the same text (6000 LETTER rows in all)
+  qwen7    passages E/NOM   competent (containment) 0.924 (171/185), strict 0.589 (109/185); flip(KV@0) all items 0.924 [0.860, 0.976] (n=185); BF16 floor mean|lp(none) - lp(clean B)| 0.0853, decision argmax differs 0.000 (n=185); in-batch determinism max|lp(none) - lp(none2)| 0.0e+00, answers differ 0.000; lp-argmax = containment answer 0.976 (3034/3109)
+  qwen7    passages E/OPTB  competent (containment) 0.903 (167/185), strict 0.903 (167/185); flip(KV@0) all items 0.908 [0.836, 0.966] (n=185); BF16 floor mean|lp(none) - lp(clean B)| 0.1060, decision argmax differs 0.000 (n=185); in-batch determinism max|lp(none) - lp(none2)| 0.0e+00, answers differ 0.000; lp-argmax = containment answer 1.000 (3791/3792)
+  qwen7    passages E/OPTA  competent (containment) 0.897 (166/185), strict 0.897 (166/185); flip(KV@0) all items 0.897 [0.817, 0.961] (n=185); BF16 floor mean|lp(none) - lp(clean B)| 0.1008, decision argmax differs 0.000 (n=185); in-batch determinism max|lp(none) - lp(none2)| 0.0e+00, answers differ 0.000; lp-argmax = containment answer 0.998 (3824/3830)
+  qwen7    passages R/NOM   competent (containment) 0.972 (69/71), strict 0.563 (40/71); flip(KV@0) all items 0.972 [0.913, 1.000] (n=71); BF16 floor mean|lp(none) - lp(clean B)| 0.0589, decision argmax differs 0.014 (n=71); in-batch determinism max|lp(none) - lp(none2)| 0.0e+00, answers differ 0.000; lp-argmax = containment answer 0.967 (1104/1142)
+  qwen7    passages R/OPTB  competent (containment) 0.944 (67/71), strict 0.944 (67/71); flip(KV@0) all items 0.944 [0.857, 1.000] (n=71); BF16 floor mean|lp(none) - lp(clean B)| 0.0563, decision argmax differs 0.000 (n=71); in-batch determinism max|lp(none) - lp(none2)| 0.0e+00, answers differ 0.000; lp-argmax = containment answer 0.999 (1461/1462)
+  qwen7    passages R/OPTA  competent (containment) 0.958 (68/71), strict 0.958 (68/71); flip(KV@0) all items 0.958 [0.879, 1.000] (n=71); BF16 floor mean|lp(none) - lp(clean B)| 0.0844, decision argmax differs 0.000 (n=71); in-batch determinism max|lp(none) - lp(none2)| 0.0e+00, answers differ 0.000; lp-argmax = containment answer 0.997 (1473/1477)
+  qwen7    edits NONE   @3 self = B 1.000, floor mean|E(self) - E(clean B)| 0.1371 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.997 (3908/3919); @7 self = B 1.000, floor mean|E(self) - E(clean B)| 0.1238 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.996 (3904/3920); @11 self = B 1.000, floor mean|E(self) - E(clean B)| 0.1442 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.994 (874/879); @15 self = B 1.000, floor mean|E(self) - E(clean B)| 0.1361 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 1.000 (880/880)
+  qwen7    edits AFTER  @3 self = B 1.000, floor mean|E(self) - E(clean B)| 0.1253 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.995 (3902/3920); @7 self = B 1.000, floor mean|E(self) - E(clean B)| 0.1403 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.995 (3902/3920); @11 self = B 1.000, floor mean|E(self) - E(clean B)| 0.1435 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.994 (875/880); @15 self = B 1.000, floor mean|E(self) - E(clean B)| 0.1288 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 1.000 (880/880)
+  qwen7    edits LETTER @3 self = B 0.938, floor mean|E(self) - E(clean B)| 0.1563 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.990 (3877/3917); @7 self = B 0.938, floor mean|E(self) - E(clean B)| 0.1465 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.989 (3877/3920); @11 self = B 0.950, floor mean|E(self) - E(clean B)| 0.1687 (E-argmax differs 0.000, answers differ 0.013), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.990 (871/880); @15 self = B 0.938, floor mean|E(self) - E(clean B)| 0.1691 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.994 (875/880)
+  qwen7    edits POST   @3 self = B 1.000, floor mean|E(self) - E(clean B)| 0.1435 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.996 (3906/3920); @7 self = B 1.000, floor mean|E(self) - E(clean B)| 0.1470 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.995 (3901/3920); @11 self = B 1.000, floor mean|E(self) - E(clean B)| 0.1385 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.999 (879/880); @15 self = B 1.000, floor mean|E(self) - E(clean B)| 0.1507 (E-argmax differs 0.000, answers differ 0.000), in-batch max|E(self) - E(self2)| 0.0e+00 (answers differ 0.000), E-argmax = generation 0.997 (877/880)
+  qwen7    edits LETTER@3 letter/word conflicts: 0.000 (0/3915) of the letter answers name another candidate word in the same text (3920 LETTER rows in all)
+  qwen7    edits LETTER@7 letter/word conflicts: 0.000 (0/3902) of the letter answers name another candidate word in the same text (3920 LETTER rows in all)
+  qwen7    edits LETTER@11 letter/word conflicts: 0.000 (0/880) of the letter answers name another candidate word in the same text (880 LETTER rows in all)
+  qwen7    edits LETTER@15 letter/word conflicts: 0.000 (0/880) of the letter answers name another candidate word in the same text (880 LETTER rows in all)
+  qwen7    edits competence: nat|t at NONE@3 answers t: 1.000 [1.000, 1.000] (n=80) (over (core, t); the edit arm's flips use all cores)
+
+#### PREDICTIONS (generated answers, competent items, containment; 95 % two-stage cluster bootstrap, 10,000 resamples, seed 20261015)
+  P1s stories: late flip >= 0.95 at every l <= 0.5 L in NONE, BEFORE and POST-NULL, each model -> SUPPORTED AT THE POINT
+      mistral7: SUPPORTED
+          NONE late@2 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          NONE late@4 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          NONE late@6 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          NONE late@8 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          NONE late@10 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          NONE late@12 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          NONE late@14 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          NONE late@16 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          BEFORE late@2 1.000 [1.000, 1.000] (n=149) >= 0.95: SUPPORTED
+          BEFORE late@4 1.000 [1.000, 1.000] (n=149) >= 0.95: SUPPORTED
+          BEFORE late@6 1.000 [1.000, 1.000] (n=149) >= 0.95: SUPPORTED
+          BEFORE late@8 1.000 [1.000, 1.000] (n=149) >= 0.95: SUPPORTED
+          BEFORE late@10 1.000 [1.000, 1.000] (n=149) >= 0.95: SUPPORTED
+          BEFORE late@12 1.000 [1.000, 1.000] (n=149) >= 0.95: SUPPORTED
+          BEFORE late@14 1.000 [1.000, 1.000] (n=149) >= 0.95: SUPPORTED
+          BEFORE late@16 1.000 [1.000, 1.000] (n=149) >= 0.95: SUPPORTED
+          POST-NULL late@2 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          POST-NULL late@4 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          POST-NULL late@6 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          POST-NULL late@8 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          POST-NULL late@10 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          POST-NULL late@12 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          POST-NULL late@14 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          POST-NULL late@16 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+      llama8: SUPPORTED AT THE POINT
+          NONE late@2 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          NONE late@4 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          NONE late@6 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          NONE late@8 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          NONE late@10 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          NONE late@12 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          NONE late@14 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          NONE late@16 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          BEFORE late@2 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          BEFORE late@4 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          BEFORE late@6 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          BEFORE late@8 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          BEFORE late@10 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          BEFORE late@12 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          BEFORE late@14 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          BEFORE late@16 0.980 [0.947, 1.000] (n=150) >= 0.95: SUPPORTED AT THE POINT
+          POST-NULL late@2 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          POST-NULL late@4 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          POST-NULL late@6 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          POST-NULL late@8 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          POST-NULL late@10 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          POST-NULL late@12 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          POST-NULL late@14 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          POST-NULL late@16 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+      qwen7: SUPPORTED
+          NONE late@2 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          NONE late@4 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          NONE late@6 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          NONE late@8 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          NONE late@10 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          NONE late@12 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          NONE late@14 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          BEFORE late@2 1.000 [1.000, 1.000] (n=148) >= 0.95: SUPPORTED
+          BEFORE late@4 1.000 [1.000, 1.000] (n=148) >= 0.95: SUPPORTED
+          BEFORE late@6 1.000 [1.000, 1.000] (n=148) >= 0.95: SUPPORTED
+          BEFORE late@8 1.000 [1.000, 1.000] (n=148) >= 0.95: SUPPORTED
+          BEFORE late@10 1.000 [1.000, 1.000] (n=148) >= 0.95: SUPPORTED
+          BEFORE late@12 1.000 [1.000, 1.000] (n=148) >= 0.95: SUPPORTED
+          BEFORE late@14 1.000 [1.000, 1.000] (n=148) >= 0.95: SUPPORTED
+          POST-NULL late@2 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          POST-NULL late@4 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          POST-NULL late@6 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          POST-NULL late@8 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          POST-NULL late@10 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          POST-NULL late@12 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+          POST-NULL late@14 1.000 [1.000, 1.000] (n=150) >= 0.95: SUPPORTED
+  P1p passages: late flip >= 0.8 in NOM and OPTB at x = 0.15, 0.3, 0.45, each model -> NOT SUPPORTED (NOT SUPPORTED in: llama8)
+      mistral7: SUPPORTED AT THE POINT
+          E NOM late@5 0.988 [0.961, 1.000] (n=167) >= 0.8: SUPPORTED
+          E NOM late@10 0.982 [0.950, 1.000] (n=167) >= 0.8: SUPPORTED
+          E NOM late@14 0.952 [0.904, 0.988] (n=167) >= 0.8: SUPPORTED
+          E OPTB late@5 1.000 [1.000, 1.000] (n=156) >= 0.8: SUPPORTED
+          E OPTB late@10 0.987 [0.958, 1.000] (n=156) >= 0.8: SUPPORTED
+          E OPTB late@14 0.821 [0.729, 0.902] (n=156) >= 0.8: SUPPORTED AT THE POINT
+      llama8: NOT SUPPORTED
+          E NOM late@5 0.988 [0.960, 1.000] (n=171) >= 0.8: SUPPORTED
+          E NOM late@10 0.977 [0.943, 1.000] (n=171) >= 0.8: SUPPORTED
+          E NOM late@14 0.977 [0.943, 1.000] (n=171) >= 0.8: SUPPORTED
+          E OPTB late@5 0.988 [0.961, 1.000] (n=171) >= 0.8: SUPPORTED
+          E OPTB late@10 0.953 [0.903, 0.989] (n=171) >= 0.8: SUPPORTED
+          E OPTB late@14 0.696 [0.595, 0.787] (n=171) >= 0.8: NOT SUPPORTED
+      qwen7: SUPPORTED
+          E NOM late@4 1.000 [1.000, 1.000] (n=171) >= 0.8: SUPPORTED
+          E NOM late@8 1.000 [1.000, 1.000] (n=171) >= 0.8: SUPPORTED
+          E NOM late@13 0.988 [0.961, 1.000] (n=171) >= 0.8: SUPPORTED
+          E OPTB late@4 1.000 [1.000, 1.000] (n=167) >= 0.8: SUPPORTED
+          E OPTB late@8 1.000 [1.000, 1.000] (n=167) >= 0.8: SUPPORTED
+          E OPTB late@13 1.000 [1.000, 1.000] (n=167) >= 0.8: SUPPORTED
+  P2s stories: l_c(AFTER)/L and l_c(LETTER)/L <= 0.35 (mistral7, llama8) / 0.55 (qwen7); [l_c(NONE) - l_c(AFTER)]/L >= 0.15, each model -> SUPPORTED
+      mistral7: SUPPORTED
+          l_c(AFTER)/L (l_c 8) 0.250 [0.250, 0.312] (n=149) <= 0.35: SUPPORTED
+          l_c(LETTER)/L (l_c 8) 0.250 [0.250, 0.250] (n=138) <= 0.35: SUPPORTED
+          [l_c(NONE) - l_c(AFTER)]/L (l_c(NONE) 22) 0.438 [0.375, 0.438] (n=149) >= 0.15: SUPPORTED
+      llama8: SUPPORTED
+          l_c(AFTER)/L (l_c 10) 0.312 [0.250, 0.312] (n=150) <= 0.35: SUPPORTED
+          l_c(LETTER)/L (l_c 6) 0.188 [0.188, 0.250] (n=150) <= 0.35: SUPPORTED
+          [l_c(NONE) - l_c(AFTER)]/L (l_c(NONE) 26) 0.500 [0.438, 0.562] (n=150) >= 0.15: SUPPORTED
+      qwen7: SUPPORTED
+          l_c(AFTER)/L (l_c 14) 0.500 [0.357, 0.500] (n=148) <= 0.55: SUPPORTED
+          l_c(LETTER)/L (l_c 10) 0.357 [0.357, 0.357] (n=137) <= 0.55: SUPPORTED
+          [l_c(NONE) - l_c(AFTER)]/L (l_c(NONE) 26) 0.429 [0.429, 0.571] (n=148) >= 0.15: SUPPORTED
+  P2p passages: OPTA late flip at round(0.3 L) <= 0.4 in at least 2 of 3 models (counted at the point) -> SUPPORTED [2 of 3 at the point]
+      mistral7: SUPPORTED
+          E OPTA late@10 0.080 [0.028, 0.145] (n=162) <= 0.4: SUPPORTED
+      llama8: SUPPORTED
+          E OPTA late@10 0.279 [0.181, 0.378] (n=154) <= 0.4: SUPPORTED
+      qwen7: NOT SUPPORTED
+          E OPTA late@8 0.940 [0.876, 0.987] (n=166) <= 0.4: NOT SUPPORTED
+  P3s stories, at l_b: early flip >= 0.7 in AFTER and in LETTER, <= 0.05 in NONE and in BEFORE, each model -> NOT SUPPORTED (NOT SUPPORTED in: mistral7)
+      mistral7: NOT SUPPORTED
+          AFTER early@8 0.638 [0.529, 0.743] (n=149) >= 0.7: NOT SUPPORTED
+          LETTER early@8 0.725 [0.614, 0.829] (n=138) >= 0.7: SUPPORTED AT THE POINT
+          NONE early@8 0.000 [0.000, 0.000] (n=150) <= 0.05: SUPPORTED
+          BEFORE early@8 0.000 [0.000, 0.000] (n=149) <= 0.05: SUPPORTED
+      llama8: SUPPORTED
+          AFTER early@10 0.827 [0.734, 0.911] (n=150) >= 0.7: SUPPORTED
+          LETTER early@10 0.980 [0.946, 1.000] (n=150) >= 0.7: SUPPORTED
+          NONE early@10 0.000 [0.000, 0.000] (n=150) <= 0.05: SUPPORTED
+          BEFORE early@10 0.000 [0.000, 0.000] (n=150) <= 0.05: SUPPORTED
+      qwen7: SUPPORTED
+          AFTER early@14 0.872 [0.795, 0.937] (n=148) >= 0.7: SUPPORTED
+          LETTER early@14 0.847 [0.753, 0.925] (n=137) >= 0.7: SUPPORTED
+          NONE early@14 0.000 [0.000, 0.000] (n=150) <= 0.05: SUPPORTED
+          BEFORE early@14 0.000 [0.000, 0.000] (n=148) <= 0.05: SUPPORTED
+  P3p passages, early window to round(0.3 L): OPTA >= 0.5, NOM <= 0.1, OPTB <= 0.1, each model -> NOT SUPPORTED (NOT SUPPORTED in: qwen7)
+      mistral7: SUPPORTED
+          E OPTA early@10 0.802 [0.714, 0.882] (n=162) >= 0.5: SUPPORTED
+          E NOM early@10 0.000 [0.000, 0.000] (n=167) <= 0.1: SUPPORTED
+          E OPTB early@10 0.019 [0.000, 0.060] (n=156) <= 0.1: SUPPORTED
+      llama8: SUPPORTED AT THE POINT
+          E OPTA early@10 0.519 [0.409, 0.639] (n=154) >= 0.5: SUPPORTED AT THE POINT
+          E NOM early@10 0.000 [0.000, 0.000] (n=171) <= 0.1: SUPPORTED
+          E OPTB early@10 0.000 [0.000, 0.000] (n=171) <= 0.1: SUPPORTED
+      qwen7: NOT SUPPORTED
+          E OPTA early@8 0.000 [0.000, 0.000] (n=166) >= 0.5: NOT SUPPORTED
+          E NOM early@8 0.000 [0.000, 0.000] (n=171) <= 0.1: SUPPORTED
+          E OPTB early@8 0.000 [0.000, 0.000] (n=167) <= 0.1: SUPPORTED
+  P4 silent: at l_b in AFTER >= 0.8 of the non-flipped answers are B, each model; at Mistral the median absolute p(B) of the B answers >= 0.8 -> SUPPORTED
+      mistral7: SUPPORTED
+          AFTER late@8: share B among the non-S answers 0.989 [0.961, 1.000] (n=91) >= 0.8: SUPPORTED
+          AFTER late@8: median absolute p(B) of the B answers 0.998 [0.996, 0.999] (n=90) >= 0.8: SUPPORTED
+      llama8: SUPPORTED
+          AFTER late@10: share B among the non-S answers 1.000 [1.000, 1.000] (n=130) >= 0.8: SUPPORTED
+      qwen7: SUPPORTED
+          AFTER late@14: share B among the non-S answers 1.000 [1.000, 1.000] (n=136) >= 0.8: SUPPORTED
+  P5a single-site E1 tracks the natural late patch: |flip(E1) - flip(nat)| <= 0.1 in every format x block cell, each model -> NOT SUPPORTED (NOT SUPPORTED in: qwen7)
+      mistral7: SUPPORTED AT THE POINT
+          NONE@3 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          NONE@7 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          NONE@11 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          NONE@15 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          AFTER@3 flip(E1) - flip(nat) -0.013 [-0.039, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          AFTER@7 flip(E1) - flip(nat) -0.062 [-0.130, -0.006] (n=80) in [-0.1, 0.1]: SUPPORTED AT THE POINT
+          AFTER@11 flip(E1) - flip(nat) 0.013 [0.000, 0.041] (n=80) in [-0.1, 0.1]: SUPPORTED
+          AFTER@15 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          LETTER@3 flip(E1) - flip(nat) -0.006 [-0.028, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          LETTER@7 flip(E1) - flip(nat) -0.062 [-0.119, -0.014] (n=80) in [-0.1, 0.1]: SUPPORTED AT THE POINT
+          LETTER@11 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          LETTER@15 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          POST@3 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          POST@7 flip(E1) - flip(nat) -0.019 [-0.054, 0.007] (n=80) in [-0.1, 0.1]: SUPPORTED
+          POST@11 flip(E1) - flip(nat) 0.006 [-0.029, 0.049] (n=80) in [-0.1, 0.1]: SUPPORTED
+          POST@15 flip(E1) - flip(nat) -0.019 [-0.075, 0.016] (n=80) in [-0.1, 0.1]: SUPPORTED
+      llama8: SUPPORTED AT THE POINT
+          NONE@3 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          NONE@7 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          NONE@11 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          NONE@15 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          AFTER@3 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          AFTER@7 flip(E1) - flip(nat) -0.062 [-0.111, -0.020] (n=80) in [-0.1, 0.1]: SUPPORTED AT THE POINT
+          AFTER@11 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          AFTER@15 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          LETTER@3 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          LETTER@7 flip(E1) - flip(nat) -0.056 [-0.102, -0.018] (n=80) in [-0.1, 0.1]: SUPPORTED AT THE POINT
+          LETTER@11 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          LETTER@15 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          POST@3 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          POST@7 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          POST@11 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          POST@15 flip(E1) - flip(nat) 0.019 [-0.014, 0.057] (n=80) in [-0.1, 0.1]: SUPPORTED
+      qwen7: NOT SUPPORTED
+          NONE@3 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          NONE@7 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          NONE@11 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          NONE@15 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          AFTER@3 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          AFTER@7 flip(E1) - flip(nat) 0.000 [-0.039, 0.041] (n=80) in [-0.1, 0.1]: SUPPORTED
+          AFTER@11 flip(E1) - flip(nat) -0.106 [-0.188, -0.038] (n=80) in [-0.1, 0.1]: NOT SUPPORTED
+          AFTER@15 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          LETTER@3 flip(E1) - flip(nat) -0.019 [-0.051, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          LETTER@7 flip(E1) - flip(nat) -0.019 [-0.064, 0.022] (n=80) in [-0.1, 0.1]: SUPPORTED
+          LETTER@11 flip(E1) - flip(nat) -0.025 [-0.082, 0.031] (n=80) in [-0.1, 0.1]: SUPPORTED
+          LETTER@15 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          POST@3 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          POST@7 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          POST@11 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+          POST@15 flip(E1) - flip(nat) 0.000 [0.000, 0.000] (n=80) in [-0.1, 0.1]: SUPPORTED
+  P5b E4b fails with the list where the window is open: tau = flip(AFTER)/flip(NONE) <= 0.7 at every block where E4b's NONE flip >= 0.5 (qwen7, mistral7; precondition tau_nat(3) >= 0.9) -> NOT SUPPORTED (NOT SUPPORTED in: mistral7)
+      qwen7: SUPPORTED AT THE POINT  precondition tau_nat(3) 0.994 [0.973, 1.000] (n=80) >= 0.9; blocks [3, 7, 11, 15]
+          tau_E4b(3) (E4b NONE flip 1.000 >= 0.5) 0.694 [0.569, 0.806] (n=80) <= 0.7: SUPPORTED AT THE POINT
+          tau_E4b(7) (E4b NONE flip 0.994 >= 0.5) 0.302 [0.179, 0.430] (n=80) <= 0.7: SUPPORTED
+          tau_E4b(11) (E4b NONE flip 0.875 >= 0.5) 0.029 [0.000, 0.068] (n=80) <= 0.7: SUPPORTED
+          tau_E4b(15) (E4b NONE flip 0.775 >= 0.5) 0.000 [0.000, 0.000] (n=80) <= 0.7: SUPPORTED
+      mistral7: NOT SUPPORTED  precondition tau_nat(3) 0.994 [0.973, 1.000] (n=80) >= 0.9; blocks [3, 7, 11, 15]
+          tau_E4b(3) (E4b NONE flip 0.988 >= 0.5) 0.703 [0.594, 0.808] (n=80) <= 0.7: NOT SUPPORTED
+          tau_E4b(7) (E4b NONE flip 0.956 >= 0.5) 0.046 [0.000, 0.125] (n=80) <= 0.7: SUPPORTED
+          tau_E4b(11) (E4b NONE flip 0.831 >= 0.5) 0.000 [0.000, 0.000] (n=80) <= 0.7: SUPPORTED
+          tau_E4b(15) (E4b NONE flip 0.644 >= 0.5) 0.000 [0.000, 0.000] (n=80) <= 0.7: SUPPORTED
+  POST scope: POST late flip >= 0.8 at every l <= 0.5 L, each model -> NOT SUPPORTED (NOT SUPPORTED in: mistral7)
+      mistral7: NOT SUPPORTED
+          POST late@2 1.000 [1.000, 1.000] (n=150) >= 0.8: SUPPORTED
+          POST late@4 1.000 [1.000, 1.000] (n=150) >= 0.8: SUPPORTED
+          POST late@6 1.000 [1.000, 1.000] (n=150) >= 0.8: SUPPORTED
+          POST late@8 0.880 [0.799, 0.953] (n=150) >= 0.8: SUPPORTED AT THE POINT
+          POST late@10 0.773 [0.681, 0.862] (n=150) >= 0.8: NOT SUPPORTED
+          POST late@12 0.727 [0.634, 0.815] (n=150) >= 0.8: NOT SUPPORTED
+          POST late@14 0.760 [0.669, 0.845] (n=150) >= 0.8: NOT SUPPORTED
+          POST late@16 0.773 [0.680, 0.859] (n=150) >= 0.8: NOT SUPPORTED
+      llama8: SUPPORTED AT THE POINT
+          POST late@2 1.000 [1.000, 1.000] (n=150) >= 0.8: SUPPORTED
+          POST late@4 1.000 [1.000, 1.000] (n=150) >= 0.8: SUPPORTED
+          POST late@6 1.000 [1.000, 1.000] (n=150) >= 0.8: SUPPORTED
+          POST late@8 0.987 [0.961, 1.000] (n=150) >= 0.8: SUPPORTED
+          POST late@10 0.980 [0.948, 1.000] (n=150) >= 0.8: SUPPORTED
+          POST late@12 0.947 [0.899, 0.985] (n=150) >= 0.8: SUPPORTED
+          POST late@14 0.867 [0.794, 0.931] (n=150) >= 0.8: SUPPORTED AT THE POINT
+          POST late@16 0.860 [0.775, 0.931] (n=150) >= 0.8: SUPPORTED AT THE POINT
+      qwen7: SUPPORTED
+          POST late@2 1.000 [1.000, 1.000] (n=150) >= 0.8: SUPPORTED
+          POST late@4 0.993 [0.971, 1.000] (n=150) >= 0.8: SUPPORTED
+          POST late@6 1.000 [1.000, 1.000] (n=150) >= 0.8: SUPPORTED
+          POST late@8 1.000 [1.000, 1.000] (n=150) >= 0.8: SUPPORTED
+          POST late@10 1.000 [1.000, 1.000] (n=150) >= 0.8: SUPPORTED
+          POST late@12 1.000 [1.000, 1.000] (n=150) >= 0.8: SUPPORTED
+          POST late@14 0.993 [0.972, 1.000] (n=150) >= 0.8: SUPPORTED
+  P1 free form stays open: late flip >= 0.95 at every l <= 0.5 L in NONE, BEFORE, POST-NULL (stories); >= 0.8 in NOM and OPTB at x = 0.15, 0.3, 0.45 (passages) -> NOT SUPPORTED (P1s SUPPORTED AT THE POINT; P1p NOT SUPPORTED)
+  P2 listed closes: l_c(AFTER)/L, l_c(LETTER)/L <= 0.35 (Mistral, Llama) / 0.55 (Qwen), [l_c(NONE) - l_c(AFTER)]/L >= 0.15; passages OPTA late flip at round(0.3 L) <= 0.4 in 2 of 3 models -> SUPPORTED (P2s SUPPORTED; P2p SUPPORTED, 2 of 3 at the point)
+      per model: the stories part P2s alone; the passages part P2p is decided over the models (2 of 3 at the point), not per model: mistral7 SUPPORTED (P2p here SUPPORTED); llama8 SUPPORTED (P2p here SUPPORTED); qwen7 SUPPORTED (P2p here NOT SUPPORTED)
+  P3 the crossover: early flip at l_b >= 0.7 in AFTER and LETTER, <= 0.05 in NONE and BEFORE (stories); early window to round(0.3 L): OPTA >= 0.5, NOM <= 0.1, OPTB <= 0.1 (passages) -> NOT SUPPORTED (P3s NOT SUPPORTED; P3p NOT SUPPORTED)
+  P5c all-position steering (CAA, E1 at every position >= p), reported either way: it transfers if its AFTER flip >= 0.5 at block 11 or 15 where the natural patch's AFTER flip <= 0.2
+      mistral7: TRANSFERS  block 11: nat AFTER 0.013 [0.000, 0.041] (n=80) <= 0.2, CAA AFTER 0.956 [0.884, 1.000] (n=80) -> >= 0.5; block 15: nat AFTER 0.000 [0.000, 0.000] (n=80) <= 0.2, CAA AFTER 1.000 [1.000, 1.000] (n=80) -> >= 0.5
+      llama8: TRANSFERS  block 11: nat AFTER 0.000 [0.000, 0.000] (n=80) <= 0.2, CAA AFTER 1.000 [1.000, 1.000] (n=80) -> >= 0.5; block 15: nat AFTER 0.000 [0.000, 0.000] (n=80) <= 0.2, CAA AFTER 1.000 [1.000, 1.000] (n=80) -> >= 0.5
+      qwen7: TRANSFERS  block 11: nat AFTER 0.750 [0.614, 0.868] (n=80) > 0.2 (the window is open; not read); block 15: nat AFTER 0.000 [0.000, 0.000] (n=80) <= 0.2, CAA AFTER 1.000 [1.000, 1.000] (n=80) -> >= 0.5
+
+#### FALSIFIERS (at the point in each model; triggered in any model)
+  F1 early flip at l_b >= 0.2 in NONE or in BEFORE -> not triggered
+      mistral7: not triggered  NONE early@8 0.000 [0.000, 0.000] (n=150); BEFORE early@8 0.000 [0.000, 0.000] (n=149)
+      llama8: not triggered  NONE early@10 0.000 [0.000, 0.000] (n=150); BEFORE early@10 0.000 [0.000, 0.000] (n=150)
+      qwen7: not triggered  NONE early@14 0.000 [0.000, 0.000] (n=150); BEFORE early@14 0.000 [0.000, 0.000] (n=148)
+  F2s [l_c(BEFORE) - l_c(AFTER)]/L < 0.1 -> not triggered
+      mistral7: not triggered  [l_c(BEFORE) - l_c(AFTER)]/L 0.312 [0.312, 0.375] (n=149)
+      llama8: not triggered  [l_c(BEFORE) - l_c(AFTER)]/L 0.250 [0.250, 0.312] (n=150)
+      qwen7: not triggered  [l_c(BEFORE) - l_c(AFTER)]/L 0.357 [0.357, 0.500] (n=148)
+  F2p passages: late flip OPTB - OPTA at round(0.3 L) < 0.1 -> TRIGGERED (in qwen7)
+      mistral7: not triggered  OPTB - OPTA late@10 0.907 [0.833, 0.965] (n=156)
+      llama8: not triggered  OPTB - OPTA late@10 0.674 [0.566, 0.776] (n=154)
+      qwen7: TRIGGERED  OPTB - OPTA late@8 0.060 [0.013, 0.124] (n=166)
+  F3 [l_c(NONE) - l_c(AFTER)]/L < 0.1 -> not triggered
+      mistral7: not triggered  [l_c(NONE) - l_c(AFTER)]/L 0.438 [0.375, 0.438] (n=149)
+      llama8: not triggered  [l_c(NONE) - l_c(AFTER)]/L 0.500 [0.438, 0.562] (n=150)
+      qwen7: not triggered  [l_c(NONE) - l_c(AFTER)]/L 0.429 [0.429, 0.571] (n=148)
+  B-F1 joint alpha = 0.5 AFTER flip >= 0.6 at block 3 -> not triggered
+      mistral7: not triggered  AFTER@3 J0.5 flip 0.113 [0.039, 0.212] (n=80)
+      llama8: not triggered  AFTER@3 J0.5 flip 0.094 [0.038, 0.157] (n=80)
+      qwen7: not triggered  AFTER@3 J0.5 flip 0.044 [0.006, 0.100] (n=80)
+  B-F2 psi_V(NONE, 0.5) - psi_K(AFTER, 0.5) <= 0.1 at block 3 (E, nats) -> not triggered
+      mistral7: not triggered  psi_V(NONE, 3, 0.5) - psi_K(AFTER, 3, 0.5) 0.446 [0.364, 0.509] (n=80)
+      llama8: not triggered  psi_V(NONE, 3, 0.5) - psi_K(AFTER, 3, 0.5) 0.470 [0.430, 0.512] (n=80)
+      qwen7: not triggered  psi_V(NONE, 3, 0.5) - psi_K(AFTER, 3, 0.5) 0.508 [0.481, 0.533] (n=80)
+  F2 (stories or passages) -> TRIGGERED
+
+#### DIRECTION B (blocks 3 and 7; r_K = proj_k)
+  B1 block 3: joint interpolation at alpha = 0.5 flips <= 0.35 of AFTER and >= 0.9 of NONE answers, each model -> NOT SUPPORTED (NOT SUPPORTED in: mistral7, llama8, qwen7)
+      mistral7: NOT SUPPORTED
+          AFTER@3 J0.5 0.113 [0.039, 0.212] (n=80) <= 0.35: SUPPORTED
+          NONE@3 J0.5 0.450 [0.268, 0.648] (n=80) >= 0.9: NOT SUPPORTED
+      llama8: NOT SUPPORTED
+          AFTER@3 J0.5 0.094 [0.038, 0.157] (n=80) <= 0.35: SUPPORTED
+          NONE@3 J0.5 0.362 [0.201, 0.540] (n=80) >= 0.9: NOT SUPPORTED
+      qwen7: NOT SUPPORTED
+          AFTER@3 J0.5 0.044 [0.006, 0.100] (n=80) <= 0.35: SUPPORTED
+          NONE@3 J0.5 0.469 [0.312, 0.642] (n=80) >= 0.9: NOT SUPPORTED
+  B2 block 3: E1 at 0.5x flips >= 0.9 of NONE and <= 0.5 of AFTER answers, each model -> NOT SUPPORTED (NOT SUPPORTED in: mistral7, llama8, qwen7)
+      mistral7: NOT SUPPORTED
+          NONE@3 E1x0.5 0.388 [0.222, 0.569] (n=80) >= 0.9: NOT SUPPORTED
+          AFTER@3 E1x0.5 0.125 [0.041, 0.241] (n=80) <= 0.5: SUPPORTED
+      llama8: NOT SUPPORTED
+          NONE@3 E1x0.5 0.344 [0.196, 0.519] (n=80) >= 0.9: NOT SUPPORTED
+          AFTER@3 E1x0.5 0.013 [0.000, 0.041] (n=80) <= 0.5: SUPPORTED
+      qwen7: NOT SUPPORTED
+          NONE@3 E1x0.5 0.312 [0.163, 0.488] (n=80) >= 0.9: NOT SUPPORTED
+          AFTER@3 E1x0.5 0.000 [0.000, 0.000] (n=80) <= 0.5: SUPPORTED
+  B3 r_K predicts AFTER transfer: AUC >= 0.8 over the E1 multipliers, E4b and the joint-alpha rows in the cells where the natural patch transfers, each model -> SUPPORTED
+      mistral7: SUPPORTED  cells (blocks) [3]; 1568 units, 1317 positives, 251 negatives; rule r_K >= 0.8 accuracy 0.822 [0.795, 0.846] (n=80)
+          AUC of r_K 0.897 [0.853, 0.933] (n=1568) >= 0.8: SUPPORTED
+      llama8: SUPPORTED  cells (blocks) [3]; 1380 units, 1192 positives, 188 negatives; rule r_K >= 0.8 accuracy 0.858 [0.833, 0.884] (n=80)
+          AUC of r_K 0.944 [0.900, 0.976] (n=1380) >= 0.8: SUPPORTED
+      qwen7: SUPPORTED  cells (blocks) [3, 7]; 3122 units, 2270 positives, 852 negatives; rule r_K >= 0.8 accuracy 0.840 [0.817, 0.862] (n=80)
+          AUC of r_K 0.908 [0.875, 0.937] (n=3122) >= 0.8: SUPPORTED
+
+#### REPORTED (no verdicts)
+  [mistral7 stories, N9, L = 32; competent items; generated answers] late and early flip curves, l_c, K/V-only
+    NONE      late  2: 1.00 [1.00, 1.00] (n=150); 4: 1.00 [1.00, 1.00] (n=150); 6: 1.00 [1.00, 1.00] (n=150); 8: 1.00 [1.00, 1.00] (n=150); 10: 1.00 [1.00, 1.00] (n=150); 12: 1.00 [1.00, 1.00] (n=150); 14: 1.00 [1.00, 1.00] (n=150); 16: 1.00 [1.00, 1.00] (n=150); 18: 1.00 [1.00, 1.00] (n=150); 20: 0.93 [0.87, 0.97] (n=150); 22: 0.23 [0.13, 0.35] (n=150); 24: 0.19 [0.09, 0.30] (n=150); 26: 0.09 [0.03, 0.18] (n=150); 28: 0.01 [0.00, 0.05] (n=150); 30: 0.00 [0.00, 0.00] (n=150)
+    NONE      early 2: 0.00 [0.00, 0.00] (n=150); 4: 0.00 [0.00, 0.00] (n=150); 6: 0.00 [0.00, 0.00] (n=150); 8: 0.00 [0.00, 0.00] (n=150); 10: 0.00 [0.00, 0.00] (n=150); 12: 0.00 [0.00, 0.00] (n=150); 14: 0.00 [0.00, 0.00] (n=150); 16: 0.00 [0.00, 0.00] (n=150); 18: 0.00 [0.00, 0.00] (n=150); 20: 0.03 [0.00, 0.06] (n=150); 22: 0.76 [0.64, 0.87] (n=150); 24: 0.85 [0.75, 0.94] (n=150); 26: 0.92 [0.83, 0.99] (n=150); 28: 1.00 [1.00, 1.00] (n=150); 30: 1.00 [1.00, 1.00] (n=150)
+    NONE      l_c = 22, l_c/L 0.688 [0.688, 0.688] (n=150)
+    NONE      K@0 0.00 [0.00, 0.00] (n=150); V@0 0.99 [0.96, 1.00] (n=150); Klate@4 0.00 [0.00, 0.00] (n=150); Klate@8 0.00 [0.00, 0.00] (n=150); Klate@12 0.00 [0.00, 0.00] (n=150); Klate@16 0.00 [0.00, 0.00] (n=150); Vlate@4 0.99 [0.97, 1.00] (n=150); Vlate@8 0.99 [0.97, 1.00] (n=150); Vlate@12 0.99 [0.97, 1.00] (n=150); Vlate@16 0.99 [0.97, 1.00] (n=150)
+    BEFORE    late  2: 1.00 [1.00, 1.00] (n=149); 4: 1.00 [1.00, 1.00] (n=149); 6: 1.00 [1.00, 1.00] (n=149); 8: 1.00 [1.00, 1.00] (n=149); 10: 1.00 [1.00, 1.00] (n=149); 12: 1.00 [1.00, 1.00] (n=149); 14: 1.00 [1.00, 1.00] (n=149); 16: 1.00 [1.00, 1.00] (n=149); 18: 0.48 [0.36, 0.59] (n=149); 20: 0.01 [0.00, 0.04] (n=149); 22: 0.00 [0.00, 0.00] (n=149); 24: 0.00 [0.00, 0.00] (n=149); 26: 0.00 [0.00, 0.00] (n=149); 28: 0.00 [0.00, 0.00] (n=149); 30: 0.00 [0.00, 0.00] (n=149)
+    BEFORE    early 2: 0.00 [0.00, 0.00] (n=149); 4: 0.00 [0.00, 0.00] (n=149); 6: 0.00 [0.00, 0.00] (n=149); 8: 0.00 [0.00, 0.00] (n=149); 10: 0.00 [0.00, 0.00] (n=149); 12: 0.00 [0.00, 0.00] (n=149); 14: 0.00 [0.00, 0.00] (n=149); 16: 0.00 [0.00, 0.00] (n=149); 18: 0.49 [0.38, 0.61] (n=149); 20: 0.95 [0.88, 1.00] (n=149); 22: 0.99 [0.97, 1.00] (n=149); 24: 0.99 [0.97, 1.00] (n=149); 26: 1.00 [1.00, 1.00] (n=149); 28: 1.00 [1.00, 1.00] (n=149); 30: 1.00 [1.00, 1.00] (n=149)
+    BEFORE    l_c = 18, l_c/L 0.562 [0.562, 0.625] (n=149)
+    BEFORE    K@0 0.00 [0.00, 0.00] (n=149); V@0 0.99 [0.96, 1.00] (n=149); Klate@4 0.00 [0.00, 0.00] (n=149); Klate@8 0.00 [0.00, 0.00] (n=149); Klate@12 0.00 [0.00, 0.00] (n=149); Klate@16 0.00 [0.00, 0.00] (n=149); Vlate@4 0.99 [0.96, 1.00] (n=149); Vlate@8 0.99 [0.96, 1.00] (n=149); Vlate@12 0.99 [0.96, 1.00] (n=149); Vlate@16 0.99 [0.97, 1.00] (n=149)
+    POST-NULL late  2: 1.00 [1.00, 1.00] (n=150); 4: 1.00 [1.00, 1.00] (n=150); 6: 1.00 [1.00, 1.00] (n=150); 8: 1.00 [1.00, 1.00] (n=150); 10: 1.00 [1.00, 1.00] (n=150); 12: 1.00 [1.00, 1.00] (n=150); 14: 1.00 [1.00, 1.00] (n=150); 16: 1.00 [1.00, 1.00] (n=150); 18: 0.99 [0.97, 1.00] (n=150); 20: 0.58 [0.46, 0.70] (n=150); 22: 0.11 [0.03, 0.20] (n=150); 24: 0.07 [0.01, 0.14] (n=150); 26: 0.03 [0.00, 0.10] (n=150); 28: 0.00 [0.00, 0.00] (n=150); 30: 0.00 [0.00, 0.00] (n=150)
+    POST-NULL early 2: 0.00 [0.00, 0.00] (n=150); 4: 0.00 [0.00, 0.00] (n=150); 6: 0.00 [0.00, 0.00] (n=150); 8: 0.00 [0.00, 0.00] (n=150); 10: 0.00 [0.00, 0.00] (n=150); 12: 0.00 [0.00, 0.00] (n=150); 14: 0.00 [0.00, 0.00] (n=150); 16: 0.00 [0.00, 0.00] (n=150); 18: 0.00 [0.00, 0.00] (n=150); 20: 0.29 [0.18, 0.40] (n=150); 22: 0.89 [0.79, 0.96] (n=150); 24: 0.91 [0.83, 0.98] (n=150); 26: 0.97 [0.94, 1.00] (n=150); 28: 0.99 [0.97, 1.00] (n=150); 30: 1.00 [1.00, 1.00] (n=150)
+    POST-NULL l_c = 22, l_c/L 0.688 [0.625, 0.688] (n=150)
+    POST-NULL K@0 0.00 [0.00, 0.00] (n=150); V@0 0.96 [0.90, 1.00] (n=150); Klate@4 0.00 [0.00, 0.00] (n=150); Klate@8 0.00 [0.00, 0.00] (n=150); Klate@12 0.00 [0.00, 0.00] (n=150); Klate@16 0.00 [0.00, 0.00] (n=150); Vlate@4 0.96 [0.90, 1.00] (n=150); Vlate@8 0.96 [0.90, 1.00] (n=150); Vlate@12 0.95 [0.89, 0.99] (n=150); Vlate@16 0.97 [0.92, 1.00] (n=150)
+    POST      late  2: 1.00 [1.00, 1.00] (n=150); 4: 1.00 [1.00, 1.00] (n=150); 6: 1.00 [1.00, 1.00] (n=150); 8: 0.88 [0.80, 0.95] (n=150); 10: 0.77 [0.68, 0.86] (n=150); 12: 0.73 [0.63, 0.82] (n=150); 14: 0.76 [0.67, 0.84] (n=150); 16: 0.77 [0.68, 0.86] (n=150); 18: 0.56 [0.46, 0.66] (n=150); 20: 0.05 [0.00, 0.11] (n=150); 22: 0.01 [0.00, 0.05] (n=150); 24: 0.01 [0.00, 0.03] (n=150); 26: 0.00 [0.00, 0.00] (n=150); 28: 0.00 [0.00, 0.00] (n=150); 30: 0.00 [0.00, 0.00] (n=150)
+    POST      early 2: 0.00 [0.00, 0.00] (n=150); 4: 0.00 [0.00, 0.00] (n=150); 6: 0.00 [0.00, 0.00] (n=150); 8: 0.07 [0.02, 0.14] (n=150); 10: 0.09 [0.03, 0.16] (n=150); 12: 0.15 [0.08, 0.23] (n=150); 14: 0.14 [0.07, 0.22] (n=150); 16: 0.15 [0.08, 0.24] (n=150); 18: 0.26 [0.16, 0.36] (n=150); 20: 0.93 [0.85, 0.99] (n=150); 22: 0.98 [0.94, 1.00] (n=150); 24: 0.99 [0.98, 1.00] (n=150); 26: 1.00 [1.00, 1.00] (n=150); 28: 1.00 [1.00, 1.00] (n=150); 30: 1.00 [1.00, 1.00] (n=150)
+    POST      l_c = 20, l_c/L 0.625 [0.562, 0.625] (n=150)
+    POST      K@0 0.29 [0.20, 0.39] (n=150); V@0 0.56 [0.45, 0.67] (n=150); Klate@4 0.21 [0.13, 0.29] (n=150); Klate@8 0.00 [0.00, 0.00] (n=150); Klate@12 0.00 [0.00, 0.00] (n=150); Klate@16 0.00 [0.00, 0.00] (n=150); Vlate@4 0.58 [0.47, 0.69] (n=150); Vlate@8 0.57 [0.46, 0.68] (n=150); Vlate@12 0.69 [0.59, 0.79] (n=150); Vlate@16 0.78 [0.68, 0.87] (n=150)
+    AFTER     late  2: 0.99 [0.97, 1.00] (n=149); 4: 0.99 [0.97, 1.00] (n=149); 6: 0.99 [0.97, 1.00] (n=149); 8: 0.39 [0.28, 0.51] (n=149); 10: 0.07 [0.03, 0.13] (n=149); 12: 0.02 [0.00, 0.05] (n=149); 14: 0.00 [0.00, 0.00] (n=149); 16: 0.00 [0.00, 0.00] (n=149); 18: 0.00 [0.00, 0.00] (n=149); 20: 0.00 [0.00, 0.00] (n=149); 22: 0.00 [0.00, 0.00] (n=149); 24: 0.00 [0.00, 0.00] (n=149); 26: 0.00 [0.00, 0.00] (n=149); 28: 0.00 [0.00, 0.00] (n=149); 30: 0.00 [0.00, 0.00] (n=149)
+    AFTER     early 2: 0.01 [0.00, 0.04] (n=149); 4: 0.01 [0.00, 0.04] (n=149); 6: 0.01 [0.00, 0.04] (n=149); 8: 0.64 [0.53, 0.74] (n=149); 10: 0.89 [0.83, 0.95] (n=149); 12: 0.99 [0.96, 1.00] (n=149); 14: 1.00 [1.00, 1.00] (n=149); 16: 1.00 [1.00, 1.00] (n=149); 18: 1.00 [1.00, 1.00] (n=149); 20: 1.00 [1.00, 1.00] (n=149); 22: 1.00 [1.00, 1.00] (n=149); 24: 1.00 [1.00, 1.00] (n=149); 26: 1.00 [1.00, 1.00] (n=149); 28: 1.00 [1.00, 1.00] (n=149); 30: 1.00 [1.00, 1.00] (n=149)
+    AFTER     l_c = 8, l_c/L 0.250 [0.250, 0.312] (n=149)
+    AFTER     K@0 0.95 [0.90, 0.99] (n=149); V@0 0.05 [0.01, 0.11] (n=149); Klate@4 0.92 [0.85, 0.98] (n=149); Klate@8 0.05 [0.01, 0.11] (n=149); Klate@12 0.00 [0.00, 0.00] (n=149); Klate@16 0.00 [0.00, 0.00] (n=149); Vlate@4 0.00 [0.00, 0.00] (n=149); Vlate@8 0.00 [0.00, 0.00] (n=149); Vlate@12 0.00 [0.00, 0.00] (n=149); Vlate@16 0.00 [0.00, 0.00] (n=149)
+    LETTER    late  2: 0.99 [0.97, 1.00] (n=138); 4: 0.99 [0.97, 1.00] (n=138); 6: 0.99 [0.95, 1.00] (n=138); 8: 0.21 [0.12, 0.32] (n=138); 10: 0.03 [0.00, 0.07] (n=138); 12: 0.01 [0.00, 0.05] (n=138); 14: 0.00 [0.00, 0.00] (n=138); 16: 0.00 [0.00, 0.00] (n=138); 18: 0.00 [0.00, 0.00] (n=138); 20: 0.00 [0.00, 0.00] (n=138); 22: 0.00 [0.00, 0.00] (n=138); 24: 0.00 [0.00, 0.00] (n=138); 26: 0.00 [0.00, 0.00] (n=138); 28: 0.00 [0.00, 0.00] (n=138); 30: 0.00 [0.00, 0.00] (n=138)
+    LETTER    early 2: 0.01 [0.00, 0.05] (n=138); 4: 0.01 [0.00, 0.05] (n=138); 6: 0.02 [0.00, 0.06] (n=138); 8: 0.72 [0.61, 0.83] (n=138); 10: 0.88 [0.81, 0.95] (n=138); 12: 0.97 [0.92, 1.00] (n=138); 14: 0.99 [0.97, 1.00] (n=138); 16: 1.00 [1.00, 1.00] (n=138); 18: 1.00 [1.00, 1.00] (n=138); 20: 1.00 [1.00, 1.00] (n=138); 22: 1.00 [1.00, 1.00] (n=138); 24: 1.00 [1.00, 1.00] (n=138); 26: 1.00 [1.00, 1.00] (n=138); 28: 1.00 [1.00, 1.00] (n=138); 30: 1.00 [1.00, 1.00] (n=138)
+    LETTER    l_c = 8, l_c/L 0.250 [0.250, 0.250] (n=138)
+    LETTER    K@0 0.96 [0.92, 1.00] (n=138); V@0 0.01 [0.00, 0.05] (n=138); Klate@4 0.93 [0.87, 0.98] (n=138); Klate@8 0.07 [0.02, 0.13] (n=138); Klate@12 0.01 [0.00, 0.03] (n=138); Klate@16 0.00 [0.00, 0.00] (n=138); Vlate@4 0.00 [0.00, 0.00] (n=138); Vlate@8 0.00 [0.00, 0.00] (n=138); Vlate@12 0.00 [0.00, 0.00] (n=138); Vlate@16 0.00 [0.00, 0.00] (n=138)
+    l_b = 8
+    silent failure NONE      late@8: share B among non-S NOT EVALUABLE (no items in the subset); median absolute p(B) of B answers NOT EVALUABLE (no items in the subset); median six-way p(B) NOT EVALUABLE (no items in the subset)
+    silent failure BEFORE    late@8: share B among non-S NOT EVALUABLE (no items in the subset); median absolute p(B) of B answers NOT EVALUABLE (no items in the subset); median six-way p(B) NOT EVALUABLE (no items in the subset)
+    silent failure POST-NULL late@8: share B among non-S NOT EVALUABLE (no items in the subset); median absolute p(B) of B answers NOT EVALUABLE (no items in the subset); median six-way p(B) NOT EVALUABLE (no items in the subset)
+    silent failure POST      late@8: share B among non-S 1.000 [1.000, 1.000] (n=18); median absolute p(B) of B answers 0.943 [0.760, 0.998] (n=18); median six-way p(B) 0.943 [0.780, 0.998] (n=18)
+    silent failure AFTER     late@8: share B among non-S 0.989 [0.961, 1.000] (n=91); median absolute p(B) of B answers 0.998 [0.996, 0.999] (n=90); median six-way p(B) 1.000 [0.999, 1.000] (n=90)
+    silent failure LETTER    late@8: share B among non-S 0.945 [0.885, 0.991] (n=109); median absolute p(B) of B answers 1.000 [1.000, 1.000] (n=103); median six-way p(B) 1.000 [1.000, 1.000] (n=103)
+    silent failure NONE      late@10: share B among non-S NOT EVALUABLE (no items in the subset); median absolute p(B) of B answers NOT EVALUABLE (no items in the subset); median six-way p(B) NOT EVALUABLE (no items in the subset)
+    silent failure BEFORE    late@10: share B among non-S NOT EVALUABLE (no items in the subset); median absolute p(B) of B answers NOT EVALUABLE (no items in the subset); median six-way p(B) NOT EVALUABLE (no items in the subset)
+    silent failure POST-NULL late@10: share B among non-S NOT EVALUABLE (no items in the subset); median absolute p(B) of B answers NOT EVALUABLE (no items in the subset); median six-way p(B) NOT EVALUABLE (no items in the subset)
+    silent failure POST      late@10: share B among non-S 1.000 [1.000, 1.000] (n=34); median absolute p(B) of B answers 0.843 [0.731, 0.945] (n=34); median six-way p(B) 0.854 [0.783, 0.945] (n=34)
+    silent failure AFTER     late@10: share B among non-S 0.993 [0.968, 1.000] (n=138); median absolute p(B) of B answers 0.998 [0.997, 0.999] (n=137); median six-way p(B) 1.000 [1.000, 1.000] (n=137)
+    silent failure LETTER    late@10: share B among non-S 0.993 [0.969, 1.000] (n=134); median absolute p(B) of B answers 1.000 [1.000, 1.000] (n=133); median six-way p(B) 1.000 [1.000, 1.000] (n=133)
+    inconsistency (NONE late answer S while AFTER late answer B; items competent in both) 2: 0.01 [0.00, 0.03] (n=149); 4: 0.01 [0.00, 0.03] (n=149); 6: 0.01 [0.00, 0.03] (n=149); 8: 0.60 [0.49, 0.72] (n=149); 10: 0.92 [0.86, 0.97] (n=149); 12: 0.98 [0.95, 1.00] (n=149); 14: 1.00 [1.00, 1.00] (n=149); 16: 1.00 [1.00, 1.00] (n=149); 18: 1.00 [1.00, 1.00] (n=149); 20: 0.93 [0.87, 0.97] (n=149); 22: 0.23 [0.13, 0.35] (n=149); 24: 0.19 [0.09, 0.30] (n=149); 26: 0.09 [0.03, 0.18] (n=149); 28: 0.01 [0.00, 0.05] (n=149); 30: 0.00 [0.00, 0.00] (n=149)
+  [mistral7 passages E, L = 32; competent items; containment] curves
+    NOM   late  5: 0.99 [0.96, 1.00] (n=167); 10: 0.98 [0.95, 1.00] (n=167); 14: 0.95 [0.90, 0.99] (n=167); 19: 0.46 [0.36, 0.57] (n=167)
+    NOM   early 5: 0.00 [0.00, 0.00] (n=167); 10: 0.00 [0.00, 0.00] (n=167); 14: 0.00 [0.00, 0.00] (n=167); 19: 0.11 [0.05, 0.18] (n=167)
+    NOM   Klate 5: 0.00 [0.00, 0.00] (n=167); 10: 0.00 [0.00, 0.00] (n=167); 14: 0.00 [0.00, 0.00] (n=167); 19: 0.00 [0.00, 0.00] (n=167)
+    NOM   Vlate 5: 0.55 [0.43, 0.66] (n=167); 10: 0.55 [0.43, 0.66] (n=167); 14: 0.56 [0.45, 0.68] (n=167); 19: 0.29 [0.20, 0.39] (n=167)
+    NOM   KV@0 0.99 [0.97, 1.00] (n=167); K@0 0.00 [0.00, 0.00] (n=167); V@0 0.56 [0.45, 0.66] (n=167)
+    OPTB  late  5: 1.00 [1.00, 1.00] (n=156); 10: 0.99 [0.96, 1.00] (n=156); 14: 0.82 [0.73, 0.90] (n=156); 19: 0.21 [0.12, 0.29] (n=156)
+    OPTB  early 5: 0.01 [0.00, 0.04] (n=156); 10: 0.02 [0.00, 0.06] (n=156); 14: 0.04 [0.01, 0.10] (n=156); 19: 0.76 [0.66, 0.85] (n=156)
+    OPTB  Klate 5: 0.00 [0.00, 0.00] (n=156); 10: 0.00 [0.00, 0.00] (n=156); 14: 0.01 [0.00, 0.04] (n=156); 19: 0.00 [0.00, 0.00] (n=156)
+    OPTB  Vlate 5: 0.95 [0.89, 0.99] (n=156); 10: 0.94 [0.88, 0.99] (n=156); 14: 0.90 [0.84, 0.96] (n=156); 19: 0.46 [0.36, 0.55] (n=156)
+    OPTB  KV@0 1.00 [1.00, 1.00] (n=156); K@0 0.00 [0.00, 0.00] (n=156); V@0 0.96 [0.91, 0.99] (n=156)
+    OPTA  late  5: 0.96 [0.91, 0.99] (n=162); 10: 0.08 [0.03, 0.15] (n=162); 14: 0.02 [0.00, 0.06] (n=162); 19: 0.01 [0.00, 0.04] (n=162)
+    OPTA  early 5: 0.01 [0.00, 0.03] (n=162); 10: 0.80 [0.71, 0.88] (n=162); 14: 0.91 [0.85, 0.97] (n=162); 19: 0.95 [0.90, 0.99] (n=162)
+    OPTA  Klate 5: 0.25 [0.17, 0.35] (n=162); 10: 0.00 [0.00, 0.00] (n=162); 14: 0.00 [0.00, 0.00] (n=162); 19: 0.00 [0.00, 0.00] (n=162)
+    OPTA  Vlate 5: 0.12 [0.05, 0.19] (n=162); 10: 0.01 [0.00, 0.04] (n=162); 14: 0.01 [0.00, 0.03] (n=162); 19: 0.01 [0.00, 0.03] (n=162)
+    OPTA  KV@0 1.00 [1.00, 1.00] (n=162); K@0 0.35 [0.26, 0.44] (n=162); V@0 0.25 [0.16, 0.35] (n=162)
+  [mistral7 passages R, L = 32; competent items; containment] curves
+    NOM   late  5: 1.00 [1.00, 1.00] (n=63); 10: 0.98 [0.92, 1.00] (n=63); 14: 0.98 [0.93, 1.00] (n=63); 19: 0.35 [0.20, 0.50] (n=63)
+    NOM   early 5: 0.00 [0.00, 0.00] (n=63); 10: 0.00 [0.00, 0.00] (n=63); 14: 0.00 [0.00, 0.00] (n=63); 19: 0.08 [0.01, 0.17] (n=63)
+    NOM   Klate 5: 0.00 [0.00, 0.00] (n=63); 10: 0.00 [0.00, 0.00] (n=63); 14: 0.00 [0.00, 0.00] (n=63); 19: 0.00 [0.00, 0.00] (n=63)
+    NOM   Vlate 5: 0.48 [0.29, 0.66] (n=63); 10: 0.46 [0.26, 0.65] (n=63); 14: 0.49 [0.29, 0.67] (n=63); 19: 0.30 [0.16, 0.46] (n=63)
+    NOM   KV@0 1.00 [1.00, 1.00] (n=63); K@0 0.00 [0.00, 0.00] (n=63); V@0 0.48 [0.29, 0.66] (n=63)
+    OPTB  late  5: 1.00 [1.00, 1.00] (n=69); 10: 0.94 [0.87, 1.00] (n=69); 14: 0.83 [0.69, 0.94] (n=69); 19: 0.16 [0.04, 0.29] (n=69)
+    OPTB  early 5: 0.00 [0.00, 0.00] (n=69); 10: 0.00 [0.00, 0.00] (n=69); 14: 0.04 [0.00, 0.14] (n=69); 19: 0.75 [0.62, 0.88] (n=69)
+    OPTB  Klate 5: 0.00 [0.00, 0.00] (n=69); 10: 0.01 [0.00, 0.07] (n=69); 14: 0.01 [0.00, 0.07] (n=69); 19: 0.01 [0.00, 0.07] (n=69)
+    OPTB  Vlate 5: 0.90 [0.79, 0.99] (n=69); 10: 0.90 [0.80, 0.98] (n=69); 14: 0.88 [0.78, 0.97] (n=69); 19: 0.42 [0.27, 0.58] (n=69)
+    OPTB  KV@0 1.00 [1.00, 1.00] (n=69); K@0 0.00 [0.00, 0.00] (n=69); V@0 0.90 [0.79, 0.99] (n=69)
+    OPTA  late  5: 0.92 [0.80, 1.00] (n=66); 10: 0.09 [0.00, 0.20] (n=66); 14: 0.05 [0.00, 0.13] (n=66); 19: 0.00 [0.00, 0.00] (n=66)
+    OPTA  early 5: 0.02 [0.00, 0.07] (n=66); 10: 0.80 [0.69, 0.90] (n=66); 14: 0.94 [0.84, 1.00] (n=66); 19: 0.94 [0.85, 1.00] (n=66)
+    OPTA  Klate 5: 0.38 [0.23, 0.53] (n=66); 10: 0.00 [0.00, 0.00] (n=66); 14: 0.00 [0.00, 0.00] (n=66); 19: 0.00 [0.00, 0.00] (n=66)
+    OPTA  Vlate 5: 0.11 [0.02, 0.23] (n=66); 10: 0.06 [0.00, 0.17] (n=66); 14: 0.06 [0.00, 0.15] (n=66); 19: 0.02 [0.00, 0.07] (n=66)
+    OPTA  KV@0 1.00 [1.00, 1.00] (n=66); K@0 0.47 [0.32, 0.62] (n=66); V@0 0.21 [0.10, 0.34] (n=66)
+  [mistral7 passages E LETA (exploratory, deadline-gated)]
+    LETA  late  5: 0.93 [0.87, 0.98] (n=161); 10: 0.01 [0.00, 0.04] (n=161); 14: 0.00 [0.00, 0.00] (n=161); 19: 0.00 [0.00, 0.00] (n=161)
+    LETA  early 5: 0.01 [0.00, 0.04] (n=161); 10: 0.88 [0.81, 0.94] (n=161); 14: 1.00 [1.00, 1.00] (n=161); 19: 1.00 [1.00, 1.00] (n=161)
+  [mistral7 edits, E9, 80 cores; generated answers over (core, t)] flip, stale, tau, r_K per row
+    @3 nat     r_K 1.000  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.99 [0.97, 1.00] (n=80) stale 0.01; LETTER 0.97 [0.93, 1.00] (n=80) stale 0.00; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.99 [0.97, 1.00] (n=80)
+    @3 E1      r_K 0.974  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.98 [0.95, 1.00] (n=80) stale 0.02; LETTER 0.96 [0.92, 0.99] (n=80) stale 0.00; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.98 [0.95, 1.00] (n=80)
+    @3 E4b     r_K 0.697  NONE 0.99 [0.96, 1.00] (n=80) stale 0.01; AFTER 0.69 [0.59, 0.80] (n=80) stale 0.24; LETTER 0.54 [0.41, 0.66] (n=80) stale 0.28; POST 0.91 [0.84, 0.96] (n=80) stale 0.05; tau 0.70 [0.59, 0.81] (n=80)
+    @3 E1x0.5  r_K 0.444  NONE 0.39 [0.22, 0.57] (n=80) stale 0.61; AFTER 0.12 [0.04, 0.24] (n=80) stale 0.88; LETTER 0.19 [0.08, 0.31] (n=80) stale 0.79; POST 0.12 [0.04, 0.25] (n=80) stale 0.87; tau 0.32 [0.13, 0.54] (n=80)
+    @3 E1x0.75 r_K 0.830  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.84 [0.75, 0.92] (n=80) stale 0.16; LETTER 0.86 [0.79, 0.93] (n=80) stale 0.09; POST 0.98 [0.93, 1.00] (n=80) stale 0.02; tau 0.84 [0.75, 0.92] (n=80)
+    @3 E1x1.5  r_K 1.066  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 1.00 [1.00, 1.00] (n=80) stale 0.00; LETTER 0.98 [0.95, 1.00] (n=80) stale 0.00; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 1.00 [1.00, 1.00] (n=80)
+    @3 J0.25   r_K 0.250  NONE 0.00 [0.00, 0.00] (n=80) stale 1.00; AFTER 0.01 [0.00, 0.03] (n=80) stale 0.99; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.96; POST 0.00 [0.00, 0.00] (n=80) stale 1.00; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @3 J0.5    r_K 0.500  NONE 0.45 [0.27, 0.65] (n=80) stale 0.53; AFTER 0.11 [0.04, 0.21] (n=80) stale 0.88; LETTER 0.19 [0.08, 0.32] (n=80) stale 0.70; POST 0.26 [0.11, 0.43] (n=80) stale 0.74; tau 0.25 [0.10, 0.45] (n=80)
+    @3 J0.65   r_K 0.650  NONE 0.97 [0.94, 1.00] (n=80) stale 0.01; AFTER 0.60 [0.46, 0.74] (n=80) stale 0.39; LETTER 0.56 [0.39, 0.72] (n=80) stale 0.29; POST 0.78 [0.65, 0.89] (n=80) stale 0.19; tau 0.62 [0.47, 0.76] (n=80)
+    @3 J0.8    r_K 0.800  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.93 [0.86, 0.97] (n=80) stale 0.07; LETTER 0.91 [0.83, 0.97] (n=80) stale 0.06; POST 0.99 [0.97, 1.00] (n=80) stale 0.01; tau 0.93 [0.86, 0.97] (n=80)
+    @3 J0.9    r_K 0.900  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.98 [0.95, 1.00] (n=80) stale 0.02; LETTER 0.94 [0.88, 0.98] (n=80) stale 0.04; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.98 [0.95, 1.00] (n=80)
+    @3 J1.25   r_K 1.250  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 1.00 [1.00, 1.00] (n=80) stale 0.00; LETTER 0.94 [0.89, 0.99] (n=80) stale 0.00; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 1.00 [1.00, 1.00] (n=80)
+    @3 K1      r_K 1.000  NONE 0.00 [0.00, 0.00] (n=80) stale 0.98; AFTER 0.96 [0.92, 1.00] (n=80) stale 0.04; LETTER 0.93 [0.87, 0.97] (n=80) stale 0.03; POST 0.33 [0.19, 0.46] (n=80) stale 0.66; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @3 V1      r_K 0.000  NONE 0.96 [0.91, 0.99] (n=80) stale 0.00; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.94; POST 0.76 [0.64, 0.87] (n=80) stale 0.23; tau 0.00 [0.00, 0.00] (n=80)
+    @3 K0.5    r_K 0.500  NONE 0.00 [0.00, 0.00] (n=80) stale 1.00; AFTER 0.07 [0.00, 0.18] (n=80) stale 0.93; LETTER 0.14 [0.06, 0.23] (n=80) stale 0.79; POST 0.00 [0.00, 0.00] (n=80) stale 1.00; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @3 K0.8    r_K 0.800  NONE 0.00 [0.00, 0.00] (n=80) stale 1.00; AFTER 0.66 [0.53, 0.79] (n=80) stale 0.33; LETTER 0.80 [0.69, 0.90] (n=80) stale 0.14; POST 0.16 [0.07, 0.27] (n=80) stale 0.83; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @3 V0.5    r_K 0.000  NONE 0.08 [0.02, 0.17] (n=80) stale 0.92; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.93; POST 0.00 [0.00, 0.00] (n=80) stale 1.00; tau 0.00 [0.00, 0.00] (n=80)
+    @3 V0.8    r_K 0.000  NONE 0.94 [0.87, 0.99] (n=80) stale 0.01; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.95; POST 0.53 [0.39, 0.67] (n=80) stale 0.47; tau 0.00 [0.00, 0.00] (n=80)
+    @3 K0.5V1  r_K 0.500  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.38 [0.24, 0.51] (n=80) stale 0.62; LETTER 0.28 [0.14, 0.42] (n=80) stale 0.60; POST 0.88 [0.80, 0.95] (n=80) stale 0.11; tau 0.38 [0.24, 0.51] (n=80)
+    @3 K0.8V1  r_K 0.800  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.95 [0.90, 0.99] (n=80) stale 0.05; LETTER 0.93 [0.86, 0.97] (n=80) stale 0.05; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.95 [0.90, 0.99] (n=80)
+    @3 K1V0.5  r_K 1.000  NONE 0.91 [0.82, 0.98] (n=80) stale 0.08; AFTER 0.99 [0.96, 1.00] (n=80) stale 0.01; LETTER 0.94 [0.89, 0.98] (n=80) stale 0.01; POST 0.97 [0.94, 1.00] (n=80) stale 0.01; tau 1.08 [1.01, 1.20] (n=80)
+    @3 K1V0.8  r_K 1.000  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.99 [0.96, 1.00] (n=80) stale 0.01; LETTER 0.96 [0.91, 0.99] (n=80) stale 0.01; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.99 [0.96, 1.00] (n=80)
+    @3 CAA     r_K 0.974  NONE 0.95 [0.90, 0.99] (n=80) stale 0.00; AFTER 0.98 [0.95, 1.00] (n=80) stale 0.00; LETTER 0.51 [0.33, 0.68] (n=80) stale 0.40; POST 0.94 [0.88, 0.99] (n=80) stale 0.00; tau 1.03 [0.98, 1.09] (n=80)
+    @7 nat     r_K 1.000  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.39 [0.24, 0.53] (n=80) stale 0.61; LETTER 0.31 [0.17, 0.45] (n=80) stale 0.64; POST 0.94 [0.87, 0.99] (n=80) stale 0.06; tau 0.39 [0.24, 0.53] (n=80)
+    @7 E1      r_K 0.918  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.33 [0.20, 0.46] (n=80) stale 0.68; LETTER 0.25 [0.13, 0.38] (n=80) stale 0.69; POST 0.92 [0.84, 0.97] (n=80) stale 0.08; tau 0.33 [0.20, 0.46] (n=80)
+    @7 E4b     r_K 0.572  NONE 0.96 [0.90, 0.99] (n=80) stale 0.02; AFTER 0.04 [0.00, 0.12] (n=80) stale 0.94; LETTER 0.05 [0.01, 0.10] (n=80) stale 0.89; POST 0.71 [0.57, 0.85] (n=80) stale 0.28; tau 0.05 [0.00, 0.12] (n=80)
+    @7 E1x0.5  r_K 0.420  NONE 0.32 [0.16, 0.52] (n=80) stale 0.68; AFTER 0.02 [0.00, 0.06] (n=80) stale 0.98; LETTER 0.07 [0.02, 0.13] (n=80) stale 0.89; POST 0.07 [0.01, 0.18] (n=80) stale 0.93; tau 0.06 [0.00, 0.18] (n=80)
+    @7 E1x0.75 r_K 0.757  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.12 [0.04, 0.23] (n=80) stale 0.88; LETTER 0.15 [0.06, 0.26] (n=80) stale 0.82; POST 0.78 [0.65, 0.90] (n=80) stale 0.22; tau 0.12 [0.04, 0.23] (n=80)
+    @7 E1x1.5  r_K 1.077  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.61 [0.46, 0.76] (n=80) stale 0.39; LETTER 0.36 [0.23, 0.50] (n=80) stale 0.51; POST 0.97 [0.92, 1.00] (n=80) stale 0.03; tau 0.61 [0.46, 0.76] (n=80)
+    @7 J0.25   r_K 0.250  NONE 0.00 [0.00, 0.00] (n=80) stale 1.00; AFTER 0.01 [0.00, 0.03] (n=80) stale 0.99; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.95; POST 0.00 [0.00, 0.00] (n=80) stale 1.00; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @7 J0.5    r_K 0.500  NONE 0.46 [0.28, 0.66] (n=80) stale 0.51; AFTER 0.04 [0.00, 0.11] (n=80) stale 0.96; LETTER 0.05 [0.01, 0.10] (n=80) stale 0.92; POST 0.12 [0.03, 0.23] (n=80) stale 0.88; tau 0.08 [0.00, 0.23] (n=80)
+    @7 J0.65   r_K 0.650  NONE 0.97 [0.93, 1.00] (n=80) stale 0.01; AFTER 0.09 [0.02, 0.19] (n=80) stale 0.91; LETTER 0.12 [0.05, 0.22] (n=80) stale 0.85; POST 0.39 [0.21, 0.57] (n=80) stale 0.61; tau 0.09 [0.02, 0.19] (n=80)
+    @7 J0.8    r_K 0.800  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.14 [0.06, 0.26] (n=80) stale 0.86; LETTER 0.16 [0.06, 0.26] (n=80) stale 0.80; POST 0.73 [0.58, 0.86] (n=80) stale 0.27; tau 0.14 [0.06, 0.26] (n=80)
+    @7 J0.9    r_K 0.900  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.27 [0.15, 0.40] (n=80) stale 0.73; LETTER 0.20 [0.08, 0.33] (n=80) stale 0.76; POST 0.84 [0.73, 0.93] (n=80) stale 0.16; tau 0.27 [0.15, 0.40] (n=80)
+    @7 J1.25   r_K 1.250  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.59 [0.43, 0.75] (n=80) stale 0.41; LETTER 0.48 [0.34, 0.62] (n=80) stale 0.44; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.59 [0.43, 0.75] (n=80)
+    @7 K1      r_K 1.000  NONE 0.00 [0.00, 0.00] (n=80) stale 0.99; AFTER 0.11 [0.03, 0.21] (n=80) stale 0.89; LETTER 0.18 [0.08, 0.30] (n=80) stale 0.79; POST 0.06 [0.00, 0.14] (n=80) stale 0.94; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @7 V1      r_K 0.000  NONE 0.96 [0.90, 0.99] (n=80) stale 0.00; AFTER 0.01 [0.00, 0.03] (n=80) stale 0.99; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.94; POST 0.79 [0.67, 0.89] (n=80) stale 0.21; tau 0.01 [0.00, 0.03] (n=80)
+    @7 K0.5    r_K 0.500  NONE 0.00 [0.00, 0.00] (n=80) stale 1.00; AFTER 0.02 [0.00, 0.06] (n=80) stale 0.98; LETTER 0.04 [0.01, 0.09] (n=80) stale 0.91; POST 0.00 [0.00, 0.00] (n=80) stale 1.00; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @7 K0.8    r_K 0.800  NONE 0.00 [0.00, 0.00] (n=80) stale 1.00; AFTER 0.06 [0.01, 0.15] (n=80) stale 0.94; LETTER 0.13 [0.05, 0.23] (n=80) stale 0.83; POST 0.01 [0.00, 0.04] (n=80) stale 0.99; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @7 V0.5    r_K 0.000  NONE 0.08 [0.02, 0.17] (n=80) stale 0.92; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.94; POST 0.00 [0.00, 0.00] (n=80) stale 1.00; tau 0.00 [0.00, 0.00] (n=80)
+    @7 V0.8    r_K 0.000  NONE 0.94 [0.87, 0.99] (n=80) stale 0.01; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.94; POST 0.55 [0.40, 0.69] (n=80) stale 0.45; tau 0.00 [0.00, 0.00] (n=80)
+    @7 K0.5V1  r_K 0.500  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.08 [0.01, 0.18] (n=80) stale 0.92; LETTER 0.09 [0.02, 0.18] (n=80) stale 0.89; POST 0.82 [0.70, 0.92] (n=80) stale 0.18; tau 0.08 [0.01, 0.18] (n=80)
+    @7 K0.8V1  r_K 0.800  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.19 [0.09, 0.30] (n=80) stale 0.81; LETTER 0.16 [0.07, 0.28] (n=80) stale 0.80; POST 0.87 [0.77, 0.95] (n=80) stale 0.13; tau 0.19 [0.09, 0.30] (n=80)
+    @7 K1V0.5  r_K 1.000  NONE 0.91 [0.82, 0.97] (n=80) stale 0.08; AFTER 0.16 [0.06, 0.29] (n=80) stale 0.84; LETTER 0.19 [0.08, 0.31] (n=80) stale 0.79; POST 0.42 [0.26, 0.58] (n=80) stale 0.58; tau 0.18 [0.07, 0.31] (n=80)
+    @7 K1V0.8  r_K 1.000  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.29 [0.17, 0.42] (n=80) stale 0.71; LETTER 0.25 [0.12, 0.38] (n=80) stale 0.71; POST 0.79 [0.66, 0.90] (n=80) stale 0.20; tau 0.29 [0.17, 0.42] (n=80)
+    @7 CAA     r_K 0.918  NONE 0.92 [0.85, 0.98] (n=80) stale 0.00; AFTER 1.00 [1.00, 1.00] (n=80) stale 0.00; LETTER 0.30 [0.18, 0.43] (n=80) stale 0.46; POST 0.89 [0.82, 0.96] (n=80) stale 0.00; tau 1.09 [1.02, 1.18] (n=80)
+    @11 nat     r_K 1.000  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.01 [0.00, 0.04] (n=80) stale 0.99; LETTER 0.03 [0.00, 0.06] (n=80) stale 0.94; POST 0.89 [0.79, 0.97] (n=80) stale 0.11; tau 0.01 [0.00, 0.04] (n=80)
+    @11 E1      r_K 0.876  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.03 [0.00, 0.08] (n=80) stale 0.97; LETTER 0.03 [0.00, 0.06] (n=80) stale 0.94; POST 0.89 [0.80, 0.97] (n=80) stale 0.11; tau 0.03 [0.00, 0.08] (n=80)
+    @11 E4b     r_K 0.509  NONE 0.83 [0.74, 0.90] (n=80) stale 0.04; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.98; POST 0.60 [0.46, 0.73] (n=80) stale 0.38; tau 0.00 [0.00, 0.00] (n=80)
+    @11 CAA     r_K 0.876  NONE 0.84 [0.72, 0.94] (n=80) stale 0.00; AFTER 0.96 [0.88, 1.00] (n=80) stale 0.00; LETTER 0.41 [0.29, 0.54] (n=80) stale 0.37; POST 0.98 [0.94, 1.00] (n=80) stale 0.00; tau 1.13 [1.03, 1.28] (n=80)
+    @15 nat     r_K 1.000  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.00 [0.00, 0.00] (n=80) stale 0.99; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.93; POST 0.94 [0.87, 0.99] (n=80) stale 0.06; tau 0.00 [0.00, 0.00] (n=80)
+    @15 E1      r_K 0.885  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.00 [0.00, 0.00] (n=80) stale 0.99; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.93; POST 0.93 [0.84, 0.98] (n=80) stale 0.07; tau 0.00 [0.00, 0.00] (n=80)
+    @15 E4b     r_K 0.489  NONE 0.64 [0.53, 0.76] (n=80) stale 0.09; AFTER 0.00 [0.00, 0.00] (n=80) stale 0.99; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.93; POST 0.46 [0.29, 0.63] (n=80) stale 0.49; tau 0.00 [0.00, 0.00] (n=80)
+    @15 CAA     r_K 0.885  NONE 0.99 [0.97, 1.00] (n=80) stale 0.00; AFTER 1.00 [1.00, 1.00] (n=80) stale 0.00; LETTER 0.51 [0.39, 0.63] (n=80) stale 0.29; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 1.01 [1.00, 1.03] (n=80)
+    psi (nats) NONE@3: psi_J(0.25) 0.19 [0.16, 0.22] (n=80); psi_J(0.5) 0.63 [0.60, 0.67] (n=80); psi_J(0.65) 0.85 [0.83, 0.87] (n=80); psi_J(0.8) 0.95 [0.94, 0.96] (n=80); psi_J(0.9) 0.98 [0.98, 0.98] (n=80); psi_J(1.25) 1.03 [1.02, 1.04] (n=80); psi_K(0.5) 0.91 [-4.12, 4.37] (n=80); psi_K(0.8) 0.56 [-1.30, 2.75] (n=80); psi_V(0.5) 0.56 [0.53, 0.60] (n=80); psi_V(0.8) 0.91 [0.89, 0.92] (n=80)
+    psi (nats) AFTER@3: psi_J(0.25) 0.07 [0.04, 0.11] (n=80); psi_J(0.5) 0.27 [0.19, 0.37] (n=80); psi_J(0.65) 0.75 [0.65, 0.83] (n=80); psi_J(0.8) 0.97 [0.95, 0.99] (n=80); psi_J(0.9) 1.00 [0.99, 1.01] (n=80); psi_J(1.25) 1.00 [0.98, 1.00] (n=80); psi_K(0.5) 0.12 [0.04, 0.22] (n=80); psi_K(0.8) 0.84 [0.77, 0.90] (n=80); psi_V(0.5) 0.45 [0.43, 0.48] (n=80); psi_V(0.8) 0.78 [0.75, 0.80] (n=80)
+    psi (nats) LETTER@3: psi_J(0.25) 0.06 [0.03, 0.10] (n=80); psi_J(0.5) 0.25 [0.12, 0.39] (n=80); psi_J(0.65) 0.61 [0.47, 0.75] (n=80); psi_J(0.8) 0.96 [0.92, 1.00] (n=80); psi_J(0.9) 1.01 [1.00, 1.02] (n=80); psi_J(1.25) 0.97 [0.95, 0.98] (n=80); psi_K(0.5) 0.22 [0.10, 0.35] (n=80); psi_K(0.8) 0.87 [0.79, 0.94] (n=80); psi_V(0.5) 0.36 [0.26, 0.52] (n=80); psi_V(0.8) 0.73 [0.61, 0.82] (n=80)
+    psi (nats) POST@3: psi_J(0.25) 0.15 [0.13, 0.18] (n=80); psi_J(0.5) 0.57 [0.49, 0.65] (n=80); psi_J(0.65) 0.85 [0.80, 0.88] (n=80); psi_J(0.8) 0.97 [0.95, 0.98] (n=80); psi_J(0.9) 0.99 [0.99, 1.00] (n=80); psi_J(1.25) 1.01 [1.01, 1.02] (n=80); psi_K(0.5) 0.12 [0.05, 0.19] (n=80); psi_K(0.8) 0.77 [0.61, 0.88] (n=80); psi_V(0.5) 0.52 [0.48, 0.55] (n=80); psi_V(0.8) 0.89 [0.87, 0.91] (n=80)
+    psi (nats) NONE@7: psi_J(0.25) 0.19 [0.16, 0.22] (n=80); psi_J(0.5) 0.63 [0.60, 0.67] (n=80); psi_J(0.65) 0.85 [0.83, 0.87] (n=80); psi_J(0.8) 0.95 [0.94, 0.96] (n=80); psi_J(0.9) 0.98 [0.98, 0.99] (n=80); psi_J(1.25) 1.02 [1.02, 1.03] (n=80); psi_K(0.5) 0.48 [-0.85, 1.96] (n=80); psi_K(0.8) 0.74 [0.06, 1.50] (n=80); psi_V(0.5) 0.56 [0.53, 0.60] (n=80); psi_V(0.8) 0.91 [0.89, 0.92] (n=80)
+    psi (nats) AFTER@7: psi_J(0.25) 0.09 [0.06, 0.14] (n=80); psi_J(0.5) 0.23 [0.16, 0.34] (n=80); psi_J(0.65) 0.38 [0.28, 0.50] (n=80); psi_J(0.8) 0.58 [0.48, 0.67] (n=80); psi_J(0.9) 0.80 [0.74, 0.85] (n=80); psi_J(1.25) 1.34 [1.23, 1.50] (n=80); psi_K(0.5) 0.30 [0.14, 0.43] (n=80); psi_K(0.8) 0.68 [0.54, 0.79] (n=80); psi_V(0.5) 0.44 [0.41, 0.47] (n=80); psi_V(0.8) 0.76 [0.74, 0.79] (n=80)
+    psi (nats) LETTER@7: psi_J(0.25) 0.13 [0.08, 0.19] (n=80); psi_J(0.5) 0.36 [0.23, 0.46] (n=80); psi_J(0.65) 0.50 [0.35, 0.61] (n=80); psi_J(0.8) 0.66 [0.55, 0.74] (n=80); psi_J(0.9) 0.84 [0.77, 0.88] (n=80); psi_J(1.25) 1.48 [1.25, 1.88] (n=80); psi_K(0.5) 0.40 [0.27, 0.50] (n=80); psi_K(0.8) 0.74 [0.60, 0.82] (n=80); psi_V(0.5) 0.38 [0.25, 0.52] (n=80); psi_V(0.8) 0.71 [0.62, 0.84] (n=80)
+    psi (nats) POST@7: psi_J(0.25) 0.15 [0.13, 0.18] (n=80); psi_J(0.5) 0.53 [0.44, 0.61] (n=80); psi_J(0.65) 0.74 [0.67, 0.80] (n=80); psi_J(0.8) 0.89 [0.86, 0.92] (n=80); psi_J(0.9) 0.96 [0.94, 0.97] (n=80); psi_J(1.25) 1.05 [1.03, 1.07] (n=80); psi_K(0.5) 0.16 [0.09, 0.23] (n=80); psi_K(0.8) 0.57 [0.42, 0.66] (n=80); psi_V(0.5) 0.51 [0.48, 0.55] (n=80); psi_V(0.8) 0.89 [0.87, 0.91] (n=80)
+    psi (logits) NONE@3: psi_J(0.25) 0.20 [0.17, 0.23] (n=80); psi_J(0.5) 0.64 [0.61, 0.68] (n=80); psi_J(0.65) 0.85 [0.83, 0.87] (n=80); psi_J(0.8) 0.95 [0.94, 0.96] (n=80); psi_J(0.9) 0.98 [0.98, 0.98] (n=80); psi_J(1.25) 1.02 [1.02, 1.03] (n=80); psi_K(0.5) 0.29 [0.18, 0.35] (n=80); psi_K(0.8) 0.68 [0.61, 0.72] (n=80); psi_V(0.5) 0.55 [0.52, 0.59] (n=80); psi_V(0.8) 0.91 [0.89, 0.92] (n=80)
+    psi (logits) AFTER@3: psi_J(0.25) 0.06 [0.04, 0.11] (n=80); psi_J(0.5) 0.27 [0.19, 0.36] (n=80); psi_J(0.65) 0.74 [0.65, 0.82] (n=80); psi_J(0.8) 0.97 [0.95, 0.99] (n=80); psi_J(0.9) 1.00 [0.99, 1.00] (n=80); psi_J(1.25) 1.00 [0.98, 1.01] (n=80); psi_K(0.5) 0.12 [0.04, 0.22] (n=80); psi_K(0.8) 0.84 [0.77, 0.90] (n=80); psi_V(0.5) 0.46 [0.43, 0.48] (n=80); psi_V(0.8) 0.78 [0.76, 0.80] (n=80)
+    psi (logits) LETTER@3: psi_J(0.25) 0.06 [0.03, 0.10] (n=80); psi_J(0.5) 0.25 [0.12, 0.39] (n=80); psi_J(0.65) 0.61 [0.47, 0.75] (n=80); psi_J(0.8) 0.96 [0.92, 1.00] (n=80); psi_J(0.9) 1.01 [1.00, 1.02] (n=80); psi_J(1.25) 0.97 [0.95, 0.98] (n=80); psi_K(0.5) 0.22 [0.10, 0.35] (n=80); psi_K(0.8) 0.87 [0.79, 0.94] (n=80); psi_V(0.5) 0.36 [0.26, 0.52] (n=80); psi_V(0.8) 0.73 [0.61, 0.82] (n=80)
+    psi (logits) POST@3: psi_J(0.25) 0.16 [0.13, 0.18] (n=80); psi_J(0.5) 0.57 [0.49, 0.64] (n=80); psi_J(0.65) 0.84 [0.80, 0.87] (n=80); psi_J(0.8) 0.96 [0.94, 0.97] (n=80); psi_J(0.9) 0.99 [0.99, 0.99] (n=80); psi_J(1.25) 1.02 [1.01, 1.02] (n=80); psi_K(0.5) 0.12 [0.05, 0.19] (n=80); psi_K(0.8) 0.76 [0.60, 0.87] (n=80); psi_V(0.5) 0.52 [0.49, 0.55] (n=80); psi_V(0.8) 0.89 [0.87, 0.90] (n=80)
+    psi (logits) NONE@7: psi_J(0.25) 0.20 [0.17, 0.23] (n=80); psi_J(0.5) 0.64 [0.61, 0.68] (n=80); psi_J(0.65) 0.85 [0.83, 0.87] (n=80); psi_J(0.8) 0.95 [0.94, 0.96] (n=80); psi_J(0.9) 0.98 [0.98, 0.99] (n=80); psi_J(1.25) 1.02 [1.02, 1.03] (n=80); psi_K(0.5) 0.29 [0.19, 0.35] (n=80); psi_K(0.8) 0.68 [0.61, 0.72] (n=80); psi_V(0.5) 0.55 [0.52, 0.59] (n=80); psi_V(0.8) 0.91 [0.89, 0.92] (n=80)
+    psi (logits) AFTER@7: psi_J(0.25) 0.09 [0.06, 0.14] (n=80); psi_J(0.5) 0.23 [0.15, 0.34] (n=80); psi_J(0.65) 0.38 [0.28, 0.50] (n=80); psi_J(0.8) 0.58 [0.48, 0.67] (n=80); psi_J(0.9) 0.80 [0.74, 0.85] (n=80); psi_J(1.25) 1.33 [1.23, 1.49] (n=80); psi_K(0.5) 0.30 [0.14, 0.44] (n=80); psi_K(0.8) 0.67 [0.52, 0.78] (n=80); psi_V(0.5) 0.44 [0.41, 0.47] (n=80); psi_V(0.8) 0.77 [0.74, 0.79] (n=80)
+    psi (logits) LETTER@7: psi_J(0.25) 0.13 [0.08, 0.19] (n=80); psi_J(0.5) 0.36 [0.23, 0.46] (n=80); psi_J(0.65) 0.50 [0.35, 0.61] (n=80); psi_J(0.8) 0.66 [0.55, 0.74] (n=80); psi_J(0.9) 0.84 [0.77, 0.88] (n=80); psi_J(1.25) 1.48 [1.25, 1.88] (n=80); psi_K(0.5) 0.40 [0.27, 0.50] (n=80); psi_K(0.8) 0.74 [0.60, 0.82] (n=80); psi_V(0.5) 0.38 [0.25, 0.52] (n=80); psi_V(0.8) 0.71 [0.62, 0.84] (n=80)
+    psi (logits) POST@7: psi_J(0.25) 0.16 [0.14, 0.18] (n=80); psi_J(0.5) 0.52 [0.45, 0.60] (n=80); psi_J(0.65) 0.73 [0.67, 0.79] (n=80); psi_J(0.8) 0.89 [0.86, 0.92] (n=80); psi_J(0.9) 0.95 [0.94, 0.97] (n=80); psi_J(1.25) 1.05 [1.03, 1.07] (n=80); psi_K(0.5) 0.16 [0.10, 0.24] (n=80); psi_K(0.8) 0.58 [0.46, 0.67] (n=80); psi_V(0.5) 0.51 [0.48, 0.55] (n=80); psi_V(0.8) 0.89 [0.87, 0.90] (n=80)
+  [llama8 stories, N9, L = 32; competent items; generated answers] late and early flip curves, l_c, K/V-only
+    NONE      late  2: 1.00 [1.00, 1.00] (n=150); 4: 1.00 [1.00, 1.00] (n=150); 6: 1.00 [1.00, 1.00] (n=150); 8: 1.00 [1.00, 1.00] (n=150); 10: 1.00 [1.00, 1.00] (n=150); 12: 1.00 [1.00, 1.00] (n=150); 14: 1.00 [1.00, 1.00] (n=150); 16: 1.00 [1.00, 1.00] (n=150); 18: 0.96 [0.91, 0.99] (n=150); 20: 0.93 [0.87, 0.98] (n=150); 22: 0.85 [0.77, 0.92] (n=150); 24: 0.59 [0.46, 0.71] (n=150); 26: 0.05 [0.01, 0.10] (n=150); 28: 0.00 [0.00, 0.00] (n=150); 30: 0.00 [0.00, 0.00] (n=150)
+    NONE      early 2: 0.00 [0.00, 0.00] (n=150); 4: 0.00 [0.00, 0.00] (n=150); 6: 0.00 [0.00, 0.00] (n=150); 8: 0.00 [0.00, 0.00] (n=150); 10: 0.00 [0.00, 0.00] (n=150); 12: 0.00 [0.00, 0.00] (n=150); 14: 0.00 [0.00, 0.00] (n=150); 16: 0.00 [0.00, 0.00] (n=150); 18: 0.00 [0.00, 0.00] (n=150); 20: 0.00 [0.00, 0.00] (n=150); 22: 0.00 [0.00, 0.00] (n=150); 24: 0.25 [0.14, 0.36] (n=150); 26: 0.83 [0.73, 0.91] (n=150); 28: 1.00 [1.00, 1.00] (n=150); 30: 0.99 [0.96, 1.00] (n=150)
+    NONE      l_c = 26, l_c/L 0.812 [0.750, 0.812] (n=150)
+    NONE      K@0 0.00 [0.00, 0.00] (n=150); V@0 0.89 [0.81, 0.96] (n=150); Klate@4 0.00 [0.00, 0.00] (n=150); Klate@8 0.00 [0.00, 0.00] (n=150); Klate@12 0.00 [0.00, 0.00] (n=150); Klate@16 0.00 [0.00, 0.00] (n=150); Vlate@4 0.89 [0.81, 0.96] (n=150); Vlate@8 0.91 [0.83, 0.97] (n=150); Vlate@12 0.91 [0.83, 0.97] (n=150); Vlate@16 0.92 [0.84, 0.98] (n=150)
+    BEFORE    late  2: 1.00 [1.00, 1.00] (n=150); 4: 1.00 [1.00, 1.00] (n=150); 6: 1.00 [1.00, 1.00] (n=150); 8: 1.00 [1.00, 1.00] (n=150); 10: 1.00 [1.00, 1.00] (n=150); 12: 1.00 [1.00, 1.00] (n=150); 14: 1.00 [1.00, 1.00] (n=150); 16: 0.98 [0.95, 1.00] (n=150); 18: 0.09 [0.03, 0.17] (n=150); 20: 0.01 [0.00, 0.04] (n=150); 22: 0.04 [0.00, 0.10] (n=150); 24: 0.01 [0.00, 0.04] (n=150); 26: 0.00 [0.00, 0.00] (n=150); 28: 0.00 [0.00, 0.00] (n=150); 30: 0.00 [0.00, 0.00] (n=150)
+    BEFORE    early 2: 0.00 [0.00, 0.00] (n=150); 4: 0.00 [0.00, 0.00] (n=150); 6: 0.00 [0.00, 0.00] (n=150); 8: 0.00 [0.00, 0.00] (n=150); 10: 0.00 [0.00, 0.00] (n=150); 12: 0.00 [0.00, 0.00] (n=150); 14: 0.00 [0.00, 0.00] (n=150); 16: 0.00 [0.00, 0.00] (n=150); 18: 0.90 [0.83, 0.96] (n=150); 20: 0.99 [0.96, 1.00] (n=150); 22: 0.96 [0.91, 0.99] (n=150); 24: 0.99 [0.97, 1.00] (n=150); 26: 1.00 [1.00, 1.00] (n=150); 28: 1.00 [1.00, 1.00] (n=150); 30: 1.00 [1.00, 1.00] (n=150)
+    BEFORE    l_c = 18, l_c/L 0.562 [0.562, 0.562] (n=150)
+    BEFORE    K@0 0.00 [0.00, 0.00] (n=150); V@0 1.00 [1.00, 1.00] (n=150); Klate@4 0.00 [0.00, 0.00] (n=150); Klate@8 0.00 [0.00, 0.00] (n=150); Klate@12 0.00 [0.00, 0.00] (n=150); Klate@16 0.00 [0.00, 0.00] (n=150); Vlate@4 1.00 [1.00, 1.00] (n=150); Vlate@8 1.00 [1.00, 1.00] (n=150); Vlate@12 1.00 [1.00, 1.00] (n=150); Vlate@16 1.00 [1.00, 1.00] (n=150)
+    POST-NULL late  2: 1.00 [1.00, 1.00] (n=150); 4: 1.00 [1.00, 1.00] (n=150); 6: 1.00 [1.00, 1.00] (n=150); 8: 1.00 [1.00, 1.00] (n=150); 10: 1.00 [1.00, 1.00] (n=150); 12: 1.00 [1.00, 1.00] (n=150); 14: 1.00 [1.00, 1.00] (n=150); 16: 1.00 [1.00, 1.00] (n=150); 18: 0.96 [0.91, 0.99] (n=150); 20: 0.93 [0.86, 0.98] (n=150); 22: 0.85 [0.77, 0.93] (n=150); 24: 0.48 [0.35, 0.62] (n=150); 26: 0.03 [0.00, 0.07] (n=150); 28: 0.00 [0.00, 0.00] (n=150); 30: 0.00 [0.00, 0.00] (n=150)
+    POST-NULL early 2: 0.00 [0.00, 0.00] (n=150); 4: 0.00 [0.00, 0.00] (n=150); 6: 0.00 [0.00, 0.00] (n=150); 8: 0.00 [0.00, 0.00] (n=150); 10: 0.00 [0.00, 0.00] (n=150); 12: 0.00 [0.00, 0.00] (n=150); 14: 0.00 [0.00, 0.00] (n=150); 16: 0.00 [0.00, 0.00] (n=150); 18: 0.00 [0.00, 0.00] (n=150); 20: 0.00 [0.00, 0.00] (n=150); 22: 0.01 [0.00, 0.03] (n=150); 24: 0.39 [0.26, 0.52] (n=150); 26: 0.92 [0.84, 0.99] (n=150); 28: 1.00 [1.00, 1.00] (n=150); 30: 1.00 [1.00, 1.00] (n=150)
+    POST-NULL l_c = 24, l_c/L 0.750 [0.750, 0.812] (n=150)
+    POST-NULL K@0 0.00 [0.00, 0.00] (n=150); V@0 0.89 [0.81, 0.95] (n=150); Klate@4 0.00 [0.00, 0.00] (n=150); Klate@8 0.00 [0.00, 0.00] (n=150); Klate@12 0.00 [0.00, 0.00] (n=150); Klate@16 0.00 [0.00, 0.00] (n=150); Vlate@4 0.89 [0.81, 0.95] (n=150); Vlate@8 0.88 [0.80, 0.95] (n=150); Vlate@12 0.88 [0.80, 0.95] (n=150); Vlate@16 0.90 [0.82, 0.97] (n=150)
+    POST      late  2: 1.00 [1.00, 1.00] (n=150); 4: 1.00 [1.00, 1.00] (n=150); 6: 1.00 [1.00, 1.00] (n=150); 8: 0.99 [0.96, 1.00] (n=150); 10: 0.98 [0.95, 1.00] (n=150); 12: 0.95 [0.90, 0.98] (n=150); 14: 0.87 [0.79, 0.93] (n=150); 16: 0.86 [0.77, 0.93] (n=150); 18: 0.31 [0.21, 0.43] (n=150); 20: 0.23 [0.14, 0.34] (n=150); 22: 0.19 [0.09, 0.29] (n=150); 24: 0.11 [0.04, 0.20] (n=150); 26: 0.00 [0.00, 0.00] (n=150); 28: 0.00 [0.00, 0.00] (n=150); 30: 0.00 [0.00, 0.00] (n=150)
+    POST      early 2: 0.00 [0.00, 0.00] (n=150); 4: 0.00 [0.00, 0.00] (n=150); 6: 0.00 [0.00, 0.00] (n=150); 8: 0.01 [0.00, 0.03] (n=150); 10: 0.01 [0.00, 0.04] (n=150); 12: 0.05 [0.01, 0.11] (n=150); 14: 0.11 [0.05, 0.18] (n=150); 16: 0.15 [0.08, 0.23] (n=150); 18: 0.52 [0.40, 0.64] (n=150); 20: 0.61 [0.50, 0.73] (n=150); 22: 0.63 [0.51, 0.74] (n=150); 24: 0.79 [0.68, 0.89] (n=150); 26: 0.99 [0.97, 1.00] (n=150); 28: 1.00 [1.00, 1.00] (n=150); 30: 1.00 [1.00, 1.00] (n=150)
+    POST      l_c = 18, l_c/L 0.562 [0.562, 0.562] (n=150)
+    POST      K@0 0.07 [0.02, 0.12] (n=150); V@0 0.89 [0.81, 0.95] (n=150); Klate@4 0.07 [0.02, 0.12] (n=150); Klate@8 0.02 [0.00, 0.05] (n=150); Klate@12 0.00 [0.00, 0.00] (n=150); Klate@16 0.00 [0.00, 0.00] (n=150); Vlate@4 0.81 [0.72, 0.89] (n=150); Vlate@8 0.83 [0.74, 0.90] (n=150); Vlate@12 0.89 [0.82, 0.95] (n=150); Vlate@16 0.80 [0.71, 0.88] (n=150)
+    AFTER     late  2: 1.00 [1.00, 1.00] (n=150); 4: 1.00 [1.00, 1.00] (n=150); 6: 0.72 [0.61, 0.83] (n=150); 8: 0.50 [0.39, 0.61] (n=150); 10: 0.13 [0.07, 0.21] (n=150); 12: 0.00 [0.00, 0.00] (n=150); 14: 0.00 [0.00, 0.00] (n=150); 16: 0.00 [0.00, 0.00] (n=150); 18: 0.00 [0.00, 0.00] (n=150); 20: 0.00 [0.00, 0.00] (n=150); 22: 0.00 [0.00, 0.00] (n=150); 24: 0.00 [0.00, 0.00] (n=150); 26: 0.00 [0.00, 0.00] (n=150); 28: 0.00 [0.00, 0.00] (n=150); 30: 0.00 [0.00, 0.00] (n=150)
+    AFTER     early 2: 0.00 [0.00, 0.00] (n=150); 4: 0.00 [0.00, 0.00] (n=150); 6: 0.26 [0.16, 0.37] (n=150); 8: 0.46 [0.34, 0.58] (n=150); 10: 0.83 [0.73, 0.91] (n=150); 12: 1.00 [1.00, 1.00] (n=150); 14: 1.00 [1.00, 1.00] (n=150); 16: 1.00 [1.00, 1.00] (n=150); 18: 1.00 [1.00, 1.00] (n=150); 20: 1.00 [1.00, 1.00] (n=150); 22: 1.00 [1.00, 1.00] (n=150); 24: 1.00 [1.00, 1.00] (n=150); 26: 1.00 [1.00, 1.00] (n=150); 28: 1.00 [1.00, 1.00] (n=150); 30: 1.00 [1.00, 1.00] (n=150)
+    AFTER     l_c = 10, l_c/L 0.312 [0.250, 0.312] (n=150)
+    AFTER     K@0 0.73 [0.63, 0.82] (n=150); V@0 0.17 [0.09, 0.26] (n=150); Klate@4 0.57 [0.46, 0.68] (n=150); Klate@8 0.03 [0.00, 0.06] (n=150); Klate@12 0.00 [0.00, 0.00] (n=150); Klate@16 0.00 [0.00, 0.00] (n=150); Vlate@4 0.00 [0.00, 0.00] (n=150); Vlate@8 0.01 [0.00, 0.03] (n=150); Vlate@12 0.01 [0.00, 0.03] (n=150); Vlate@16 0.00 [0.00, 0.00] (n=150)
+    LETTER    late  2: 1.00 [1.00, 1.00] (n=150); 4: 1.00 [1.00, 1.00] (n=150); 6: 0.46 [0.35, 0.57] (n=150); 8: 0.21 [0.12, 0.31] (n=150); 10: 0.03 [0.00, 0.08] (n=150); 12: 0.00 [0.00, 0.00] (n=150); 14: 0.00 [0.00, 0.00] (n=150); 16: 0.00 [0.00, 0.00] (n=150); 18: 0.00 [0.00, 0.00] (n=150); 20: 0.00 [0.00, 0.00] (n=150); 22: 0.00 [0.00, 0.00] (n=150); 24: 0.00 [0.00, 0.00] (n=150); 26: 0.00 [0.00, 0.00] (n=150); 28: 0.00 [0.00, 0.00] (n=150); 30: 0.00 [0.00, 0.00] (n=150)
+    LETTER    early 2: 0.00 [0.00, 0.00] (n=150); 4: 0.00 [0.00, 0.00] (n=150); 6: 0.50 [0.39, 0.62] (n=150); 8: 0.78 [0.68, 0.87] (n=150); 10: 0.98 [0.95, 1.00] (n=150); 12: 1.00 [1.00, 1.00] (n=150); 14: 1.00 [1.00, 1.00] (n=150); 16: 1.00 [1.00, 1.00] (n=150); 18: 1.00 [1.00, 1.00] (n=150); 20: 1.00 [1.00, 1.00] (n=150); 22: 1.00 [1.00, 1.00] (n=150); 24: 1.00 [1.00, 1.00] (n=150); 26: 1.00 [1.00, 1.00] (n=150); 28: 1.00 [1.00, 1.00] (n=150); 30: 1.00 [1.00, 1.00] (n=150)
+    LETTER    l_c = 6, l_c/L 0.188 [0.188, 0.250] (n=150)
+    LETTER    K@0 0.94 [0.88, 0.99] (n=150); V@0 0.03 [0.00, 0.08] (n=150); Klate@4 0.89 [0.82, 0.96] (n=150); Klate@8 0.12 [0.06, 0.19] (n=150); Klate@12 0.00 [0.00, 0.00] (n=150); Klate@16 0.00 [0.00, 0.00] (n=150); Vlate@4 0.00 [0.00, 0.00] (n=150); Vlate@8 0.00 [0.00, 0.00] (n=150); Vlate@12 0.00 [0.00, 0.00] (n=150); Vlate@16 0.00 [0.00, 0.00] (n=150)
+    l_b = 10
+    silent failure NONE      late@10: share B among non-S NOT EVALUABLE (no items in the subset); median absolute p(B) of B answers NOT EVALUABLE (no items in the subset); median six-way p(B) NOT EVALUABLE (no items in the subset)
+    silent failure BEFORE    late@10: share B among non-S NOT EVALUABLE (no items in the subset); median absolute p(B) of B answers NOT EVALUABLE (no items in the subset); median six-way p(B) NOT EVALUABLE (no items in the subset)
+    silent failure POST-NULL late@10: share B among non-S NOT EVALUABLE (no items in the subset); median absolute p(B) of B answers NOT EVALUABLE (no items in the subset); median six-way p(B) NOT EVALUABLE (no items in the subset)
+    silent failure POST      late@10: share B among non-S 1.000 [1.000, 1.000] (n=3) (NOT EVALUABLE: undefined in 9.0 % of resamples (> 5 %)); median absolute p(B) of B answers 0.567 [0.522, 0.617] (n=3) (NOT EVALUABLE: undefined in 9.0 % of resamples (> 5 %)); median six-way p(B) 0.580 [0.542, 0.644] (n=3) (NOT EVALUABLE: undefined in 9.0 % of resamples (> 5 %))
+    silent failure AFTER     late@10: share B among non-S 1.000 [1.000, 1.000] (n=130); median absolute p(B) of B answers 0.857 [0.799, 0.916] (n=130); median six-way p(B) 0.864 [0.812, 0.926] (n=130)
+    silent failure LETTER    late@10: share B among non-S 1.000 [1.000, 1.000] (n=145); median absolute p(B) of B answers 0.977 [0.964, 0.984] (n=145); median six-way p(B) 0.978 [0.964, 0.984] (n=145)
+    inconsistency (NONE late answer S while AFTER late answer B; items competent in both) 2: 0.00 [0.00, 0.00] (n=150); 4: 0.00 [0.00, 0.00] (n=150); 6: 0.26 [0.16, 0.37] (n=150); 8: 0.48 [0.36, 0.60] (n=150); 10: 0.87 [0.79, 0.93] (n=150); 12: 1.00 [1.00, 1.00] (n=150); 14: 1.00 [1.00, 1.00] (n=150); 16: 1.00 [1.00, 1.00] (n=150); 18: 0.96 [0.91, 0.99] (n=150); 20: 0.93 [0.87, 0.98] (n=150); 22: 0.85 [0.77, 0.92] (n=150); 24: 0.59 [0.46, 0.71] (n=150); 26: 0.05 [0.01, 0.10] (n=150); 28: 0.00 [0.00, 0.00] (n=150); 30: 0.00 [0.00, 0.00] (n=150)
+  [llama8 passages E, L = 32; competent items; containment] curves
+    NOM   late  5: 0.99 [0.96, 1.00] (n=171); 10: 0.98 [0.94, 1.00] (n=171); 14: 0.98 [0.94, 1.00] (n=171); 19: 0.49 [0.38, 0.61] (n=171)
+    NOM   early 5: 0.00 [0.00, 0.00] (n=171); 10: 0.00 [0.00, 0.00] (n=171); 14: 0.00 [0.00, 0.00] (n=171); 19: 0.03 [0.00, 0.07] (n=171)
+    NOM   Klate 5: 0.00 [0.00, 0.00] (n=171); 10: 0.00 [0.00, 0.00] (n=171); 14: 0.00 [0.00, 0.00] (n=171); 19: 0.00 [0.00, 0.00] (n=171)
+    NOM   Vlate 5: 0.58 [0.47, 0.70] (n=171); 10: 0.58 [0.47, 0.70] (n=171); 14: 0.60 [0.48, 0.72] (n=171); 19: 0.42 [0.30, 0.54] (n=171)
+    NOM   KV@0 1.00 [1.00, 1.00] (n=171); K@0 0.00 [0.00, 0.00] (n=171); V@0 0.57 [0.45, 0.68] (n=171)
+    OPTB  late  5: 0.99 [0.96, 1.00] (n=171); 10: 0.95 [0.90, 0.99] (n=171); 14: 0.70 [0.59, 0.79] (n=171); 19: 0.01 [0.00, 0.04] (n=171)
+    OPTB  early 5: 0.00 [0.00, 0.00] (n=171); 10: 0.00 [0.00, 0.00] (n=171); 14: 0.06 [0.02, 0.11] (n=171); 19: 0.95 [0.90, 0.99] (n=171)
+    OPTB  Klate 5: 0.00 [0.00, 0.00] (n=171); 10: 0.01 [0.00, 0.03] (n=171); 14: 0.01 [0.00, 0.03] (n=171); 19: 0.01 [0.00, 0.03] (n=171)
+    OPTB  Vlate 5: 0.98 [0.94, 1.00] (n=171); 10: 0.99 [0.96, 1.00] (n=171); 14: 0.91 [0.85, 0.96] (n=171); 19: 0.04 [0.01, 0.07] (n=171)
+    OPTB  KV@0 0.99 [0.97, 1.00] (n=171); K@0 0.00 [0.00, 0.00] (n=171); V@0 0.99 [0.96, 1.00] (n=171)
+    OPTA  late  5: 0.65 [0.54, 0.75] (n=154); 10: 0.28 [0.18, 0.38] (n=154); 14: 0.12 [0.05, 0.19] (n=154); 19: 0.01 [0.00, 0.03] (n=154)
+    OPTA  early 5: 0.10 [0.05, 0.18] (n=154); 10: 0.52 [0.41, 0.64] (n=154); 14: 0.82 [0.73, 0.90] (n=154); 19: 0.95 [0.90, 0.99] (n=154)
+    OPTA  Klate 5: 0.08 [0.03, 0.14] (n=154); 10: 0.03 [0.00, 0.07] (n=154); 14: 0.00 [0.00, 0.00] (n=154); 19: 0.00 [0.00, 0.00] (n=154)
+    OPTA  Vlate 5: 0.14 [0.07, 0.23] (n=154); 10: 0.10 [0.04, 0.18] (n=154); 14: 0.09 [0.03, 0.16] (n=154); 19: 0.00 [0.00, 0.00] (n=154)
+    OPTA  KV@0 1.00 [1.00, 1.00] (n=154); K@0 0.18 [0.10, 0.27] (n=154); V@0 0.40 [0.28, 0.54] (n=154)
+  [llama8 passages R, L = 32; competent items; containment] curves
+    NOM   late  5: 1.00 [1.00, 1.00] (n=66); 10: 1.00 [1.00, 1.00] (n=66); 14: 1.00 [1.00, 1.00] (n=66); 19: 0.52 [0.33, 0.70] (n=66)
+    NOM   early 5: 0.00 [0.00, 0.00] (n=66); 10: 0.00 [0.00, 0.00] (n=66); 14: 0.00 [0.00, 0.00] (n=66); 19: 0.00 [0.00, 0.00] (n=66)
+    NOM   Klate 5: 0.00 [0.00, 0.00] (n=66); 10: 0.00 [0.00, 0.00] (n=66); 14: 0.00 [0.00, 0.00] (n=66); 19: 0.00 [0.00, 0.00] (n=66)
+    NOM   Vlate 5: 0.52 [0.35, 0.68] (n=66); 10: 0.50 [0.33, 0.66] (n=66); 14: 0.50 [0.33, 0.66] (n=66); 19: 0.35 [0.18, 0.52] (n=66)
+    NOM   KV@0 1.00 [1.00, 1.00] (n=66); K@0 0.00 [0.00, 0.00] (n=66); V@0 0.52 [0.35, 0.68] (n=66)
+    OPTB  late  5: 1.00 [1.00, 1.00] (n=67); 10: 1.00 [1.00, 1.00] (n=67); 14: 0.75 [0.59, 0.87] (n=67); 19: 0.00 [0.00, 0.00] (n=67)
+    OPTB  early 5: 0.00 [0.00, 0.00] (n=67); 10: 0.00 [0.00, 0.00] (n=67); 14: 0.06 [0.00, 0.15] (n=67); 19: 0.96 [0.88, 1.00] (n=67)
+    OPTB  Klate 5: 0.00 [0.00, 0.00] (n=67); 10: 0.00 [0.00, 0.00] (n=67); 14: 0.00 [0.00, 0.00] (n=67); 19: 0.00 [0.00, 0.00] (n=67)
+    OPTB  Vlate 5: 1.00 [1.00, 1.00] (n=67); 10: 1.00 [1.00, 1.00] (n=67); 14: 0.96 [0.88, 1.00] (n=67); 19: 0.00 [0.00, 0.00] (n=67)
+    OPTB  KV@0 1.00 [1.00, 1.00] (n=67); K@0 0.00 [0.00, 0.00] (n=67); V@0 1.00 [1.00, 1.00] (n=67)
+    OPTA  late  5: 0.60 [0.40, 0.76] (n=60); 10: 0.27 [0.11, 0.44] (n=60); 14: 0.13 [0.04, 0.25] (n=60); 19: 0.03 [0.00, 0.11] (n=60)
+    OPTA  early 5: 0.17 [0.06, 0.30] (n=60); 10: 0.57 [0.42, 0.71] (n=60); 14: 0.85 [0.73, 0.95] (n=60); 19: 0.88 [0.77, 0.97] (n=60)
+    OPTA  Klate 5: 0.12 [0.02, 0.23] (n=60); 10: 0.08 [0.00, 0.19] (n=60); 14: 0.00 [0.00, 0.00] (n=60); 19: 0.00 [0.00, 0.00] (n=60)
+    OPTA  Vlate 5: 0.17 [0.06, 0.30] (n=60); 10: 0.13 [0.04, 0.25] (n=60); 14: 0.10 [0.02, 0.20] (n=60); 19: 0.02 [0.00, 0.07] (n=60)
+    OPTA  KV@0 1.00 [1.00, 1.00] (n=60); K@0 0.23 [0.11, 0.36] (n=60); V@0 0.45 [0.31, 0.60] (n=60)
+  [llama8 passages E LETA (exploratory, deadline-gated)]
+    LETA  late  5: 0.52 [0.42, 0.62] (n=162); 10: 0.04 [0.01, 0.09] (n=162); 14: 0.01 [0.00, 0.03] (n=162); 19: 0.00 [0.00, 0.00] (n=162)
+    LETA  early 5: 0.27 [0.16, 0.38] (n=162); 10: 0.80 [0.70, 0.89] (n=162); 14: 0.99 [0.97, 1.00] (n=162); 19: 1.00 [1.00, 1.00] (n=162)
+  [llama8 edits, E9, 80 cores; generated answers over (core, t)] flip, stale, tau, r_K per row
+    @3 nat     r_K 1.000  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 1.00 [1.00, 1.00] (n=80) stale 0.00; LETTER 1.00 [1.00, 1.00] (n=80) stale 0.00; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 1.00 [1.00, 1.00] (n=80)
+    @3 E1      r_K 0.967  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 1.00 [1.00, 1.00] (n=80) stale 0.00; LETTER 1.00 [1.00, 1.00] (n=80) stale 0.00; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 1.00 [1.00, 1.00] (n=80)
+    @3 E1x0.5  r_K 0.446  NONE 0.34 [0.20, 0.52] (n=80) stale 0.62; AFTER 0.01 [0.00, 0.04] (n=80) stale 0.99; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.99; POST 0.16 [0.07, 0.28] (n=80) stale 0.83; tau 0.04 [0.00, 0.11] (n=80)
+    @3 E1x0.75 r_K 0.801  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.91 [0.84, 0.97] (n=80) stale 0.04; LETTER 0.84 [0.72, 0.94] (n=80) stale 0.09; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.91 [0.84, 0.97] (n=80)
+    @3 E1x1.5  r_K 1.075  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.99 [0.97, 1.00] (n=80) stale 0.00; LETTER 1.00 [1.00, 1.00] (n=80) stale 0.00; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.99 [0.97, 1.00] (n=80)
+    @3 J0.25   r_K 0.250  NONE 0.00 [0.00, 0.00] (n=80) stale 0.99; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 1.00; POST 0.00 [0.00, 0.00] (n=80) stale 1.00; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @3 J0.5    r_K 0.500  NONE 0.36 [0.20, 0.54] (n=80) stale 0.46; AFTER 0.09 [0.04, 0.16] (n=80) stale 0.73; LETTER 0.01 [0.00, 0.04] (n=80) stale 0.80; POST 0.42 [0.27, 0.58] (n=80) stale 0.50; tau 0.26 [0.09, 0.58] (n=80)
+    @3 J0.65   r_K 0.650  NONE 0.93 [0.84, 0.99] (n=80) stale 0.00; AFTER 0.64 [0.53, 0.75] (n=80) stale 0.16; LETTER 0.28 [0.17, 0.41] (n=80) stale 0.33; POST 0.93 [0.87, 0.98] (n=80) stale 0.05; tau 0.69 [0.57, 0.81] (n=80)
+    @3 J0.8    r_K 0.800  NONE 0.99 [0.97, 1.00] (n=80) stale 0.00; AFTER 0.91 [0.83, 0.98] (n=80) stale 0.00; LETTER 0.86 [0.75, 0.95] (n=80) stale 0.02; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.92 [0.84, 0.98] (n=80)
+    @3 J0.9    r_K 0.900  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.96 [0.89, 1.00] (n=80) stale 0.00; LETTER 1.00 [1.00, 1.00] (n=80) stale 0.00; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.96 [0.89, 1.00] (n=80)
+    @3 J1.25   r_K 1.250  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 1.00 [1.00, 1.00] (n=80) stale 0.00; LETTER 1.00 [1.00, 1.00] (n=80) stale 0.00; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 1.00 [1.00, 1.00] (n=80)
+    @3 K1      r_K 1.000  NONE 0.00 [0.00, 0.00] (n=80) stale 0.84; AFTER 0.72 [0.60, 0.84] (n=80) stale 0.14; LETTER 0.99 [0.97, 1.00] (n=80) stale 0.01; POST 0.12 [0.04, 0.23] (n=80) stale 0.85; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @3 V1      r_K 0.000  NONE 0.83 [0.72, 0.94] (n=80) stale 0.00; AFTER 0.00 [0.00, 0.00] (n=80) stale 0.97; LETTER 0.00 [0.00, 0.00] (n=80) stale 1.00; POST 0.85 [0.74, 0.94] (n=80) stale 0.10; tau 0.00 [0.00, 0.00] (n=80)
+    @3 K0.5    r_K 0.500  NONE 0.00 [0.00, 0.00] (n=80) stale 0.99; AFTER 0.00 [0.00, 0.00] (n=80) stale 0.99; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.94; POST 0.00 [0.00, 0.00] (n=80) stale 1.00; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @3 K0.8    r_K 0.800  NONE 0.00 [0.00, 0.00] (n=80) stale 0.91; AFTER 0.13 [0.05, 0.22] (n=80) stale 0.76; LETTER 0.39 [0.26, 0.54] (n=80) stale 0.42; POST 0.00 [0.00, 0.00] (n=80) stale 0.99; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @3 V0.5    r_K 0.000  NONE 0.00 [0.00, 0.00] (n=80) stale 0.93; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 1.00; POST 0.03 [0.00, 0.09] (n=80) stale 0.95; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @3 V0.8    r_K 0.000  NONE 0.69 [0.55, 0.85] (n=80) stale 0.01; AFTER 0.00 [0.00, 0.00] (n=80) stale 0.98; LETTER 0.00 [0.00, 0.00] (n=80) stale 1.00; POST 0.66 [0.50, 0.79] (n=80) stale 0.27; tau 0.00 [0.00, 0.00] (n=80)
+    @3 K0.5V1  r_K 0.500  NONE 0.99 [0.96, 1.00] (n=80) stale 0.00; AFTER 0.69 [0.60, 0.78] (n=80) stale 0.16; LETTER 0.13 [0.06, 0.23] (n=80) stale 0.44; POST 0.99 [0.97, 1.00] (n=80) stale 0.01; tau 0.70 [0.61, 0.79] (n=80)
+    @3 K0.8V1  r_K 0.800  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.94 [0.87, 1.00] (n=80) stale 0.00; LETTER 0.92 [0.85, 0.98] (n=80) stale 0.00; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.94 [0.87, 1.00] (n=80)
+    @3 K1V0.5  r_K 1.000  NONE 0.91 [0.82, 0.98] (n=80) stale 0.01; AFTER 0.96 [0.89, 1.00] (n=80) stale 0.00; LETTER 1.00 [1.00, 1.00] (n=80) stale 0.00; POST 0.96 [0.90, 0.99] (n=80) stale 0.01; tau 1.06 [0.99, 1.16] (n=80)
+    @3 K1V0.8  r_K 1.000  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.99 [0.96, 1.00] (n=80) stale 0.00; LETTER 1.00 [1.00, 1.00] (n=80) stale 0.00; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.99 [0.96, 1.00] (n=80)
+    @3 CAA     r_K 0.967  NONE 0.82 [0.71, 0.92] (n=80) stale 0.00; AFTER 0.96 [0.91, 1.00] (n=80) stale 0.00; LETTER 0.27 [0.16, 0.38] (n=80) stale 0.44; POST 0.97 [0.93, 1.00] (n=80) stale 0.00; tau 1.17 [1.06, 1.31] (n=80)
+    @7 nat     r_K 1.000  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.66 [0.52, 0.78] (n=80) stale 0.33; LETTER 0.23 [0.11, 0.35] (n=80) stale 0.71; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.66 [0.52, 0.78] (n=80)
+    @7 E1      r_K 0.909  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.59 [0.45, 0.72] (n=80) stale 0.38; LETTER 0.17 [0.06, 0.29] (n=80) stale 0.76; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.59 [0.45, 0.72] (n=80)
+    @7 E1x0.5  r_K 0.417  NONE 0.29 [0.15, 0.46] (n=80) stale 0.68; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 1.00; POST 0.06 [0.01, 0.11] (n=80) stale 0.94; tau 0.00 [0.00, 0.00] (n=80)
+    @7 E1x0.75 r_K 0.734  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.13 [0.05, 0.22] (n=80) stale 0.87; LETTER 0.04 [0.00, 0.11] (n=80) stale 0.95; POST 0.95 [0.89, 0.99] (n=80) stale 0.05; tau 0.13 [0.05, 0.22] (n=80)
+    @7 E1x1.5  r_K 1.089  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.88 [0.79, 0.95] (n=80) stale 0.10; LETTER 0.28 [0.15, 0.43] (n=80) stale 0.58; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.88 [0.79, 0.95] (n=80)
+    @7 J0.25   r_K 0.250  NONE 0.00 [0.00, 0.00] (n=80) stale 0.99; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 1.00; POST 0.00 [0.00, 0.00] (n=80) stale 1.00; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @7 J0.5    r_K 0.500  NONE 0.37 [0.21, 0.55] (n=80) stale 0.44; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.99; POST 0.15 [0.03, 0.28] (n=80) stale 0.82; tau 0.00 [0.00, 0.00] (n=80)
+    @7 J0.65   r_K 0.650  NONE 0.93 [0.84, 0.99] (n=80) stale 0.00; AFTER 0.07 [0.02, 0.13] (n=80) stale 0.91; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.97; POST 0.76 [0.60, 0.88] (n=80) stale 0.22; tau 0.07 [0.02, 0.15] (n=80)
+    @7 J0.8    r_K 0.800  NONE 0.99 [0.96, 1.00] (n=80) stale 0.00; AFTER 0.27 [0.16, 0.39] (n=80) stale 0.68; LETTER 0.05 [0.01, 0.11] (n=80) stale 0.89; POST 0.96 [0.91, 1.00] (n=80) stale 0.04; tau 0.27 [0.16, 0.39] (n=80)
+    @7 J0.9    r_K 0.900  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.46 [0.32, 0.60] (n=80) stale 0.51; LETTER 0.11 [0.03, 0.21] (n=80) stale 0.81; POST 0.99 [0.97, 1.00] (n=80) stale 0.01; tau 0.46 [0.32, 0.60] (n=80)
+    @7 J1.25   r_K 1.250  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.93 [0.86, 0.97] (n=80) stale 0.07; LETTER 0.73 [0.62, 0.83] (n=80) stale 0.27; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.93 [0.86, 0.97] (n=80)
+    @7 K1      r_K 1.000  NONE 0.00 [0.00, 0.00] (n=80) stale 0.84; AFTER 0.09 [0.02, 0.19] (n=80) stale 0.89; LETTER 0.16 [0.04, 0.30] (n=80) stale 0.79; POST 0.01 [0.00, 0.04] (n=80) stale 0.98; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @7 V1      r_K 0.000  NONE 0.82 [0.70, 0.95] (n=80) stale 0.00; AFTER 0.00 [0.00, 0.00] (n=80) stale 0.98; LETTER 0.00 [0.00, 0.00] (n=80) stale 1.00; POST 0.85 [0.74, 0.94] (n=80) stale 0.09; tau 0.00 [0.00, 0.00] (n=80)
+    @7 K0.5    r_K 0.500  NONE 0.00 [0.00, 0.00] (n=80) stale 0.98; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.99; POST 0.00 [0.00, 0.00] (n=80) stale 1.00; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @7 K0.8    r_K 0.800  NONE 0.00 [0.00, 0.00] (n=80) stale 0.92; AFTER 0.00 [0.00, 0.00] (n=80) stale 0.99; LETTER 0.04 [0.00, 0.10] (n=80) stale 0.93; POST 0.00 [0.00, 0.00] (n=80) stale 1.00; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @7 V0.5    r_K 0.000  NONE 0.00 [0.00, 0.00] (n=80) stale 0.93; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 1.00; POST 0.03 [0.00, 0.09] (n=80) stale 0.94; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @7 V0.8    r_K 0.000  NONE 0.69 [0.55, 0.85] (n=80) stale 0.01; AFTER 0.00 [0.00, 0.00] (n=80) stale 0.99; LETTER 0.00 [0.00, 0.00] (n=80) stale 1.00; POST 0.67 [0.51, 0.81] (n=80) stale 0.26; tau 0.00 [0.00, 0.00] (n=80)
+    @7 K0.5V1  r_K 0.500  NONE 0.99 [0.96, 1.00] (n=80) stale 0.00; AFTER 0.07 [0.01, 0.15] (n=80) stale 0.92; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.99; POST 0.93 [0.85, 0.99] (n=80) stale 0.07; tau 0.08 [0.01, 0.15] (n=80)
+    @7 K0.8V1  r_K 0.800  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.41 [0.28, 0.54] (n=80) stale 0.57; LETTER 0.05 [0.01, 0.11] (n=80) stale 0.88; POST 0.99 [0.97, 1.00] (n=80) stale 0.01; tau 0.41 [0.28, 0.54] (n=80)
+    @7 K1V0.5  r_K 1.000  NONE 0.91 [0.82, 0.98] (n=80) stale 0.01; AFTER 0.32 [0.20, 0.44] (n=80) stale 0.63; LETTER 0.19 [0.07, 0.32] (n=80) stale 0.75; POST 0.78 [0.62, 0.90] (n=80) stale 0.19; tau 0.35 [0.22, 0.48] (n=80)
+    @7 K1V0.8  r_K 1.000  NONE 0.99 [0.97, 1.00] (n=80) stale 0.00; AFTER 0.55 [0.41, 0.68] (n=80) stale 0.42; LETTER 0.21 [0.09, 0.34] (n=80) stale 0.72; POST 0.99 [0.97, 1.00] (n=80) stale 0.01; tau 0.55 [0.41, 0.68] (n=80)
+    @7 CAA     r_K 0.909  NONE 0.78 [0.66, 0.87] (n=80) stale 0.00; AFTER 1.00 [1.00, 1.00] (n=80) stale 0.00; LETTER 0.08 [0.02, 0.16] (n=80) stale 0.77; POST 0.99 [0.96, 1.00] (n=80) stale 0.00; tau 1.29 [1.15, 1.51] (n=80)
+    @11 nat     r_K 1.000  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 1.00; POST 0.99 [0.97, 1.00] (n=80) stale 0.01; tau 0.00 [0.00, 0.00] (n=80)
+    @11 E1      r_K 0.888  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 1.00; POST 0.99 [0.97, 1.00] (n=80) stale 0.01; tau 0.00 [0.00, 0.00] (n=80)
+    @11 CAA     r_K 0.888  NONE 0.99 [0.94, 1.00] (n=80) stale 0.00; AFTER 1.00 [1.00, 1.00] (n=80) stale 0.00; LETTER 0.12 [0.05, 0.21] (n=80) stale 0.68; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 1.01 [1.00, 1.06] (n=80)
+    @15 nat     r_K 1.000  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 1.00; POST 0.93 [0.85, 0.99] (n=80) stale 0.07; tau 0.00 [0.00, 0.00] (n=80)
+    @15 E1      r_K 0.896  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 1.00; POST 0.95 [0.87, 1.00] (n=80) stale 0.05; tau 0.00 [0.00, 0.00] (n=80)
+    @15 CAA     r_K 0.896  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 1.00 [1.00, 1.00] (n=80) stale 0.00; LETTER 0.10 [0.04, 0.18] (n=80) stale 0.64; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 1.00 [1.00, 1.00] (n=80)
+    psi (nats) NONE@3: psi_J(0.25) 0.24 [0.22, 0.27] (n=80); psi_J(0.5) 0.60 [0.57, 0.62] (n=80); psi_J(0.65) 0.77 [0.76, 0.79] (n=80); psi_J(0.8) 0.90 [0.90, 0.91] (n=80); psi_J(0.9) 0.96 [0.96, 0.97] (n=80); psi_J(1.25) 1.04 [1.03, 1.05] (n=80); psi_K(0.5) 0.27 [0.15, 0.34] (n=80); psi_K(0.8) 0.66 [0.56, 0.71] (n=80); psi_V(0.5) 0.56 [0.54, 0.59] (n=80); psi_V(0.8) 0.87 [0.86, 0.88] (n=80)
+    psi (nats) AFTER@3: psi_J(0.25) 0.10 [0.09, 0.11] (n=80); psi_J(0.5) 0.42 [0.39, 0.45] (n=80); psi_J(0.65) 0.66 [0.63, 0.69] (n=80); psi_J(0.8) 0.85 [0.82, 0.88] (n=80); psi_J(0.9) 0.94 [0.92, 0.95] (n=80); psi_J(1.25) 1.06 [1.04, 1.08] (n=80); psi_K(0.5) 0.09 [0.05, 0.14] (n=80); psi_K(0.8) 0.60 [0.52, 0.67] (n=80); psi_V(0.5) 0.46 [0.44, 0.48] (n=80); psi_V(0.8) 0.78 [0.76, 0.80] (n=80)
+    psi (nats) LETTER@3: psi_J(0.25) 0.03 [0.02, 0.04] (n=80); psi_J(0.5) 0.15 [0.11, 0.18] (n=80); psi_J(0.65) 0.31 [0.25, 0.37] (n=80); psi_J(0.8) 0.67 [0.62, 0.72] (n=80); psi_J(0.9) 0.90 [0.88, 0.92] (n=80); psi_J(1.25) 1.00 [0.99, 1.02] (n=80); psi_K(0.5) 0.11 [0.08, 0.15] (n=80); psi_K(0.8) 0.55 [0.47, 0.62] (n=80); psi_V(0.5) 0.43 [0.30, 0.55] (n=80); psi_V(0.8) 0.67 [0.54, 0.78] (n=80)
+    psi (nats) POST@3: psi_J(0.25) 0.25 [0.24, 0.27] (n=80); psi_J(0.5) 0.63 [0.61, 0.65] (n=80); psi_J(0.65) 0.81 [0.80, 0.83] (n=80); psi_J(0.8) 0.91 [0.90, 0.93] (n=80); psi_J(0.9) 0.96 [0.95, 0.97] (n=80); psi_J(1.25) 1.07 [1.05, 1.09] (n=80); psi_K(0.5) 0.00 [-0.06, 0.05] (n=80); psi_K(0.8) 0.50 [0.39, 0.57] (n=80); psi_V(0.5) 0.62 [0.60, 0.63] (n=80); psi_V(0.8) 0.89 [0.88, 0.90] (n=80)
+    psi (nats) NONE@7: psi_J(0.25) 0.24 [0.22, 0.27] (n=80); psi_J(0.5) 0.60 [0.57, 0.62] (n=80); psi_J(0.65) 0.77 [0.76, 0.79] (n=80); psi_J(0.8) 0.90 [0.90, 0.91] (n=80); psi_J(0.9) 0.96 [0.96, 0.97] (n=80); psi_J(1.25) 1.04 [1.03, 1.05] (n=80); psi_K(0.5) 0.26 [0.14, 0.33] (n=80); psi_K(0.8) 0.66 [0.56, 0.71] (n=80); psi_V(0.5) 0.56 [0.54, 0.59] (n=80); psi_V(0.8) 0.87 [0.86, 0.88] (n=80)
+    psi (nats) AFTER@7: psi_J(0.25) 0.12 [0.10, 0.13] (n=80); psi_J(0.5) 0.33 [0.30, 0.35] (n=80); psi_J(0.65) 0.54 [0.51, 0.57] (n=80); psi_J(0.8) 0.75 [0.73, 0.77] (n=80); psi_J(0.9) 0.88 [0.87, 0.89] (n=80); psi_J(1.25) 1.15 [1.13, 1.18] (n=80); psi_K(0.5) 0.12 [0.07, 0.17] (n=80); psi_K(0.8) 0.42 [0.36, 0.47] (n=80); psi_V(0.5) 0.45 [0.44, 0.46] (n=80); psi_V(0.8) 0.78 [0.77, 0.79] (n=80)
+    psi (nats) LETTER@7: psi_J(0.25) 0.05 [0.04, 0.07] (n=80); psi_J(0.5) 0.15 [0.12, 0.19] (n=80); psi_J(0.65) 0.28 [0.23, 0.34] (n=80); psi_J(0.8) 0.48 [0.41, 0.55] (n=80); psi_J(0.9) 0.70 [0.65, 0.75] (n=80); psi_J(1.25) 1.60 [1.43, 1.84] (n=80); psi_K(0.5) 0.14 [0.10, 0.19] (n=80); psi_K(0.8) 0.48 [0.42, 0.54] (n=80); psi_V(0.5) 0.54 [0.39, 0.68] (n=80); psi_V(0.8) 0.90 [0.76, 1.13] (n=80)
+    psi (nats) POST@7: psi_J(0.25) 0.24 [0.23, 0.26] (n=80); psi_J(0.5) 0.57 [0.55, 0.59] (n=80); psi_J(0.65) 0.75 [0.73, 0.76] (n=80); psi_J(0.8) 0.88 [0.87, 0.89] (n=80); psi_J(0.9) 0.95 [0.95, 0.96] (n=80); psi_J(1.25) 1.07 [1.06, 1.08] (n=80); psi_K(0.5) -0.05 [-0.17, 0.01] (n=80); psi_K(0.8) 0.28 [0.11, 0.36] (n=80); psi_V(0.5) 0.61 [0.59, 0.63] (n=80); psi_V(0.8) 0.88 [0.87, 0.89] (n=80)
+    psi (logits) NONE@3: psi_J(0.25) 0.24 [0.22, 0.27] (n=80); psi_J(0.5) 0.60 [0.57, 0.63] (n=80); psi_J(0.65) 0.78 [0.76, 0.80] (n=80); psi_J(0.8) 0.91 [0.90, 0.91] (n=80); psi_J(0.9) 0.96 [0.96, 0.97] (n=80); psi_J(1.25) 1.05 [1.04, 1.06] (n=80); psi_K(0.5) 0.27 [0.18, 0.34] (n=80); psi_K(0.8) 0.66 [0.59, 0.72] (n=80); psi_V(0.5) 0.56 [0.53, 0.59] (n=80); psi_V(0.8) 0.87 [0.86, 0.88] (n=80)
+    psi (logits) AFTER@3: psi_J(0.25) 0.10 [0.09, 0.11] (n=80); psi_J(0.5) 0.42 [0.39, 0.45] (n=80); psi_J(0.65) 0.66 [0.63, 0.69] (n=80); psi_J(0.8) 0.85 [0.82, 0.88] (n=80); psi_J(0.9) 0.94 [0.92, 0.95] (n=80); psi_J(1.25) 1.06 [1.04, 1.08] (n=80); psi_K(0.5) 0.09 [0.05, 0.14] (n=80); psi_K(0.8) 0.60 [0.52, 0.67] (n=80); psi_V(0.5) 0.46 [0.44, 0.48] (n=80); psi_V(0.8) 0.78 [0.76, 0.80] (n=80)
+    psi (logits) LETTER@3: psi_J(0.25) 0.03 [0.02, 0.04] (n=80); psi_J(0.5) 0.15 [0.11, 0.18] (n=80); psi_J(0.65) 0.31 [0.25, 0.37] (n=80); psi_J(0.8) 0.67 [0.62, 0.72] (n=80); psi_J(0.9) 0.90 [0.88, 0.92] (n=80); psi_J(1.25) 1.00 [0.99, 1.02] (n=80); psi_K(0.5) 0.11 [0.08, 0.15] (n=80); psi_K(0.8) 0.55 [0.47, 0.62] (n=80); psi_V(0.5) 0.43 [0.30, 0.55] (n=80); psi_V(0.8) 0.67 [0.54, 0.78] (n=80)
+    psi (logits) POST@3: psi_J(0.25) 0.25 [0.24, 0.27] (n=80); psi_J(0.5) 0.64 [0.62, 0.65] (n=80); psi_J(0.65) 0.81 [0.80, 0.82] (n=80); psi_J(0.8) 0.92 [0.91, 0.93] (n=80); psi_J(0.9) 0.96 [0.95, 0.97] (n=80); psi_J(1.25) 1.08 [1.06, 1.10] (n=80); psi_K(0.5) 0.01 [-0.06, 0.06] (n=80); psi_K(0.8) 0.52 [0.41, 0.59] (n=80); psi_V(0.5) 0.61 [0.59, 0.63] (n=80); psi_V(0.8) 0.88 [0.87, 0.89] (n=80)
+    psi (logits) NONE@7: psi_J(0.25) 0.24 [0.22, 0.27] (n=80); psi_J(0.5) 0.60 [0.57, 0.63] (n=80); psi_J(0.65) 0.78 [0.76, 0.80] (n=80); psi_J(0.8) 0.91 [0.90, 0.91] (n=80); psi_J(0.9) 0.96 [0.96, 0.97] (n=80); psi_J(1.25) 1.05 [1.04, 1.05] (n=80); psi_K(0.5) 0.28 [0.19, 0.34] (n=80); psi_K(0.8) 0.67 [0.60, 0.72] (n=80); psi_V(0.5) 0.56 [0.53, 0.59] (n=80); psi_V(0.8) 0.87 [0.86, 0.88] (n=80)
+    psi (logits) AFTER@7: psi_J(0.25) 0.12 [0.10, 0.13] (n=80); psi_J(0.5) 0.33 [0.30, 0.35] (n=80); psi_J(0.65) 0.54 [0.51, 0.57] (n=80); psi_J(0.8) 0.75 [0.73, 0.77] (n=80); psi_J(0.9) 0.88 [0.87, 0.89] (n=80); psi_J(1.25) 1.15 [1.13, 1.18] (n=80); psi_K(0.5) 0.12 [0.07, 0.17] (n=80); psi_K(0.8) 0.42 [0.36, 0.47] (n=80); psi_V(0.5) 0.45 [0.44, 0.46] (n=80); psi_V(0.8) 0.78 [0.77, 0.79] (n=80)
+    psi (logits) LETTER@7: psi_J(0.25) 0.05 [0.04, 0.07] (n=80); psi_J(0.5) 0.15 [0.12, 0.19] (n=80); psi_J(0.65) 0.28 [0.23, 0.34] (n=80); psi_J(0.8) 0.48 [0.41, 0.55] (n=80); psi_J(0.9) 0.70 [0.65, 0.75] (n=80); psi_J(1.25) 1.60 [1.43, 1.84] (n=80); psi_K(0.5) 0.14 [0.10, 0.19] (n=80); psi_K(0.8) 0.48 [0.42, 0.54] (n=80); psi_V(0.5) 0.54 [0.39, 0.68] (n=80); psi_V(0.8) 0.90 [0.76, 1.13] (n=80)
+    psi (logits) POST@7: psi_J(0.25) 0.24 [0.23, 0.26] (n=80); psi_J(0.5) 0.57 [0.55, 0.59] (n=80); psi_J(0.65) 0.75 [0.73, 0.76] (n=80); psi_J(0.8) 0.88 [0.87, 0.89] (n=80); psi_J(0.9) 0.95 [0.95, 0.95] (n=80); psi_J(1.25) 1.08 [1.07, 1.09] (n=80); psi_K(0.5) -0.04 [-0.17, 0.02] (n=80); psi_K(0.8) 0.30 [0.11, 0.38] (n=80); psi_V(0.5) 0.61 [0.59, 0.62] (n=80); psi_V(0.8) 0.88 [0.87, 0.89] (n=80)
+  [qwen7 stories, N9, L = 28; competent items; generated answers] late and early flip curves, l_c, K/V-only
+    NONE      late  2: 1.00 [1.00, 1.00] (n=150); 4: 1.00 [1.00, 1.00] (n=150); 6: 1.00 [1.00, 1.00] (n=150); 8: 1.00 [1.00, 1.00] (n=150); 10: 1.00 [1.00, 1.00] (n=150); 12: 1.00 [1.00, 1.00] (n=150); 14: 1.00 [1.00, 1.00] (n=150); 16: 1.00 [1.00, 1.00] (n=150); 18: 1.00 [1.00, 1.00] (n=150); 20: 1.00 [1.00, 1.00] (n=150); 22: 1.00 [1.00, 1.00] (n=150); 24: 0.97 [0.91, 1.00] (n=150); 26: 0.28 [0.17, 0.41] (n=150)
+    NONE      early 2: 0.00 [0.00, 0.00] (n=150); 4: 0.00 [0.00, 0.00] (n=150); 6: 0.00 [0.00, 0.00] (n=150); 8: 0.00 [0.00, 0.00] (n=150); 10: 0.00 [0.00, 0.00] (n=150); 12: 0.00 [0.00, 0.00] (n=150); 14: 0.00 [0.00, 0.00] (n=150); 16: 0.00 [0.00, 0.00] (n=150); 18: 0.00 [0.00, 0.00] (n=150); 20: 0.00 [0.00, 0.00] (n=150); 22: 0.00 [0.00, 0.00] (n=150); 24: 0.04 [0.00, 0.10] (n=150); 26: 0.69 [0.57, 0.80] (n=150)
+    NONE      l_c = 26, l_c/L 0.929 [0.929, 0.929] (n=150)
+    NONE      K@0 0.00 [0.00, 0.00] (n=150); V@0 0.99 [0.95, 1.00] (n=150); Klate@4 0.00 [0.00, 0.00] (n=150); Klate@8 0.00 [0.00, 0.00] (n=150); Klate@12 0.00 [0.00, 0.00] (n=150); Klate@16 0.00 [0.00, 0.00] (n=150); Vlate@4 0.99 [0.95, 1.00] (n=150); Vlate@8 0.99 [0.95, 1.00] (n=150); Vlate@12 0.99 [0.95, 1.00] (n=150); Vlate@16 0.99 [0.95, 1.00] (n=150)
+    BEFORE    late  2: 1.00 [1.00, 1.00] (n=148); 4: 1.00 [1.00, 1.00] (n=148); 6: 1.00 [1.00, 1.00] (n=148); 8: 1.00 [1.00, 1.00] (n=148); 10: 1.00 [1.00, 1.00] (n=148); 12: 1.00 [1.00, 1.00] (n=148); 14: 1.00 [1.00, 1.00] (n=148); 16: 1.00 [1.00, 1.00] (n=148); 18: 1.00 [1.00, 1.00] (n=148); 20: 0.99 [0.96, 1.00] (n=148); 22: 0.68 [0.57, 0.79] (n=148); 24: 0.03 [0.01, 0.08] (n=148); 26: 0.00 [0.00, 0.00] (n=148)
+    BEFORE    early 2: 0.00 [0.00, 0.00] (n=148); 4: 0.00 [0.00, 0.00] (n=148); 6: 0.00 [0.00, 0.00] (n=148); 8: 0.00 [0.00, 0.00] (n=148); 10: 0.00 [0.00, 0.00] (n=148); 12: 0.00 [0.00, 0.00] (n=148); 14: 0.00 [0.00, 0.00] (n=148); 16: 0.00 [0.00, 0.00] (n=148); 18: 0.00 [0.00, 0.00] (n=148); 20: 0.01 [0.00, 0.02] (n=148); 22: 0.20 [0.13, 0.29] (n=148); 24: 0.92 [0.84, 0.98] (n=148); 26: 0.99 [0.98, 1.00] (n=148)
+    BEFORE    l_c = 24, l_c/L 0.857 [0.857, 0.857] (n=148)
+    BEFORE    K@0 0.00 [0.00, 0.00] (n=148); V@0 0.95 [0.90, 0.99] (n=148); Klate@4 0.00 [0.00, 0.00] (n=148); Klate@8 0.00 [0.00, 0.00] (n=148); Klate@12 0.00 [0.00, 0.00] (n=148); Klate@16 0.00 [0.00, 0.00] (n=148); Vlate@4 0.95 [0.90, 0.99] (n=148); Vlate@8 0.95 [0.90, 0.99] (n=148); Vlate@12 0.95 [0.89, 0.99] (n=148); Vlate@16 0.94 [0.88, 0.98] (n=148)
+    POST-NULL late  2: 1.00 [1.00, 1.00] (n=150); 4: 1.00 [1.00, 1.00] (n=150); 6: 1.00 [1.00, 1.00] (n=150); 8: 1.00 [1.00, 1.00] (n=150); 10: 1.00 [1.00, 1.00] (n=150); 12: 1.00 [1.00, 1.00] (n=150); 14: 1.00 [1.00, 1.00] (n=150); 16: 1.00 [1.00, 1.00] (n=150); 18: 1.00 [1.00, 1.00] (n=150); 20: 0.99 [0.97, 1.00] (n=150); 22: 1.00 [1.00, 1.00] (n=150); 24: 0.93 [0.88, 0.98] (n=150); 26: 0.20 [0.10, 0.32] (n=150)
+    POST-NULL early 2: 0.00 [0.00, 0.00] (n=150); 4: 0.00 [0.00, 0.00] (n=150); 6: 0.00 [0.00, 0.00] (n=150); 8: 0.00 [0.00, 0.00] (n=150); 10: 0.00 [0.00, 0.00] (n=150); 12: 0.00 [0.00, 0.00] (n=150); 14: 0.00 [0.00, 0.00] (n=150); 16: 0.00 [0.00, 0.00] (n=150); 18: 0.00 [0.00, 0.00] (n=150); 20: 0.00 [0.00, 0.00] (n=150); 22: 0.00 [0.00, 0.00] (n=150); 24: 0.03 [0.00, 0.08] (n=150); 26: 0.65 [0.52, 0.78] (n=150)
+    POST-NULL l_c = 26, l_c/L 0.929 [0.929, 0.929] (n=150)
+    POST-NULL K@0 0.00 [0.00, 0.00] (n=150); V@0 0.95 [0.91, 0.99] (n=150); Klate@4 0.00 [0.00, 0.00] (n=150); Klate@8 0.00 [0.00, 0.00] (n=150); Klate@12 0.00 [0.00, 0.00] (n=150); Klate@16 0.00 [0.00, 0.00] (n=150); Vlate@4 0.95 [0.90, 0.99] (n=150); Vlate@8 0.95 [0.91, 0.99] (n=150); Vlate@12 0.95 [0.91, 0.99] (n=150); Vlate@16 0.95 [0.90, 0.99] (n=150)
+    POST      late  2: 1.00 [1.00, 1.00] (n=150); 4: 0.99 [0.97, 1.00] (n=150); 6: 1.00 [1.00, 1.00] (n=150); 8: 1.00 [1.00, 1.00] (n=150); 10: 1.00 [1.00, 1.00] (n=150); 12: 1.00 [1.00, 1.00] (n=150); 14: 0.99 [0.97, 1.00] (n=150); 16: 0.99 [0.96, 1.00] (n=150); 18: 0.98 [0.95, 1.00] (n=150); 20: 0.97 [0.94, 1.00] (n=150); 22: 0.91 [0.85, 0.97] (n=150); 24: 0.04 [0.01, 0.09] (n=150); 26: 0.00 [0.00, 0.00] (n=150)
+    POST      early 2: 0.00 [0.00, 0.00] (n=150); 4: 0.00 [0.00, 0.00] (n=150); 6: 0.00 [0.00, 0.00] (n=150); 8: 0.00 [0.00, 0.00] (n=150); 10: 0.00 [0.00, 0.00] (n=150); 12: 0.00 [0.00, 0.00] (n=150); 14: 0.01 [0.00, 0.03] (n=150); 16: 0.03 [0.00, 0.08] (n=150); 18: 0.02 [0.00, 0.05] (n=150); 20: 0.05 [0.01, 0.10] (n=150); 22: 0.10 [0.04, 0.17] (n=150); 24: 0.92 [0.84, 0.98] (n=150); 26: 0.99 [0.96, 1.00] (n=150)
+    POST      l_c = 24, l_c/L 0.857 [0.857, 0.857] (n=150)
+    POST      K@0 0.09 [0.04, 0.15] (n=150); V@0 0.83 [0.73, 0.91] (n=150); Klate@4 0.01 [0.00, 0.03] (n=150); Klate@8 0.00 [0.00, 0.00] (n=150); Klate@12 0.00 [0.00, 0.00] (n=150); Klate@16 0.00 [0.00, 0.00] (n=150); Vlate@4 0.82 [0.71, 0.91] (n=150); Vlate@8 0.81 [0.71, 0.90] (n=150); Vlate@12 0.85 [0.75, 0.94] (n=150); Vlate@16 0.87 [0.79, 0.94] (n=150)
+    AFTER     late  2: 1.00 [1.00, 1.00] (n=148); 4: 0.95 [0.91, 0.99] (n=148); 6: 0.82 [0.71, 0.91] (n=148); 8: 0.82 [0.71, 0.91] (n=148); 10: 0.52 [0.40, 0.64] (n=148); 12: 0.51 [0.39, 0.63] (n=148); 14: 0.08 [0.03, 0.14] (n=148); 16: 0.00 [0.00, 0.00] (n=148); 18: 0.00 [0.00, 0.00] (n=148); 20: 0.00 [0.00, 0.00] (n=148); 22: 0.00 [0.00, 0.00] (n=148); 24: 0.00 [0.00, 0.00] (n=148); 26: 0.00 [0.00, 0.00] (n=148)
+    AFTER     early 2: 0.00 [0.00, 0.00] (n=148); 4: 0.01 [0.00, 0.04] (n=148); 6: 0.11 [0.03, 0.20] (n=148); 8: 0.11 [0.03, 0.20] (n=148); 10: 0.41 [0.29, 0.53] (n=148); 12: 0.39 [0.28, 0.52] (n=148); 14: 0.87 [0.80, 0.94] (n=148); 16: 0.99 [0.97, 1.00] (n=148); 18: 0.99 [0.96, 1.00] (n=148); 20: 0.99 [0.97, 1.00] (n=148); 22: 0.99 [0.97, 1.00] (n=148); 24: 1.00 [1.00, 1.00] (n=148); 26: 1.00 [1.00, 1.00] (n=148)
+    AFTER     l_c = 14, l_c/L 0.500 [0.357, 0.500] (n=148)
+    AFTER     K@0 0.97 [0.93, 1.00] (n=148); V@0 0.00 [0.00, 0.00] (n=148); Klate@4 0.52 [0.40, 0.65] (n=148); Klate@8 0.16 [0.09, 0.25] (n=148); Klate@12 0.00 [0.00, 0.00] (n=148); Klate@16 0.00 [0.00, 0.00] (n=148); Vlate@4 0.00 [0.00, 0.00] (n=148); Vlate@8 0.01 [0.00, 0.03] (n=148); Vlate@12 0.00 [0.00, 0.00] (n=148); Vlate@16 0.01 [0.00, 0.03] (n=148)
+    LETTER    late  2: 1.00 [1.00, 1.00] (n=137); 4: 0.89 [0.82, 0.95] (n=137); 6: 0.67 [0.55, 0.78] (n=137); 8: 0.66 [0.54, 0.78] (n=137); 10: 0.25 [0.16, 0.35] (n=137); 12: 0.21 [0.13, 0.30] (n=137); 14: 0.07 [0.02, 0.13] (n=137); 16: 0.00 [0.00, 0.00] (n=137); 18: 0.00 [0.00, 0.00] (n=137); 20: 0.00 [0.00, 0.00] (n=137); 22: 0.00 [0.00, 0.00] (n=137); 24: 0.00 [0.00, 0.00] (n=137); 26: 0.00 [0.00, 0.00] (n=137)
+    LETTER    early 2: 0.00 [0.00, 0.00] (n=137); 4: 0.01 [0.00, 0.04] (n=137); 6: 0.13 [0.05, 0.23] (n=137); 8: 0.14 [0.06, 0.24] (n=137); 10: 0.40 [0.28, 0.53] (n=137); 12: 0.40 [0.28, 0.53] (n=137); 14: 0.85 [0.75, 0.92] (n=137); 16: 1.00 [1.00, 1.00] (n=137); 18: 1.00 [1.00, 1.00] (n=137); 20: 1.00 [1.00, 1.00] (n=137); 22: 1.00 [1.00, 1.00] (n=137); 24: 1.00 [1.00, 1.00] (n=137); 26: 1.00 [1.00, 1.00] (n=137)
+    LETTER    l_c = 10, l_c/L 0.357 [0.357, 0.357] (n=137)
+    LETTER    K@0 0.91 [0.84, 0.96] (n=137); V@0 0.00 [0.00, 0.00] (n=137); Klate@4 0.73 [0.62, 0.83] (n=137); Klate@8 0.32 [0.22, 0.43] (n=137); Klate@12 0.07 [0.02, 0.12] (n=137); Klate@16 0.00 [0.00, 0.00] (n=137); Vlate@4 0.00 [0.00, 0.00] (n=137); Vlate@8 0.00 [0.00, 0.00] (n=137); Vlate@12 0.00 [0.00, 0.00] (n=137); Vlate@16 0.00 [0.00, 0.00] (n=137)
+    l_b = 14
+    silent failure NONE      late@8: share B among non-S NOT EVALUABLE (no items in the subset); median absolute p(B) of B answers NOT EVALUABLE (no items in the subset); median six-way p(B) NOT EVALUABLE (no items in the subset)
+    silent failure BEFORE    late@8: share B among non-S NOT EVALUABLE (no items in the subset); median absolute p(B) of B answers NOT EVALUABLE (no items in the subset); median six-way p(B) NOT EVALUABLE (no items in the subset)
+    silent failure POST-NULL late@8: share B among non-S NOT EVALUABLE (no items in the subset); median absolute p(B) of B answers NOT EVALUABLE (no items in the subset); median six-way p(B) NOT EVALUABLE (no items in the subset)
+    silent failure POST      late@8: share B among non-S NOT EVALUABLE (no items in the subset); median absolute p(B) of B answers NOT EVALUABLE (no items in the subset); median six-way p(B) NOT EVALUABLE (no items in the subset)
+    silent failure AFTER     late@8: share B among non-S 0.667 [0.345, 0.893] (n=27); median absolute p(B) of B answers 0.989 [0.915, 1.000] (n=18); median six-way p(B) 0.989 [0.915, 1.000] (n=18)
+    silent failure LETTER    late@8: share B among non-S 0.478 [0.250, 0.689] (n=46); median absolute p(B) of B answers 0.998 [0.913, 1.000] (n=22); median six-way p(B) 0.998 [0.915, 1.000] (n=22)
+    silent failure NONE      late@14: share B among non-S NOT EVALUABLE (no items in the subset); median absolute p(B) of B answers NOT EVALUABLE (no items in the subset); median six-way p(B) NOT EVALUABLE (no items in the subset)
+    silent failure BEFORE    late@14: share B among non-S NOT EVALUABLE (no items in the subset); median absolute p(B) of B answers NOT EVALUABLE (no items in the subset); median six-way p(B) NOT EVALUABLE (no items in the subset)
+    silent failure POST-NULL late@14: share B among non-S NOT EVALUABLE (no items in the subset); median absolute p(B) of B answers NOT EVALUABLE (no items in the subset); median six-way p(B) NOT EVALUABLE (no items in the subset)
+    silent failure POST      late@14: share B among non-S 1.000 [1.000, 1.000] (n=1) (NOT EVALUABLE: undefined in 50.2 % of resamples (> 5 %)); median absolute p(B) of B answers 0.594 [0.594, 0.594] (n=1) (NOT EVALUABLE: undefined in 50.2 % of resamples (> 5 %)); median six-way p(B) 0.594 [0.594, 0.594] (n=1) (NOT EVALUABLE: undefined in 50.2 % of resamples (> 5 %))
+    silent failure AFTER     late@14: share B among non-S 1.000 [1.000, 1.000] (n=136); median absolute p(B) of B answers 1.000 [1.000, 1.000] (n=136); median six-way p(B) 1.000 [1.000, 1.000] (n=136)
+    silent failure LETTER    late@14: share B among non-S 0.913 [0.846, 0.970] (n=127); median absolute p(B) of B answers 1.000 [1.000, 1.000] (n=116); median six-way p(B) 1.000 [1.000, 1.000] (n=116)
+    inconsistency (NONE late answer S while AFTER late answer B; items competent in both) 2: 0.00 [0.00, 0.00] (n=148); 4: 0.01 [0.00, 0.04] (n=148); 6: 0.12 [0.04, 0.22] (n=148); 8: 0.12 [0.04, 0.22] (n=148); 10: 0.41 [0.29, 0.53] (n=148); 12: 0.41 [0.28, 0.53] (n=148); 14: 0.92 [0.86, 0.97] (n=148); 16: 1.00 [1.00, 1.00] (n=148); 18: 1.00 [1.00, 1.00] (n=148); 20: 1.00 [1.00, 1.00] (n=148); 22: 1.00 [1.00, 1.00] (n=148); 24: 0.97 [0.91, 1.00] (n=148); 26: 0.28 [0.17, 0.41] (n=148)
+  [qwen7 passages E, L = 28; competent items; containment] curves
+    NOM   late  4: 1.00 [1.00, 1.00] (n=171); 8: 1.00 [1.00, 1.00] (n=171); 13: 0.99 [0.96, 1.00] (n=171); 17: 0.80 [0.69, 0.89] (n=171)
+    NOM   early 4: 0.00 [0.00, 0.00] (n=171); 8: 0.00 [0.00, 0.00] (n=171); 13: 0.00 [0.00, 0.00] (n=171); 17: 0.00 [0.00, 0.00] (n=171)
+    NOM   Klate 4: 0.00 [0.00, 0.00] (n=171); 8: 0.00 [0.00, 0.00] (n=171); 13: 0.00 [0.00, 0.00] (n=171); 17: 0.00 [0.00, 0.00] (n=171)
+    NOM   Vlate 4: 0.56 [0.43, 0.69] (n=171); 8: 0.56 [0.43, 0.69] (n=171); 13: 0.56 [0.43, 0.69] (n=171); 17: 0.56 [0.42, 0.69] (n=171)
+    NOM   KV@0 1.00 [1.00, 1.00] (n=171); K@0 0.00 [0.00, 0.00] (n=171); V@0 0.56 [0.43, 0.68] (n=171)
+    OPTB  late  4: 1.00 [1.00, 1.00] (n=167); 8: 1.00 [1.00, 1.00] (n=167); 13: 1.00 [1.00, 1.00] (n=167); 17: 0.94 [0.89, 0.98] (n=167)
+    OPTB  early 4: 0.00 [0.00, 0.00] (n=167); 8: 0.00 [0.00, 0.00] (n=167); 13: 0.00 [0.00, 0.00] (n=167); 17: 0.02 [0.00, 0.05] (n=167)
+    OPTB  Klate 4: 0.00 [0.00, 0.00] (n=167); 8: 0.00 [0.00, 0.00] (n=167); 13: 0.00 [0.00, 0.00] (n=167); 17: 0.00 [0.00, 0.00] (n=167)
+    OPTB  Vlate 4: 0.98 [0.95, 1.00] (n=167); 8: 0.98 [0.94, 1.00] (n=167); 13: 0.96 [0.92, 0.99] (n=167); 17: 0.95 [0.91, 0.99] (n=167)
+    OPTB  KV@0 1.00 [1.00, 1.00] (n=167); K@0 0.00 [0.00, 0.00] (n=167); V@0 1.00 [1.00, 1.00] (n=167)
+    OPTA  late  4: 0.98 [0.95, 1.00] (n=166); 8: 0.94 [0.88, 0.99] (n=166); 13: 0.86 [0.77, 0.93] (n=166); 17: 0.01 [0.00, 0.03] (n=166)
+    OPTA  early 4: 0.00 [0.00, 0.00] (n=166); 8: 0.00 [0.00, 0.00] (n=166); 13: 0.07 [0.02, 0.13] (n=166); 17: 0.93 [0.88, 0.98] (n=166)
+    OPTA  Klate 4: 0.52 [0.42, 0.62] (n=166); 8: 0.21 [0.14, 0.29] (n=166); 13: 0.10 [0.05, 0.16] (n=166); 17: 0.00 [0.00, 0.00] (n=166)
+    OPTA  Vlate 4: 0.09 [0.04, 0.15] (n=166); 8: 0.06 [0.02, 0.11] (n=166); 13: 0.03 [0.00, 0.07] (n=166); 17: 0.01 [0.00, 0.04] (n=166)
+    OPTA  KV@0 0.99 [0.97, 1.00] (n=166); K@0 0.70 [0.60, 0.79] (n=166); V@0 0.11 [0.06, 0.18] (n=166)
+  [qwen7 passages R, L = 28; competent items; containment] curves
+    NOM   late  4: 0.99 [0.94, 1.00] (n=69); 8: 1.00 [1.00, 1.00] (n=69); 13: 1.00 [1.00, 1.00] (n=69); 17: 0.70 [0.56, 0.82] (n=69)
+    NOM   early 4: 0.00 [0.00, 0.00] (n=69); 8: 0.00 [0.00, 0.00] (n=69); 13: 0.00 [0.00, 0.00] (n=69); 17: 0.00 [0.00, 0.00] (n=69)
+    NOM   Klate 4: 0.00 [0.00, 0.00] (n=69); 8: 0.00 [0.00, 0.00] (n=69); 13: 0.00 [0.00, 0.00] (n=69); 17: 0.00 [0.00, 0.00] (n=69)
+    NOM   Vlate 4: 0.43 [0.27, 0.61] (n=69); 8: 0.43 [0.27, 0.61] (n=69); 13: 0.45 [0.29, 0.61] (n=69); 17: 0.46 [0.30, 0.63] (n=69)
+    NOM   KV@0 1.00 [1.00, 1.00] (n=69); K@0 0.00 [0.00, 0.00] (n=69); V@0 0.43 [0.27, 0.61] (n=69)
+    OPTB  late  4: 1.00 [1.00, 1.00] (n=67); 8: 0.99 [0.93, 1.00] (n=67); 13: 0.99 [0.94, 1.00] (n=67); 17: 0.93 [0.84, 0.99] (n=67)
+    OPTB  early 4: 0.00 [0.00, 0.00] (n=67); 8: 0.00 [0.00, 0.00] (n=67); 13: 0.00 [0.00, 0.00] (n=67); 17: 0.00 [0.00, 0.00] (n=67)
+    OPTB  Klate 4: 0.00 [0.00, 0.00] (n=67); 8: 0.00 [0.00, 0.00] (n=67); 13: 0.00 [0.00, 0.00] (n=67); 17: 0.00 [0.00, 0.00] (n=67)
+    OPTB  Vlate 4: 0.94 [0.86, 1.00] (n=67); 8: 0.93 [0.84, 1.00] (n=67); 13: 0.93 [0.84, 1.00] (n=67); 17: 0.91 [0.82, 0.99] (n=67)
+    OPTB  KV@0 1.00 [1.00, 1.00] (n=67); K@0 0.00 [0.00, 0.00] (n=67); V@0 0.94 [0.86, 1.00] (n=67)
+    OPTA  late  4: 0.99 [0.93, 1.00] (n=68); 8: 0.93 [0.81, 1.00] (n=68); 13: 0.82 [0.68, 0.94] (n=68); 17: 0.07 [0.01, 0.16] (n=68)
+    OPTA  early 4: 0.00 [0.00, 0.00] (n=68); 8: 0.01 [0.00, 0.07] (n=68); 13: 0.07 [0.00, 0.16] (n=68); 17: 0.94 [0.86, 1.00] (n=68)
+    OPTA  Klate 4: 0.54 [0.36, 0.70] (n=68); 8: 0.26 [0.11, 0.42] (n=68); 13: 0.10 [0.01, 0.23] (n=68); 17: 0.00 [0.00, 0.00] (n=68)
+    OPTA  Vlate 4: 0.12 [0.03, 0.23] (n=68); 8: 0.13 [0.04, 0.25] (n=68); 13: 0.12 [0.03, 0.23] (n=68); 17: 0.06 [0.00, 0.14] (n=68)
+    OPTA  KV@0 1.00 [1.00, 1.00] (n=68); K@0 0.76 [0.58, 0.90] (n=68); V@0 0.18 [0.07, 0.30] (n=68)
+  [qwen7 passages E LETA (exploratory, deadline-gated)]
+    LETA  late  4: 0.99 [0.97, 1.00] (n=167); 8: 0.92 [0.86, 0.97] (n=167); 13: 0.62 [0.52, 0.71] (n=167); 17: 0.00 [0.00, 0.00] (n=167)
+    LETA  early 4: 0.00 [0.00, 0.00] (n=167); 8: 0.02 [0.00, 0.06] (n=167); 13: 0.16 [0.09, 0.24] (n=167); 17: 1.00 [1.00, 1.00] (n=167)
+  [qwen7 edits, E9, 80 cores; generated answers over (core, t)] flip, stale, tau, r_K per row
+    @3 nat     r_K 1.000  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.99 [0.97, 1.00] (n=80) stale 0.00; LETTER 0.94 [0.88, 0.98] (n=80) stale 0.01; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.99 [0.97, 1.00] (n=80)
+    @3 E1      r_K 0.980  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.99 [0.97, 1.00] (n=80) stale 0.00; LETTER 0.92 [0.85, 0.97] (n=80) stale 0.01; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.99 [0.97, 1.00] (n=80)
+    @3 E4b     r_K 0.731  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.69 [0.57, 0.81] (n=80) stale 0.24; LETTER 0.45 [0.34, 0.56] (n=80) stale 0.27; POST 0.99 [0.97, 1.00] (n=80) stale 0.00; tau 0.69 [0.57, 0.81] (n=80)
+    @3 E1x0.5  r_K 0.458  NONE 0.31 [0.16, 0.49] (n=80) stale 0.69; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.04 [0.00, 0.09] (n=80) stale 0.90; POST 0.04 [0.00, 0.10] (n=80) stale 0.95; tau 0.00 [0.00, 0.00] (n=80)
+    @3 E1x0.75 r_K 0.830  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.91 [0.84, 0.97] (n=80) stale 0.07; LETTER 0.80 [0.71, 0.89] (n=80) stale 0.09; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.91 [0.84, 0.97] (n=80)
+    @3 E1x1.5  r_K 1.092  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.99 [0.96, 1.00] (n=80) stale 0.00; LETTER 0.89 [0.81, 0.95] (n=80) stale 0.01; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.99 [0.96, 1.00] (n=80)
+    @3 J0.25   r_K 0.250  NONE 0.00 [0.00, 0.00] (n=80) stale 1.00; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.94; POST 0.00 [0.00, 0.00] (n=80) stale 1.00; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @3 J0.5    r_K 0.500  NONE 0.47 [0.31, 0.64] (n=80) stale 0.51; AFTER 0.04 [0.01, 0.10] (n=80) stale 0.88; LETTER 0.04 [0.00, 0.09] (n=80) stale 0.71; POST 0.08 [0.03, 0.15] (n=80) stale 0.91; tau 0.09 [0.01, 0.20] (n=80)
+    @3 J0.65   r_K 0.650  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.44 [0.32, 0.56] (n=80) stale 0.35; LETTER 0.21 [0.12, 0.32] (n=80) stale 0.30; POST 0.96 [0.90, 0.99] (n=80) stale 0.01; tau 0.44 [0.32, 0.56] (n=80)
+    @3 J0.8    r_K 0.800  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.83 [0.75, 0.91] (n=80) stale 0.08; LETTER 0.60 [0.48, 0.72] (n=80) stale 0.08; POST 0.99 [0.97, 1.00] (n=80) stale 0.00; tau 0.83 [0.75, 0.91] (n=80)
+    @3 J0.9    r_K 0.900  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.96 [0.90, 0.99] (n=80) stale 0.02; LETTER 0.81 [0.72, 0.90] (n=80) stale 0.06; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.96 [0.90, 0.99] (n=80)
+    @3 J1.25   r_K 1.250  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 1.00 [1.00, 1.00] (n=80) stale 0.00; LETTER 0.93 [0.87, 0.97] (n=80) stale 0.01; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 1.00 [1.00, 1.00] (n=80)
+    @3 K1      r_K 1.000  NONE 0.00 [0.00, 0.00] (n=80) stale 0.97; AFTER 0.65 [0.51, 0.78] (n=80) stale 0.24; LETTER 0.72 [0.61, 0.83] (n=80) stale 0.05; POST 0.01 [0.00, 0.03] (n=80) stale 0.99; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @3 V1      r_K 0.000  NONE 0.98 [0.94, 1.00] (n=80) stale 0.00; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.87; POST 0.93 [0.86, 0.97] (n=80) stale 0.06; tau 0.00 [0.00, 0.00] (n=80)
+    @3 K0.5    r_K 0.500  NONE 0.00 [0.00, 0.00] (n=80) stale 1.00; AFTER 0.00 [0.00, 0.00] (n=80) stale 0.99; LETTER 0.01 [0.00, 0.04] (n=80) stale 0.88; POST 0.00 [0.00, 0.00] (n=80) stale 1.00; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @3 K0.8    r_K 0.800  NONE 0.00 [0.00, 0.00] (n=80) stale 0.99; AFTER 0.17 [0.08, 0.29] (n=80) stale 0.64; LETTER 0.36 [0.24, 0.49] (n=80) stale 0.21; POST 0.00 [0.00, 0.00] (n=80) stale 1.00; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @3 V0.5    r_K 0.000  NONE 0.05 [0.01, 0.11] (n=80) stale 0.95; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.93; POST 0.00 [0.00, 0.00] (n=80) stale 0.99; tau 0.00 [0.00, 0.00] (n=80)
+    @3 V0.8    r_K 0.000  NONE 0.94 [0.87, 1.00] (n=80) stale 0.01; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.91; POST 0.66 [0.51, 0.78] (n=80) stale 0.30; tau 0.00 [0.00, 0.00] (n=80)
+    @3 K0.5V1  r_K 0.500  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.42 [0.28, 0.56] (n=80) stale 0.47; LETTER 0.10 [0.04, 0.18] (n=80) stale 0.50; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.42 [0.28, 0.56] (n=80)
+    @3 K0.8V1  r_K 0.800  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.89 [0.82, 0.95] (n=80) stale 0.04; LETTER 0.67 [0.56, 0.77] (n=80) stale 0.09; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.89 [0.82, 0.95] (n=80)
+    @3 K1V0.5  r_K 1.000  NONE 0.92 [0.84, 0.99] (n=80) stale 0.07; AFTER 0.91 [0.84, 0.96] (n=80) stale 0.05; LETTER 0.86 [0.77, 0.93] (n=80) stale 0.03; POST 0.99 [0.95, 1.00] (n=80) stale 0.00; tau 0.99 [0.89, 1.10] (n=80)
+    @3 K1V0.8  r_K 1.000  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.99 [0.97, 1.00] (n=80) stale 0.00; LETTER 0.92 [0.85, 0.97] (n=80) stale 0.02; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.99 [0.97, 1.00] (n=80)
+    @3 CAA     r_K 0.980  NONE 0.59 [0.44, 0.74] (n=80) stale 0.00; AFTER 0.91 [0.84, 0.97] (n=80) stale 0.00; LETTER 0.10 [0.04, 0.17] (n=80) stale 0.44; POST 0.84 [0.75, 0.92] (n=80) stale 0.00; tau 1.53 [1.26, 1.96] (n=80)
+    @7 nat     r_K 1.000  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.93 [0.87, 0.98] (n=80) stale 0.03; LETTER 0.78 [0.68, 0.87] (n=80) stale 0.06; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.93 [0.87, 0.98] (n=80)
+    @7 E1      r_K 0.937  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.93 [0.87, 0.98] (n=80) stale 0.04; LETTER 0.76 [0.64, 0.86] (n=80) stale 0.07; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.93 [0.87, 0.98] (n=80)
+    @7 E4b     r_K 0.568  NONE 0.99 [0.97, 1.00] (n=80) stale 0.00; AFTER 0.30 [0.18, 0.43] (n=80) stale 0.61; LETTER 0.09 [0.03, 0.17] (n=80) stale 0.49; POST 0.96 [0.92, 0.99] (n=80) stale 0.02; tau 0.30 [0.18, 0.43] (n=80)
+    @7 E1x0.5  r_K 0.436  NONE 0.27 [0.16, 0.40] (n=80) stale 0.73; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.04 [0.00, 0.09] (n=80) stale 0.92; POST 0.02 [0.00, 0.05] (n=80) stale 0.98; tau 0.00 [0.00, 0.00] (n=80)
+    @7 E1x0.75 r_K 0.739  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.47 [0.34, 0.60] (n=80) stale 0.52; LETTER 0.39 [0.27, 0.52] (n=80) stale 0.49; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.47 [0.34, 0.60] (n=80)
+    @7 E1x1.5  r_K 1.105  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.92 [0.85, 0.97] (n=80) stale 0.00; LETTER 0.70 [0.58, 0.82] (n=80) stale 0.01; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.92 [0.85, 0.97] (n=80)
+    @7 J0.25   r_K 0.250  NONE 0.00 [0.00, 0.00] (n=80) stale 1.00; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.94; POST 0.00 [0.00, 0.00] (n=80) stale 1.00; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @7 J0.5    r_K 0.500  NONE 0.47 [0.32, 0.65] (n=80) stale 0.50; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.01 [0.00, 0.04] (n=80) stale 0.86; POST 0.02 [0.00, 0.05] (n=80) stale 0.96; tau 0.00 [0.00, 0.00] (n=80)
+    @7 J0.65   r_K 0.650  NONE 0.99 [0.97, 1.00] (n=80) stale 0.00; AFTER 0.19 [0.10, 0.29] (n=80) stale 0.69; LETTER 0.09 [0.03, 0.16] (n=80) stale 0.54; POST 0.87 [0.76, 0.95] (n=80) stale 0.11; tau 0.19 [0.10, 0.29] (n=80)
+    @7 J0.8    r_K 0.800  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.73 [0.62, 0.83] (n=80) stale 0.17; LETTER 0.38 [0.27, 0.50] (n=80) stale 0.20; POST 0.99 [0.97, 1.00] (n=80) stale 0.00; tau 0.73 [0.62, 0.83] (n=80)
+    @7 J0.9    r_K 0.900  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.86 [0.77, 0.93] (n=80) stale 0.07; LETTER 0.62 [0.49, 0.74] (n=80) stale 0.10; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.86 [0.77, 0.93] (n=80)
+    @7 J1.25   r_K 1.250  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 1.00 [1.00, 1.00] (n=80) stale 0.00; LETTER 0.87 [0.78, 0.94] (n=80) stale 0.02; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 1.00 [1.00, 1.00] (n=80)
+    @7 K1      r_K 1.000  NONE 0.00 [0.00, 0.00] (n=80) stale 0.97; AFTER 0.33 [0.22, 0.46] (n=80) stale 0.58; LETTER 0.54 [0.41, 0.67] (n=80) stale 0.20; POST 0.00 [0.00, 0.00] (n=80) stale 1.00; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @7 V1      r_K 0.000  NONE 0.98 [0.94, 1.00] (n=80) stale 0.00; AFTER 0.00 [0.00, 0.00] (n=80) stale 0.99; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.87; POST 0.93 [0.86, 0.98] (n=80) stale 0.05; tau 0.00 [0.00, 0.00] (n=80)
+    @7 K0.5    r_K 0.500  NONE 0.00 [0.00, 0.00] (n=80) stale 1.00; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.95; POST 0.00 [0.00, 0.00] (n=80) stale 1.00; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @7 K0.8    r_K 0.800  NONE 0.00 [0.00, 0.00] (n=80) stale 0.99; AFTER 0.04 [0.00, 0.09] (n=80) stale 0.91; LETTER 0.20 [0.11, 0.30] (n=80) stale 0.51; POST 0.00 [0.00, 0.00] (n=80) stale 1.00; tau nan [nan, nan] (n=80) (NOT EVALUABLE: undefined at the point)
+    @7 V0.5    r_K 0.000  NONE 0.04 [0.01, 0.09] (n=80) stale 0.96; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.93; POST 0.00 [0.00, 0.00] (n=80) stale 1.00; tau 0.00 [0.00, 0.00] (n=80)
+    @7 V0.8    r_K 0.000  NONE 0.94 [0.86, 1.00] (n=80) stale 0.01; AFTER 0.00 [0.00, 0.00] (n=80) stale 0.99; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.91; POST 0.67 [0.53, 0.79] (n=80) stale 0.29; tau 0.00 [0.00, 0.00] (n=80)
+    @7 K0.5V1  r_K 0.500  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.22 [0.11, 0.33] (n=80) stale 0.70; LETTER 0.05 [0.01, 0.11] (n=80) stale 0.64; POST 0.99 [0.96, 1.00] (n=80) stale 0.01; tau 0.22 [0.11, 0.33] (n=80)
+    @7 K0.8V1  r_K 0.800  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.84 [0.76, 0.92] (n=80) stale 0.08; LETTER 0.44 [0.32, 0.57] (n=80) stale 0.17; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.84 [0.76, 0.92] (n=80)
+    @7 K1V0.5  r_K 1.000  NONE 0.91 [0.83, 0.99] (n=80) stale 0.07; AFTER 0.79 [0.69, 0.88] (n=80) stale 0.13; LETTER 0.66 [0.54, 0.78] (n=80) stale 0.11; POST 0.97 [0.92, 1.00] (n=80) stale 0.02; tau 0.87 [0.74, 1.00] (n=80)
+    @7 K1V0.8  r_K 1.000  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.88 [0.81, 0.94] (n=80) stale 0.05; LETTER 0.76 [0.65, 0.87] (n=80) stale 0.07; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.88 [0.81, 0.94] (n=80)
+    @7 CAA     r_K 0.937  NONE 0.27 [0.15, 0.41] (n=80) stale 0.00; AFTER 0.89 [0.81, 0.97] (n=80) stale 0.00; LETTER 0.19 [0.08, 0.32] (n=80) stale 0.32; POST 0.56 [0.42, 0.69] (n=80) stale 0.00; tau 3.33 [2.22, 5.71] (n=80)
+    @11 nat     r_K 1.000  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.75 [0.61, 0.87] (n=80) stale 0.22; LETTER 0.22 [0.13, 0.32] (n=80) stale 0.25; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.75 [0.61, 0.87] (n=80)
+    @11 E1      r_K 0.846  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.64 [0.49, 0.78] (n=80) stale 0.32; LETTER 0.19 [0.10, 0.29] (n=80) stale 0.33; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.64 [0.49, 0.78] (n=80)
+    @11 E4b     r_K 0.472  NONE 0.88 [0.81, 0.93] (n=80) stale 0.04; AFTER 0.03 [0.00, 0.06] (n=80) stale 0.97; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.84; POST 0.78 [0.69, 0.85] (n=80) stale 0.19; tau 0.03 [0.00, 0.07] (n=80)
+    @11 CAA     r_K 0.846  NONE 0.82 [0.71, 0.91] (n=80) stale 0.00; AFTER 0.99 [0.97, 1.00] (n=80) stale 0.00; LETTER 0.13 [0.06, 0.22] (n=80) stale 0.76; POST 0.82 [0.72, 0.92] (n=80) stale 0.00; tau 1.21 [1.09, 1.38] (n=80)
+    @15 nat     r_K 1.000  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.94; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.00 [0.00, 0.00] (n=80)
+    @15 E1      r_K 0.812  NONE 1.00 [1.00, 1.00] (n=80) stale 0.00; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.94; POST 1.00 [1.00, 1.00] (n=80) stale 0.00; tau 0.00 [0.00, 0.00] (n=80)
+    @15 E4b     r_K 0.404  NONE 0.78 [0.64, 0.89] (n=80) stale 0.04; AFTER 0.00 [0.00, 0.00] (n=80) stale 1.00; LETTER 0.00 [0.00, 0.00] (n=80) stale 0.94; POST 0.59 [0.44, 0.73] (n=80) stale 0.36; tau 0.00 [0.00, 0.00] (n=80)
+    @15 CAA     r_K 0.812  NONE 0.96 [0.89, 1.00] (n=80) stale 0.00; AFTER 1.00 [1.00, 1.00] (n=80) stale 0.00; LETTER 0.09 [0.03, 0.17] (n=80) stale 0.77; POST 0.95 [0.88, 1.00] (n=80) stale 0.00; tau 1.04 [1.00, 1.12] (n=80)
+    psi (nats) NONE@3: psi_J(0.25) 0.24 [0.22, 0.25] (n=80); psi_J(0.5) 0.58 [0.56, 0.60] (n=80); psi_J(0.65) 0.76 [0.75, 0.78] (n=80); psi_J(0.8) 0.90 [0.89, 0.90] (n=80); psi_J(0.9) 0.96 [0.95, 0.96] (n=80); psi_J(1.25) 1.05 [1.04, 1.05] (n=80); psi_K(0.5) 0.42 [0.36, 0.49] (n=80); psi_K(0.8) 0.75 [0.71, 0.80] (n=80); psi_V(0.5) 0.59 [0.57, 0.60] (n=80); psi_V(0.8) 0.89 [0.88, 0.90] (n=80)
+    psi (nats) AFTER@3: psi_J(0.25) 0.07 [0.06, 0.08] (n=80); psi_J(0.5) 0.28 [0.23, 0.32] (n=80); psi_J(0.65) 0.61 [0.55, 0.66] (n=80); psi_J(0.8) 0.85 [0.82, 0.88] (n=80); psi_J(0.9) 0.94 [0.93, 0.96] (n=80); psi_J(1.25) 1.03 [1.02, 1.05] (n=80); psi_K(0.5) 0.08 [0.06, 0.10] (n=80); psi_K(0.8) 0.50 [0.44, 0.57] (n=80); psi_V(0.5) 0.45 [0.43, 0.48] (n=80); psi_V(0.8) 0.77 [0.75, 0.79] (n=80)
+    psi (nats) LETTER@3: psi_J(0.25) 0.01 [0.00, 0.02] (n=80); psi_J(0.5) 0.11 [0.06, 0.17] (n=80); psi_J(0.65) 0.40 [0.30, 0.50] (n=80); psi_J(0.8) 0.80 [0.72, 0.87] (n=80); psi_J(0.9) 0.94 [0.90, 0.97] (n=80); psi_J(1.25) 0.99 [0.98, 1.01] (n=80); psi_K(0.5) 0.06 [0.03, 0.11] (n=80); psi_K(0.8) 0.63 [0.52, 0.73] (n=80); psi_V(0.5) 0.43 [0.18, 0.57] (n=80); psi_V(0.8) 0.80 [0.66, 0.98] (n=80)
+    psi (nats) POST@3: psi_J(0.25) 0.20 [0.19, 0.21] (n=80); psi_J(0.5) 0.53 [0.50, 0.55] (n=80); psi_J(0.65) 0.71 [0.70, 0.73] (n=80); psi_J(0.8) 0.86 [0.86, 0.87] (n=80); psi_J(0.9) 0.94 [0.94, 0.95] (n=80); psi_J(1.25) 1.08 [1.08, 1.09] (n=80); psi_K(0.5) 0.01 [-0.03, 0.05] (n=80); psi_K(0.8) 0.27 [0.20, 0.34] (n=80); psi_V(0.5) 0.59 [0.57, 0.61] (n=80); psi_V(0.8) 0.87 [0.86, 0.88] (n=80)
+    psi (nats) NONE@7: psi_J(0.25) 0.24 [0.22, 0.25] (n=80); psi_J(0.5) 0.58 [0.56, 0.61] (n=80); psi_J(0.65) 0.76 [0.75, 0.78] (n=80); psi_J(0.8) 0.90 [0.89, 0.90] (n=80); psi_J(0.9) 0.96 [0.95, 0.96] (n=80); psi_J(1.25) 1.05 [1.04, 1.05] (n=80); psi_K(0.5) 0.43 [0.36, 0.50] (n=80); psi_K(0.8) 0.76 [0.72, 0.82] (n=80); psi_V(0.5) 0.59 [0.57, 0.60] (n=80); psi_V(0.8) 0.89 [0.88, 0.90] (n=80)
+    psi (nats) AFTER@7: psi_J(0.25) 0.07 [0.06, 0.08] (n=80); psi_J(0.5) 0.21 [0.18, 0.25] (n=80); psi_J(0.65) 0.50 [0.44, 0.56] (n=80); psi_J(0.8) 0.80 [0.76, 0.83] (n=80); psi_J(0.9) 0.93 [0.91, 0.94] (n=80); psi_J(1.25) 1.08 [1.06, 1.10] (n=80); psi_K(0.5) 0.09 [0.07, 0.12] (n=80); psi_K(0.8) 0.44 [0.38, 0.50] (n=80); psi_V(0.5) 0.46 [0.43, 0.48] (n=80); psi_V(0.8) 0.78 [0.75, 0.80] (n=80)
+    psi (nats) LETTER@7: psi_J(0.25) 0.01 [0.00, 0.02] (n=80); psi_J(0.5) 0.08 [0.04, 0.12] (n=80); psi_J(0.65) 0.28 [0.21, 0.36] (n=80); psi_J(0.8) 0.69 [0.60, 0.77] (n=80); psi_J(0.9) 0.89 [0.85, 0.92] (n=80); psi_J(1.25) 1.08 [1.03, 1.16] (n=80); psi_K(0.5) 0.06 [0.03, 0.09] (n=80); psi_K(0.8) 0.51 [0.42, 0.60] (n=80); psi_V(0.5) 0.42 [0.22, 0.55] (n=80); psi_V(0.8) 0.68 [0.50, 0.80] (n=80)
+    psi (nats) POST@7: psi_J(0.25) 0.21 [0.20, 0.22] (n=80); psi_J(0.5) 0.51 [0.49, 0.53] (n=80); psi_J(0.65) 0.70 [0.68, 0.71] (n=80); psi_J(0.8) 0.85 [0.84, 0.86] (n=80); psi_J(0.9) 0.94 [0.93, 0.94] (n=80); psi_J(1.25) 1.09 [1.09, 1.11] (n=80); psi_K(0.5) 0.01 [-0.04, 0.06] (n=80); psi_K(0.8) 0.23 [0.14, 0.31] (n=80); psi_V(0.5) 0.59 [0.57, 0.61] (n=80); psi_V(0.8) 0.87 [0.87, 0.88] (n=80)
+    psi (logits) NONE@3: psi_J(0.25) 0.23 [0.21, 0.25] (n=80); psi_J(0.5) 0.57 [0.54, 0.59] (n=80); psi_J(0.65) 0.75 [0.74, 0.77] (n=80); psi_J(0.8) 0.89 [0.88, 0.90] (n=80); psi_J(0.9) 0.95 [0.95, 0.96] (n=80); psi_J(1.25) 1.06 [1.05, 1.06] (n=80); psi_K(0.5) 0.41 [0.34, 0.47] (n=80); psi_K(0.8) 0.77 [0.72, 0.81] (n=80); psi_V(0.5) 0.58 [0.57, 0.60] (n=80); psi_V(0.8) 0.88 [0.87, 0.89] (n=80)
+    psi (logits) AFTER@3: psi_J(0.25) 0.07 [0.06, 0.08] (n=80); psi_J(0.5) 0.28 [0.23, 0.32] (n=80); psi_J(0.65) 0.61 [0.55, 0.66] (n=80); psi_J(0.8) 0.85 [0.82, 0.88] (n=80); psi_J(0.9) 0.94 [0.93, 0.96] (n=80); psi_J(1.25) 1.03 [1.02, 1.05] (n=80); psi_K(0.5) 0.08 [0.06, 0.10] (n=80); psi_K(0.8) 0.50 [0.44, 0.57] (n=80); psi_V(0.5) 0.45 [0.43, 0.48] (n=80); psi_V(0.8) 0.77 [0.75, 0.79] (n=80)
+    psi (logits) LETTER@3: psi_J(0.25) 0.01 [0.00, 0.02] (n=80); psi_J(0.5) 0.11 [0.06, 0.17] (n=80); psi_J(0.65) 0.40 [0.30, 0.50] (n=80); psi_J(0.8) 0.80 [0.72, 0.87] (n=80); psi_J(0.9) 0.94 [0.90, 0.97] (n=80); psi_J(1.25) 0.99 [0.98, 1.01] (n=80); psi_K(0.5) 0.06 [0.03, 0.11] (n=80); psi_K(0.8) 0.63 [0.52, 0.73] (n=80); psi_V(0.5) 0.43 [0.18, 0.57] (n=80); psi_V(0.8) 0.80 [0.66, 0.98] (n=80)
+    psi (logits) POST@3: psi_J(0.25) 0.20 [0.19, 0.21] (n=80); psi_J(0.5) 0.53 [0.50, 0.55] (n=80); psi_J(0.65) 0.71 [0.70, 0.73] (n=80); psi_J(0.8) 0.86 [0.85, 0.87] (n=80); psi_J(0.9) 0.94 [0.94, 0.95] (n=80); psi_J(1.25) 1.10 [1.08, 1.11] (n=80); psi_K(0.5) 0.01 [-0.03, 0.06] (n=80); psi_K(0.8) 0.28 [0.20, 0.36] (n=80); psi_V(0.5) 0.59 [0.58, 0.61] (n=80); psi_V(0.8) 0.87 [0.87, 0.88] (n=80)
+    psi (logits) NONE@7: psi_J(0.25) 0.23 [0.21, 0.25] (n=80); psi_J(0.5) 0.57 [0.54, 0.59] (n=80); psi_J(0.65) 0.76 [0.74, 0.77] (n=80); psi_J(0.8) 0.89 [0.88, 0.90] (n=80); psi_J(0.9) 0.95 [0.95, 0.96] (n=80); psi_J(1.25) 1.06 [1.05, 1.07] (n=80); psi_K(0.5) 0.41 [0.35, 0.47] (n=80); psi_K(0.8) 0.76 [0.72, 0.80] (n=80); psi_V(0.5) 0.58 [0.57, 0.60] (n=80); psi_V(0.8) 0.88 [0.87, 0.89] (n=80)
+    psi (logits) AFTER@7: psi_J(0.25) 0.07 [0.06, 0.08] (n=80); psi_J(0.5) 0.21 [0.18, 0.25] (n=80); psi_J(0.65) 0.50 [0.44, 0.56] (n=80); psi_J(0.8) 0.80 [0.76, 0.83] (n=80); psi_J(0.9) 0.93 [0.91, 0.94] (n=80); psi_J(1.25) 1.08 [1.06, 1.10] (n=80); psi_K(0.5) 0.09 [0.07, 0.12] (n=80); psi_K(0.8) 0.44 [0.38, 0.50] (n=80); psi_V(0.5) 0.46 [0.43, 0.48] (n=80); psi_V(0.8) 0.78 [0.75, 0.80] (n=80)
+    psi (logits) LETTER@7: psi_J(0.25) 0.01 [0.00, 0.02] (n=80); psi_J(0.5) 0.08 [0.04, 0.12] (n=80); psi_J(0.65) 0.28 [0.21, 0.36] (n=80); psi_J(0.8) 0.69 [0.60, 0.77] (n=80); psi_J(0.9) 0.89 [0.85, 0.92] (n=80); psi_J(1.25) 1.08 [1.03, 1.16] (n=80); psi_K(0.5) 0.06 [0.03, 0.09] (n=80); psi_K(0.8) 0.51 [0.42, 0.60] (n=80); psi_V(0.5) 0.42 [0.22, 0.55] (n=80); psi_V(0.8) 0.68 [0.50, 0.80] (n=80)
+    psi (logits) POST@7: psi_J(0.25) 0.20 [0.19, 0.21] (n=80); psi_J(0.5) 0.51 [0.49, 0.53] (n=80); psi_J(0.65) 0.70 [0.68, 0.71] (n=80); psi_J(0.8) 0.85 [0.84, 0.86] (n=80); psi_J(0.9) 0.94 [0.93, 0.94] (n=80); psi_J(1.25) 1.10 [1.09, 1.11] (n=80); psi_K(0.5) 0.01 [-0.04, 0.07] (n=80); psi_K(0.8) 0.24 [0.14, 0.33] (n=80); psi_V(0.5) 0.59 [0.58, 0.61] (n=80); psi_V(0.8) 0.88 [0.87, 0.88] (n=80)
+  Passage predictions on the held-out R items (decide nothing) and in strict match (sensitivity):
+  P1p [R, containment]  -> NOT SUPPORTED (NOT SUPPORTED in: llama8)
+      mistral7: SUPPORTED AT THE POINT; llama8: NOT SUPPORTED; qwen7: SUPPORTED
+  P2p [R, containment]  -> SUPPORTED AT THE POINT [2 of 3 at the point]
+      mistral7: SUPPORTED; llama8: SUPPORTED AT THE POINT; qwen7: NOT SUPPORTED
+  P3p [R, containment]  -> NOT SUPPORTED (NOT SUPPORTED in: qwen7)
+      mistral7: SUPPORTED; llama8: SUPPORTED AT THE POINT; qwen7: NOT SUPPORTED
+  P1p [E, strict]  -> NOT SUPPORTED (NOT SUPPORTED in: llama8)
+      mistral7: SUPPORTED AT THE POINT; llama8: NOT SUPPORTED; qwen7: SUPPORTED
+  P2p [E, strict]  -> SUPPORTED [2 of 3 at the point]
+      mistral7: SUPPORTED; llama8: SUPPORTED; qwen7: NOT SUPPORTED
+  P3p [E, strict]  -> NOT SUPPORTED (NOT SUPPORTED in: qwen7)
+      mistral7: SUPPORTED; llama8: SUPPORTED AT THE POINT; qwen7: NOT SUPPORTED
+  P1p [R, strict]  -> NOT SUPPORTED (NOT SUPPORTED in: llama8)
+      mistral7: SUPPORTED AT THE POINT; llama8: NOT SUPPORTED; qwen7: SUPPORTED
+  P2p [R, strict]  -> SUPPORTED AT THE POINT [2 of 3 at the point]
+      mistral7: SUPPORTED; llama8: SUPPORTED AT THE POINT; qwen7: NOT SUPPORTED
+  P3p [R, strict]  -> NOT SUPPORTED (NOT SUPPORTED in: qwen7)
+      mistral7: SUPPORTED; llama8: SUPPORTED AT THE POINT; qwen7: NOT SUPPORTED
+
+#### EXPLORATORY (not scored)
+  E-argmax versions (the six-way E argmax of the trie scores instead of the generated answer):
+  P1s [E-argmax]  -> SUPPORTED AT THE POINT
+      mistral7: SUPPORTED; llama8: SUPPORTED AT THE POINT; qwen7: SUPPORTED
+  P2s [E-argmax]  -> SUPPORTED
+      mistral7: SUPPORTED; llama8: SUPPORTED; qwen7: SUPPORTED
+  P3s [E-argmax]  -> NOT SUPPORTED (NOT SUPPORTED in: mistral7)
+      mistral7: NOT SUPPORTED; llama8: SUPPORTED; qwen7: SUPPORTED
+  POST [E-argmax]  -> NOT SUPPORTED (NOT SUPPORTED in: mistral7)
+      mistral7: NOT SUPPORTED; llama8: SUPPORTED AT THE POINT; qwen7: SUPPORTED
+  All items instead of the competent items:
+  P1s [all items]  -> SUPPORTED AT THE POINT
+      mistral7: SUPPORTED; llama8: SUPPORTED AT THE POINT; qwen7: SUPPORTED
+  P2s [all items]  -> SUPPORTED
+      mistral7: SUPPORTED; llama8: SUPPORTED; qwen7: SUPPORTED
+  P3s [all items]  -> NOT SUPPORTED (NOT SUPPORTED in: mistral7)
+      mistral7: NOT SUPPORTED; llama8: SUPPORTED; qwen7: SUPPORTED
+  POST [all items]  -> NOT SUPPORTED (NOT SUPPORTED in: mistral7)
+      mistral7: NOT SUPPORTED; llama8: SUPPORTED AT THE POINT; qwen7: SUPPORTED
+  P1p [all items]  -> NOT SUPPORTED (NOT SUPPORTED in: mistral7, llama8)
+      mistral7: NOT SUPPORTED; llama8: NOT SUPPORTED; qwen7: SUPPORTED
+  P3p [all items]  -> NOT SUPPORTED (NOT SUPPORTED in: llama8, qwen7)
+      mistral7: SUPPORTED; llama8: NOT SUPPORTED; qwen7: NOT SUPPORTED
+  P2p [all items]  -> SUPPORTED [2 of 3 at the point]
+      mistral7: SUPPORTED; llama8: SUPPORTED; qwen7: NOT SUPPORTED
+  Per lexicon and per list order (B listed before S, or S before B) at l_b (late and early AFTER / NONE flips):
+    mistral7 lexicon 1  : AFTER late 0.38 [0.20, 0.57] (n=74); AFTER early 0.64 [0.49, 0.79] (n=74); LETTER late 0.26 [0.11, 0.43] (n=70); LETTER early 0.70 [0.56, 0.84] (n=70); NONE late 1.00 [1.00, 1.00] (n=75); NONE early 0.00 [0.00, 0.00] (n=75); BEFORE late 1.00 [1.00, 1.00] (n=74); BEFORE early 0.00 [0.00, 0.00] (n=74)
+    mistral7 lexicon 2  : AFTER late 0.40 [0.25, 0.55] (n=75); AFTER early 0.64 [0.48, 0.79] (n=75); LETTER late 0.16 [0.07, 0.28] (n=68); LETTER early 0.75 [0.58, 0.90] (n=68); NONE late 1.00 [1.00, 1.00] (n=75); NONE early 0.00 [0.00, 0.00] (n=75); BEFORE late 1.00 [1.00, 1.00] (n=75); BEFORE early 0.00 [0.00, 0.00] (n=75)
+    mistral7 B before S : AFTER late 0.15 [0.04, 0.28] (n=55); AFTER early 0.38 [0.22, 0.56] (n=55); LETTER late 0.06 [0.00, 0.19] (n=49); LETTER early 0.51 [0.33, 0.71] (n=49); NONE late 1.00 [1.00, 1.00] (n=55); NONE early 0.00 [0.00, 0.00] (n=55); BEFORE late 1.00 [1.00, 1.00] (n=55); BEFORE early 0.00 [0.00, 0.00] (n=55)
+    mistral7 S before B : AFTER late 0.53 [0.38, 0.68] (n=94); AFTER early 0.79 [0.67, 0.90] (n=94); LETTER late 0.29 [0.17, 0.43] (n=89); LETTER early 0.84 [0.73, 0.94] (n=89); NONE late 1.00 [1.00, 1.00] (n=95); NONE early 0.00 [0.00, 0.00] (n=95); BEFORE late 1.00 [1.00, 1.00] (n=94); BEFORE early 0.00 [0.00, 0.00] (n=94)
+    llama8   lexicon 1  : AFTER late 0.12 [0.04, 0.24] (n=75); AFTER early 0.69 [0.54, 0.84] (n=75); LETTER late 0.03 [0.00, 0.09] (n=75); LETTER early 0.97 [0.92, 1.00] (n=75); NONE late 1.00 [1.00, 1.00] (n=75); NONE early 0.00 [0.00, 0.00] (n=75); BEFORE late 1.00 [1.00, 1.00] (n=75); BEFORE early 0.00 [0.00, 0.00] (n=75)
+    llama8   lexicon 2  : AFTER late 0.15 [0.04, 0.26] (n=75); AFTER early 0.96 [0.88, 1.00] (n=75); LETTER late 0.04 [0.00, 0.10] (n=75); LETTER early 0.99 [0.94, 1.00] (n=75); NONE late 1.00 [1.00, 1.00] (n=75); NONE early 0.00 [0.00, 0.00] (n=75); BEFORE late 1.00 [1.00, 1.00] (n=75); BEFORE early 0.00 [0.00, 0.00] (n=75)
+    llama8   B before S : AFTER late 0.20 [0.08, 0.35] (n=55); AFTER early 0.89 [0.77, 0.98] (n=55); LETTER late 0.04 [0.00, 0.12] (n=55); LETTER early 0.98 [0.92, 1.00] (n=55); NONE late 1.00 [1.00, 1.00] (n=55); NONE early 0.00 [0.00, 0.00] (n=55); BEFORE late 1.00 [1.00, 1.00] (n=55); BEFORE early 0.00 [0.00, 0.00] (n=55)
+    llama8   S before B : AFTER late 0.09 [0.03, 0.18] (n=95); AFTER early 0.79 [0.66, 0.90] (n=95); LETTER late 0.03 [0.00, 0.09] (n=95); LETTER early 0.98 [0.93, 1.00] (n=95); NONE late 1.00 [1.00, 1.00] (n=95); NONE early 0.00 [0.00, 0.00] (n=95); BEFORE late 1.00 [1.00, 1.00] (n=95); BEFORE early 0.00 [0.00, 0.00] (n=95)
+    qwen7    lexicon 1  : AFTER late 0.09 [0.01, 0.19] (n=75); AFTER early 0.85 [0.73, 0.95] (n=75); LETTER late 0.06 [0.00, 0.14] (n=69); LETTER early 0.86 [0.72, 0.95] (n=69); NONE late 1.00 [1.00, 1.00] (n=75); NONE early 0.00 [0.00, 0.00] (n=75); BEFORE late 1.00 [1.00, 1.00] (n=75); BEFORE early 0.00 [0.00, 0.00] (n=75)
+    qwen7    lexicon 2  : AFTER late 0.07 [0.01, 0.15] (n=73); AFTER early 0.89 [0.78, 0.98] (n=73); LETTER late 0.09 [0.02, 0.19] (n=68); LETTER early 0.84 [0.70, 0.95] (n=68); NONE late 1.00 [1.00, 1.00] (n=75); NONE early 0.00 [0.00, 0.00] (n=75); BEFORE late 1.00 [1.00, 1.00] (n=73); BEFORE early 0.00 [0.00, 0.00] (n=73)
+    qwen7    B before S : AFTER late 0.07 [0.00, 0.19] (n=54); AFTER early 0.93 [0.83, 1.00] (n=54); LETTER late 0.00 [0.00, 0.00] (n=49); LETTER early 0.80 [0.63, 0.93] (n=49); NONE late 1.00 [1.00, 1.00] (n=55); NONE early 0.00 [0.00, 0.00] (n=55); BEFORE late 1.00 [1.00, 1.00] (n=53); BEFORE early 0.00 [0.00, 0.00] (n=53)
+    qwen7    S before B : AFTER late 0.09 [0.02, 0.16] (n=94); AFTER early 0.84 [0.73, 0.93] (n=94); LETTER late 0.11 [0.04, 0.20] (n=88); LETTER early 0.88 [0.76, 0.96] (n=88); NONE late 1.00 [1.00, 1.00] (n=95); NONE early 0.00 [0.00, 0.00] (n=95); BEFORE late 1.00 [1.00, 1.00] (n=95); BEFORE early 0.00 [0.00, 0.00] (n=95)
+  Stage 8a's OPTA K_S@0.3L decision-token share reproduced by Klate@round(0.3 L) (E items, all items, argmax over the decision tokens; stage 8a: results/gpu_stage8a/explore/<key>.json, part onset_piece, row K_S@on):
+    mistral7 stage 9 OPTA Klate@10 0.005 [0.000, 0.025] (n=185) against stage 8a K_S@on 0.005 (n=185)
+    llama8   stage 9 OPTA Klate@10 0.038 [0.006, 0.077] (n=185) against stage 8a K_S@on 0.038 (n=185)
+    qwen7    stage 9 OPTA Klate@8 0.195 [0.126, 0.270] (n=185) against stage 8a K_S@on 0.195 (n=185)
+
+#### SUMMARY
+  Predictions (combined over the models; per model in PREDICTIONS):
+    P1    NOT SUPPORTED            mistral7 SUPPORTED AT THE POINT, llama8 NOT SUPPORTED, qwen7 SUPPORTED
+    P1s   SUPPORTED AT THE POINT   mistral7 SUPPORTED, llama8 SUPPORTED AT THE POINT, qwen7 SUPPORTED
+    P1p   NOT SUPPORTED            mistral7 SUPPORTED AT THE POINT, llama8 NOT SUPPORTED, qwen7 SUPPORTED
+    P2    SUPPORTED                mistral7 SUPPORTED, llama8 SUPPORTED, qwen7 SUPPORTED
+    P2s   SUPPORTED                mistral7 SUPPORTED, llama8 SUPPORTED, qwen7 SUPPORTED
+    P2p   SUPPORTED                mistral7 SUPPORTED, llama8 SUPPORTED, qwen7 NOT SUPPORTED
+    P3    NOT SUPPORTED            mistral7 NOT SUPPORTED, llama8 SUPPORTED AT THE POINT, qwen7 NOT SUPPORTED
+    P3s   NOT SUPPORTED            mistral7 NOT SUPPORTED, llama8 SUPPORTED, qwen7 SUPPORTED
+    P3p   NOT SUPPORTED            mistral7 SUPPORTED, llama8 SUPPORTED AT THE POINT, qwen7 NOT SUPPORTED
+    P4    SUPPORTED                mistral7 SUPPORTED, llama8 SUPPORTED, qwen7 SUPPORTED
+    P5a   NOT SUPPORTED            mistral7 SUPPORTED AT THE POINT, llama8 SUPPORTED AT THE POINT, qwen7 NOT SUPPORTED
+    P5b   NOT SUPPORTED            qwen7 SUPPORTED AT THE POINT, mistral7 NOT SUPPORTED
+    POST  NOT SUPPORTED            mistral7 NOT SUPPORTED, llama8 SUPPORTED AT THE POINT, qwen7 SUPPORTED
+    B1    NOT SUPPORTED            mistral7 NOT SUPPORTED, llama8 NOT SUPPORTED, qwen7 NOT SUPPORTED
+    B2    NOT SUPPORTED            mistral7 NOT SUPPORTED, llama8 NOT SUPPORTED, qwen7 NOT SUPPORTED
+    B3    SUPPORTED                mistral7 SUPPORTED, llama8 SUPPORTED, qwen7 SUPPORTED
+    P5c   mistral7 TRANSFERS, llama8 TRANSFERS, qwen7 TRANSFERS
+    (P2 per model: the stories part P2s alone; the passages part P2p is decided over the models (2 of 3 at the point), not per model)
+  Falsifiers (at the point, any model):
+    F1    not triggered  mistral7 not triggered, llama8 not triggered, qwen7 not triggered
+    F2s   not triggered  mistral7 not triggered, llama8 not triggered, qwen7 not triggered
+    F2p   TRIGGERED      mistral7 not triggered, llama8 not triggered, qwen7 TRIGGERED
+    F2    TRIGGERED      
+    F3    not triggered  mistral7 not triggered, llama8 not triggered, qwen7 not triggered
+    B-F1  not triggered  mistral7 not triggered, llama8 not triggered, qwen7 not triggered
+    B-F2  not triggered  mistral7 not triggered, llama8 not triggered, qwen7 not triggered
+  Totals over P1-P4, P5a, P5b, POST, B1-B3: 3 SUPPORTED, 0 SUPPORTED AT THE POINT, 7 NOT SUPPORTED, 0 NOT EVALUABLE
+  Pre-written readings (note section 6) that the outcome selects:
+    - F2 triggers: report only the evaluation warning ("intervention verdicts depend on the answer format"), in the appendix, with no mechanism claim.
+    - P5c transfers: state the claim for single-site edits, patching and KV-cache edits only.
+    - Direction B: describe the convexity without a threshold claim (B1 NOT SUPPORTED, B2 NOT SUPPORTED, B3 SUPPORTED; B-F1 not triggered, B-F2 not triggered). The failed channel-ratio law stays reported as failed.
+  Checks: OK; FP32 gate: True
+  figure tables written: fig_window.csv, fig_edits.csv, fig_dose.csv in results/gpu_stage9

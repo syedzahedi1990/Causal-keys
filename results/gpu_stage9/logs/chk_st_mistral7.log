@@ -1,0 +1,2 @@
+==== 2026-10-21T14:45:26Z python experiments/stage9_stories.py --stage check --model /root/stage8_models/mistral7 --key mistral7 --out results/gpu_stage9 --reserve-min 251
+check PASS: 0 failures []; trie nodes {'N9': [83, 116], 'C': [83, 116]}

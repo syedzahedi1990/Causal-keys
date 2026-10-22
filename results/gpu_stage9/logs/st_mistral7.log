@@ -1,0 +1,10 @@
+==== 2026-10-21T14:50:23Z python experiments/stage9_stories.py --stage eval --model /root/stage8_models/mistral7 --key mistral7 --out results/gpu_stage9 --reserve-min 226
+lb file results/gpu_stage9/lb/mistral7.json sha256 33a483c9e284fb81433f50410f880cf67569ef83f908c52d33ddc74d0ed995a2: l_b = 8
+frames file results/gpu_stage8b/frames/mistral7.json sha256 9434618bf9d10464c1daafa9fe8b6fd45cb11596b8cb668e75eebdfdb6ccb953: frames []; G3 results/gpu_stage8b/g3/mistral7.json -> scorer trie
+  NONE: 150 items (200s)
+  BEFORE: 150 items (221s)
+  POST-NULL: 150 items (229s)
+  POST: 150 items (224s)
+  AFTER: 150 items (210s)
+  LETTER: 150 items (165s)
+wrote results/gpu_stage9/stories/mistral7.json (formats not run [])

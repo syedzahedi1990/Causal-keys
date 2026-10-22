@@ -1,0 +1,3 @@
+==== 2026-10-21T18:40:50Z python experiments/stage9_passages.py --stage eval --formats LETA --splits E --squad results/gpu_stage8a/squad/dev-v1.1.json --model /root/stage8_models/qwen7 --key qwen7 --out results/gpu_stage9 --reserve-min 10
+[qwen7] E/LETA: 185 items (163s)
+wrote results/gpu_stage9/passages/qwen7_LETA.json (181s)

@@ -77,4 +77,18 @@
     the runs, the verdict table and per-model results.
   - **Checks.** Independent checks of the numbers (S9 macros asserted against the score file), the claims, anonymity
     and a reviewer's reading came before the final fix pass. The main text is 8.00 pages.
+- **v6 estimates** (`paper2_v6_estimates.pdf`, built from `paper/main_estimates.tex`, which inputs
+  `paper/sections/est/` and the same shared appendix and `numbers.tex` as v6). The same results as v6, with the main
+  text organized around estimates and 95 % intervals rather than verdicts against preset thresholds.
+  - **Where the verdicts are.** The \rsk marks and "predicted; supported / not supported" parentheticals are out of
+    the main text. A Setup paragraph says the analyses were preregistered (stages 1-8) or frozen in a dated note
+    (stage 9) and points to every verdict, including the failures. The abstract keeps the risky tally that entry J
+    requires, and stage 9's 3 of 10.
+  - **Tables.** Table 2 is a per-model table of the stage-9 key estimates, and the v6 tally table moves to a short
+    note before the appendix (`sections/est/app_version.tex`).
+  - **Near misses** are given by their estimates and intervals.
+  - **Restrictions kept.** The pre-written-reading restrictions stand: passages as an evaluation warning, the steering
+    scope (letters), and no dose threshold.
+  - **Checks.** Independent number, honesty and reviewer checks were applied, with 10 must-fixes. The main text is
+    8 pages.
 

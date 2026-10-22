@@ -1,0 +1,72 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}                                 % >{...} column specs (tables/tab_stage9.tex)
+\usepackage{hyperref}
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+\usepackage{icml2026}          % anonymous submission mode
+\usepackage{amsmath,amssymb,mathtools,amsthm}
+\usepackage[capitalize,noabbrev]{cleveref}
+\usepackage{xfp}                                   % \fpeval for \pct
+
+% ---- notation shared by all sections
+\newcommand{\pct}[1]{\fpeval{round(100*(#1),0)}\,\%}
+\newcommand{\pctn}[1]{\fpeval{round(100*(#1),0)}}
+\newcommand{\fmtOpt}{\textsc{options-after}}
+\newcommand{\fmtListA}{\textsc{list-after}}
+\newcommand{\fmtLetter}{\textsc{letters-after}}
+\newcommand{\fmtPost}{\textsc{sentence-after}}
+\newcommand{\fmtNull}{\textsc{null-sentence}}
+\newcommand{\fmtSentB}{\textsc{sentence-before}}
+\newcommand{\fmtNone}{\textsc{no-mention}}
+\newcommand{\fmtBefore}{\textsc{list-before}}
+\newcommand{\rsk}{\textsuperscript{\textsf{R}}}   % a risky prediction; used only by the shared appendix (crosswalk)
+% ---- estimates: an estimate with its 95 % interval, inline (\ci) and stacked in a table cell (\cist);
+%      wrap negative macro values in $...$ when passing them
+\newcommand{\ci}[3]{#1 [#2,\,#3]}
+\newcommand{\cist}[3]{\begin{tabular}[t]{@{}c@{}}#1\\[-2pt]{\tiny[#2,\,#3]}\end{tabular}}
+\input{numbers}
+
+\icmltitlerunning{Looked Up or Copied?}
+
+\begin{document}
+
+\twocolumn[
+  \icmltitle{Looked Up or Copied? Where the Candidates Are Named Decides\texorpdfstring{\\}{ }How---and When---a Model Reads an In-Context Value}
+  \icmlsetsymbol{equal}{*}
+  \begin{icmlauthorlist}
+    \icmlauthor{Anonymous Authors}{anon}
+  \end{icmlauthorlist}
+  \icmlaffiliation{anon}{Anonymous Institution}
+  \icmlcorrespondingauthor{Anonymous Authors}{anon@example.com}
+  \icmlkeywords{mechanistic interpretability, attention, key-value cache, activation patching, interventions, preregistration}
+  \vskip 0.3in
+]
+\printAffiliationsAndNotice{}
+
+\begin{abstract}
+\input{sections/est/abstract}
+\end{abstract}
+
+\input{sections/est/intro}
+\input{sections/est/method}
+\input{sections/est/results_read}
+\input{sections/est/results_mechanism}
+\input{sections/est/results_intervention}
+\input{sections/est/related}
+\input{sections/est/discussion}
+\input{sections/est/impact}
+
+\bibliography{references}
+\bibliographystyle{icml2026}
+
+\newpage
+\appendix
+\onecolumn
+\input{sections/est/app_version}
+\input{sections/appendix}
+
+\end{document}

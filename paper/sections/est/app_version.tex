@@ -1,0 +1,27 @@
+\section*{About this version of the main text}
+\addcontentsline{toc}{section}{About this version of the main text}
+The main text reports estimates, with intervals, curves and ranges over models; the appendix that follows gives every verdict. The appendix was written to accompany status marks in the main text, which this version does not print: \rsk{} marks a risky prediction (recorded probability of holding below 0.8), and in the verbatim accounts moved to the appendix (\cref{app:claim2-brief,app:law-brief}), whose marks ``are those of the main text'', an unmarked claim was preregistered in the final round and held. Where the appendix refers to the marks (\cref{app:crosswalk}; items 14 and 17 of \cref{app:decisions}) or quotes pre-written wording, the corresponding main-text sentence here states the estimate instead and claims no more. The preamble and item 12 of \cref{app:decisions} place the alternative tally in \cref{sec:discussion}; in this version it is given here. Item 13 describes the law paragraph of the other version; the one here gives the pooled estimates of the steering vectors in all three models, which include those of J-C1 (\cref{app:law-brief}). \Cref{tab:status} gives the tallies (the calibration summary of item 14). If the risky lines were independent, a risky tally as low as the observed \JxRiskyMetABCD{} of \JxRiskyVerdABCD{} or lower would have had probability \JxRiskyTailP{} under the recorded probabilities (post hoc; \cref{app:prereg-j}); under the stricter of two conflicting evaluability rules the risky tally is \JxRiskyMetABCDAlt{} of \JxRiskyVerdABCDAlt{} (expected \JxRiskyExpABCDAlt; \cref{app:decisions}).
+
+\begin{table}[!ht]
+  \centering
+  \caption{\textbf{How the predictions fared.} Final preregistration (stage 8), by the recorded probability of holding (replication: at least 0.9; extrapolation: at least 0.8; risky: less): held / with a verdict (expected: sum of the recorded probabilities); n.e.: not evaluable, not counted. Last row: the stage-9 note's lines.}
+  \label{tab:status}
+  \small\setlength{\tabcolsep}{5pt}
+  % "with a verdict" = met + not met, summed by TeX from the printed counts; expected in brackets.
+  \begin{tabular}{@{}lcccc@{}}
+    \toprule
+    Evidence (claim) & Replication & Extrapolation & Risky & n.e. \\
+    \midrule
+    Fresh stories (1) & \JbClassLMet/\the\numexpr\JbClassLMet+\JbClassLNotMet\relax{} (\JbClassLExp) & \JbClassMMet/\the\numexpr\JbClassMMet+\JbClassMNotMet\relax{} (\JbClassMExp) & \JxRiskyMetB/\JxRiskyVerdB{} (\JxRiskyExpB) & \JbCountNotEval \\
+    Passages (1) & \JaClassLMet/\the\numexpr\JaClassLMet+\JaClassLNotMet\relax{} (\JaClassLExp) & \JaClassMMet/\the\numexpr\JaClassMMet+\JaClassMNotMet\relax{} (\JaClassMExp) & \JxRiskyMetA/\JxRiskyVerdA{} (\JxRiskyExpA) & \JaCountNotEval \\
+    Mechanism (2) & \JdClassLMet/\the\numexpr\JdClassLMet+\JdClassLNotMet\relax{} (\JdClassLExp) & \JdClassMMet/\the\numexpr\JdClassMMet+\JdClassMNotMet\relax{} (\JdClassMExp) & \JxRiskyMetD/\JxRiskyVerdD{} (\JxRiskyExpD) & \JdCountNotEval \\
+    Channel-ratio law (3) & -- & \JcClassMMet/\the\numexpr\JcClassMMet+\JcClassMNotMet\relax{} (\JcClassMExp) & \JxRiskyMetC/\JxRiskyVerdC{} (\JxRiskyExpC) & \JcCountNotEval \\
+    \midrule
+    All & \JxClassLMetABCD/\JxClassLVerdABCD{} (\JxClassLExpABCD) & \JxClassMMetABCD/\JxClassMVerdABCD{} (\JxClassMExpABCD) & \JxRiskyMetABCD/\JxRiskyVerdABCD{} (\JxRiskyExpABCD) & \JxNotEvalABCD \\
+    \midrule
+    \multicolumn{3}{@{}l}{Measurement validity (fresh stories)} & \JxClassValMetABCD/\JxClassValVerdABCD{} (\JxClassValExpABCD) & \JbClassValNotEval \\
+    \midrule
+    Edit window (3; stage 9) & \multicolumn{3}{c}{\NqTotSupported/\NqTotLines{} lines supported (no probabilities)} & \NqTotNotEvaluable \\
+    \bottomrule
+  \end{tabular}
+\end{table}
